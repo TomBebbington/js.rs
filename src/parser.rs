@@ -268,7 +268,7 @@ impl Parser {
 			},
 			TOpenParen => {
 				let mut args = Vec::new();
-				let mut expect_comma_or_end = false;
+				let mut expect_comma_or_end = *self.tokens.get(self.pos + 1) == TCloseParen;
 				loop {
 					self.pos += 1;
 					let token = self.tokens.get(self.pos).clone();
