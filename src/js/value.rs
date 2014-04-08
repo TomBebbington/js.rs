@@ -172,6 +172,9 @@ impl json::ToJson for ValueData {
 			VBoolean(b) => json::Boolean(b),
 			VObject(ref obj) => {
 				let mut nobj = TreeMap::new();
+				for (k, v) in obj.borrow().iter() {
+					nobj.insert(k.clone(), v.borrow().to_json());
+				}
 				json::Object(~nobj)
 			},
 			VString(ref str) => json::String(str.to_owned()),
