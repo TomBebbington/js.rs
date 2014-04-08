@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/TopHattedCoder/rust_js.svg?branch=master)](https://travis-ci.org/TopHattedCoder/rust_js)
 This is a generic JS parser and interpreter written in Rust. Currently, it has very, very limited support for the JS language.
 
 Supported features
