@@ -4,5 +4,4 @@ before_install:
 install:
   - sudo apt-get install rust-nightly
 script:
-  - rustc src/lib.rs
-  - rustc src/interactive.rs
+  - make all
