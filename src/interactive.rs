@@ -16,8 +16,8 @@ fn main() {
 		let result_e = parser.parse_all().v_unwrap();
 		let result = engine.run(result_e);
 		match result {
-			Ok(v) => print!("{}", v),
-			Err(v) => print!("Error: {}", v)
+			Ok(v) => print!("{}", v.borrow()),
+			Err(v) => print!("Error: {}", v.borrow())
 		}
 		print!("\n> ");
 	}

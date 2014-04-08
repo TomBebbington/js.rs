@@ -6,9 +6,7 @@ extern crate collections;
 use rust_js::lexer::Lexer;
 use rust_js::parser::{Parser, VerboseResult};
 use rust_js::exec::{Executor, Interpreter};
-use rust_js::js::value::*;
-use collections::TreeMap;
-use std::fmt::Show;
+use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString};
 
 fn run(script:&str) -> Value {
 	let mut lexer = Lexer::new();
@@ -16,23 +14,17 @@ fn run(script:&str) -> Value {
 	let mut parser = Parser::new(lexer.tokens);
 	let result = parser.parse_all().v_unwrap();
 	let mut engine : ~Interpreter = Executor::new();
-	let result = engine.run(result);
-	println!("Result: {}", result);
+	let result : Result<Value, Value> = engine.run(result);
 	return result.unwrap();
 }
-fn assert_eq<T:Show + Eq>(a:T, b:T) -> () {
-	if a != b {
-		fail!("Expected {}, got {}", a, b);
+fn assert_eq(a:ValueData, b:Value) -> () {
+	if a != *b.borrow() {
+		fail!("Expected {}, got {}", a, b.borrow());
 	}
 }
 #[test]
 fn test_array_comma() {
-	let mut map = ~TreeMap::new();
-	map.insert(~"0", VNull);
-	map.insert(~"1", VString(~"home"));
-	map.insert(~"2", VNull);
-	map.insert(~"3", VString(~"school"));
-	assert_eq(VObject(map), run("[ , 'home', , 'school']"));
+	assert_eq(VNull, run("[ , 'home', , 'school'][0]"));
 }
 #[test]
 fn test_escape() {

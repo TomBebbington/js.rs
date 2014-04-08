@@ -5,6 +5,7 @@ use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::f64;
 use std::gc::Gc;
+use std::cell::{RefCell, Ref};
 use js::{console, math, object, array, function, json};
 /// An execution engine
 pub trait Executor {
@@ -28,7 +29,7 @@ pub struct Interpreter {
 }
 impl Executor for Interpreter {
 	fn new() -> ~Interpreter {
-		let mut globals = TreeMap::new();
+		let mut globals : ObjectData = TreeMap::new();
 		globals.swap(~"NaN", Gc::new(VNumber(f64::NAN)));
 		globals.swap(~"Infinity", Gc::new(VNumber(f64::INFINITY)));
 		globals.swap(~"console", console::_create());
@@ -72,13 +73,13 @@ impl Executor for Interpreter {
 				Some(v) => v.clone()
 			}),
 			GetConstFieldExpr(ref obj, ref field) => {
-				let val_obj = try!(self.run(*obj)).borrow();
-				Ok(val_obj.get_field(*field))
+				let val_obj = try!(self.run(*obj));
+				Ok(val_obj.borrow().get_field(field.clone()))
 			},
 			GetFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
 				let val_field = try!(self.run(*field));
-				Ok(val_obj[val_field])
+				Ok(val_obj.borrow().get_field(val_field.borrow().to_str()))
 			},
 			CallExpr(ref callee, ref args) => {
 				let func = try!(self.run(callee.clone()));
@@ -87,7 +88,7 @@ impl Executor for Interpreter {
 					v_args.push(try!(self.run(*arg)));
 				}
 				Ok(match *func.borrow() {
-					VFunction(ref func) => func.call(Gc::new(VObject(self.globals.clone())), Gc::new(VNull), v_args).unwrap(),
+					VFunction(ref func) => func.borrow().call(Gc::new(VObject(RefCell::new(self.globals.clone()))), Gc::new(VNull), v_args).unwrap(),
 					_ => Gc::new(VUndefined)
 				})
 			},
@@ -113,13 +114,13 @@ impl Executor for Interpreter {
 				})
 			},
 			SwitchExpr(ref val_e, ref vals, ref default) => {
-				let val = try!(self.run(*val_e)).borrow();
+				let val = try!(self.run(*val_e)).borrow().clone();
 				let mut result = Gc::new(VNull);
 				let mut matched = false;
 				for tup in vals.iter() {
 					let tup:&(~Expr, Vec<~Expr>) = tup;
 					match *tup {
-						(ref cond, ref block) if(val == try!(self.run(*cond)).borrow()) => {
+						(ref cond, ref block) if(val == *try!(self.run(*cond)).borrow()) => {
 							matched = true;
 							let last_expr = block.last().unwrap();
 							for expr in block.iter() {
@@ -143,7 +144,7 @@ impl Executor for Interpreter {
 					obj.insert(key.clone(), try!(self.run(val.clone())));
 				}
 				obj.swap(~"__proto__", self.globals.find(&~"Object").unwrap().clone());
-				Ok(VObject(obj))
+				Ok(Gc::new(VObject(RefCell::new(obj))))
 			},
 			ArrayDeclExpr(ref arr) => {
 				let mut arr_map = TreeMap::new();
@@ -154,38 +155,37 @@ impl Executor for Interpreter {
 					index += 1;
 				}
 				arr_map.swap(~"__proto__", self.globals.find(&~"Array").unwrap().clone());
-				Ok(VObject(arr_map))
+				Ok(Gc::new(VObject(RefCell::new(arr_map))))
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {
 				println!("Name: {}, args: {}, expr: {}", name, args, expr);
-				Ok(VNull)
+				Ok(Gc::new(VNull))
 			},
 			NumOpExpr(ref op, ref a, ref b) => {
-				let v_a = try!(self.run(*a));
-				let v_b = try!(self.run(*b));
-				Ok(match *op {
+				let v_a = try!(self.run(*a)).borrow().clone();
+				let v_b = try!(self.run(*b)).borrow().clone();
+				Ok(Gc::new(match *op {
 					OpAdd => v_a + v_b,
 					OpSub => v_a - v_b,
 					OpMul => v_a * v_b,
 					OpDiv => v_a / v_b,
 					OpAnd => v_a & v_b,
 					OpOr => v_a | v_b,
-				})
+				}))
 			},
 			ConstructExpr(ref func, ref args) => {
-				Ok(VNull)
+				Ok(Gc::new(VNull))
 			},
 			ReturnExpr(ref ret) => {
-				let v_ret = try!(self.run(ret.clone().unwrap())).borrow();
-				println!("Return {}", v_ret);
-				Ok(VNull)
+				let v_ret = try!(self.run(ret.clone().unwrap()));
+				Ok(Gc::new(VNull))
 			},
 			ThrowExpr(ref ex) => Err(try!(self.run(*ex))),
 			AssignExpr(ref ref_e, ref val_e) => {
 				let val = try!(self.run(*val_e));
 				match **ref_e {
 					LocalExpr(ref name) => {
-						self.globals.insert(name.clone(), val.clone());
+						self.globals.insert(name.clone(), val);
 					},
 					_ => ()
 				}

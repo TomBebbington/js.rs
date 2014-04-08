@@ -6,14 +6,14 @@ use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
 use std::gc::Gc;
+use std::cell::RefCell;
 static PROTOTYPE : &'static str = "__proto__";
 #[must_use]
 pub type ResultValue = Result<Value, Value>;
-#[deriving(Clone, Eq)]
 pub type Value = Gc<ValueData>;
 #[deriving(Clone)]
 /// Represents a Javascript value at runtime
-enum ValueData {
+pub enum ValueData {
 	/// The null value
 	VNull,
 	/// The undefined value
@@ -27,9 +27,9 @@ enum ValueData {
 	/// An integer value
 	VInteger(i32),
 	/// A value that is an object
-	VObject(ObjectData),
+	VObject(RefCell<ObjectData>),
 	/// A value that is a function
-	VFunction(Function)
+	VFunction(RefCell<Function>)
 }
 impl ValueData {
 	/// Returns true if the value is undefined
@@ -99,33 +99,28 @@ impl ValueData {
 	}
 	/// Resolved the field in the value
 	pub fn get_field(&self, field:~str) -> Value {
-		let obj_data : &ObjectData = match *self {
-			VObject(ref obj) => obj,
-			VFunction(ref func) => &func.object,
+		let obj : ObjectData = match *self {
+			VObject(ref obj) => obj.borrow().clone(),
+			VFunction(ref func) => func.borrow().clone().object,
 			_ => return Gc::new(VUndefined)
 		};
-		let mut curr = obj_data;
-		loop {
-			match curr.find(&field) {
-				Some(val) => return val.clone(),
-				None => match curr.find(&PROTOTYPE.to_owned()) {
-					Some(val) => match *val.borrow() {
-						VObject(ref obj) => curr = obj,
-						_ => ()
-					},
-					_ => return Gc::new(VUndefined)
-				}
+		match obj.find(&field) {
+			Some(val) => *val,
+			None => match obj.find(&PROTOTYPE.to_owned()) {
+				Some(val) => 
+					val.borrow().get_field(field),
+				None => Gc::new(VUndefined)
 			}
 		}
 	}
 	/// Set the field in the value
-	pub fn set_field(&mut self, field:~str, val:Value) -> Value {
+	pub fn set_field(&self, field:~str, val:Value) -> Value {
 		match *self {
-			VObject(ref mut obj) => {
-				obj.swap(field, val.clone());
+			VObject(ref obj) => {
+				obj.borrow_mut().swap(field, val.clone());
 			},
-			VFunction(ref mut func) => {
-				func.object.swap(field, val.clone());
+			VFunction(ref func) => {
+				func.borrow_mut().object.swap(field, val.clone());
 			},
 			_ => ()
 		}
@@ -140,7 +135,7 @@ impl fmt::Show for ValueData {
 			VBoolean(v) => write!(f.buf, "{}", v),
 			VString(ref v) => write!(f.buf, "{}", v),
 			VNumber(v) => write!(f.buf, "{}", v),
-			VObject(ref v) => write!(f.buf, "{}", v),
+			VObject(ref v) => write!(f.buf, "{}", v.borrow().deref()),
 			VInteger(v) => write!(f.buf, "{}", v),
 			VFunction(ref v) => write!(f.buf, "function ...")
 		}
@@ -148,19 +143,19 @@ impl fmt::Show for ValueData {
 }
 impl Eq for ValueData {
 	fn eq(&self, other:&ValueData) -> bool {
-		match (*self, *other) {
+		match (self.clone(), other.clone()) {
 			(VNull, VNull) | (VUndefined, VUndefined) => true,
 			(VBoolean(a), VBoolean(b)) if a == b => true,
-			(VString(a), VString(b)) if a == b => true,
+			(VString(ref a), VString(ref b)) if a == b => true,
 			(VNumber(a), VNumber(b)) if a == b => true,
-			(VObject(a), VObject(b)) if a == b => true,
+			(VObject(ref a), VObject(ref b)) if self == other => true,
 			(VInteger(a), VInteger(b)) if a == b => true,
-			(VFunction(a), VFunction(b)) if a == b => true,
+			(VFunction(ref a), VFunction(ref b)) if self == other => true,
 			_ => false
 		}
 	}
 }
-impl json::ToJson for Value {
+impl json::ToJson for ValueData {
 	fn to_json( &self ) -> json::Json {
 		match *self {
 			VNull | VUndefined => json::Null,
@@ -176,66 +171,61 @@ impl json::ToJson for Value {
 		}
 	}
 }
-impl Add<Value, Value> for Value {
-	fn add(&self, other:&Value) -> Value {
+impl Add<ValueData, ValueData> for ValueData {
+	fn add(&self, other:&ValueData) -> ValueData {
 		return match (self.clone(), other.clone()) {
 			(VString(s), other) | (other, VString(s)) => VString(s.to_owned() + other.to_str()),
 			(_, _) => VNumber(self.to_num() + other.to_num())
 		}
 	}
 }
-impl Sub<Value, Value> for Value {
-	fn sub(&self, other:&Value) -> Value {
+impl Sub<ValueData, ValueData> for ValueData {
+	fn sub(&self, other:&ValueData) -> ValueData {
 		return VNumber(self.to_num() - other.to_num());
 	}
 }
-impl Mul<Value, Value> for Value {
-	fn mul(&self, other:&Value) -> Value {
+impl Mul<ValueData, ValueData> for ValueData {
+	fn mul(&self, other:&ValueData) -> ValueData {
 		return VNumber(self.to_num() * other.to_num());
 	}
 }
-impl Div<Value, Value> for Value {
-	fn div(&self, other:&Value) -> Value {
+impl Div<ValueData, ValueData> for ValueData {
+	fn div(&self, other:&ValueData) -> ValueData {
 		return VNumber(self.to_num() / other.to_num());
 	}
 }
-impl Rem<Value, Value> for Value {
-	fn rem(&self, other:&Value) -> Value {
+impl Rem<ValueData, ValueData> for ValueData {
+	fn rem(&self, other:&ValueData) -> ValueData {
 		return VNumber(self.to_num() % other.to_num());
 	}
 }
-impl BitAnd<Value, Value> for Value {
-	fn bitand(&self, other:&Value) -> Value {
+impl BitAnd<ValueData, ValueData> for ValueData {
+	fn bitand(&self, other:&ValueData) -> ValueData {
 		return VInteger(self.to_int() & other.to_int());
 	}
 }
-impl BitOr<Value, Value> for Value {
-	fn bitor(&self, other:&Value) -> Value {
+impl BitOr<ValueData, ValueData> for ValueData {
+	fn bitor(&self, other:&ValueData) -> ValueData {
 		return VInteger(self.to_int() | other.to_int());
 	}
 }
-impl BitXor<Value, Value> for Value {
-	fn bitxor(&self, other:&Value) -> Value {
+impl BitXor<ValueData, ValueData> for ValueData {
+	fn bitxor(&self, other:&ValueData) -> ValueData {
 		return VInteger(self.to_int() ^ other.to_int());
 	}
 }
-impl Shl<Value, Value> for Value {
-	fn shl(&self, other:&Value) -> Value {
+impl Shl<ValueData, ValueData> for ValueData {
+	fn shl(&self, other:&ValueData) -> ValueData {
 		return VInteger(self.to_int() << other.to_int());
 	}
 }
-impl Shr<Value, Value> for Value {
-	fn shr(&self, other:&Value) -> Value {
+impl Shr<ValueData, ValueData> for ValueData {
+	fn shr(&self, other:&ValueData) -> ValueData {
 		return VInteger(self.to_int() >> other.to_int());
 	}
 }
-impl Not<Value> for Value {
-	fn not(&self) -> Value {
+impl Not<ValueData> for ValueData {
+	fn not(&self) -> ValueData {
 		return VInteger(!self.to_int());
-	}
-}
-impl Index<Value, Value> for Value {
-	fn index(&self, other:&Value) -> Value {
-		return self.get_field(other.to_str());
 	}
 }

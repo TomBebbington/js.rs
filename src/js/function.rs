@@ -2,6 +2,7 @@ use collections::treemap::TreeMap;
 use js::object::ObjectData;
 use js::value::{Value, VFunction, VInteger, VObject, ResultValue};
 use std::gc::Gc;
+use std::cell::RefCell;
 type FunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
 /// Represents a Javascript function in-memory
 pub struct Function {
@@ -16,7 +17,7 @@ impl Function {
 	/// Make a new function with the given function data
 	pub fn new(data : FunctionData, nargs: uint) -> Function {
 		let mut obj = TreeMap::new();
-		obj.insert(~"arguments", VInteger(nargs as i32));
+		obj.insert(~"arguments", Gc::new(VInteger(nargs as i32)));
 		Function {object: obj, data: data, nargs: nargs}
 	}
 	/// Call a function with some arguments
@@ -38,5 +39,5 @@ impl Clone for Function {
 /// Create a new 'Function' object
 pub fn _create() -> Value {
 	let mut function = TreeMap::new();
-	VObject(Gc::new(function))
+	Gc::new(VObject(RefCell::new(function)))
 }
