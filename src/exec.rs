@@ -5,7 +5,7 @@ use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::f64;
 use std::gc::Gc;
-use std::cell::{RefCell, Ref};
+use std::cell::RefCell;
 use js::{console, math, object, array, function, json};
 /// An execution engine
 pub trait Executor {

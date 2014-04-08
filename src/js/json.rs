@@ -1,10 +1,10 @@
 use js::function::{NativeFunc, NativeFunction};
 use js::value::{Value, VObject, VString, VFunction, ResultValue};
 use collections::treemap::TreeMap;
-use serialize::json::ToJson;
+use serialize::json::{ToJson, Decoder, from_str};
 use std::gc::Gc;
 use std::cell::RefCell;
-/// Turn an object into a string
+/// Turn a Javascript object into a JSON string
 pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
 	let json = (obj.borrow() as &ToJson).to_json();
