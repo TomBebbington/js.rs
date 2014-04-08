@@ -19,7 +19,7 @@ impl fmt::Show for ParseError {
 				try!(write!(f.buf, "Expected "));
 				let last = wanted.last().unwrap();
 				for wanted_token in wanted.iter() {
-					match write!(f.buf, "{}{}", wanted_token, if wanted_token == last {""} else {", "}) {
+					match write!(f.buf, "'{}'{}", wanted_token, if wanted_token == last {""} else {", "}) {
 						Err(err) => return Err(err),
 						Ok(_) => ()
 					}
@@ -270,18 +270,20 @@ impl Parser {
 				let mut args = Vec::new();
 				let mut expect_comma_or_end = false;
 				loop {
-					let token = self.tokens.get(self.pos).clone();
 					self.pos += 1;
-					match token {
-						TCloseParen if expect_comma_or_end => break,
-						TComma if expect_comma_or_end => expect_comma_or_end = false,
-						_ if expect_comma_or_end =>
-							return Err(Expected(vec!(TComma, TCloseParen), token)),
-						_ if !expect_comma_or_end => {
-							args.push(try!(self.parse()));
-							expect_comma_or_end = true;
-						},
-						_ => ()
+					let token = self.tokens.get(self.pos).clone();
+					if token == TCloseParen && expect_comma_or_end {
+						self.pos += 1;
+						break;
+					} else if token == TComma && expect_comma_or_end {
+						expect_comma_or_end = false;
+					} else if expect_comma_or_end {
+						return Err(Expected(vec!(TComma, TCloseParen), token));
+					} else {
+						let parsed = try!(self.parse());
+						self.pos -= 1;
+						args.push(parsed);
+						expect_comma_or_end = true;
 					}
 				}
 				result = ~CallExpr(expr, args);
