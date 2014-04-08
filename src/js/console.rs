@@ -1,7 +1,7 @@
-use js::function::Function;
-use collections::treemap::TreeMap;
+use js::function::{NativeFunction, NativeFunc};
 use js::object::ObjectData;
 use js::value::{Value, ResultValue, VFunction, VUndefined, VObject};
+use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::cell::RefCell;
 use time::{now, strftime};
@@ -13,6 +13,6 @@ pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new 'console' object
 pub fn _create() -> Value {
 	let mut console = TreeMap::new();
-	console.insert(~"log", Gc::new(VFunction(RefCell::new(Function::new(log, 1)))));
+	console.insert(~"log", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(log, 1))))));
 	Gc::new(VObject(RefCell::new(console)))
 }

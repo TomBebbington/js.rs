@@ -1,8 +1,8 @@
 use js::value::{Value, VNumber, VInteger, VFunction, VObject, ResultValue};
-use js::function::Function;
-use std::io::stdio;
-use collections::treemap::TreeMap;
+use js::function::{NativeFunction, NativeFunc};
 use js::object::ObjectData;
+use collections::treemap::TreeMap;
+use std::io::stdio;
 use std::f64;
 use std::gc::Gc;
 use std::cell::RefCell;
@@ -106,16 +106,16 @@ pub fn _create() -> Value {
 	math.insert(~"SQRT1_2", Gc::new(VNumber(0.5f64.sqrt())));
 	math.insert(~"SQRT2", Gc::new(VNumber(f64::consts::SQRT2)));
 	math.insert(~"PI", Gc::new(VNumber(f64::consts::PI)));
-	math.insert(~"abs", Gc::new(VFunction(RefCell::new(Function::new(abs, 1)))));
-	math.insert(~"acos", Gc::new(VFunction(RefCell::new(Function::new(acos, 1)))));
-	math.insert(~"asin", Gc::new(VFunction(RefCell::new(Function::new(asin, 1)))));
-	math.insert(~"atan", Gc::new(VFunction(RefCell::new(Function::new(atan, 1)))));
-	math.insert(~"atan2", Gc::new(VFunction(RefCell::new(Function::new(atan2, 2)))));
-	math.insert(~"cbrt", Gc::new(VFunction(RefCell::new(Function::new(cbrt, 1)))));
-	math.insert(~"ceil", Gc::new(VFunction(RefCell::new(Function::new(ceil, 1)))));
-	math.insert(~"cos", Gc::new(VFunction(RefCell::new(Function::new(cos, 1)))));
-	math.insert(~"floor", Gc::new(VFunction(RefCell::new(Function::new(floor, 1)))));
-	math.insert(~"sin", Gc::new(VFunction(RefCell::new(Function::new(sin, 1)))));
-	math.insert(~"tan", Gc::new(VFunction(RefCell::new(Function::new(tan, 1)))));
+	math.insert(~"abs", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(abs, 1))))));
+	math.insert(~"acos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(acos, 1))))));
+	math.insert(~"asin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(asin, 1))))));
+	math.insert(~"atan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(atan, 1))))));
+	math.insert(~"atan2", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(atan2, 2))))));
+	math.insert(~"cbrt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cbrt, 1))))));
+	math.insert(~"ceil", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(ceil, 1))))));
+	math.insert(~"cos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cos, 1))))));
+	math.insert(~"floor", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(floor, 1))))));
+	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
+	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
 	Gc::new(VObject(RefCell::new(math)))
 }

@@ -1,5 +1,5 @@
 use collections::treemap::TreeMap;
-use js::function::Function;
+use js::function::{NativeFunc, NativeFunction};
 use js::value::{Value, VFunction, VUndefined, VInteger, ResultValue};
 use std::gc::Gc;
 use std::cell::RefCell;
@@ -12,6 +12,6 @@ pub fn make_array(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Object' object
 pub fn _create() -> Value {
-	let mut func = Function::new(make_array, 0);
-	Gc::new(VFunction(RefCell::new(func)))
+	let mut func = NativeFunction::new(make_array, 0);
+	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
 }

@@ -1,39 +1,66 @@
-use collections::treemap::TreeMap;
 use js::object::ObjectData;
 use js::value::{Value, VFunction, VInteger, VObject, ResultValue};
+use ast::Expr;
+use collections::treemap::TreeMap;
 use std::gc::Gc;
+use exec::Executor;
 use std::cell::RefCell;
-type FunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
-/// Represents a Javascript function in-memory
-pub struct Function {
+type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
+#[deriving(Clone)]
+/// A Javascript function
+pub enum Function {
+	/// A native javascript function
+	NativeFunc(NativeFunction),
+	/// A regular javascript function
+	RegularFunc(RegularFunction)
+}
+impl Function {
+	/// Call a function with some arguments
+	pub fn call(&self, exe:&mut Executor, this:Value, callee:Value, args:Vec<Value>) -> ResultValue {
+		match *self {
+			NativeFunc(ref ntv) => {
+				let func = ntv.data;
+				func(this, callee, args)
+			}, RegularFunc(ref data) => {
+				exe.run(&data.expr)
+			}
+		}
+	}
+}
+#[deriving(Clone)]
+/// Represents a regular javascript function in memory
+pub struct RegularFunction {
+	/// The fields associated with the function
+	pub object : ObjectData,
+	/// This function's expression
+	pub expr : Expr,
+	/// The arguments
+	pub args : Vec<~str>
+}
+impl RegularFunction {
+	/// Make a new regular function
+	pub fn new(expr : Expr, args: Vec<~str>) -> RegularFunction {
+		let mut obj = TreeMap::new();
+		obj.insert(~"arguments", Gc::new(VInteger(args.len() as i32)));
+		RegularFunction {object: obj, expr: expr, args: args}
+	}
+}
+#[deriving(Clone)]
+/// Represents a native javascript function in memory
+pub struct NativeFunction {
 	/// The fields associated with the function
 	pub object : ObjectData,
 	/// The callable function data
-	pub data: FunctionData,
+	pub data: NativeFunctionData,
 	/// The number of arguments
 	pub nargs: uint
 }
-impl Function {
-	/// Make a new function with the given function data
-	pub fn new(data : FunctionData, nargs: uint) -> Function {
+impl NativeFunction {
+	/// Make a new native function with the given function data
+	pub fn new(data : NativeFunctionData, nargs: uint) -> NativeFunction {
 		let mut obj = TreeMap::new();
 		obj.insert(~"arguments", Gc::new(VInteger(nargs as i32)));
-		Function {object: obj, data: data, nargs: nargs}
-	}
-	/// Call a function with some arguments
-	pub fn call(&self, this:Value, callee:Value, args:Vec<Value>) -> ResultValue {
-		let func = self.data;
-		func(this, callee, args)
-	}
-}
-impl Eq for Function {
-	fn eq(&self, b : &Function) -> bool {
-		self == b
-	}
-}
-impl Clone for Function {
-	fn clone(&self) -> Function {
-		Function{ object: self.object.clone(), data: self.data.clone(), nargs: self.nargs}
+		NativeFunction {object: obj, data: data, nargs: nargs}
 	}
 }
 /// Create a new 'Function' object

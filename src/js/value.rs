@@ -1,5 +1,5 @@
 use js::object::ObjectData;
-use js::function::Function;
+use js::function::{Function, NativeFunc, RegularFunc};
 use collections::TreeMap;
 use serialize::json;
 use std::fmt;
@@ -101,7 +101,13 @@ impl ValueData {
 	pub fn get_field(&self, field:~str) -> Value {
 		let obj : ObjectData = match *self {
 			VObject(ref obj) => obj.borrow().clone(),
-			VFunction(ref func) => func.borrow().clone().object,
+			VFunction(ref func) => {
+				let func = func.borrow().clone();
+				match func {
+					NativeFunc(f) => f.object.clone(),
+					RegularFunc(f) => f.object.clone()
+				}
+			},
 			_ => return Gc::new(VUndefined)
 		};
 		match obj.find(&field) {
@@ -117,10 +123,14 @@ impl ValueData {
 	pub fn set_field(&self, field:~str, val:Value) -> Value {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().swap(field, val.clone());
+				obj.borrow_mut().swap(field, val);
 			},
 			VFunction(ref func) => {
-				func.borrow_mut().object.swap(field, val.clone());
+				let mut func = func.borrow_mut().clone();
+				match func {
+					NativeFunc(ref mut f) => f.object.swap(field, val),
+					RegularFunc(ref mut f) => f.object.swap(field, val)
+				};
 			},
 			_ => ()
 		}

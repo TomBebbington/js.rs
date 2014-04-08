@@ -88,7 +88,10 @@ impl Executor for Interpreter {
 					v_args.push(try!(self.run(*arg)));
 				}
 				Ok(match *func.borrow() {
-					VFunction(ref func) => func.borrow().call(Gc::new(VObject(RefCell::new(self.globals.clone()))), Gc::new(VNull), v_args).unwrap(),
+					VFunction(ref func) => {
+						let globals = self.globals.clone();
+						func.borrow().call(self, Gc::new(VObject(RefCell::new(globals))), Gc::new(VNull), v_args).unwrap()
+					},
 					_ => Gc::new(VUndefined)
 				})
 			},

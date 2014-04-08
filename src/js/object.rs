@@ -1,5 +1,5 @@
 use collections::treemap::TreeMap;
-use js::function::Function;
+use js::function::{NativeFunc, NativeFunction};
 use js::value::{ValueData, Value, VFunction, VUndefined, VObject, VInteger, ResultValue};
 use std::gc::Gc;
 use std::cell::RefCell;
@@ -34,11 +34,11 @@ pub fn set_proto_of(_:Value, _:Value, mut args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Object' object
 pub fn _create() -> Value {
-	let mut func = Function::new(make_object, 0);
+	let mut func = NativeFunction::new(make_object, 0);
 	let mut prototype : ObjectData = TreeMap::new();
 	func.object.swap(~"length", Gc::new(VInteger(1)));
 	func.object.swap(~"prototype", Gc::new(VObject(RefCell::new(prototype))));
-	func.object.swap(~"setPrototypeOf", Gc::new(VFunction(RefCell::new(Function::new(set_proto_of, 2)))));
-	func.object.swap(~"getPrototypeOf", Gc::new(VFunction(RefCell::new((Function::new(get_proto_of, 1))))));
-	Gc::new(VFunction(RefCell::new(func)))
+	func.object.swap(~"setPrototypeOf", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(set_proto_of, 2))))));
+	func.object.swap(~"getPrototypeOf", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(get_proto_of, 1))))));
+	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
 }
