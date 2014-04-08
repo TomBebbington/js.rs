@@ -72,6 +72,14 @@ pub fn cos(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		f64::NAN
 	})))
 }
+/// Get the power to raise the natural logarithm to get the number
+pub fn exp(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	Ok(Gc::new(VNumber(if args.len() >= 1 {
+		args.get(0).borrow().to_num().exp()
+	} else {
+		f64::NAN
+	})))
+}
 /// Get the highest integer below a number
 pub fn floor(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(if args.len() >= 1 {
@@ -119,6 +127,7 @@ pub fn _create() -> Value {
 	math.insert(~"cbrt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cbrt, 1))))));
 	math.insert(~"ceil", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(ceil, 1))))));
 	math.insert(~"cos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cos, 1))))));
+	math.insert(~"exp", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(exp, 1))))));
 	math.insert(~"floor", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(floor, 1))))));
 	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
 	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
