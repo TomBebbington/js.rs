@@ -2,6 +2,7 @@ use js::value::{Value, VNumber, VInteger, VFunction, VObject, ResultValue};
 use js::function::{NativeFunction, NativeFunc};
 use js::object::ObjectData;
 use collections::treemap::TreeMap;
+use rand::random;
 use std::io::stdio;
 use std::f64;
 use std::gc::Gc;
@@ -79,6 +80,10 @@ pub fn floor(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		f64::NAN
 	})))
 }
+/// Generate a random floating-point number between 0 and 1
+pub fn _random(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	Ok(Gc::new(VNumber(random())))
+}
 /// Get the sine of a number
 pub fn sin(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(if args.len() >= 1 {
@@ -115,6 +120,7 @@ pub fn _create() -> Value {
 	math.insert(~"ceil", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(ceil, 1))))));
 	math.insert(~"cos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cos, 1))))));
 	math.insert(~"floor", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(floor, 1))))));
+	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
 	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
 	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
 	Gc::new(VObject(RefCell::new(math)))
