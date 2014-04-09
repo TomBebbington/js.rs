@@ -1,7 +1,7 @@
 use ast::{Token, Expr};
-use ast::{BlockExpr, ConstExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr};
+use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;

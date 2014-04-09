@@ -4,7 +4,7 @@ use std::char::from_u32;
 use std::num::FromStrRadix;
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
-use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
+use ast::{BitAnd, BitOr, BitXor};
 use ast::Token;
 use std::io::{IoResult, EndOfFile};
 #[deriving(Clone)]
