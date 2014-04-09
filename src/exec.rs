@@ -16,7 +16,7 @@ pub trait Executor {
 	/// Makes a new execution engine
 	fn new() -> ~Self;
 	/// Sets a global variable
-	fn set_global(&mut self, name:~str, val:Value) -> ();
+	fn set_global(&mut self, name:~str, val:Value) -> Value;
 	/// Gets a global variable
 	fn get_global(&self, name:~str) -> Value;
 	/// Make a new scope
@@ -28,8 +28,8 @@ pub trait Executor {
 }
 /// An intepreter
 pub struct Interpreter {
-	/// A hash map representing the global variables
-	globals: ObjectData,
+	/// An object representing the global variables
+	global: Value,
 	/// The scopes
 	scopes: Vec<Gc<RefCell<ObjectData>>>,
 }
@@ -44,16 +44,13 @@ impl Executor for Interpreter {
 		globals.swap(~"Array", array::_create());
 		globals.swap(~"Function", function::_create());
 		globals.swap(~"JSON", json::_create());
-		return ~Interpreter {globals: globals, scopes: Vec::new()};
+		return ~Interpreter {global: Gc::new(VObject(RefCell::new(globals))), scopes: Vec::new()};
 	}
-	fn set_global(&mut self, name:~str, val:Value) {
-		self.globals.swap(name, val);
+	fn set_global(&mut self, name:~str, val:Value) -> Value {
+		self.global.borrow().set_field(name, val)
 	}
 	fn get_global(&self, name:~str) -> Value {
-		match self.globals.find(&name) {
-			None => Gc::new(VUndefined),
-			Some(ref g) => **g
-		}
+		self.global.borrow().get_field(name)
 	}
 	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>> {
 		let mut data = TreeMap::new();
@@ -95,10 +92,7 @@ impl Executor for Interpreter {
 					}
 				}
 				Ok(if value.borrow() == &VUndefined {
-					match self.globals.find(name) {
-						None => Gc::new(VUndefined),
-						Some(v) => v.clone()
-					}
+					self.global.borrow().get_field(name.clone())
 				} else {
 					value
 				})
@@ -113,6 +107,7 @@ impl Executor for Interpreter {
 				Ok(val_obj.borrow().get_field(val_field.borrow().to_str()))
 			},
 			CallExpr(ref callee, ref args) => {
+				let mut this = self.global.clone();
 				let func = try!(self.run(callee.clone()));
 				let mut v_args = Vec::with_capacity(args.len());
 				for arg in args.iter() {
@@ -120,8 +115,7 @@ impl Executor for Interpreter {
 				}
 				Ok(match *func.borrow() {
 					VFunction(ref func) => {
-						let globals = self.globals.clone();
-						func.borrow().call(self, Gc::new(VObject(RefCell::new(globals))), Gc::new(VNull), v_args).unwrap()
+						func.borrow().call(self, this, Gc::new(VNull), v_args).unwrap()
 					},
 					_ => Gc::new(VUndefined)
 				})
@@ -195,7 +189,7 @@ impl Executor for Interpreter {
 				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));
 				let val = Gc::new(VFunction(RefCell::new(function)));
 				if name.is_some() {
-					self.globals.swap(name.clone().unwrap(), val);
+					self.global.borrow().set_field(name.clone().unwrap(), val);
 				}
 				Ok(val)
 			},
@@ -249,7 +243,7 @@ impl Executor for Interpreter {
 				let val = try!(self.run(*val_e));
 				match **ref_e {
 					LocalExpr(ref name) => {
-						self.globals.insert(name.clone(), val);
+						self.global.borrow().set_field(name.clone(), val);
 					},
 					GetConstFieldExpr(ref obj, ref field) => {
 						let val_obj = try!(self.run(*obj));
