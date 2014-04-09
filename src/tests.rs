@@ -53,3 +53,7 @@ fn test_function() {
 fn test_constructor() {
 	assert_eq(VString(~"Hello"), run("function Text(phrase) { this.phrase = phrase; }; text = new Text('Hello'); text.phrase"));
 }
+#[test]
+fn test_json() {
+	assert_eq(VNumber(~"42"), run("JSON.parse(JSON.stringify({num: 42})).num"))
+}

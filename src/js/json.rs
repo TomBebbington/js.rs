@@ -1,9 +1,20 @@
 use js::function::{NativeFunc, NativeFunction};
-use js::value::{Value, VObject, VString, VFunction, ResultValue};
+use js::value::{Value, ValueData, VObject, VString, VFunction, ResultValue};
 use collections::treemap::TreeMap;
-use serialize::json::ToJson;
+use serialize::json::{ToJson, from_str};
 use std::gc::Gc;
 use std::cell::RefCell;
+/// Turn a JSON string back into a Javascript object
+pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	match from_str(args.get(0).borrow().to_str()) {
+		Ok(json) => {
+			Ok(Gc::new(ValueData::from_json(json)))
+		},
+		Err(err) => {
+			Err(Gc::new(VString(err.to_str())))
+		}
+	}
+}
 /// Turn a Javascript object into a JSON string
 pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
@@ -14,5 +25,6 @@ pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 pub fn _create() -> Value {
 	let mut obj = TreeMap::new();
 	obj.insert(~"stringify", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(stringify, 1))))));
+	obj.insert(~"parse", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse, 1))))));
 	Gc::new(VObject(RefCell::new(obj)))
 }
