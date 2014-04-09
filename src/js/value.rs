@@ -177,7 +177,7 @@ impl fmt::Show for ValueData {
 					},
 					RegularFunc(rf) => {
 						try!(f.buf.write_str("function("));
-						try!(f.buf.write_str(rf.args.concat()));
+						try!(f.buf.write_str(rf.args.connect(", ")));
 						try!(f.buf.write_str(") "));
 						write!(f.buf, "{}", rf.expr)
 					}
