@@ -225,8 +225,11 @@ impl Executor for Interpreter {
 				Ok(Gc::new(VNull))
 			},
 			ReturnExpr(ref ret) => {
-				let v_ret = try!(self.run(ret.clone().unwrap()));
-				Ok(Gc::new(VNull))
+				match *ret {
+					Some(ref v) =>
+						self.run(v.clone()),
+					None => Ok(Gc::new(VUndefined))
+				}
 			},
 			ThrowExpr(ref ex) => Err(try!(self.run(*ex))),
 			AssignExpr(ref ref_e, ref val_e) => {
