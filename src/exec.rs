@@ -87,7 +87,6 @@ impl Executor for Interpreter {
 			LocalExpr(ref name) => {
 				let mut value = Gc::new(VUndefined);
 				for scope in self.scopes.iter().rev() {
-					println!("Searching {} for {}", scope.borrow().borrow().deref(), name.clone());
 					match scope.borrow().borrow().find(name) {
 						Some(v) => {
 							value = v.clone();
