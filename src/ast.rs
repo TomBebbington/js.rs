@@ -102,7 +102,13 @@ impl fmt::Show for Expr {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
 			ConstExpr(ref c) => write!(f.buf, "{}", c),
-			BlockExpr(ref block) => write!(f.buf, "{} {} {}", '{', block, '}'),
+			BlockExpr(ref block) => {
+				try!(f.buf.write_str("{"));
+				for expr in block.iter() {
+					try!(write!(f.buf, "{};", expr));
+				}
+				f.buf.write_str("}")
+			},
 			LocalExpr(ref s) => write!(f.buf, "{}", s),
 			GetConstFieldExpr(ref ex, ref field) => write!(f.buf, "{}.{}", ex, field),
 			GetFieldExpr(ref ex, ref field) => write!(f.buf, "{}[{}]", ex, field),
@@ -128,8 +134,17 @@ impl fmt::Show for Expr {
 impl fmt::Show for TreeMap<~str, ~Expr> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		try!(f.buf.write_str("{ "));
-		for (k, v) in self.iter() {
-			try!(write!(f.buf, "{} = {}\n", k, v));
+		match self.iter().last() {
+			Some((last_key, _)) => {
+				for (k, v) in self.iter() {
+					try!(write!(f.buf, "{}: {}", k, v));
+					if k == last_key {
+						try!(f.buf.write_str(","));
+					}
+					try!(f.buf.write_str("\n"));
+				}
+			},
+			None => ()
 		}
 		f.buf.write_str("}")
 	}
