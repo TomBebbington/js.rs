@@ -2,7 +2,6 @@
 #![crate_type = "lib"]
 #![comment = "Rust Javascript parsing and interpretation library"]
 #![license = "MIT"]
-#![feature(globs, macro_rules)]
 #![deny(deprecated_owned_vector)]
 #![deny(non_uppercase_statics)]
 #![deny(missing_doc)]

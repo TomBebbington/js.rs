@@ -1,6 +1,8 @@
-use ast::*;
+use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
+use ast::{OpSub, OpAdd, OpMul, OpDiv, OpAnd, OpOr};
 use js::value::{Value, VNull, VUndefined, VNumber, VString, VObject, VBoolean, VFunction, ResultValue};
-use js::object::*;
+use js::object::ObjectData;
 use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::f64;
