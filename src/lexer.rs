@@ -4,7 +4,7 @@ use std::char::from_u32;
 use std::num::FromStrRadix;
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
-use ast::{BitAnd, BitOr, BitXor, BitNot};
+use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::Token;
 use std::io::{IoResult, EndOfFile};
 #[deriving(Clone)]
@@ -188,6 +188,10 @@ impl Lexer {
 				'&' => {
 					self.clear_buffer();
 					self.tokens.push(TBitOp(BitAnd))
+				},
+				'^' => {
+					self.clear_buffer();
+					self.tokens.push(TBitOp(BitXor))
 				},
 				'=' => {
 					self.clear_buffer();

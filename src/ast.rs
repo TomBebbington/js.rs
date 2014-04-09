@@ -66,8 +66,6 @@ pub enum BitOp {
 	BitOr,
 	/// Bitwise xor
 	BitXor,
-	/// Bitwise invert
-	BitNot,
 	/// Bitwise shift left
 	BitShl,
 	/// Bitwise shift right
@@ -79,7 +77,6 @@ impl fmt::Show for BitOp {
 			BitAnd => "&",
 			BitOr => "|",
 			BitXor => "^",
-			BitNot => "~",
 			BitShl => "<<",
 			BitShr => ">>"
 		});
@@ -90,6 +87,8 @@ impl fmt::Show for BitOp {
 pub enum Expr {
 	/// Run a numeric operation on two numeric expressions
 	NumOpExpr(NumOp, ~Expr, ~Expr),
+	/// Run a bitwise operation on two numeric expressions
+	BitOpExpr(BitOp, ~Expr, ~Expr),
 	/// Make a simple value
 	ConstExpr(Const),
 	/// Run several expressions
@@ -148,6 +147,7 @@ impl fmt::Show for Expr {
 			ArrayDeclExpr(ref arr) => write!(f.buf, "{}", arr),
 			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f.buf, "function {}({}){}", name, args, expr),
 			NumOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
+			BitOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
 			ReturnExpr(Some(ref ex)) => write!(f.buf, "return {}", ex),
 			ReturnExpr(None) => f.buf.write_str("return"),
 			ThrowExpr(ref ex) => write!(f.buf, "throw {}", ex),

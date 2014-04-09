@@ -1,6 +1,7 @@
-use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, BitOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
+use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use js::value::{Value, VNull, VUndefined, VNumber, VString, VObject, VBoolean, VFunction, ResultValue};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
@@ -209,6 +210,17 @@ impl Executor for Interpreter {
 					OpMul => v_a * v_b,
 					OpDiv => v_a / v_b,
 					OpMod => v_a % v_b
+				}))
+			},
+			BitOpExpr(ref op, ref a, ref b) => {
+				let v_a = try!(self.run(*a)).borrow().clone();
+				let v_b = try!(self.run(*b)).borrow().clone();
+				Ok(Gc::new(match *op {
+					BitAnd => v_a & v_b,
+					BitOr => v_a | v_b,
+					BitXor => v_a ^ v_b,
+					BitShl => v_a << v_b,
+					BitShr => v_a >> v_b
 				}))
 			},
 			ConstructExpr(ref func, ref args) => {
