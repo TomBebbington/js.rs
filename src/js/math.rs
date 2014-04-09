@@ -136,6 +136,14 @@ pub fn sin(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		f64::NAN
 	})))
 }
+/// Get the square root of a number
+pub fn sqrt(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	Ok(Gc::new(VNumber(if args.len() >= 1 {
+		args.get(0).borrow().to_num().sqrt()
+	} else {
+		f64::NAN
+	})))
+}
 /// Get the tangent of a number
 pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(if args.len() >= 1 {
@@ -171,6 +179,7 @@ pub fn _create() -> Value {
 	math.insert(~"pow", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(pow, 2))))));
 	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
 	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
+	math.insert(~"sqrt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sqrt, 1))))));
 	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
 	Gc::new(VObject(RefCell::new(math)))
 }
