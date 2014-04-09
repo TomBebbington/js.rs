@@ -101,7 +101,12 @@ impl Lexer {
 						});
 					}
 				},
-				'"' | '\'' if self.string_start.is_some() => {
+				'"' if self.string_start.is_some() && self.string_start.unwrap() == DoubleQuote => {
+					self.string_start = None;
+					self.tokens.push(TString(self.string_buffer.clone()));
+					self.string_buffer.clear();
+				},
+				'\'' if self.string_start.is_some() && self.string_start.unwrap() == SingleQuote => {
 					self.string_start = None;
 					self.tokens.push(TString(self.string_buffer.clone()));
 					self.string_buffer.clear();
