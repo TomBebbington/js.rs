@@ -2,8 +2,9 @@ use std::io::{BufReader, BufferedReader, Reader};
 use std::str::{from_char, with_capacity};
 use std::char::from_u32;
 use std::num::FromStrRadix;
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp};
-use ast::{OpAdd, OpSub, OpMul, OpDiv, OpAnd, OpOr};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
+use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
+use ast::{BitAnd, BitOr, BitXor, BitNot};
 use ast::Token;
 use std::io::{IoResult, EndOfFile};
 #[deriving(Clone)]
@@ -176,13 +177,17 @@ impl Lexer {
 					self.clear_buffer();
 					self.tokens.push(TNumOp(OpSub))
 				},
-				'&' => {
+				'%' => {
 					self.clear_buffer();
-					self.tokens.push(TNumOp(OpAnd))
+					self.tokens.push(TNumOp(OpMod))
 				},
 				'|' => {
 					self.clear_buffer();
-					self.tokens.push(TNumOp(OpOr))
+					self.tokens.push(TBitOp(BitOr))
+				},
+				'&' => {
+					self.clear_buffer();
+					self.tokens.push(TBitOp(BitAnd))
 				},
 				'=' => {
 					self.clear_buffer();

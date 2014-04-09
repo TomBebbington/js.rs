@@ -1,6 +1,6 @@
 use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
-use ast::{OpSub, OpAdd, OpMul, OpDiv, OpAnd, OpOr};
+use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use js::value::{Value, VNull, VUndefined, VNumber, VString, VObject, VBoolean, VFunction, ResultValue};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
@@ -208,8 +208,7 @@ impl Executor for Interpreter {
 					OpSub => v_a - v_b,
 					OpMul => v_a * v_b,
 					OpDiv => v_a / v_b,
-					OpAnd => v_a & v_b,
-					OpOr => v_a | v_b,
+					OpMod => v_a % v_b
 				}))
 			},
 			ConstructExpr(ref func, ref args) => {

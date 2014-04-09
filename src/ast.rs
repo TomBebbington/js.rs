@@ -43,10 +43,8 @@ pub enum NumOp {
 	OpDiv,
 	/// Multiply them together
 	OpMul,
-	/// Bitwise and
-	OpAnd,
-	/// Bitwise or
-	OpOr
+	/// Get the modulus of a number and another
+	OpMod
 }
 impl fmt::Show for NumOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -55,8 +53,35 @@ impl fmt::Show for NumOp {
 			OpSub => "-",
 			OpDiv => "/",
 			OpMul => "*",
-			OpAnd => "&",
-			OpOr => "|"
+			OpMod => "%"
+		});
+	}
+}
+#[deriving(Clone, Eq)]
+/// A bitwise operation
+pub enum BitOp {
+	/// Bitwise and
+	BitAnd,
+	/// Bitwise or
+	BitOr,
+	/// Bitwise xor
+	BitXor,
+	/// Bitwise invert
+	BitNot,
+	/// Bitwise shift left
+	BitShl,
+	/// Bitwise shift right
+	BitShr
+}
+impl fmt::Show for BitOp {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		return f.buf.write_str(match *self {
+			BitAnd => "&",
+			BitOr => "|",
+			BitXor => "^",
+			BitNot => "~",
+			BitShl => "<<",
+			BitShr => ">>"
 		});
 	}
 }
@@ -184,7 +209,9 @@ pub enum Token {
 	/// A question
 	TQuestion,
 	/// A numeric operation
-	TNumOp(NumOp)
+	TNumOp(NumOp),
+	/// A bitwise operation
+	TBitOp(BitOp)
 }
 impl fmt::Show for Token {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -204,7 +231,8 @@ impl fmt::Show for Token {
 			TCloseArray => f.buf.write_str("]"),
 			TNumber(num) => write!(f.buf, "{}", num),
 			TQuestion => f.buf.write_str("?"),
-			TNumOp(op) => write!(f.buf, "{}", op)
+			TNumOp(op) => write!(f.buf, "{}", op),
+			TBitOp(op) => write!(f.buf, "{}", op)
 		}
 	}
 }
