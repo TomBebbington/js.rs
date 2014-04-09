@@ -1,12 +1,13 @@
 use js::object::ObjectData;
 use js::function::{Function, NativeFunc, RegularFunc};
 use collections::TreeMap;
-use serialize::json;
+use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
 use std::gc::Gc;
 use std::cell::RefCell;
+use std::iter::FromIterator;
 static PROTOTYPE : &'static str = "__proto__";
 #[must_use]
 pub type ResultValue = Result<Value, Value>;
@@ -135,6 +136,30 @@ impl ValueData {
 		}
 		val
 	}
+	/// Convert from a JSON value to a JS value
+	pub fn from_json(json:Json) -> ValueData {
+		match json {
+			Number(v) => VNumber(v),
+			String(v) => VString(v),
+			Boolean(v) => VBoolean(v),
+			List(vs) => {
+				let mut i = 0;
+				let mut data : ObjectData = FromIterator::from_iter(vs.iter().map(|json| {
+					i += 1;
+					((i - 1).to_str(), Gc::new(ValueData::from_json(json.clone())))
+				}));
+				data.insert(~"length", Gc::new(VInteger(vs.len() as i32)));
+				VObject(RefCell::new(data))
+			},
+			Object(obj) => {
+				let mut data : ObjectData = FromIterator::from_iter(obj.iter().map(|(key, json)| {
+					(key.clone(), Gc::new(ValueData::from_json(json.clone())))
+				}));
+				VObject(RefCell::new(data))
+			},
+			Null => VNull
+		}
+	}
 }
 impl fmt::Show for ValueData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -199,11 +224,11 @@ impl Eq for ValueData {
 		}
 	}
 }
-impl json::ToJson for ValueData {
-	fn to_json( &self ) -> json::Json {
+impl ToJson for ValueData {
+	fn to_json( &self ) -> Json {
 		match *self {
-			VNull | VUndefined => json::Null,
-			VBoolean(b) => json::Boolean(b),
+			VNull | VUndefined => Null,
+			VBoolean(b) => Boolean(b),
 			VObject(ref obj) => {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
@@ -211,12 +236,12 @@ impl json::ToJson for ValueData {
 						nobj.insert(k.clone(), v.borrow().to_json());
 					}
 				}
-				json::Object(~nobj)
+				Object(~nobj)
 			},
-			VString(ref str) => json::String(str.to_owned()),
-			VNumber(num) => json::Number(num),
-			VInteger(val) => json::Number(val as f64),
-			VFunction(_) => json::Null
+			VString(ref str) => String(str.to_owned()),
+			VNumber(num) => Number(num),
+			VInteger(val) => Number(val as f64),
+			VFunction(_) => Null
 		}
 	}
 }
