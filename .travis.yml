@@ -8,7 +8,7 @@ install:
   - sudo apt-get install rust-nightly python-pip
   - sudo pip install cargo-lite
 script:
-  - make build
+  - make build docs
 notifications:
   email:
     - tophattedcoder@gmail.com
