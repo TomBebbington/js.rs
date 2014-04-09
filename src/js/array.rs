@@ -5,12 +5,12 @@ use std::gc::Gc;
 use std::cell::RefCell;
 pub type ObjectData = TreeMap<~str, Value>;
 
-/// Create new object
+/// Create new array
 pub fn make_array(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	this.borrow().set_field(~"length", Gc::new(VInteger(0)));
 	Ok(Gc::new(VUndefined))
 }
-/// Create a new 'Object' object
+/// Create a new 'Array' object
 pub fn _create() -> Value {
 	let mut func = NativeFunction::new(make_array, 0);
 	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
