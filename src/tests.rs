@@ -55,5 +55,5 @@ fn test_constructor() {
 }
 #[test]
 fn test_json() {
-	assert_eq(VNumber(~"42"), run("JSON.parse(JSON.stringify({num: 42})).num"))
+	assert_eq(VNumber(42), run("JSON.parse(JSON.stringify({num: 42})).num"))
 }
