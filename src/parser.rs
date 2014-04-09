@@ -27,10 +27,10 @@ impl fmt::Show for ParseError {
 						Ok(_) => ()
 					}
 				}
-				write!(f.buf, ", got {}", got)
+				write!(f.buf, " but got {}", got)
 			},
 			ExpectedExpr(ref wanted, ref got) => {
-				write!(f.buf, "Expected {}, got {}", wanted, got)
+				write!(f.buf, "Expected {}, but got {}", wanted, got)
 			}
 		}
 	}
