@@ -1,7 +1,7 @@
 use ast::{Token, Expr};
-use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr};
+use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TEqual};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -327,6 +327,11 @@ impl Parser {
 				self.pos += 1;
 				let next = try!(self.parse());
 				result = ~BitOpExpr(op, expr, next);
+			},
+			TEqual => {
+				self.pos += 1;
+				let next = try!(self.parse());
+				result = ~AssignExpr(expr, next);
 			},
 			_ => carry_on = false
 		};
