@@ -88,6 +88,14 @@ pub fn floor(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		f64::NAN
 	})))
 }
+/// Get the natural logarithm of a number
+pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	Ok(Gc::new(VNumber(if args.len() >= 1 {
+		args.get(0).borrow().to_num().log(&f64::consts::E)
+	} else {
+		f64::NAN
+	})))
+}
 /// Generate a random floating-point number between 0 and 1
 pub fn _random(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(random())))
@@ -129,6 +137,7 @@ pub fn _create() -> Value {
 	math.insert(~"cos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cos, 1))))));
 	math.insert(~"exp", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(exp, 1))))));
 	math.insert(~"floor", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(floor, 1))))));
+	math.insert(~"log", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(log, 1))))));
 	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
 	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
 	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
