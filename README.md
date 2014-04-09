@@ -3,6 +3,7 @@ This is a generic JS parser and interpreter written in Rust. Currently, it has v
 
 Supported features
 ------------------
++ Math functions (fully supports the standard functions)
 + Switch blocks (partially implemented, they currently ignore break statements)
 + If blocks
 + While blocks
