@@ -123,13 +123,12 @@ impl ValueData {
 	pub fn set_field(&self, field:~str, val:Value) -> Value {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().swap(field, val);
+				obj.borrow_mut().insert(field, val);
 			},
 			VFunction(ref func) => {
-				let mut func = func.borrow_mut().clone();
-				match func {
-					NativeFunc(ref mut f) => f.object.swap(field, val),
-					RegularFunc(ref mut f) => f.object.swap(field, val)
+				match *func.borrow_mut().deref_mut() {
+					NativeFunc(ref mut f) => f.object.insert(field, val),
+					RegularFunc(ref mut f) => f.object.insert(field, val)
 				};
 			},
 			_ => ()
