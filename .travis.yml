@@ -6,3 +6,6 @@ install:
 script:
   - make build tests
   - ./bin/tests
+notifications:
+  email:
+    - tophattedcoder@gmail.com
