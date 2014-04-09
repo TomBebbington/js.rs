@@ -145,9 +145,44 @@ impl fmt::Show for ValueData {
 			VBoolean(v) => write!(f.buf, "{}", v),
 			VString(ref v) => write!(f.buf, "{}", v),
 			VNumber(v) => write!(f.buf, "{}", v),
-			VObject(ref v) => write!(f.buf, "{}", v.borrow().deref()),
+			VObject(ref v) => {
+				try!(f.buf.write_str("{"));
+				match v.borrow().iter().last() {
+					Some((last_key, _)) => {
+						for (key, val) in v.borrow().iter() {
+							try!(write!(f.buf, "{}: {}", key, val.borrow()));
+							if key != last_key {
+								try!(f.buf.write_str(", "));
+							}
+						}
+					},
+					None => ()
+				}
+				f.buf.write_str("}")
+			},
 			VInteger(v) => write!(f.buf, "{}", v),
-			VFunction(ref v) => write!(f.buf, "function ...")
+			VFunction(ref v) => {
+				match v.borrow().clone() {
+					NativeFunc(nf) => {
+						try!(f.buf.write_str("function("));
+						let mut letter = 'a';
+						for i in range(0, nf.nargs) {
+							try!(write!(f.buf, "{}", letter));
+							letter = ((letter as u8) + 1u8) as char;
+							if i < nf.nargs - 1 {
+								try!(f.buf.write_str(", "));
+							}
+						}
+						f.buf.write_str(") {...}")
+					},
+					RegularFunc(rf) => {
+						try!(f.buf.write_str("function("));
+						try!(f.buf.write_str(rf.args.concat()));
+						try!(f.buf.write_str(") "));
+						write!(f.buf, "{}", rf.expr)
+					}
+				}
+			}
 		}
 	}
 }
