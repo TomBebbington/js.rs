@@ -128,6 +128,14 @@ pub fn pow(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 pub fn _random(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(random())))
 }
+/// Round a number to the nearest integer
+pub fn round(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	Ok(Gc::new(VNumber(if args.len() >= 1 {
+		args.get(0).borrow().to_num().round()
+	} else {
+		f64::NAN
+	})))
+}
 /// Get the sine of a number
 pub fn sin(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(if args.len() >= 1 {
@@ -178,6 +186,7 @@ pub fn _create() -> Value {
 	math.insert(~"min", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(min, 2))))));
 	math.insert(~"pow", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(pow, 2))))));
 	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
+	math.insert(~"round", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(round, 1))))));
 	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
 	math.insert(~"sqrt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sqrt, 1))))));
 	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
