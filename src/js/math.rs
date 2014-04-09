@@ -105,6 +105,15 @@ pub fn max(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}
 	Ok(Gc::new(VNumber(max)))
 }
+/// Get the minimum of several numbers
+pub fn min(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	let mut max = f64::INFINITY;
+	for arg in args.iter() {
+		let num = arg.borrow().to_num();
+		max = max.min(num);
+	}
+	Ok(Gc::new(VNumber(max)))
+}
 /// Generate a random floating-point number between 0 and 1
 pub fn _random(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VNumber(random())))
@@ -148,6 +157,7 @@ pub fn _create() -> Value {
 	math.insert(~"floor", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(floor, 1))))));
 	math.insert(~"log", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(log, 1))))));
 	math.insert(~"max", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(max, 2))))));
+	math.insert(~"min", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(min, 2))))));
 	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
 	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
 	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
