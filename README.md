@@ -14,3 +14,7 @@ Supported features
 Roadmap
 -------
 + Add functions
+
+Contributing
+------------
+If you want to contribute just file a pull request with your changes. If it passes travis and is reasonably clean and justifiable, it will be merged. Look at the lints specified in src/lib.rs for coding guidelines.
