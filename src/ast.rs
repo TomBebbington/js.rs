@@ -136,7 +136,23 @@ impl fmt::Show for Expr {
 			LocalExpr(ref s) => write!(f.buf, "{}", s),
 			GetConstFieldExpr(ref ex, ref field) => write!(f.buf, "{}.{}", ex, field),
 			GetFieldExpr(ref ex, ref field) => write!(f.buf, "{}[{}]", ex, field),
-			CallExpr(ref ex, ref args) => write!(f.buf, "{}({})", ex, args),
+			CallExpr(ref ex, ref args) => {
+				try!(write!(f.buf, "{}", ex));
+				try!(f.buf.write_str("("));
+				let last = args.iter().last();
+				match last {
+					Some(last_arg) => {
+						for arg in args.iter() {
+							try!(write!(f.buf, "{}", arg));
+							if arg != last_arg {
+								try!(f.buf.write_str(", "));
+							}
+						}
+					},
+					None => ()
+				}
+				f.buf.write_str(")")
+			},
 			ConstructExpr(ref func, ref args) => write!(f.buf, "new {}({})", func, args),
 			WhileLoopExpr(ref cond, ref expr) => write!(f.buf, "while({}) {}", cond, expr),
 			IfExpr(ref cond, ref expr, None) => write!(f.buf, "if({}) {}", cond, expr),

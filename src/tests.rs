@@ -32,7 +32,10 @@ fn test_escape() {
 }
 #[test]
 fn test_to_string() {
-	assert_eq(VString(~"{a: 3}"), run("({a : 3})+''"));
+	assert_eq(VString(~"117"), run("117+''"));
+	assert_eq(VString(~"0.12"), run("0.12+''"));
+	assert_eq(VString(~"null"), run("null+''"));
+	assert_eq(VString(~"undefined"), run("unexisty+''"));
 }
 #[test]
 fn test_num_op() {
@@ -48,5 +51,5 @@ fn test_function() {
 }
 #[test]
 fn test_constructor() {
-	assert_eq(VString(~"Hello"), run("function Text(phrase) { this.phrase = phrase; } new Text('Hello').phrase"));
+	assert_eq(VString(~"Hello"), run("function Text(phrase) { this.phrase = phrase; }; text = new Text('Hello'); text.phrase"));
 }

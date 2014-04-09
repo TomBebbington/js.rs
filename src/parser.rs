@@ -84,7 +84,6 @@ impl Parser {
 			"return" => Ok(Some(~ReturnExpr(Some(try!(self.parse()))))),
 			"new" => {
 				let call = try!(self.parse());
-				print!("new {}", call);
 				match *call {
 					CallExpr(ref func, ref args) => Ok(Some(~ConstructExpr(func.clone(), args.clone()))),
 					_ => Err(ExpectedExpr(~"constructor", *call))

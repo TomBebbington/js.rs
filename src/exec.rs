@@ -221,8 +221,21 @@ impl Executor for Interpreter {
 					BitShr => v_a >> v_b
 				}))
 			},
-			ConstructExpr(ref func, ref args) => {
-				Ok(Gc::new(VNull))
+			ConstructExpr(ref callee, ref args) => {
+				let func = try!(self.run(callee.clone()));
+				let mut v_args = Vec::with_capacity(args.len());
+				for arg in args.iter() {
+					v_args.push(try!(self.run(*arg)));
+				}
+				let this = Gc::new(VObject(RefCell::new(TreeMap::new())));
+				this.borrow().set_field(~"__proto__", func.borrow().get_field(~"prototype"));
+				Ok(match *func.borrow() {
+					VFunction(ref func) => {
+						func.borrow().call(self, this, Gc::new(VNull), v_args).unwrap();
+						this
+					},
+					_ => Gc::new(VUndefined)
+				})
 			},
 			ReturnExpr(ref ret) => {
 				match *ret {
@@ -237,6 +250,10 @@ impl Executor for Interpreter {
 				match **ref_e {
 					LocalExpr(ref name) => {
 						self.globals.insert(name.clone(), val);
+					},
+					GetConstFieldExpr(ref obj, ref field) => {
+						let val_obj = try!(self.run(*obj));
+						val_obj.borrow().set_field(field.clone(), val);
 					},
 					_ => ()
 				}
