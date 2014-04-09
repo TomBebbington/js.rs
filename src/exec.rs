@@ -32,8 +32,6 @@ pub struct Interpreter {
 	globals: ObjectData,
 	/// The scopes
 	scopes: Vec<Gc<RefCell<ObjectData>>>,
-	/// The current function scope
-	current_scope: uint
 }
 impl Executor for Interpreter {
 	fn new() -> ~Interpreter {
@@ -46,7 +44,7 @@ impl Executor for Interpreter {
 		globals.swap(~"Array", array::_create());
 		globals.swap(~"Function", function::_create());
 		globals.swap(~"JSON", json::_create());
-		return ~Interpreter {globals: globals, scopes: Vec::new(), current_scope: 0};
+		return ~Interpreter {globals: globals, scopes: Vec::new()};
 	}
 	fn set_global(&mut self, name:~str, val:Value) {
 		self.globals.swap(name, val);
