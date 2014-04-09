@@ -1,4 +1,2 @@
 #ignore binaries
 bin/*
-#ignore docs
-doc/*

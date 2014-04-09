@@ -1,6 +1,7 @@
-use collections::treemap::TreeMap;
 use js::function::{NativeFunc, NativeFunction};
-use js::value::{ValueData, Value, VFunction, VUndefined, VObject, VInteger, ResultValue};
+use js::value::{ValueData, Value, VFunction, VUndefined, VObject, VInteger, VString, ResultValue};
+use collections::treemap::TreeMap;
+use serialize::json::;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::fmt;
@@ -32,13 +33,18 @@ pub fn set_proto_of(_:Value, _:Value, mut args:Vec<Value>) -> ResultValue {
 	obj.borrow().set_field(~"__proto__", proto);
 	return Ok(*obj);
 }
+/// To string
+pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
+	return Ok(Gc::new(VString(this.borrow().to_str())));
+}
 /// Create a new 'Object' object
 pub fn _create() -> Value {
 	let mut func = NativeFunction::new(make_object, 0);
 	let mut prototype : ObjectData = TreeMap::new();
-	func.object.swap(~"length", Gc::new(VInteger(1)));
-	func.object.swap(~"prototype", Gc::new(VObject(RefCell::new(prototype))));
-	func.object.swap(~"setPrototypeOf", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(set_proto_of, 2))))));
-	func.object.swap(~"getPrototypeOf", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(get_proto_of, 1))))));
+	prototype.insert(~"toString", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(to_string, 0))))));
+	func.object.insert(~"length", Gc::new(VInteger(1)));
+	func.object.insert(~"prototype", Gc::new(VObject(RefCell::new(prototype))));
+	func.object.insert(~"setPrototypeOf", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(set_proto_of, 2))))));
+	func.object.insert(~"getPrototypeOf", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(get_proto_of, 1))))));
 	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
 }
