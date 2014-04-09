@@ -177,7 +177,7 @@ impl Executor for Interpreter {
 				for (key, val) in map.iter() {
 					obj.insert(key.clone(), try!(self.run(val.clone())));
 				}
-				obj.swap(~"__proto__", self.globals.find(&~"Object").unwrap().clone());
+				obj.swap(~"__proto__", self.get_global(~"Object").borrow().get_field(~"prototype"));
 				Ok(Gc::new(VObject(RefCell::new(obj))))
 			},
 			ArrayDeclExpr(ref arr) => {
@@ -188,7 +188,7 @@ impl Executor for Interpreter {
 					arr_map.insert(index.to_str(), val);
 					index += 1;
 				}
-				arr_map.swap(~"__proto__", self.globals.find(&~"Array").unwrap().clone());
+				arr_map.insert(~"__proto__", self.get_global(~"Array").borrow().get_field(~"prototype"));
 				Ok(Gc::new(VObject(RefCell::new(arr_map))))
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {
