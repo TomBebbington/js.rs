@@ -204,17 +204,25 @@ impl Parser {
 				nexte
 			},
 			TOpenArray => {
-				self.pos += 1;
 				let mut array = Vec::new();
-				while self.tokens.get(self.pos) == &TComma || array.len() == 0 {
-					array.push(match *self.tokens.get(self.pos) {
-						TComma => ~ConstExpr(CNull),
-						_ => try!(self.parse())
-					});
+				let mut expect_comma_or_end = *self.tokens.get(self.pos) == TCloseArray;
+				loop {
+					let token = self.tokens.get(self.pos).clone();
+					if token == TCloseArray && expect_comma_or_end {
+						self.pos += 1;
+						break;
+					} else if token == TComma && expect_comma_or_end {
+						expect_comma_or_end = false;
+					} else if expect_comma_or_end {
+						return Err(Expected(vec!(TComma, TCloseArray), token));
+					} else {
+						let parsed = try!(self.parse());
+						self.pos -= 1;
+						array.push(parsed);
+						expect_comma_or_end = true;
+					}
 					self.pos += 1;
 				}
-				self.pos -= 1;
-				try!(self.expect(TCloseArray));
 				~ArrayDeclExpr(array)
 			},
 			TOpenBlock if self.tokens.get(self.pos) == &TCloseBlock => {
