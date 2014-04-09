@@ -20,6 +20,7 @@
 extern crate collections;
 extern crate time;
 extern crate serialize;
+extern crate rand;
 /// The Abstract Syntax Tree module
 pub mod ast;
 /// The lexing module
