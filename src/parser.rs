@@ -213,6 +213,9 @@ impl Parser {
 						break;
 					} else if token == TComma && expect_comma_or_end {
 						expect_comma_or_end = false;
+					} else if token == TComma && !expect_comma_or_end {
+						array.push(~ConstExpr(CNull));
+						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
 						return Err(Expected(vec!(TComma, TCloseArray), token));
 					} else {
