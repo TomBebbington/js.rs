@@ -107,8 +107,18 @@ impl Executor for Interpreter {
 				Ok(val_obj.borrow().get_field(val_field.borrow().to_str()))
 			},
 			CallExpr(ref callee, ref args) => {
-				let mut this = self.global.clone();
-				let func = try!(self.run(callee.clone()));
+				let (this, func) = match **callee {
+					GetConstFieldExpr(ref obj, ref field) => {
+						let obj = try!(self.run(*obj));
+						(obj, obj.borrow().get_field(field.clone()))
+					},
+					GetFieldExpr(ref obj, ref field) => {
+						let obj = try!(self.run(*obj));
+						let field = try!(self.run(*field));
+						(obj, obj.borrow().get_field(field.borrow().to_str()))
+					},
+					_ => (self.global.clone(), try!(self.run(callee.clone())))
+				};
 				let mut v_args = Vec::with_capacity(args.len());
 				for arg in args.iter() {
 					v_args.push(try!(self.run(*arg)));
