@@ -123,12 +123,12 @@ impl Executor for Interpreter {
 				for arg in args.iter() {
 					v_args.push(try!(self.run(*arg)));
 				}
-				Ok(match *func.borrow() {
+				match *func.borrow() {
 					VFunction(ref func) => {
-						func.borrow().call(self, this, Gc::new(VNull), v_args).unwrap()
+						func.borrow().call(self, this, Gc::new(VNull), v_args)
 					},
-					_ => Gc::new(VUndefined)
-				})
+					_ => Err(Gc::new(VUndefined))
+				}
 			},
 			WhileLoopExpr(ref cond, ref expr) => {
 				let mut result = Gc::new(VUndefined);
