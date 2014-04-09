@@ -1,7 +1,7 @@
 use js::function::{NativeFunc, NativeFunction};
 use js::value::{Value, VObject, VString, VFunction, ResultValue};
 use collections::treemap::TreeMap;
-use serialize::json::{ToJson, Decoder, from_str};
+use serialize::json::ToJson;
 use std::gc::Gc;
 use std::cell::RefCell;
 /// Turn a Javascript object into a JSON string

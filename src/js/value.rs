@@ -207,7 +207,9 @@ impl json::ToJson for ValueData {
 			VObject(ref obj) => {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
-					nobj.insert(k.clone(), v.borrow().to_json());
+					if *k != ~"__proto__" {
+						nobj.insert(k.clone(), v.borrow().to_json());
+					}
 				}
 				json::Object(~nobj)
 			},
