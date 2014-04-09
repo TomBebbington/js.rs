@@ -22,7 +22,15 @@ impl Function {
 				let func = ntv.data;
 				func(this, callee, args)
 			}, RegularFunc(ref data) => {
-				exe.run(&data.expr)
+				let scope = exe.make_scope();
+				for i in range(0, data.args.len()) {
+					let name = data.args.get(i);
+					let expr = args.get(i);
+					scope.borrow().borrow_mut().swap(name.clone(), *expr);
+				}
+				let result = exe.run(&data.expr);
+				exe.destroy_scope();
+				result
 			}
 		}
 	}

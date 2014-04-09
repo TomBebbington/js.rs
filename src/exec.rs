@@ -3,12 +3,13 @@ use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpAnd, OpOr};
 use js::value::{Value, VNull, VUndefined, VNumber, VString, VObject, VBoolean, VFunction, ResultValue};
 use js::object::ObjectData;
+use js::function::{RegularFunc, RegularFunction};
+use js::{console, math, object, array, function, json};
 use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::f64;
 use std::gc::Gc;
 use std::cell::RefCell;
-use js::{console, math, object, array, function, json};
 /// An execution engine
 pub trait Executor {
 	/// Makes a new execution engine
@@ -17,6 +18,10 @@ pub trait Executor {
 	fn set_global(&mut self, name:~str, val:Value) -> ();
 	/// Gets a global variable
 	fn get_global(&self, name:~str) -> Value;
+	/// Make a new scope
+	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>>;
+	/// Destroy the current scope
+	fn destroy_scope(&mut self) -> ();
 	/// Runs the expression
 	fn run(&mut self, expr:&Expr) -> ResultValue;
 }
@@ -24,8 +29,8 @@ pub trait Executor {
 pub struct Interpreter {
 	/// A hash map representing the global variables
 	globals: ObjectData,
-	/// The function scopes currently in use
-	function_scopes: Vec<ObjectData>,
+	/// The scopes
+	scopes: Vec<Gc<RefCell<ObjectData>>>,
 	/// The current function scope
 	current_scope: uint
 }
@@ -40,7 +45,7 @@ impl Executor for Interpreter {
 		globals.swap(~"Array", array::_create());
 		globals.swap(~"Function", function::_create());
 		globals.swap(~"JSON", json::_create());
-		return ~Interpreter {globals: globals, function_scopes: Vec::new(), current_scope: 0};
+		return ~Interpreter {globals: globals, scopes: Vec::new(), current_scope: 0};
 	}
 	fn set_global(&mut self, name:~str, val:Value) {
 		self.globals.swap(name, val);
@@ -50,6 +55,15 @@ impl Executor for Interpreter {
 			None => Gc::new(VUndefined),
 			Some(ref g) => **g
 		}
+	}
+	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>> {
+		let mut data = TreeMap::new();
+		let value = Gc::new(RefCell::new(data));
+		self.scopes.push(value.clone());
+		value
+	}
+	fn destroy_scope(&mut self) -> () {
+		self.scopes.pop();
 	}
 	fn run(&mut self, expr:&Expr) -> ResultValue {
 		match *expr {
@@ -70,10 +84,27 @@ impl Executor for Interpreter {
 				}
 				Ok(obj)
 			},
-			LocalExpr(ref name) => Ok(match self.globals.find(name) {
-				None => Gc::new(VUndefined),
-				Some(v) => v.clone()
-			}),
+			LocalExpr(ref name) => {
+				let mut value = Gc::new(VUndefined);
+				for scope in self.scopes.iter().rev() {
+					println!("Searching {} for {}", scope.borrow().borrow().deref(), name.clone());
+					match scope.borrow().borrow().find(name) {
+						Some(v) => {
+							value = v.clone();
+							break;
+						}
+						None => ()
+					}
+				}
+				Ok(if value.borrow() == &VUndefined {
+					match self.globals.find(name) {
+						None => Gc::new(VUndefined),
+						Some(v) => v.clone()
+					}
+				} else {
+					value
+				})
+			},
 			GetConstFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
 				Ok(val_obj.borrow().get_field(field.clone()))
@@ -163,8 +194,12 @@ impl Executor for Interpreter {
 				Ok(Gc::new(VObject(RefCell::new(arr_map))))
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {
-				println!("Name: {}, args: {}, expr: {}", name, args, expr);
-				Ok(Gc::new(VNull))
+				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));
+				let val = Gc::new(VFunction(RefCell::new(function)));
+				if name.is_some() {
+					self.globals.swap(name.clone().unwrap(), val);
+				}
+				Ok(val)
 			},
 			NumOpExpr(ref op, ref a, ref b) => {
 				let v_a = try!(self.run(*a)).borrow().clone();
