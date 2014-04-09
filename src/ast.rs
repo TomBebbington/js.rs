@@ -128,8 +128,17 @@ impl fmt::Show for Expr {
 impl fmt::Show for TreeMap<~str, ~Expr> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		try!(f.buf.write_str("{ "));
-		for (k, v) in self.iter() {
-			try!(write!(f.buf, "{} = {}\n", k, v));
+		match self.iter().last() {
+			Some((last_key, _)) => {
+				for (k, v) in self.iter() {
+					try!(write!(f.buf, "{}: {}", k, v));
+					if k == last_key {
+						try!(f.buf.write_str(","));
+					}
+					try!(f.buf.write_str("\n"));
+				}
+			},
+			None => ()
 		}
 		f.buf.write_str("}")
 	}
