@@ -1,5 +1,5 @@
 use js::function::{NativeFunction, NativeFunc};
-use js::value::{Value, ResultValue, VFunction, VUndefined, VObject, to_value, from_value};
+use js::value::{Value, ValueData, ResultValue, VFunction, VUndefined, VObject, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::cell::RefCell;
@@ -23,9 +23,9 @@ pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'console' object
 pub fn _create() -> Value {
-	let mut console = TreeMap::new();
-	console.insert(~"log", to_value(log));
-	console.insert(~"error", to_value(error));
-	console.insert(~"exception", to_value(error));
-	to_value(console)
+	let mut console = ValueData::new_obj();
+	console.borrow().set_field(~"log", to_value(log));
+	console.borrow().set_field(~"error", to_value(error));
+	console.borrow().set_field(~"exception", to_value(error));
+	console
 }

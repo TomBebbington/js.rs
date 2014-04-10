@@ -1,6 +1,6 @@
 use js::function::{NativeFunction, NativeFunc};
 use js::object::ObjectData;
-use js::value::{Value, ResultValue, VFunction, VString, VObject, VUndefined, to_value};
+use js::value::{Value, ValueData, ResultValue, VFunction, VString, VObject, VUndefined, to_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::cell::RefCell;
@@ -20,11 +20,11 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Error' object
 pub fn _create() -> Value {
-	let mut func = NativeFunction::new(make_error);
-	let mut prototype : ObjectData = TreeMap::new();
-	prototype.insert(~"message", to_value(~""));
-	prototype.insert(~"name", to_value(~"Error"));
-	prototype.insert(~"toString", to_value(to_string));
-	func.object.insert(~"prototype", to_value(prototype));
-	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
+	let mut func = to_value(make_error);
+	let mut prototype = ValueData::new_obj();
+	prototype.borrow().set_field(~"message", to_value(~""));
+	prototype.borrow().set_field(~"name", to_value(~"Error"));
+	prototype.borrow().set_field(~"toString", to_value(to_string));
+	func.borrow().set_field(~"prototype", prototype);
+	func
 }

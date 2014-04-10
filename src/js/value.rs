@@ -1,4 +1,4 @@
-use js::object::ObjectData;
+use js::object::{ObjectData, Property};
 use js::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
@@ -34,6 +34,10 @@ pub enum ValueData {
 	VFunction(RefCell<Function>)
 }
 impl ValueData {
+	/// Returns a new empty object
+	pub fn new_obj() -> Value {
+		Gc::new(VObject(RefCell::new(TreeMap::new())))
+	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {
 		return match *self {
@@ -99,8 +103,8 @@ impl ValueData {
 			VInteger(num) => num
 		}
 	}
-	/// Resolved the field in the value
-	pub fn get_field(&self, field:~str) -> Value {
+	/// Resolve the field in the value
+	pub fn get_prop(&self, field:~str) -> Option<Property> {
 		let obj : ObjectData = match *self {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) => {
@@ -110,32 +114,55 @@ impl ValueData {
 					RegularFunc(f) => f.object.clone()
 				}
 			},
-			_ => return Gc::new(VUndefined)
+			_ => return None
 		};
 		match obj.find(&field) {
-			Some(val) => *val,
+			Some(val) => Some(*val),
 			None => match obj.find(&PROTOTYPE.to_owned()) {
-				Some(val) => 
-					val.borrow().get_field(field),
-				None => Gc::new(VUndefined)
+				Some(prop) => 
+					prop.value.borrow().get_prop(field),
+				None => None
 			}
+		}
+	}
+	/// Resolve the field in the value
+	pub fn get_field(&self, field:~str) -> Value {
+		match self.get_prop(field) {
+			Some(prop) => prop.value,
+			None => Gc::new(VUndefined)
 		}
 	}
 	/// Set the field in the value
 	pub fn set_field(&self, field:~str, val:Value) -> Value {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().insert(field, val);
+				obj.borrow_mut().insert(field, Property::new(val));
 			},
 			VFunction(ref func) => {
 				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field, val),
-					RegularFunc(ref mut f) => f.object.insert(field, val)
+					NativeFunc(ref mut f) => f.object.insert(field, Property::new(val)),
+					RegularFunc(ref mut f) => f.object.insert(field, Property::new(val))
 				};
 			},
 			_ => ()
 		}
 		val
+	}
+	/// Set the field in the value
+	pub fn set_prop(&self, field:~str, prop:Property) -> Property {
+		match *self {
+			VObject(ref obj) => {
+				obj.borrow_mut().insert(field, prop);
+			},
+			VFunction(ref func) => {
+				match *func.borrow_mut().deref_mut() {
+					NativeFunc(ref mut f) => f.object.insert(field, prop),
+					RegularFunc(ref mut f) => f.object.insert(field, prop)
+				};
+			},
+			_ => ()
+		}
+		prop
 	}
 	/// Convert from a JSON value to a JS value
 	pub fn from_json(json:Json) -> ValueData {
@@ -147,14 +174,14 @@ impl ValueData {
 				let mut i = 0;
 				let mut data : ObjectData = FromIterator::from_iter(vs.iter().map(|json| {
 					i += 1;
-					((i - 1).to_str(), Gc::new(ValueData::from_json(json.clone())))
+					((i - 1).to_str(), Property::new(to_value(json.clone())))
 				}));
-				data.insert(~"length", Gc::new(VInteger(vs.len() as i32)));
+				data.insert(~"length", Property::new(to_value(vs.len() as i32)));
 				VObject(RefCell::new(data))
 			},
 			Object(obj) => {
 				let mut data : ObjectData = FromIterator::from_iter(obj.iter().map(|(key, json)| {
-					(key.clone(), Gc::new(ValueData::from_json(json.clone())))
+					(key.clone(), Property::new(to_value(json.clone())))
 				}));
 				VObject(RefCell::new(data))
 			},
@@ -175,7 +202,7 @@ impl fmt::Show for ValueData {
 				match v.borrow().iter().last() {
 					Some((last_key, _)) => {
 						for (key, val) in v.borrow().iter() {
-							try!(write!(f.buf, "{}: {}", key, val.borrow()));
+							try!(write!(f.buf, "{}: {}", key, val.value.borrow()));
 							if key != last_key {
 								try!(f.buf.write_str(", "));
 							}
@@ -225,7 +252,7 @@ impl ToJson for ValueData {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
 					if *k != ~"__proto__" {
-						nobj.insert(k.clone(), v.borrow().to_json());
+						nobj.insert(k.clone(), v.value.borrow().to_json());
 					}
 				}
 				Object(~nobj)
@@ -296,7 +323,7 @@ impl Not<ValueData> for ValueData {
 	}
 }
 /// Conversion to and from a Javascript value
-trait ValueConv {
+pub trait ValueConv {
 	/// Convert this into a Javascript value
 	fn to_value(&self) -> Value;
 	/// Convert a Javascript value to a Rust value
@@ -338,7 +365,7 @@ impl<T:ValueConv> ValueConv for Vec<T> {
 	fn to_value(&self) -> Value {
 		let mut arr = TreeMap::new();
 		for i in range(0, self.len()) {
-			arr.insert(i.to_str(), self.get(i).to_value());
+			arr.insert(i.to_str(), Property::new(self.get(i).to_value()));
 		}
 		to_value(arr)
 	}

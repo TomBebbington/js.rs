@@ -1,4 +1,4 @@
-use js::value::{Value, ResultValue, VFunction, VNumber, VInteger, VObject, VBoolean, to_value, from_value};
+use js::value::{Value, ValueData, ResultValue, VFunction, VNumber, VInteger, VObject, VBoolean, to_value, from_value};
 use js::function::{NativeFunc, NativeFunction};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
@@ -73,16 +73,16 @@ pub fn init(obj:Value) {
 }
 /// Create a new 'Number' object
 pub fn _create() -> Value {
-	let mut number = TreeMap::new();
-	number.insert(~"NaN", to_value(NAN));
-	number.insert(~"MAX_VALUE", to_value(MAX_VALUE));
-	number.insert(~"MIN_VALUE", to_value(MIN_VALUE));
-	number.insert(~"POSITIVE_INFINITY", to_value(INFINITY));
-	number.insert(~"NEGATIVE_INFINITY", to_value(NEG_INFINITY));
-	number.insert(~"EPSILON", to_value(EPSILON));
-	number.insert(~"parseFloat", to_value(parse_float));
-	number.insert(~"parseInt", to_value(parse_int));
-	number.insert(~"isFinite", to_value(strict_is_finite));
-	number.insert(~"isNaN", to_value(strict_is_nan));
-	to_value(number)
+	let mut number = ValueData::new_obj();
+	number.borrow().set_field(~"NaN", to_value(NAN));
+	number.borrow().set_field(~"MAX_VALUE", to_value(MAX_VALUE));
+	number.borrow().set_field(~"MIN_VALUE", to_value(MIN_VALUE));
+	number.borrow().set_field(~"POSITIVE_INFINITY", to_value(INFINITY));
+	number.borrow().set_field(~"NEGATIVE_INFINITY", to_value(NEG_INFINITY));
+	number.borrow().set_field(~"EPSILON", to_value(EPSILON));
+	number.borrow().set_field(~"parseFloat", to_value(parse_float));
+	number.borrow().set_field(~"parseInt", to_value(parse_int));
+	number.borrow().set_field(~"isFinite", to_value(strict_is_finite));
+	number.borrow().set_field(~"isNaN", to_value(strict_is_nan));
+	number
 }

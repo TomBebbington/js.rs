@@ -23,8 +23,8 @@ pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'JSON' object
 pub fn _create() -> Value {
-	let mut obj = TreeMap::new();
-	obj.insert(~"stringify", to_value(stringify));
-	obj.insert(~"parse", to_value(parse));
-	to_value(obj)
+	let mut obj = ValueData::new_obj();
+	obj.borrow().set_field(~"stringify", to_value(stringify));
+	obj.borrow().set_field(~"parse", to_value(parse));
+	obj
 }

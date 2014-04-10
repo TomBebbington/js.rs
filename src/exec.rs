@@ -2,7 +2,7 @@ use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use js::value::{Value, VNull, VUndefined, VNumber, VInteger, VString, VObject, VBoolean, VFunction, ResultValue, to_value};
+use js::value::{Value, ValueData, VNull, VUndefined, VNumber, VInteger, VString, VObject, VBoolean, VFunction, ResultValue, to_value};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
@@ -34,16 +34,15 @@ pub struct Interpreter {
 }
 impl Executor for Interpreter {
 	fn new() -> ~Interpreter {
-		let mut globals : ObjectData = TreeMap::new();
-		globals.insert(~"console", console::_create());
-		globals.insert(~"Math", math::_create());
-		globals.insert(~"Object", object::_create());
-		globals.insert(~"Array", array::_create());
-		globals.insert(~"Function", function::_create());
-		globals.insert(~"JSON", json::_create());
-		globals.insert(~"Number", number::_create());
-		globals.insert(~"Error", error::_create());
-		let global = Gc::new(VObject(RefCell::new(globals)));
+		let global = ValueData::new_obj();
+		global.borrow().set_field(~"console", console::_create());
+		global.borrow().set_field(~"Math", math::_create());
+		global.borrow().set_field(~"Object", object::_create());
+		global.borrow().set_field(~"Array", array::_create());
+		global.borrow().set_field(~"Function", function::_create());
+		global.borrow().set_field(~"JSON", json::_create());
+		global.borrow().set_field(~"Number", number::_create());
+		global.borrow().set_field(~"Error", error::_create());
 		number::init(global);
 		uri::init(global);
 		return ~Interpreter {global: global, scopes: Vec::new()};
@@ -87,7 +86,7 @@ impl Executor for Interpreter {
 				for scope in self.scopes.iter().rev() {
 					match scope.borrow().borrow().find(name) {
 						Some(v) => {
-							value = v.clone();
+							value = v.value.clone();
 							break;
 						}
 						None => ()
@@ -179,24 +178,24 @@ impl Executor for Interpreter {
 				Ok(result)
 			},
 			ObjectDeclExpr(ref map) => {
-				let mut obj = TreeMap::new();
+				let mut obj = ValueData::new_obj();
 				for (key, val) in map.iter() {
-					obj.insert(key.clone(), try!(self.run(val.clone())));
+					obj.borrow().set_field(key.clone(), try!(self.run(val.clone())));
 				}
-				obj.swap(~"__proto__", self.get_global(~"Object").borrow().get_field(~"prototype"));
-				Ok(Gc::new(VObject(RefCell::new(obj))))
+				obj.borrow().set_field(~"__proto__", self.get_global(~"Object").borrow().get_field(~"prototype"));
+				Ok(obj)
 			},
 			ArrayDeclExpr(ref arr) => {
-				let mut arr_map = TreeMap::new();
+				let mut arr_map = ValueData::new_obj();
 				let mut index : i32 = 0;
 				for val in arr.iter() {
 					let val = try!(self.run(val.clone()));
-					arr_map.insert(index.to_str(), val);
+					arr_map.borrow().set_field(index.to_str(), val);
 					index += 1;
 				}
-				arr_map.insert(~"__proto__", self.get_global(~"Array").borrow().get_field(~"prototype"));
-				arr_map.insert(~"length", to_value(index));
-				Ok(Gc::new(VObject(RefCell::new(arr_map))))
+				arr_map.borrow().set_field(~"__proto__", self.get_global(~"Array").borrow().get_field(~"prototype"));
+				arr_map.borrow().set_field(~"length", to_value(index));
+				Ok(arr_map)
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {
 				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));

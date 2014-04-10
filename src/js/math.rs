@@ -1,4 +1,4 @@
-use js::value::{Value, VNumber, VFunction, VObject, ResultValue, to_value, from_value};
+use js::value::{Value, ValueData, VNumber, VFunction, VObject, ResultValue, to_value, from_value};
 use js::function::{NativeFunction, NativeFunc};
 use collections::treemap::TreeMap;
 use rand::random;
@@ -160,33 +160,33 @@ pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Math' object
 pub fn _create() -> Value {
-	let mut math = TreeMap::new();
-	math.insert(~"E", to_value(f64::consts::E));
-	math.insert(~"LN2", to_value(f64::consts::LN_2));
-	math.insert(~"LN10", to_value(f64::consts::LN_10));
-	math.insert(~"LOG2E", to_value(f64::consts::LOG2_E));
-	math.insert(~"LOG10E", to_value(f64::consts::LOG10_E));
-	math.insert(~"SQRT1_2", to_value(0.5f64.sqrt()));
-	math.insert(~"SQRT2", to_value(f64::consts::SQRT2));
-	math.insert(~"PI", to_value(f64::consts::PI));
-	math.insert(~"abs", to_value(abs));
-	math.insert(~"acos", to_value(acos));
-	math.insert(~"asin", to_value(asin));
-	math.insert(~"atan", to_value(atan));
-	math.insert(~"atan2", to_value(atan2));
-	math.insert(~"cbrt", to_value(cbrt));
-	math.insert(~"ceil", to_value(ceil));
-	math.insert(~"cos", to_value(cos));
-	math.insert(~"exp", to_value(exp));
-	math.insert(~"floor", to_value(floor));
-	math.insert(~"log", to_value(log));
-	math.insert(~"max", to_value(max));
-	math.insert(~"min", to_value(min));
-	math.insert(~"pow", to_value(pow));
-	math.insert(~"random", to_value(_random));
-	math.insert(~"round", to_value(round));
-	math.insert(~"sin", to_value(sin));
-	math.insert(~"sqrt", to_value(sqrt));
-	math.insert(~"tan", to_value(tan));
-	to_value(math)
+	let mut math = ValueData::new_obj();
+	math.borrow().set_field(~"E", to_value(f64::consts::E));
+	math.borrow().set_field(~"LN2", to_value(f64::consts::LN_2));
+	math.borrow().set_field(~"LN10", to_value(f64::consts::LN_10));
+	math.borrow().set_field(~"LOG2E", to_value(f64::consts::LOG2_E));
+	math.borrow().set_field(~"LOG10E", to_value(f64::consts::LOG10_E));
+	math.borrow().set_field(~"SQRT1_2", to_value(0.5f64.sqrt()));
+	math.borrow().set_field(~"SQRT2", to_value(f64::consts::SQRT2));
+	math.borrow().set_field(~"PI", to_value(f64::consts::PI));
+	math.borrow().set_field(~"abs", to_value(abs));
+	math.borrow().set_field(~"acos", to_value(acos));
+	math.borrow().set_field(~"asin", to_value(asin));
+	math.borrow().set_field(~"atan", to_value(atan));
+	math.borrow().set_field(~"atan2", to_value(atan2));
+	math.borrow().set_field(~"cbrt", to_value(cbrt));
+	math.borrow().set_field(~"ceil", to_value(ceil));
+	math.borrow().set_field(~"cos", to_value(cos));
+	math.borrow().set_field(~"exp", to_value(exp));
+	math.borrow().set_field(~"floor", to_value(floor));
+	math.borrow().set_field(~"log", to_value(log));
+	math.borrow().set_field(~"max", to_value(max));
+	math.borrow().set_field(~"min", to_value(min));
+	math.borrow().set_field(~"pow", to_value(pow));
+	math.borrow().set_field(~"random", to_value(_random));
+	math.borrow().set_field(~"round", to_value(round));
+	math.borrow().set_field(~"sin", to_value(sin));
+	math.borrow().set_field(~"sqrt", to_value(sqrt));
+	math.borrow().set_field(~"tan", to_value(tan));
+	math
 }

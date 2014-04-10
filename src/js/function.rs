@@ -1,4 +1,4 @@
-use js::object::ObjectData;
+use js::object::{ObjectData, Property};
 use js::value::{Value, VInteger, VObject, ResultValue, to_value};
 use ast::Expr;
 use collections::treemap::TreeMap;
@@ -23,11 +23,11 @@ impl Function {
 				func(this, callee, args)
 			}, RegularFunc(ref data) => {
 				let scope = exe.make_scope();
-				scope.borrow().borrow_mut().insert(~"this", this);
+				scope.borrow().borrow_mut().insert(~"this", Property::new(this));
 				for i in range(0, data.args.len()) {
 					let name = data.args.get(i);
 					let expr = args.get(i);
-					scope.borrow().borrow_mut().insert(name.clone(), *expr);
+					scope.borrow().borrow_mut().insert(name.clone(), Property::new(*expr));
 				}
 				let result = exe.run(&data.expr);
 				exe.destroy_scope();
@@ -50,7 +50,7 @@ impl RegularFunction {
 	/// Make a new regular function
 	pub fn new(expr : Expr, args: Vec<~str>) -> RegularFunction {
 		let mut obj = TreeMap::new();
-		obj.insert(~"arguments", Gc::new(VInteger(args.len() as i32)));
+		obj.insert(~"arguments", Property::new(Gc::new(VInteger(args.len() as i32))));
 		RegularFunction {object: obj, expr: expr, args: args}
 	}
 }
