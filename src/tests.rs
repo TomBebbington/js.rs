@@ -6,7 +6,7 @@ extern crate collections;
 use rust_js::lexer::Lexer;
 use rust_js::parser::{Parser, VerboseResult};
 use rust_js::exec::{Executor, Interpreter};
-use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString};
+use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString, from_value};
 
 fn run(script:&str) -> Value {
 	let mut lexer = Lexer::new();
@@ -20,6 +20,13 @@ fn run(script:&str) -> Value {
 fn assert_eq(a:ValueData, b:Value) -> () {
 	if a != *b.borrow() {
 		fail!("Expected {}, got {}", a, b.borrow());
+	}
+}
+#[test]
+fn test_value_conversion() {
+	let val:Vec<i32> = from_value(run("[0, 2, 34, 12]")).unwrap();
+	if *val.get(0) != 0 || *val.get(1) != 2 || *val.get(2) != 34 || *val.get(3) != 12 {
+		fail!("Bad value {}", val);
 	}
 }
 #[test]

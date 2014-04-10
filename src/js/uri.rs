@@ -1,5 +1,5 @@
 use js::function::{NativeFunction, NativeFunc};
-use js::value::{Value, ResultValue, VFunction, VString, VUndefined};
+use js::value::{Value, ResultValue, VFunction, VString, VUndefined, to_value};
 use url::{encode, decode, encode_component, decode_component};
 use std::cell::RefCell;
 use std::gc::Gc;
@@ -38,8 +38,8 @@ pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Initialise the URI functions on a global object
 pub fn init(obj:Value) {
-	obj.borrow().set_field(~"encodeURI", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(encode_uri, 1))))));
-	obj.borrow().set_field(~"encodeURIComponent", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(encode_uri_component, 1))))));
-	obj.borrow().set_field(~"decodeURI", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(decode_uri, 1))))));
-	obj.borrow().set_field(~"decodeURIComponent", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(decode_uri_component, 1))))));
+	obj.borrow().set_field(~"encodeURI", to_value(encode_uri));
+	obj.borrow().set_field(~"encodeURIComponent", to_value(encode_uri_component));
+	obj.borrow().set_field(~"decodeURI", to_value(decode_uri));
+	obj.borrow().set_field(~"decodeURIComponent", to_value(decode_uri_component));
 }

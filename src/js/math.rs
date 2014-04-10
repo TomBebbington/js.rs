@@ -1,4 +1,4 @@
-use js::value::{Value, VNumber, VFunction, VObject, ResultValue};
+use js::value::{Value, VNumber, VFunction, VObject, ResultValue, to_value};
 use js::function::{NativeFunction, NativeFunc};
 use collections::treemap::TreeMap;
 use rand::random;
@@ -101,7 +101,7 @@ pub fn max(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		let num = arg.borrow().to_num();
 		max = max.max(num);
 	}
-	Ok(Gc::new(VNumber(max)))
+	Ok(to_value(max))
 }
 /// Get the minimum of several numbers
 pub fn min(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
@@ -110,7 +110,7 @@ pub fn min(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		let num = arg.borrow().to_num();
 		max = max.min(num);
 	}
-	Ok(Gc::new(VNumber(max)))
+	Ok(to_value(max))
 }
 /// Raise a number to a power
 pub fn pow(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
@@ -161,32 +161,32 @@ pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new 'Math' object
 pub fn _create() -> Value {
 	let mut math = TreeMap::new();
-	math.insert(~"E", Gc::new(VNumber(f64::consts::E)));
-	math.insert(~"LN2", Gc::new(VNumber(f64::consts::LN_2)));
-	math.insert(~"LN10", Gc::new(VNumber(f64::consts::LN_10)));
-	math.insert(~"LOG2E", Gc::new(VNumber(f64::consts::LOG2_E)));
-	math.insert(~"LOG10E", Gc::new(VNumber(f64::consts::LOG10_E)));
+	math.insert(~"E", to_value(f64::consts::E));
+	math.insert(~"LN2", to_value(f64::consts::LN_2));
+	math.insert(~"LN10", to_value(f64::consts::LN_10));
+	math.insert(~"LOG2E", to_value(f64::consts::LOG2_E));
+	math.insert(~"LOG10E", to_value(f64::consts::LOG10_E));
 	math.insert(~"SQRT1_2", Gc::new(VNumber(0.5f64.sqrt())));
-	math.insert(~"SQRT2", Gc::new(VNumber(f64::consts::SQRT2)));
-	math.insert(~"PI", Gc::new(VNumber(f64::consts::PI)));
-	math.insert(~"abs", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(abs, 1))))));
-	math.insert(~"acos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(acos, 1))))));
-	math.insert(~"asin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(asin, 1))))));
-	math.insert(~"atan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(atan, 1))))));
-	math.insert(~"atan2", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(atan2, 2))))));
-	math.insert(~"cbrt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cbrt, 1))))));
-	math.insert(~"ceil", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(ceil, 1))))));
-	math.insert(~"cos", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(cos, 1))))));
-	math.insert(~"exp", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(exp, 1))))));
-	math.insert(~"floor", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(floor, 1))))));
-	math.insert(~"log", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(log, 1))))));
-	math.insert(~"max", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(max, 2))))));
-	math.insert(~"min", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(min, 2))))));
-	math.insert(~"pow", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(pow, 2))))));
-	math.insert(~"random", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(_random, 0))))));
-	math.insert(~"round", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(round, 1))))));
-	math.insert(~"sin", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sin, 1))))));
-	math.insert(~"sqrt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(sqrt, 1))))));
-	math.insert(~"tan", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(tan, 1))))));
-	Gc::new(VObject(RefCell::new(math)))
+	math.insert(~"SQRT2", to_value(f64::consts::SQRT2));
+	math.insert(~"PI", to_value(f64::consts::PI));
+	math.insert(~"abs", to_value(abs));
+	math.insert(~"acos", to_value(acos));
+	math.insert(~"asin", to_value(asin));
+	math.insert(~"atan", to_value(atan));
+	math.insert(~"atan2", to_value(atan2));
+	math.insert(~"cbrt", to_value(cbrt));
+	math.insert(~"ceil", to_value(ceil));
+	math.insert(~"cos", to_value(cos));
+	math.insert(~"exp", to_value(exp));
+	math.insert(~"floor", to_value(floor));
+	math.insert(~"log", to_value(log));
+	math.insert(~"max", to_value(max));
+	math.insert(~"min", to_value(min));
+	math.insert(~"pow", to_value(pow));
+	math.insert(~"random", to_value(_random));
+	math.insert(~"round", to_value(round));
+	math.insert(~"sin", to_value(sin));
+	math.insert(~"sqrt", to_value(sqrt));
+	math.insert(~"tan", to_value(tan));
+	to_value(math)
 }

@@ -1,7 +1,8 @@
 use js::object::ObjectData;
-use js::function::{Function, NativeFunc, RegularFunc};
+use js::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
+use serialize::{Encodable, Decodable};
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
@@ -302,4 +303,121 @@ impl Not<ValueData> for ValueData {
 	fn not(&self) -> ValueData {
 		return VInteger(!self.to_int());
 	}
+}
+/// Conversion to and from a Javascript value
+trait ValueConv {
+	/// Convert this into a Javascript value
+	fn to_value(&self) -> Value;
+	/// Convert a Javascript value to a Rust value
+	fn from_value(v:Value) -> Option<Self>;
+}
+impl ValueConv for ~str {
+	fn to_value(&self) -> Value {
+		Gc::new(VString(self.clone()))
+	}
+	fn from_value(v:Value) -> Option<~str> {
+		Some(v.borrow().to_str())
+	}
+}
+impl ValueConv for f64 {
+	fn to_value(&self) -> Value {
+		Gc::new(VNumber(self.clone()))
+	}
+	fn from_value(v:Value) -> Option<f64> {
+		Some(v.borrow().to_num())
+	}
+}
+impl ValueConv for i32 {
+	fn to_value(&self) -> Value {
+		Gc::new(VInteger(self.clone()))
+	}
+	fn from_value(v:Value) -> Option<i32> {
+		Some(v.borrow().to_int())
+	}
+}
+impl ValueConv for bool {
+	fn to_value(&self) -> Value {
+		Gc::new(VBoolean(self.clone()))
+	}
+	fn from_value(v:Value) -> Option<bool> {
+		Some(v.borrow().is_true())
+	}
+}
+impl<T:ValueConv> ValueConv for Vec<T> {
+	fn to_value(&self) -> Value {
+		let mut arr = TreeMap::new();
+		for i in range(0, self.len()) {
+			arr.insert(i.to_str(), self.get(i).to_value());
+		}
+		to_value(arr)
+	}
+	fn from_value(v:Value) -> Option<Vec<T>> {
+		let len = v.borrow().get_field(~"length").borrow().to_int();
+		let mut vec = Vec::with_capacity(len as uint);
+		for i in range(0, len) {
+			match ValueConv::from_value(v.borrow().get_field(i.to_str())) {
+				Some(v) => vec.push(v),
+				None => ()
+			}
+		}
+		Some(vec)
+	}
+}
+impl ValueConv for NativeFunctionData {
+	fn to_value(&self) -> Value {
+		Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self, 0)))))
+	}
+	fn from_value(v:Value) -> Option<NativeFunctionData> {
+		match *v.borrow() {
+			VFunction(ref func) => {
+				match *func.borrow() {
+					NativeFunc(ref data) => Some(data.data),
+					_ => None
+				}
+			},
+			_ => None
+		}
+	}
+}
+impl ValueConv for ObjectData {
+	fn to_value(&self) -> Value {
+		Gc::new(VObject(RefCell::new(self.clone())))
+	}
+	fn from_value(v:Value) -> Option<ObjectData> {
+		match *v.borrow() {
+			VObject(ref obj) => Some(obj.clone().borrow().deref().clone()),
+			VFunction(ref func) => {
+				Some(match *func.borrow().deref() {
+					NativeFunc(ref data) => data.object.clone(),
+					RegularFunc(ref data) => data.object.clone()
+				})
+			},
+			_ => None
+		}
+	}
+}
+impl ValueConv for Json {
+	fn to_value(&self) -> Value {
+		Gc::new(ValueData::from_json(self.clone()))
+	}
+	fn from_value(v:Value) -> Option<Json> {
+		Some(v.borrow().to_json())
+	}
+}
+impl ValueConv for () {
+	fn to_value(&self) -> Value {
+		Gc::new(VNull)
+	}
+	fn from_value(v:Value) -> Option<()> {
+		Some(())
+	}
+}
+/// A utility function that just calls ValueConv::from_value
+pub fn from_value<A: ValueConv>(v: Value) -> Option<A> {
+	ValueConv::from_value(v)
+}
+
+/// A utility function that just calls ValueConv::to_value
+pub fn to_value<A: ValueConv>(v: A) -> Value {
+	v.to_value()
 }

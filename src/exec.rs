@@ -2,7 +2,7 @@ use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use js::value::{Value, VNull, VUndefined, VNumber, VInteger, VString, VObject, VBoolean, VFunction, ResultValue};
+use js::value::{Value, VNull, VUndefined, VNumber, VInteger, VString, VObject, VBoolean, VFunction, ResultValue, to_value};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
@@ -67,8 +67,8 @@ impl Executor for Interpreter {
 		match *expr {
 			ConstExpr(CNull) => Ok(Gc::new(VNull)),
 			ConstExpr(CUndefined) => Ok(Gc::new(VUndefined)),
-			ConstExpr(CNum(num)) => Ok(Gc::new(VNumber(num))),
-			ConstExpr(CInt(num)) => Ok(Gc::new(VNumber(num as f64))),
+			ConstExpr(CNum(num)) => Ok(to_value(num)),
+			ConstExpr(CInt(num)) => Ok(to_value(num as f64)),
 			ConstExpr(CString(ref str)) => Ok(Gc::new(VString(str.to_owned()))),
 			ConstExpr(CBool(val)) => Ok(Gc::new(VBoolean(val))),
 			ConstExpr(CRegExp(ref reg, _, _)) => Ok(Gc::new(VBoolean(true))),
@@ -195,7 +195,7 @@ impl Executor for Interpreter {
 					index += 1;
 				}
 				arr_map.insert(~"__proto__", self.get_global(~"Array").borrow().get_field(~"prototype"));
-				arr_map.insert(~"length", Gc::new(VInteger(index)));
+				arr_map.insert(~"length", to_value(index));
 				Ok(Gc::new(VObject(RefCell::new(arr_map))))
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {

@@ -1,5 +1,5 @@
 use js::function::{NativeFunc, NativeFunction};
-use js::value::{Value, ValueData, VObject, VString, VFunction, ResultValue};
+use js::value::{Value, ValueData, VObject, VString, VFunction, ResultValue, to_value};
 use collections::treemap::TreeMap;
 use serialize::json::{ToJson, from_str};
 use std::gc::Gc;
@@ -24,7 +24,7 @@ pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new 'JSON' object
 pub fn _create() -> Value {
 	let mut obj = TreeMap::new();
-	obj.insert(~"stringify", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(stringify, 1))))));
-	obj.insert(~"parse", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse, 1))))));
-	Gc::new(VObject(RefCell::new(obj)))
+	obj.insert(~"stringify", to_value(stringify));
+	obj.insert(~"parse", to_value(parse));
+	to_value(obj)
 }

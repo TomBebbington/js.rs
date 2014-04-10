@@ -1,6 +1,6 @@
 use js::function::{NativeFunction, NativeFunc};
 use js::object::ObjectData;
-use js::value::{Value, ResultValue, VFunction, VString, VObject, VUndefined};
+use js::value::{Value, ResultValue, VFunction, VString, VObject, VUndefined, to_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::cell::RefCell;
@@ -24,7 +24,7 @@ pub fn _create() -> Value {
 	let mut prototype : ObjectData = TreeMap::new();
 	prototype.insert(~"message", Gc::new(VString(~"")));
 	prototype.insert(~"name", Gc::new(VString(~"Error")));
-	prototype.insert(~"toString", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(to_string, 0))))));
-	func.object.insert(~"prototype", Gc::new(VObject(RefCell::new(prototype))));
+	prototype.insert(~"toString", to_value(to_string));
+	func.object.insert(~"prototype", to_value(prototype));
 	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
 }

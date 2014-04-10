@@ -1,11 +1,11 @@
 use js::object::ObjectData;
-use js::value::{Value, VFunction, VInteger, VObject, ResultValue};
+use js::value::{Value, VInteger, VObject, ResultValue, to_value};
 use ast::Expr;
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use exec::Executor;
 use std::cell::RefCell;
-type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
+pub type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
 #[deriving(Clone)]
 /// A Javascript function
 pub enum Function {
@@ -68,12 +68,12 @@ impl NativeFunction {
 	/// Make a new native function with the given function data
 	pub fn new(data : NativeFunctionData, nargs: uint) -> NativeFunction {
 		let mut obj = TreeMap::new();
-		obj.insert(~"arguments", Gc::new(VInteger(nargs as i32)));
+		obj.insert(~"arguments", to_value(nargs as i32));
 		NativeFunction {object: obj, data: data, nargs: nargs}
 	}
 }
 /// Create a new 'Function' object
 pub fn _create() -> Value {
-	let mut function = TreeMap::new();
-	Gc::new(VObject(RefCell::new(function)))
+	let mut function : ObjectData = TreeMap::new();
+	to_value(function)
 }

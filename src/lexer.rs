@@ -7,6 +7,7 @@ use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor};
 use ast::Token;
 use std::io::{IoResult, EndOfFile};
+use std::char::is_whitespace;
 #[deriving(Clone)]
 #[deriving(Eq)]
 #[deriving(Show)]
@@ -209,7 +210,7 @@ impl Lexer {
 					self.clear_buffer();
 					self.tokens.push(TEqual)
 				},
-				' ' | '\t' | '\n' => self.clear_buffer(),
+				_ if is_whitespace(ch) => self.clear_buffer(),
 				_ => self.ident_buffer = format!("{}{}", self.ident_buffer, ch)
 			};
 		}

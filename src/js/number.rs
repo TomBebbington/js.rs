@@ -1,4 +1,4 @@
-use js::value::{Value, ResultValue, VFunction, VNumber, VInteger, VObject, VBoolean};
+use js::value::{Value, ResultValue, VFunction, VNumber, VInteger, VObject, VBoolean, to_value};
 use js::function::{NativeFunc, NativeFunction};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
@@ -66,25 +66,25 @@ pub fn strict_is_nan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Initialise the parse functions on a global object
 pub fn init(obj:Value) {
-	obj.borrow().set_field(~"NaN", Gc::new(VNumber(NAN)));
-	obj.borrow().set_field(~"Infinity", Gc::new(VNumber(INFINITY)));
-	obj.borrow().set_field(~"parseFloat", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse_float, 1))))));
-	obj.borrow().set_field(~"parseInt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse_int, 1))))));
-	obj.borrow().set_field(~"isFinite", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(is_finite, 1))))));
-	obj.borrow().set_field(~"isNaN", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(is_nan, 1))))));
+	obj.borrow().set_field(~"NaN", to_value(NAN));
+	obj.borrow().set_field(~"Infinity", to_value(INFINITY));
+	obj.borrow().set_field(~"parseFloat", to_value(parse_float));
+	obj.borrow().set_field(~"parseInt", to_value(parse_int));
+	obj.borrow().set_field(~"isFinite", to_value(is_finite));
+	obj.borrow().set_field(~"isNaN", to_value(is_nan));
 }
 /// Create a new 'Number' object
 pub fn _create() -> Value {
 	let mut number = TreeMap::new();
-	number.insert(~"NaN", Gc::new(VNumber(NAN)));
-	number.insert(~"MAX_VALUE", Gc::new(VNumber(MAX_VALUE)));
-	number.insert(~"MIN_VALUE", Gc::new(VNumber(MIN_VALUE)));
-	number.insert(~"POSITIVE_INFINITY", Gc::new(VNumber(INFINITY)));
-	number.insert(~"NEGATIVE_INFINITY", Gc::new(VNumber(NEG_INFINITY)));
-	number.insert(~"EPSILON", Gc::new(VNumber(EPSILON)));
-	number.insert(~"parseFloat", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse_float, 1))))));
-	number.insert(~"parseInt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse_int, 1))))));
-	number.insert(~"isFinite", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(strict_is_finite, 1))))));
-	number.insert(~"isNaN", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(strict_is_nan, 1))))));
-	Gc::new(VObject(RefCell::new(number)))
+	number.insert(~"NaN", to_value(NAN));
+	number.insert(~"MAX_VALUE", to_value(MAX_VALUE));
+	number.insert(~"MIN_VALUE", to_value(MIN_VALUE));
+	number.insert(~"POSITIVE_INFINITY", to_value(INFINITY));
+	number.insert(~"NEGATIVE_INFINITY", to_value(NEG_INFINITY));
+	number.insert(~"EPSILON", to_value(EPSILON));
+	number.insert(~"parseFloat", to_value(parse_float));
+	number.insert(~"parseInt", to_value(parse_int));
+	number.insert(~"isFinite", to_value(strict_is_finite));
+	number.insert(~"isNaN", to_value(strict_is_nan));
+	to_value(number)
 }
