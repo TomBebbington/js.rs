@@ -8,7 +8,6 @@ use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
 use collections::treemap::TreeMap;
 use std::vec::Vec;
-use std::f64;
 use std::gc::Gc;
 use std::cell::RefCell;
 /// An execution engine
