@@ -5,7 +5,7 @@ use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use js::value::{Value, VNull, VUndefined, VNumber, VString, VObject, VBoolean, VFunction, ResultValue};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
-use js::{console, math, object, array, function, json};
+use js::{console, math, object, array, function, json, number};
 use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::f64;
@@ -44,7 +44,10 @@ impl Executor for Interpreter {
 		globals.insert(~"Array", array::_create());
 		globals.insert(~"Function", function::_create());
 		globals.insert(~"JSON", json::_create());
-		return ~Interpreter {global: Gc::new(VObject(RefCell::new(globals))), scopes: Vec::new()};
+		globals.insert(~"Number", number::_create());
+		let global = Gc::new(VObject(RefCell::new(globals)));
+		number::init(global);
+		return ~Interpreter {global: global, scopes: Vec::new()};
 	}
 	fn set_global(&mut self, name:~str, val:Value) -> Value {
 		self.global.borrow().set_field(name, val)

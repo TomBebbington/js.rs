@@ -43,6 +43,8 @@ pub mod js {
 	pub mod math;
 	/// The global JSON object
 	pub mod json;
+	/// The global Number object and associated functions
+	pub mod number;
 	/// Errors
 	pub mod error;
 }
