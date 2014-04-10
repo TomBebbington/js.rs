@@ -2,7 +2,7 @@ use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use js::value::{Value, ValueData, VNull, VUndefined, VNumber, VInteger, VString, VObject, VBoolean, VFunction, ResultValue, to_value};
+use js::value::{Value, ValueData, VNull, VUndefined, VString, VObject, VBoolean, VFunction, ResultValue, to_value};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
