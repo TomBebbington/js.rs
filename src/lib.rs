@@ -19,6 +19,7 @@ extern crate collections;
 extern crate time;
 extern crate serialize;
 extern crate rand;
+extern crate url;
 /// The Abstract Syntax Tree module
 pub mod ast;
 /// The lexing module
@@ -47,4 +48,6 @@ pub mod js {
 	pub mod number;
 	/// Errors
 	pub mod error;
+	/// Global methods concerning URIs
+	pub mod uri;
 }
