@@ -179,7 +179,7 @@ impl ValueData {
 				VObject(RefCell::new(data))
 			},
 			Object(obj) => {
-				let mut data : ObjectData = FromIterator::from_iter(obj.iter().map(|(key, json)| {
+				let data : ObjectData = FromIterator::from_iter(obj.iter().map(|(key, json)| {
 					(key.clone(), Property::new(to_value(json.clone())))
 				}));
 				VObject(RefCell::new(data))
@@ -214,7 +214,7 @@ impl fmt::Show for ValueData {
 			VInteger(v) => write!(f.buf, "{}", v),
 			VFunction(ref v) => {
 				match v.borrow().clone() {
-					NativeFunc(nf) => {
+					NativeFunc(_) => {
 						f.buf.write_str("function() { [native code] }")
 					},
 					RegularFunc(rf) => {
