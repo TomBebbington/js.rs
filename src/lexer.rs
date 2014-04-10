@@ -91,9 +91,16 @@ impl Lexer {
 							'u' => {
 								let mut nums = ~"";
 								for _ in range(0, 4) {
-									nums = format!("{}{}", nums, reader.read_char().unwrap());
+									nums = format!("{}{}", nums, try!(reader.read_char()));
 								}
-								from_u32(FromStrRadix::from_str_radix(nums, 16).unwrap()).unwrap()
+								let as_num = match FromStrRadix::from_str_radix(nums, 16) {
+									Some(v) => v,
+									None => 0
+								};
+								match from_u32(as_num) {
+									Some(v) => v,
+									None => fail!("{} is not a valid unicode scalar value", as_num)
+								}
 							},
 							'\'' if self.string_start == Some(SingleQuote) => '\'',
 							'"' if self.string_start == Some(DoubleQuote) => '"',
