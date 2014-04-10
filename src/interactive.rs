@@ -11,7 +11,7 @@ fn main() {
 	print!("> ");
 	for line in io::stdin().lines() {
 		match line {
-			Some(line) => {
+			Ok(line) => {
 				let mut lexer = Lexer::new();
 				lexer.lex_str(line.unwrap()).v_unwrap();
 				let mut parser = Parser::new(lexer.tokens);
@@ -23,7 +23,9 @@ fn main() {
 				}
 				print!("\n> ");
 			},
-			None => ()
+			Err(err) => {
+				fail!("{}", err);
+			}
 		}
 	}
 }
