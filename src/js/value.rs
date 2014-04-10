@@ -189,16 +189,7 @@ impl fmt::Show for ValueData {
 			VFunction(ref v) => {
 				match v.borrow().clone() {
 					NativeFunc(nf) => {
-						try!(f.buf.write_str("function("));
-						let mut letter = 'a';
-						for i in range(0, nf.nargs) {
-							try!(write!(f.buf, "{}", letter));
-							letter = ((letter as u8) + 1u8) as char;
-							if i < nf.nargs - 1 {
-								try!(f.buf.write_str(", "));
-							}
-						}
-						f.buf.write_str(") {...}")
+						f.buf.write_str("function() { [native code] }")
 					},
 					RegularFunc(rf) => {
 						try!(f.buf.write_str("function("));
@@ -365,7 +356,7 @@ impl<T:ValueConv> ValueConv for Vec<T> {
 }
 impl ValueConv for NativeFunctionData {
 	fn to_value(&self) -> Value {
-		Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self, 0)))))
+		Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self)))))
 	}
 	fn from_value(v:Value) -> Option<NativeFunctionData> {
 		match *v.borrow() {

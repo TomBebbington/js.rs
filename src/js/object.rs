@@ -38,7 +38,7 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Object' object
 pub fn _create() -> Value {
-	let mut func = NativeFunction::new(make_object, 0);
+	let mut func = NativeFunction::new(make_object);
 	let mut prototype : ObjectData = TreeMap::new();
 	prototype.insert(~"toString", to_value(to_string));
 	func.object.insert(~"length", to_value(1i32));

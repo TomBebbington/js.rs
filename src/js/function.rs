@@ -60,16 +60,13 @@ pub struct NativeFunction {
 	/// The fields associated with the function
 	pub object : ObjectData,
 	/// The callable function data
-	pub data: NativeFunctionData,
-	/// The number of arguments
-	pub nargs: uint
+	pub data: NativeFunctionData
 }
 impl NativeFunction {
 	/// Make a new native function with the given function data
-	pub fn new(data : NativeFunctionData, nargs: uint) -> NativeFunction {
+	pub fn new(data : NativeFunctionData) -> NativeFunction {
 		let mut obj = TreeMap::new();
-		obj.insert(~"arguments", to_value(nargs as i32));
-		NativeFunction {object: obj, data: data, nargs: nargs}
+		NativeFunction {object: obj, data: data}
 	}
 }
 /// Create a new 'Function' object

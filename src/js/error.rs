@@ -20,7 +20,7 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Error' object
 pub fn _create() -> Value {
-	let mut func = NativeFunction::new(make_error, 0);
+	let mut func = NativeFunction::new(make_error);
 	let mut prototype : ObjectData = TreeMap::new();
 	prototype.insert(~"message", to_value(~""));
 	prototype.insert(~"name", to_value(~"Error"));

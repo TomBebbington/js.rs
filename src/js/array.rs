@@ -12,6 +12,6 @@ pub fn make_array(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Array' object
 pub fn _create() -> Value {
-	let mut func = NativeFunction::new(make_array, 0);
+	let mut func = NativeFunction::new(make_array);
 	Gc::new(VFunction(RefCell::new(NativeFunc(func))))
 }
