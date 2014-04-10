@@ -19,6 +19,7 @@ Supported language features
 Supported APIs
 --------------
 + Math
++ Number
 + JSON
 + Console.log
 
