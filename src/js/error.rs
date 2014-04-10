@@ -1,5 +1,4 @@
 use js::value::{Value, ValueData, ResultValue, VUndefined, to_value};
-use collections::treemap::TreeMap;
 use std::gc::Gc;
 
 /// Create a new error

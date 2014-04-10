@@ -60,11 +60,11 @@ impl ValueConv for Property {
 	}
 }
 /// Create new object
-pub fn make_object(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
+pub fn make_object(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VUndefined))
 }
 /// Get the prototype
-pub fn get_proto_of(_:Value, _:Value, mut args:Vec<Value>) -> ResultValue {
+pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
 	return Ok(obj.borrow().get_field(~"__proto__"));
 }
@@ -89,8 +89,8 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Object' object
 pub fn _create() -> Value {
-	let mut obj = to_value(make_object);
-	let mut prototype = ValueData::new_obj();
+	let obj = to_value(make_object);
+	let prototype = ValueData::new_obj();
 	prototype.borrow().set_field(~"toString", to_value(to_string));
 	obj.borrow().set_field(~"length", to_value(1i32));
 	obj.borrow().set_field(~"prototype", prototype);

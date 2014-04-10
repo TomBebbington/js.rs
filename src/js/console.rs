@@ -1,5 +1,4 @@
 use js::value::{Value, ValueData, ResultValue, VUndefined, to_value, from_value};
-use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::iter::FromIterator;
 use std::io::stdio::stderr;
@@ -20,7 +19,7 @@ pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'console' object
 pub fn _create() -> Value {
-	let mut console = ValueData::new_obj();
+	let console = ValueData::new_obj();
 	console.borrow().set_field(~"log", to_value(log));
 	console.borrow().set_field(~"error", to_value(error));
 	console.borrow().set_field(~"exception", to_value(error));

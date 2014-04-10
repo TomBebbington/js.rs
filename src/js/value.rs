@@ -235,9 +235,9 @@ impl Eq for ValueData {
 			(VBoolean(a), VBoolean(b)) if a == b => true,
 			(VString(ref a), VString(ref b)) if a == b => true,
 			(VNumber(a), VNumber(b)) if a == b => true,
-			(VObject(ref a), VObject(ref b)) if self == other => true,
 			(VInteger(a), VInteger(b)) if a == b => true,
-			(VFunction(ref a), VFunction(ref b)) if self == other => true,
+			(VObject(_), VObject(_)) if self == other => true,
+			(VFunction(_), VFunction(_)) if self == other => true,
 			_ => false
 		}
 	}
@@ -425,7 +425,7 @@ impl ValueConv for () {
 	fn to_value(&self) -> Value {
 		Gc::new(VNull)
 	}
-	fn from_value(v:Value) -> Option<()> {
+	fn from_value(_:Value) -> Option<()> {
 		Some(())
 	}
 }

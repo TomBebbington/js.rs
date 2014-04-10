@@ -64,12 +64,12 @@ pub struct NativeFunction {
 impl NativeFunction {
 	/// Make a new native function with the given function data
 	pub fn new(data : NativeFunctionData) -> NativeFunction {
-		let mut obj = TreeMap::new();
+		let obj = TreeMap::new();
 		NativeFunction {object: obj, data: data}
 	}
 }
 /// Create a new 'Function' object
 pub fn _create() -> Value {
-	let mut function : ObjectData = TreeMap::new();
+	let function : ObjectData = TreeMap::new();
 	to_value(function)
 }

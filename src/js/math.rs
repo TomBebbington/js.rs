@@ -1,8 +1,6 @@
 use js::value::{Value, ValueData, ResultValue, to_value, from_value};
-use collections::treemap::TreeMap;
 use rand::random;
 use std::f64;
-use std::gc::Gc;
 
 /// Get the absolute value of a number
 pub fn abs(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
@@ -121,7 +119,7 @@ pub fn pow(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}))
 }
 /// Generate a random floating-point number between 0 and 1
-pub fn _random(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn _random(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	Ok(to_value(random::<f64>()))
 }
 /// Round a number to the nearest integer
@@ -158,7 +156,7 @@ pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Math' object
 pub fn _create() -> Value {
-	let mut math = ValueData::new_obj();
+	let math = ValueData::new_obj();
 	math.borrow().set_field(~"E", to_value(f64::consts::E));
 	math.borrow().set_field(~"LN2", to_value(f64::consts::LN_2));
 	math.borrow().set_field(~"LN10", to_value(f64::consts::LN_10));

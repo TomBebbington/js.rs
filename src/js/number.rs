@@ -1,5 +1,4 @@
 use js::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from_value};
-use std::gc::Gc;
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
 /// Parse a float
 pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
@@ -70,7 +69,7 @@ pub fn init(obj:Value) {
 }
 /// Create a new 'Number' object
 pub fn _create() -> Value {
-	let mut number = ValueData::new_obj();
+	let number = ValueData::new_obj();
 	number.borrow().set_field(~"NaN", to_value(NAN));
 	number.borrow().set_field(~"MAX_VALUE", to_value(MAX_VALUE));
 	number.borrow().set_field(~"MIN_VALUE", to_value(MIN_VALUE));
