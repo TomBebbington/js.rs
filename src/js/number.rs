@@ -1,8 +1,5 @@
-use js::value::{Value, ValueData, ResultValue, VFunction, VNumber, VInteger, VObject, VBoolean, to_value, from_value};
-use js::function::{NativeFunc, NativeFunction};
-use collections::treemap::TreeMap;
+use js::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from_value};
 use std::gc::Gc;
-use std::cell::RefCell;
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
 /// Parse a float
 pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {

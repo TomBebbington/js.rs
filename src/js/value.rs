@@ -2,7 +2,6 @@ use js::object::{ObjectData, Property};
 use js::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
-use serialize::{Encodable, Decodable};
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;

@@ -1,9 +1,6 @@
-use js::function::{NativeFunction, NativeFunc};
-use js::object::ObjectData;
-use js::value::{Value, ValueData, ResultValue, VFunction, VString, VObject, VUndefined, to_value};
+use js::value::{Value, ValueData, ResultValue, VUndefined, to_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
-use std::cell::RefCell;
 
 /// Create a new error
 pub fn make_error(this:Value, _:Value, args:Vec<Value>) -> ResultValue {

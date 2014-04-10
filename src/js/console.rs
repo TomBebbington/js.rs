@@ -1,11 +1,8 @@
-use js::function::{NativeFunction, NativeFunc};
-use js::value::{Value, ValueData, ResultValue, VFunction, VUndefined, VObject, to_value, from_value};
+use js::value::{Value, ValueData, ResultValue, VUndefined, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
-use std::cell::RefCell;
 use std::iter::FromIterator;
 use std::io::stdio::stderr;
-use std::io::Writer;
 use time::{now, strftime};
 /// Print a javascript value to stdout
 pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {

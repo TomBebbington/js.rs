@@ -1,9 +1,6 @@
-use js::function::{NativeFunc, NativeFunction};
-use js::value::{Value, ValueData, ValueConv, VFunction, VUndefined, VObject, VInteger, VString, ResultValue, to_value, from_value};
+use js::value::{Value, ValueData, ValueConv, VUndefined, VString, ResultValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
-use std::cell::RefCell;
-use std::fmt;
 
 #[deriving(Clone)]
 pub type ObjectData = TreeMap<~str, Property>;

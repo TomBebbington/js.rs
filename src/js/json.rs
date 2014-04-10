@@ -1,9 +1,6 @@
-use js::function::{NativeFunc, NativeFunction};
-use js::value::{Value, ValueData, VObject, VString, VFunction, ResultValue, to_value};
-use collections::treemap::TreeMap;
+use js::value::{Value, ValueData, VString, ResultValue, to_value};
 use serialize::json::{ToJson, from_str};
 use std::gc::Gc;
-use std::cell::RefCell;
 /// Turn a JSON string back into a Javascript object
 pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	match from_str(args.get(0).borrow().to_str()) {

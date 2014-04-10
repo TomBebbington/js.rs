@@ -1,10 +1,8 @@
-use js::value::{Value, ValueData, VNumber, VFunction, VObject, ResultValue, to_value, from_value};
-use js::function::{NativeFunction, NativeFunc};
+use js::value::{Value, ValueData, ResultValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use rand::random;
 use std::f64;
 use std::gc::Gc;
-use std::cell::RefCell;
 
 /// Get the absolute value of a number
 pub fn abs(_:Value, _:Value, args:Vec<Value>) -> ResultValue {

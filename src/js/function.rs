@@ -1,10 +1,9 @@
 use js::object::{ObjectData, Property};
-use js::value::{Value, VInteger, VObject, ResultValue, to_value};
+use js::value::{Value, VInteger, ResultValue, to_value};
 use ast::Expr;
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use exec::Executor;
-use std::cell::RefCell;
 pub type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
 #[deriving(Clone)]
 /// A Javascript function
