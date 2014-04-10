@@ -1,6 +1,6 @@
 use js::function::{NativeFunction, NativeFunc};
 use js::object::ObjectData;
-use js::value::{Value, ResultValue, VFunction, VNumber, VString, VObject, VUndefined};
+use js::value::{Value, ResultValue, VFunction, VString, VObject, VUndefined};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::cell::RefCell;

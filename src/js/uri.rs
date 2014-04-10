@@ -1,5 +1,5 @@
 use js::function::{NativeFunction, NativeFunc};
-use js::value::{Value, ResultValue, VFunction, VString, VUndefined, VObject};
+use js::value::{Value, ResultValue, VFunction, VString, VUndefined};
 use url::{encode, decode, encode_component, decode_component};
 use std::cell::RefCell;
 use std::gc::Gc;
