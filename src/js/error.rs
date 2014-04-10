@@ -20,11 +20,11 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Create a new 'Error' object
 pub fn _create() -> Value {
-	let mut func = to_value(make_error);
-	let mut prototype = ValueData::new_obj();
+	let error = to_value(make_error);
+	let prototype = ValueData::new_obj();
 	prototype.borrow().set_field(~"message", to_value(~""));
 	prototype.borrow().set_field(~"name", to_value(~"Error"));
 	prototype.borrow().set_field(~"toString", to_value(to_string));
-	func.borrow().set_field(~"prototype", prototype);
-	func
+	error.borrow().set_field(~"prototype", prototype);
+	error
 }
