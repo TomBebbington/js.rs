@@ -5,8 +5,7 @@ before_install:
   - yes | sudo add-apt-repository ppa:hansjorg/rust
   - sudo apt-get update
 install:
-  - sudo apt-get install rust-nightly python-pip
-  - sudo pip install cargo-lite
+  - sudo apt-get install rust-nightly
 script:
   - make build doc
 notifications:
