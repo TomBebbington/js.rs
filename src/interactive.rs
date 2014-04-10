@@ -13,7 +13,7 @@ fn main() {
 		match line {
 			Ok(line) => {
 				let mut lexer = Lexer::new();
-				lexer.lex_str(line.unwrap()).v_unwrap();
+				lexer.lex_str(line).v_unwrap();
 				let mut parser = Parser::new(lexer.tokens);
 				let result_e = parser.parse_all().v_unwrap();
 				let result = engine.run(result_e);
