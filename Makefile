@@ -1,16 +1,13 @@
 .PHONY: all build interactive tests doc clean
 all: build interactive tests doc
 build:
-	cargo-lite build
 	mkdir -p bin
-	-mv -f src/librust* bin
+	rustc src/lib.rs --out-dir=bin --opt-level=3
 tests:
-	cd src && rustc tests.rs -L ../bin --test
-	mv src/tests bin
+	rustc src/tests.rs --out-dir=bin -L bin --test --opt-level=3
 interactive:
-	cd src && rustc interactive.rs -L ../bin
-	mv src/interactive bin/rust_js
+	rustc src/interactive.rs --out-dir=bin -L bin --opt-level=3
 doc:
-	cd src && rustdoc lib.rs -o ../doc
+	rustdoc src/lib.rs -o ../doc
 clean:
 	rm -rf bin/*
