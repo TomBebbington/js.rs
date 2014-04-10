@@ -26,8 +26,6 @@ Supported APIs
 Roadmap
 -------
 + Add Date
-+ Add Number
-+ Add global parsing functions
 
 Contributing
 ------------
