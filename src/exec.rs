@@ -69,7 +69,7 @@ impl Executor for Interpreter {
 			ConstExpr(CInt(num)) => Ok(to_value(num as f64)),
 			ConstExpr(CString(ref str)) => Ok(Gc::new(VString(str.to_owned()))),
 			ConstExpr(CBool(val)) => Ok(Gc::new(VBoolean(val))),
-			ConstExpr(CRegExp(ref reg, _, _)) => Ok(Gc::new(VBoolean(true))),
+			ConstExpr(CRegExp(_, _, _)) => Ok(Gc::new(VNull)),
 			BlockExpr(ref es) => {
 				let mut obj = Gc::new(VNull);
 				for e in es.iter() {
