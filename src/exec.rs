@@ -36,14 +36,14 @@ pub struct Interpreter {
 impl Executor for Interpreter {
 	fn new() -> ~Interpreter {
 		let mut globals : ObjectData = TreeMap::new();
-		globals.swap(~"NaN", Gc::new(VNumber(f64::NAN)));
-		globals.swap(~"Infinity", Gc::new(VNumber(f64::INFINITY)));
-		globals.swap(~"console", console::_create());
-		globals.swap(~"Math", math::_create());
-		globals.swap(~"Object", object::_create());
-		globals.swap(~"Array", array::_create());
-		globals.swap(~"Function", function::_create());
-		globals.swap(~"JSON", json::_create());
+		globals.insert(~"NaN", Gc::new(VNumber(f64::NAN)));
+		globals.insert(~"Infinity", Gc::new(VNumber(f64::INFINITY)));
+		globals.insert(~"console", console::_create());
+		globals.insert(~"Math", math::_create());
+		globals.insert(~"Object", object::_create());
+		globals.insert(~"Array", array::_create());
+		globals.insert(~"Function", function::_create());
+		globals.insert(~"JSON", json::_create());
 		return ~Interpreter {global: Gc::new(VObject(RefCell::new(globals))), scopes: Vec::new()};
 	}
 	fn set_global(&mut self, name:~str, val:Value) -> Value {
