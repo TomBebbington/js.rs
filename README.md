@@ -5,10 +5,10 @@ Documentation
 -------------
 [View here](http://www.rust-ci.org/TopHattedCoder/rust_js/doc/rust_js/)
 
-Supported features
-------------------
-+ Math functions (fully supports the standard functions)
-+ Switch blocks (partially implemented, they currently ignore break statements)
+Supported language features
+---------------------------
++ Functions(partial, return last expression)
++ Switch blocks (partial, ignore breaks)
 + If blocks
 + While blocks
 + Object declarations
@@ -16,9 +16,17 @@ Supported features
 + Strings
 + Numbers
 
+Supported APIs
+--------------
++ Math
++ JSON
++ Console.log
+
 Roadmap
 -------
-+ Add functions
++ Add Date
++ Add Number
++ Add global parsing functions
 
 Contributing
 ------------
