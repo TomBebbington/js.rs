@@ -1,9 +1,7 @@
-use js::value::{Value, VNumber, VInteger, VFunction, VObject, ResultValue};
+use js::value::{Value, VNumber, VFunction, VObject, ResultValue};
 use js::function::{NativeFunction, NativeFunc};
-use js::object::ObjectData;
 use collections::treemap::TreeMap;
 use rand::random;
-use std::io::stdio;
 use std::f64;
 use std::gc::Gc;
 use std::cell::RefCell;

@@ -1,7 +1,6 @@
 use js::function::{NativeFunc, NativeFunction};
-use js::value::{ValueData, Value, VFunction, VUndefined, VObject, VInteger, VString, ResultValue};
+use js::value::{Value, VFunction, VUndefined, VObject, VInteger, VString, ResultValue};
 use collections::treemap::TreeMap;
-use serialize::json::;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::fmt;

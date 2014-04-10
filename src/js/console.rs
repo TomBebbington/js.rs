@@ -1,5 +1,4 @@
 use js::function::{NativeFunction, NativeFunc};
-use js::object::ObjectData;
 use js::value::{Value, ResultValue, VFunction, VUndefined, VObject};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
