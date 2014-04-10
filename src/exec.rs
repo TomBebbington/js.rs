@@ -2,7 +2,7 @@ use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use js::value::{Value, VNull, VUndefined, VNumber, VString, VObject, VBoolean, VFunction, ResultValue};
+use js::value::{Value, VNull, VUndefined, VNumber, VInteger, VString, VObject, VBoolean, VFunction, ResultValue};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
@@ -188,13 +188,14 @@ impl Executor for Interpreter {
 			},
 			ArrayDeclExpr(ref arr) => {
 				let mut arr_map = TreeMap::new();
-				let mut index = 0;
+				let mut index : i32 = 0;
 				for val in arr.iter() {
 					let val = try!(self.run(val.clone()));
 					arr_map.insert(index.to_str(), val);
 					index += 1;
 				}
 				arr_map.insert(~"__proto__", self.get_global(~"Array").borrow().get_field(~"prototype"));
+				arr_map.insert(~"length", Gc::new(VInteger(index)));
 				Ok(Gc::new(VObject(RefCell::new(arr_map))))
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {
