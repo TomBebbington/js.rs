@@ -18,14 +18,17 @@ Supported language features
 
 Supported APIs
 --------------
++ Error (partial)
 + Math
 + Number
 + JSON
 + Console.log
++ URI decoding / encoding (partial, doesn't use JS rules)
 
 Roadmap
 -------
 + Add Date
++ Add SyntaxError, TypeError, etc
 
 Contributing
 ------------
