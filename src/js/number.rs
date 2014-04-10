@@ -44,6 +44,8 @@ pub fn strict_is_finite(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Initialise the parse functions on a global object
 pub fn init(obj:Value) {
+	obj.borrow().set_field(~"NaN", Gc::new(VNumber(NAN)));
+	obj.borrow().set_field(~"Infinity", Gc::new(VNumber(INFINITY)));
 	obj.borrow().set_field(~"parseFloat", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse_float, 1))))));
 	obj.borrow().set_field(~"parseInt", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(parse_int, 1))))));
 	obj.borrow().set_field(~"isFinite", Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(is_finite, 1))))));
