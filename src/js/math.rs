@@ -1,4 +1,4 @@
-use js::value::{Value, VNumber, VFunction, VObject, ResultValue, to_value};
+use js::value::{Value, VNumber, VFunction, VObject, ResultValue, to_value, from_value};
 use js::function::{NativeFunction, NativeFunc};
 use collections::treemap::TreeMap;
 use rand::random;
@@ -8,91 +8,102 @@ use std::cell::RefCell;
 
 /// Get the absolute value of a number
 pub fn abs(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().abs()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.abs()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the arccos of a number
 pub fn acos(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().acos()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.acos()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the arcsine of a number
 pub fn asin(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().asin()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.asin()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the arctangent of a number
 pub fn atan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().atan()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.atan()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the arctangent of a numbers
 pub fn atan2(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().atan2(&args.get(1).borrow().to_num())
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.atan2(&args.get(1).borrow().to_num())
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the cubic root of a number
 pub fn cbrt(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().cbrt()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.cbrt()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get lowest integer above a number
 pub fn ceil(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().ceil()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.ceil()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the cosine of a number
 pub fn cos(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().cos()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.cos()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the power to raise the natural logarithm to get the number
 pub fn exp(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().exp()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.exp()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the highest integer below a number
 pub fn floor(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().floor()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.floor()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the natural logarithm of a number
 pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().log(&f64::consts::E)
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.log(&f64::consts::E)
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the maximum of several numbers
 pub fn max(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
@@ -114,49 +125,53 @@ pub fn min(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Raise a number to a power
 pub fn pow(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 2 {
-		let num = args.get(0);
-		let power = args.get(1);
-		num.borrow().to_num().powf(&power.borrow().to_num())
+	Ok(to_value(if args.len() >= 2 {
+		let num : f64 = from_value(*args.get(0)).unwrap();
+		let power : f64 = from_value(*args.get(1)).unwrap();
+		num.powf(&power)
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Generate a random floating-point number between 0 and 1
 pub fn _random(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(random())))
+	Ok(to_value(random::<f64>()))
 }
 /// Round a number to the nearest integer
 pub fn round(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().round()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.round()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the sine of a number
 pub fn sin(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().sin()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.sin()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the square root of a number
 pub fn sqrt(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().sqrt()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.sqrt()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Get the tangent of a number
 pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VNumber(if args.len() >= 1 {
-		args.get(0).borrow().to_num().tan()
+	Ok(to_value(if args.len() >= 1 {
+		let val : f64 = from_value(*args.get(0)).unwrap();
+		val.tan()
 	} else {
 		f64::NAN
-	})))
+	}))
 }
 /// Create a new 'Math' object
 pub fn _create() -> Value {
@@ -166,7 +181,7 @@ pub fn _create() -> Value {
 	math.insert(~"LN10", to_value(f64::consts::LN_10));
 	math.insert(~"LOG2E", to_value(f64::consts::LOG2_E));
 	math.insert(~"LOG10E", to_value(f64::consts::LOG10_E));
-	math.insert(~"SQRT1_2", Gc::new(VNumber(0.5f64.sqrt())));
+	math.insert(~"SQRT1_2", to_value(0.5f64.sqrt()));
 	math.insert(~"SQRT2", to_value(f64::consts::SQRT2));
 	math.insert(~"PI", to_value(f64::consts::PI));
 	math.insert(~"abs", to_value(abs));
