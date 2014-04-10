@@ -54,8 +54,7 @@ impl Executor for Interpreter {
 		self.global.borrow().get_field(name)
 	}
 	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>> {
-		let mut data = TreeMap::new();
-		let value = Gc::new(RefCell::new(data));
+		let value = Gc::new(RefCell::new(TreeMap::new()));
 		self.scopes.push(value.clone());
 		value
 	}
@@ -178,7 +177,7 @@ impl Executor for Interpreter {
 				Ok(result)
 			},
 			ObjectDeclExpr(ref map) => {
-				let mut obj = ValueData::new_obj();
+				let obj = ValueData::new_obj();
 				for (key, val) in map.iter() {
 					obj.borrow().set_field(key.clone(), try!(self.run(val.clone())));
 				}
@@ -186,7 +185,7 @@ impl Executor for Interpreter {
 				Ok(obj)
 			},
 			ArrayDeclExpr(ref arr) => {
-				let mut arr_map = ValueData::new_obj();
+				let arr_map = ValueData::new_obj();
 				let mut index : i32 = 0;
 				for val in arr.iter() {
 					let val = try!(self.run(val.clone()));
