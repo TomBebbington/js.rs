@@ -1,6 +1,6 @@
 use js::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from_value};
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
-/// Parse a float
+/// Parse a float into a value
 pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let parsed = from_str::<f64>(from_value::<~str>(*args.get(0)).unwrap());
 	return Ok(to_value(match parsed {
@@ -8,7 +8,7 @@ pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		None => NAN
 	}));
 }
-/// Parse an int
+/// Parse an int into a value
 pub fn parse_int(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let parsed = from_str::<i32>(from_value::<~str>(*args.get(0)).unwrap());
 	return Ok(match parsed {
@@ -58,7 +58,7 @@ pub fn strict_is_nan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		}
 	}))
 }
-/// Initialise the parse functions on a global object
+/// Initialise the parse functions on the global object
 pub fn init(obj:Value) {
 	obj.borrow().set_field(~"NaN", to_value(NAN));
 	obj.borrow().set_field(~"Infinity", to_value(INFINITY));

@@ -10,26 +10,28 @@ use std::cell::RefCell;
 use std::iter::FromIterator;
 static PROTOTYPE : &'static str = "__proto__";
 #[must_use]
+/// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;
+/// A Garbage-collected Javascript value as represented in the interpreter
 pub type Value = Gc<ValueData>;
 #[deriving(Clone)]
-/// Represents a Javascript value at runtime
+/// A Javascript value
 pub enum ValueData {
-	/// The null value
+	/// `null` - A null value, such as the `parentNode` of a newly created HTML Element
 	VNull,
-	/// The undefined value
+	/// `undefined` - An undefined value, such as `{}.children`
 	VUndefined,
-	/// A boolean true / false value
+	/// `boolean` - A `true` / `false` value, for if a certain criteria is met
 	VBoolean(bool),
-	/// A string value
+	/// `String` - A UTF-8 string, such as `"hello"`
 	VString(~str),
-	/// A numeric value
+	/// `Number` - A 64-bit floating point number, such as `-1293.0625`
 	VNumber(f64),
-	/// An integer value
+	/// `Number` - A 32-bit integer, such as `0x5f3759df`
 	VInteger(i32),
-	/// A value that is an object
+	/// `Object` - An object, such as `Math`, represented by a binary tree of string keys to javascript values
 	VObject(RefCell<ObjectData>),
-	/// A value that is a function
+	/// `Function` - A runnable block of code, such as `Math.sqrt`, which can take some variables and return a useful value or act upon an object
 	VFunction(RefCell<Function>)
 }
 impl ValueData {
@@ -102,7 +104,7 @@ impl ValueData {
 			VInteger(num) => num
 		}
 	}
-	/// Resolve the field in the value
+	/// Resolve the property in the object
 	pub fn get_prop(&self, field:~str) -> Option<Property> {
 		let obj : ObjectData = match *self {
 			VObject(ref obj) => obj.borrow().clone(),
@@ -124,7 +126,7 @@ impl ValueData {
 			}
 		}
 	}
-	/// Resolve the field in the value
+	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
 	pub fn get_field(&self, field:~str) -> Value {
 		match self.get_prop(field) {
 			Some(prop) => prop.value,
@@ -147,7 +149,7 @@ impl ValueData {
 		}
 		val
 	}
-	/// Set the field in the value
+	/// Set the property in the value
 	pub fn set_prop(&self, field:~str, prop:Property) -> Property {
 		match *self {
 			VObject(ref obj) => {
@@ -321,9 +323,9 @@ impl Not<ValueData> for ValueData {
 		return VInteger(!self.to_int());
 	}
 }
-/// Conversion to and from a Javascript value
+/// Conversion between Rust and Javascript values
 pub trait ValueConv {
-	/// Convert this into a Javascript value
+	/// Convert this Rust value into a Javascript value
 	fn to_value(&self) -> Value;
 	/// Convert a Javascript value to a Rust value
 	fn from_value(v:Value) -> Option<Self>;

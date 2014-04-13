@@ -3,13 +3,13 @@ use std::gc::Gc;
 use std::iter::FromIterator;
 use std::io::stdio::stderr;
 use time::{now, strftime};
-/// Print a javascript value to stdout
+/// Print a javascript value to the standard output stream
 pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let args : Vec<~str> = FromIterator::from_iter(args.iter().map(|x|from_value::<~str>(*x).unwrap()));
 	println!("{}: {}", strftime("%X", &now()), args.connect(" "));
 	return Ok(Gc::new(VUndefined));
 }
-/// Print a javascript value to stderr
+/// Print a javascript value to the standard error stream
 pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let args : Vec<~str> = FromIterator::from_iter(args.iter().map(|x|from_value::<~str>(*x).unwrap()));
 	match writeln!(&mut stderr().unwrap(), "{}: {}", strftime("%X", &now()), args.connect(" ")) {

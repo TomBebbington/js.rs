@@ -42,7 +42,7 @@ pub struct RegularFunction {
 	pub object : ObjectData,
 	/// This function's expression
 	pub expr : Expr,
-	/// The arguments
+	/// The argument names of the function
 	pub args : Vec<~str>
 }
 impl RegularFunction {

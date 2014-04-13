@@ -1,7 +1,7 @@
 use js::value::{Value, ValueData, VString, ResultValue, to_value};
 use serialize::json::{ToJson, from_str};
 use std::gc::Gc;
-/// Turn a JSON string back into a Javascript object
+/// Parse a JSON string into a Javascript object
 pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	match from_str(args.get(0).borrow().to_str()) {
 		Ok(json) => {
@@ -12,7 +12,7 @@ pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		}
 	}
 }
-/// Turn a Javascript object into a JSON string
+/// Process a Javascript object into a JSON string
 pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
 	let json = (obj.borrow() as &ToJson).to_json();
