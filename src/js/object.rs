@@ -89,9 +89,13 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Check if it has a property
 pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let prop = from_value::<~str>(*args.get(0)).unwrap();
-	Ok(to_value::<bool>(match *this.borrow() {
-		VObject(ref obj) => obj.borrow().find(&prop).is_some(),
+	let prop = if args.len() == 0 {
+		None
+	} else {
+		from_value::<~str>(*args.get(0))
+	};
+	Ok(to_value::<bool>(prop.is_some() && match *this.borrow() {
+		VObject(ref obj) => obj.borrow().find(&prop.unwrap()).is_some(),
 		_ => false
 	}))
 }
