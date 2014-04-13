@@ -8,6 +8,6 @@ tests:
 interactive:
 	rustc src/interactive.rs --out-dir=bin -L bin --opt-level=3
 doc:
-	rustdoc src/lib.rs -o ../doc
+	rustdoc src/lib.rs -o doc
 clean:
 	rm -rf bin/*
