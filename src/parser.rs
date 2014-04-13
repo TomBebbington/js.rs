@@ -19,13 +19,13 @@ impl fmt::Show for ParseError {
 		return match *self {
 			Expected(ref wanted, ref got) if wanted.len() == 0 => write!(f.buf, "Line {}, Column {}: Expected expression, got {}", got.line_number, got.column_number, got.data),
 			Expected(ref wanted, ref got) => {
-				try!(write!(f.buf, "Line {}, Column {}:", got.line_number, got.column_number));
+				try!(write!(f.buf, "Line {}, Column {}: ", got.line_number, got.column_number));
 				try!(write!(f.buf, "Expected "));
 				let last = wanted.last().unwrap();
 				for wanted_token in wanted.iter() {
 					try!(write!(f.buf, "'{}'{}", wanted_token, if wanted_token == last {""} else {", "}));
 				}
-				write!(f.buf, " but got {}", got)
+				write!(f.buf, " but got {}", got.data)
 			},
 			ExpectedExpr(ref wanted, ref got) => {
 				write!(f.buf, "Expected {}, but got {}", wanted, got)
