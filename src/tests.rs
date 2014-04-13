@@ -3,11 +3,12 @@
 extern crate rust_js;
 extern crate test;
 extern crate collections;
+use test::Bencher;
 use rust_js::lexer::Lexer;
 use rust_js::parser::{Parser, VerboseResult};
 use rust_js::exec::{Executor, Interpreter};
-use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString, VBoolean, from_value};
-
+use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString, VBoolean, VFunction, VUndefined, from_value, to_value};
+use std::gc::Gc;
 fn run(script:&str) -> Value {
 	let mut lexer = Lexer::new();
 	lexer.lex_str(script.to_owned()).v_unwrap();
@@ -81,4 +82,25 @@ fn test_define_prop() {
 		});
 		obj.some_bool
 	}"));
+}
+#[bench]
+fn bench_fib(b: &mut Bencher) {
+	let code = "function fib(n) {
+		return n <= 1 ? 1 : fib(n - 2) + fib(n - 1);
+	}";
+	let mut lexer = Lexer::new();
+	lexer.lex_str(code.to_owned()).v_unwrap();
+	let mut parser = Parser::new(lexer.tokens);
+	let result = parser.parse_all().v_unwrap();
+	let engine : &mut Interpreter = Executor::new();
+	let result : Result<Value, Value> = engine.run(result);
+	let fib = result.unwrap();
+	b.iter(|| {
+		match *fib.borrow() {
+			VFunction(ref func) => {
+				func.borrow().call(&mut engine.clone(), ValueData::new_obj(None), Gc::new(VUndefined), vec!(to_value(40i32)));
+			},
+			_ => ()
+		}
+	});
 }
