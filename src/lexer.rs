@@ -2,7 +2,7 @@ use std::io::{BufReader, BufferedReader, Reader};
 use std::strbuf::StrBuf;
 use std::char::from_u32;
 use std::num::FromStrRadix;
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor};
 use ast::{CompEqual, CompNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
@@ -230,6 +230,11 @@ impl Lexer {
 				'^' => {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitXor));
+				},
+				'=' if try!(iter.peek().unwrap().clone()) == '>' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TArrow);
 				},
 				'=' if try!(iter.peek().unwrap().clone()) == '=' => {
 					iter.next();

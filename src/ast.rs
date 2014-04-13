@@ -167,6 +167,8 @@ pub enum Expr {
 	ArrayDeclExpr(Vec<~Expr>),
 	/// Create a function with the given name, arguments, and expression
 	FunctionDeclExpr(Option<~str>, Vec<~str>, ~Expr),
+	/// Create an arrow function with the fiven arguments and expression
+	ArrowFunctionDeclExpr(Vec<~str>, ~Expr),
 	/// Construct an object from the function and arguments given
 	ConstructExpr(~Expr, Vec<~Expr>),
 	/// Return the expression from a function
@@ -217,7 +219,8 @@ impl fmt::Show for Expr {
 			SwitchExpr(ref val, ref vals, Some(ref def)) => write!(f.buf, "switch({}){}default:{}", val, vals, def),
 			ObjectDeclExpr(ref map) => write!(f.buf, "{}", map),
 			ArrayDeclExpr(ref arr) => write!(f.buf, "{}", arr),
-			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f.buf, "function {}({}){}", name, args, expr),
+			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f.buf, "function {}({}){}", name, args.connect(", "), expr),
+			ArrowFunctionDeclExpr(ref args, ref expr) => write!(f.buf, "({}) => {}", args.connect(", "), expr),
 			NumOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
 			BitOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
 			LogOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
@@ -307,8 +310,10 @@ pub enum TokenData {
 	TCloseArray,
 	/// A 64-bit floating-point number
 	TNumber(f64),
-	/// A question
+	/// A question mark
 	TQuestion,
+	/// An arrow
+	TArrow,
 	/// A numeric operation
 	TNumOp(NumOp),
 	/// A bitwise operation
@@ -336,6 +341,7 @@ impl fmt::Show for TokenData {
 			TCloseArray => f.buf.write_str("]"),
 			TNumber(num) => write!(f.buf, "{}", num),
 			TQuestion => f.buf.write_str("?"),
+			TArrow => f.buf.write_str("=>"),
 			TNumOp(op) => write!(f.buf, "{}", op),
 			TBitOp(op) => write!(f.buf, "{}", op),
 			TLogOp(op) => write!(f.buf, "{}", op),

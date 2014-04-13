@@ -85,15 +85,7 @@ fn test_define_prop() {
 }
 #[bench]
 fn bench_fib(b: &mut Bencher) {
-	let code = "function fib(n) {
-		if(n == 0) {
-			return 0;
-		} else if (n == 1) {
-			return 1;
-		} else {
-			return fib(n - 2) + fib(n - 1);
-		}
-	}";
+	let code = "fib = n => (n <= 1) ? n : fib(n - 2) + fib(n - 1)";
 	let mut lexer = Lexer::new();
 	lexer.lex_str(code.to_owned()).v_unwrap();
 	let mut parser = Parser::new(lexer.tokens);

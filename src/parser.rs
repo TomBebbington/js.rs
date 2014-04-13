@@ -1,7 +1,7 @@
 use ast::{Token, TokenData, Expr};
-use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
+use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TEqual};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TEqual, TArrow};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -198,9 +198,54 @@ impl Parser {
 			},
 			TString(ref s) => ~ConstExpr(CString(s.to_owned())),
 			TOpenParen => {
-				let nexte = try!(self.parse());
-				try!(self.expect(TCloseParen, ~"brackets"));
-				nexte
+				match self.tokens.get(self.pos).data.clone() {
+					TCloseParen if self.tokens.get(self.pos + 1).data == TArrow => {
+						self.pos += 2;
+						let expr = try!(self.parse());
+						~ArrowFunctionDeclExpr(Vec::new(), expr)
+					},
+					_ => {
+						let next = try!(self.parse());
+						let next_tok = self.tokens.get(self.pos).clone();
+						self.pos += 1;
+						match next_tok.data.clone() {
+							TCloseParen => next,
+							TComma => { // at this point it's probably gonna be an arrow function
+								let mut args = vec!(match *next.clone() {
+									LocalExpr(name) => name,
+									_ => ~""
+								}, match self.tokens.get(self.pos).data {
+									TIdent(ref id) => id.clone(),
+									_ => ~""
+								});
+								let mut expect_ident = true;
+								loop {
+									self.pos += 1;
+									let curr_tk = self.tokens.get(self.pos).clone();
+									match curr_tk.data {
+										TIdent(ref id) if expect_ident => {
+											args.push(id.clone());
+											expect_ident = false;
+										},
+										TComma => {
+											expect_ident = true;
+										},
+										TCloseParen => {
+											self.pos += 1;
+											break;
+										},
+										_ if expect_ident => return Err(Expected(vec!(TIdent(~"identifier")), curr_tk, ~"arrow function")),
+										_ => return Err(Expected(vec!(TComma, TCloseParen), curr_tk, ~"arrow function"))
+									}
+								}
+								try!(self.expect(TArrow, ~"arrow function"));
+								let expr = try!(self.parse());
+								~ArrowFunctionDeclExpr(args, expr)
+							}
+							_ => return Err(Expected(vec!(TCloseParen), next_tok, ~"brackets"))
+						}
+					}
+				}
 			},
 			TOpenArray => {
 				let mut array = Vec::new();
@@ -341,6 +386,16 @@ impl Parser {
 				self.pos += 1;
 				let next = try!(self.parse());
 				result = ~AssignExpr(expr, next);
+			},
+			TArrow => {
+				self.pos += 1;
+				let mut args = Vec::with_capacity(1);
+				match *result.clone() {
+					LocalExpr(name) => args.push(name),
+					_ => return Err(ExpectedExpr(~"identifier", *result))
+				}
+				let next = try!(self.parse());
+				result = ~ArrowFunctionDeclExpr(args, next);
 			},
 			_ => carry_on = false
 		};

@@ -1,4 +1,4 @@
-use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, BitOpExpr, LogOpExpr, CompOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, NumOpExpr, BitOpExpr, LogOpExpr, CompOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
@@ -204,6 +204,11 @@ impl Executor for Interpreter {
 				if name.is_some() {
 					self.global.borrow().set_field(name.clone().unwrap(), val);
 				}
+				Ok(val)
+			},
+			ArrowFunctionDeclExpr(ref args, ref expr) => {
+				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));
+				let val = Gc::new(VFunction(RefCell::new(function)));
 				Ok(val)
 			},
 			NumOpExpr(ref op, ref a, ref b) => {
