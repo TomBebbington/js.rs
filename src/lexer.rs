@@ -109,12 +109,12 @@ impl Lexer {
 						});
 					}
 				},
-				'"' if self.string_start.is_some() && self.string_start.unwrap() == DoubleQuote => {
+				'"' if self.string_start == Some(DoubleQuote) => {
 					self.string_start = None;
 					self.tokens.push(TString(self.string_buffer.clone().into_owned()));
 					self.string_buffer.truncate(0);
 				},
-				'\'' if self.string_start.is_some() && self.string_start.unwrap() == SingleQuote => {
+				'\'' if self.string_start == Some(SingleQuote) => {
 					self.string_start = None;
 					self.tokens.push(TString(self.string_buffer.clone().into_owned()));
 					self.string_buffer.truncate(0);
