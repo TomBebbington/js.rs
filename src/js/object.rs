@@ -1,4 +1,4 @@
-use js::value::{Value, ValueData, ValueConv, VUndefined, VString, ResultValue, to_value, from_value};
+use js::value::{Value, ValueData, ValueConv, VUndefined, VObject, ResultValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 
@@ -85,12 +85,21 @@ pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// To string
 pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	return Ok(Gc::new(VString(this.borrow().to_str())));
+	return Ok(to_value(this.borrow().to_str()));
 }
-/// Create a new 'Object' object
+/// Check if it has a property
+pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	let prop = from_value::<~str>(*args.get(0)).unwrap();
+	Ok(to_value::<bool>(match *this.borrow() {
+		VObject(ref obj) => obj.borrow().find(&prop).is_some(),
+		_ => false
+	}))
+}
+/// Create a new `Object` object
 pub fn _create() -> Value {
 	let obj = to_value(make_object);
 	let prototype = ValueData::new_obj();
+	prototype.borrow().set_field(~"hasOwnProperty", to_value(has_own_prop));
 	prototype.borrow().set_field(~"toString", to_value(to_string));
 	obj.borrow().set_field(~"length", to_value(1i32));
 	obj.borrow().set_field(~"prototype", prototype);
