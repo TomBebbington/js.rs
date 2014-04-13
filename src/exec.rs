@@ -25,6 +25,7 @@ pub trait Executor {
 	/// Runs the expression
 	fn run(&mut self, expr:&Expr) -> ResultValue;
 }
+#[deriving(Clone)]
 /// An intepreter
 pub struct Interpreter {
 	/// An object representing the global variables
