@@ -1,4 +1,4 @@
-use ast::{Token, Expr};
+use ast::{Token, TokenData, Expr};
 use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TEqual};
@@ -10,22 +10,20 @@ use std::vec::Vec;
 /// An error encountered during parsing an expression
 pub enum ParseError {
 	/// When it expected a certain kind of token, but got another
-	Expected(Vec<Token>, Token),
+	Expected(Vec<TokenData>, Token),
 	/// When it expected a certain expression, but got another
 	ExpectedExpr(~str, Expr)
 }
 impl fmt::Show for ParseError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
-			Expected(ref wanted, ref got) if wanted.len() == 0 => write!(f.buf, "Expected expression, got {}", got),
+			Expected(ref wanted, ref got) if wanted.len() == 0 => write!(f.buf, "Line {}, Column {}: Expected expression, got {}", got.line_number, got.column_number, got.data),
 			Expected(ref wanted, ref got) => {
+				try!(write!(f.buf, "Line {}, Column {}:", got.line_number, got.column_number));
 				try!(write!(f.buf, "Expected "));
 				let last = wanted.last().unwrap();
 				for wanted_token in wanted.iter() {
-					match write!(f.buf, "'{}'{}", wanted_token, if wanted_token == last {""} else {", "}) {
-						Err(err) => return Err(err),
-						Ok(_) => ()
-					}
+					try!(write!(f.buf, "'{}'{}", wanted_token, if wanted_token == last {""} else {", "}));
 				}
 				write!(f.buf, " but got {}", got)
 			},
@@ -96,7 +94,7 @@ impl Parser {
 				try!(self.expect(TCloseParen));
 				let expr = try!(self.parse());
 				let next = self.tokens.get(self.pos + 1).clone();
-				Ok(Some(~IfExpr(cond, expr, if next == TIdent(~"else") {
+				Ok(Some(~IfExpr(cond, expr, if next.data == TIdent(~"else") {
 					self.pos += 2;
 					Some(try!(self.parse()))
 				} else {
@@ -118,7 +116,7 @@ impl Parser {
 				let mut cases = Vec::new();
 				let mut default = None;
 				while self.pos + 1 < self.tokens.len() {
-					let tok = self.tokens.get(self.pos).clone();
+					let tok = self.tokens.get(self.pos).data.clone();
 					self.pos += 1;
 					match tok {
 						TIdent(ref id) if *id == ~"case" => {
@@ -126,7 +124,7 @@ impl Parser {
 							let mut block = Vec::new();
 							try!(self.expect(TColon));
 							loop {
-								match self.tokens.get(self.pos).clone() {
+								match self.tokens.get(self.pos).data.clone() {
 									TIdent(ref id) if *id == ~"case" || *id == ~"default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
@@ -138,7 +136,7 @@ impl Parser {
 							let mut block = Vec::new();
 							try!(self.expect(TColon));
 							loop {
-								match self.tokens.get(self.pos).clone() {
+								match self.tokens.get(self.pos).data.clone() {
 									TIdent(ref id) if *id == ~"case" || *id == ~"default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
@@ -155,7 +153,7 @@ impl Parser {
 			},
 			"function" => {
 				let tk = self.tokens.get(self.pos).clone();
-				let name : Option<~str> = match tk {
+				let name : Option<~str> = match tk.data {
 					TIdent(ref name) => {
 						self.pos += 1;
 						Some(name.clone())
@@ -166,13 +164,13 @@ impl Parser {
 				try!(self.expect(TOpenParen));
 				let mut args:Vec<~str> = Vec::new();
 				let mut tk = self.tokens.get(self.pos).clone();
-				while tk != TCloseParen {
-					match tk {
+				while tk.data != TCloseParen {
+					match tk.data {
 						TIdent(ref id) => args.push(id.to_owned()),
-						_ => return Err(Expected(vec!(TIdent(~"identifier")), tk))
+						_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone()))
 					}
 					self.pos += 1;
-					if *self.tokens.get(self.pos) == TComma {
+					if self.tokens.get(self.pos).data == TComma {
 						self.pos += 1;
 					}
 					tk = self.tokens.get(self.pos).clone();
@@ -188,7 +186,7 @@ impl Parser {
 	pub fn parse(&mut self) -> ParseResult {
 		let token = self.tokens.get(self.pos).clone();
 		self.pos += 1;
-		let expr : ~Expr = match token {
+		let expr : ~Expr = match token.data {
 			TSemicolon => try!(self.parse()),
 			TIdent(ref s) => {
 				let structure = try!(self.parse_struct(s.clone()));
@@ -205,19 +203,19 @@ impl Parser {
 			},
 			TOpenArray => {
 				let mut array = Vec::new();
-				let mut expect_comma_or_end = *self.tokens.get(self.pos) == TCloseArray;
+				let mut expect_comma_or_end = self.tokens.get(self.pos).data == TCloseArray;
 				loop {
 					let token = self.tokens.get(self.pos).clone();
-					if token == TCloseArray && expect_comma_or_end {
+					if token.data == TCloseArray && expect_comma_or_end {
 						self.pos += 1;
 						break;
-					} else if token == TComma && expect_comma_or_end {
+					} else if token.data == TComma && expect_comma_or_end {
 						expect_comma_or_end = false;
-					} else if token == TComma && !expect_comma_or_end {
+					} else if token.data == TComma && !expect_comma_or_end {
 						array.push(~ConstExpr(CNull));
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseArray), token));
+						return Err(Expected(vec!(TComma, TCloseArray), token.clone()));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -228,15 +226,15 @@ impl Parser {
 				}
 				~ArrayDeclExpr(array)
 			},
-			TOpenBlock if self.tokens.get(self.pos) == &TCloseBlock => {
+			TOpenBlock if self.tokens.get(self.pos).data == TCloseBlock => {
 				self.pos += 1;
 				~ObjectDeclExpr(~TreeMap::new())
 			},
-			TOpenBlock if self.tokens.get(self.pos + 1) == &TColon => {
+			TOpenBlock if self.tokens.get(self.pos + 1).data == TColon => {
 				let mut map = ~TreeMap::new();
-				while self.tokens.get(self.pos - 1) == &TComma || map.len() == 0 {
+				while self.tokens.get(self.pos - 1).data == TComma || map.len() == 0 {
 					let tk = self.tokens.get(self.pos).clone();
-					let name = match tk {
+					let name = match tk.data {
 						TIdent(ref id) => id,
 						TString(ref str) => str,
 						_ => return Err(Expected(vec!(TIdent(~"identifier"), TString(~"string")), tk))
@@ -252,7 +250,7 @@ impl Parser {
 			TOpenBlock => {
 				let mut exprs = Vec::new();
 				loop {
-					if *self.tokens.get(self.pos) == TCloseBlock {
+					if self.tokens.get(self.pos).data == TCloseBlock {
 						break;
 					} else {
 						exprs.push(try!(self.parse()));
@@ -270,26 +268,26 @@ impl Parser {
 		let next = self.tokens.get(self.pos).clone();
 		let mut carry_on = true;
 		let mut result = expr.clone();
-		match next {
+		match next.data {
 			TDot => {
 				self.pos += 1;
 				let tk = self.tokens.get(self.pos).clone();
-				match tk {
+				match tk.data {
 					TIdent(ref s) => result = ~GetConstFieldExpr(expr, s.to_owned()),
-					_ => return Err(Expected(vec!(TIdent(~"identifier")), next))
+					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk))
 				}
 				self.pos += 1;
 			},
 			TOpenParen => {
 				let mut args = Vec::new();
-				let mut expect_comma_or_end = *self.tokens.get(self.pos + 1) == TCloseParen;
+				let mut expect_comma_or_end = self.tokens.get(self.pos + 1).data == TCloseParen;
 				loop {
 					self.pos += 1;
 					let token = self.tokens.get(self.pos).clone();
-					if token == TCloseParen && expect_comma_or_end {
+					if token.data == TCloseParen && expect_comma_or_end {
 						self.pos += 1;
 						break;
-					} else if token == TComma && expect_comma_or_end {
+					} else if token.data == TComma && expect_comma_or_end {
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
 						return Err(Expected(vec!(TComma, TCloseParen), token));
@@ -338,10 +336,10 @@ impl Parser {
 		return if carry_on && self.pos < self.tokens.len() { self.parse_next(result) } else {Ok(result)};
 	}
 	/// Returns an error if the next symbol is not [tk]
-	fn expect(&mut self, tk:Token) -> Result<(), ParseError> {
+	fn expect(&mut self, tk:TokenData) -> Result<(), ParseError> {
 		self.pos += 1;
 		let curr_tk = self.tokens.get(self.pos - 1).clone();
-		return if curr_tk != tk {
+		return if curr_tk.data != tk {
 			Err(Expected(vec!(tk), curr_tk))
 		} else {
 			Ok(())

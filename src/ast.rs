@@ -195,8 +195,34 @@ impl fmt::Show for TreeMap<~str, ~Expr> {
 }
 #[deriving(Clone)]
 #[deriving(Eq)]
+/// A single of token of Javascript code including the line number and column number
+pub struct Token {
+	/// The token
+	pub data : TokenData,
+	/// The line number
+	pub line_number : uint,
+	/// The column number
+	pub column_number : uint
+}
+impl Token {
+	/// Create a new detailed token from the token data, line number and column number
+	pub fn new(data: TokenData, line_number: uint, column_number: uint) -> Token {
+		Token {
+			data: data,
+			line_number: line_number,
+			column_number: column_number
+		}
+	}
+}
+impl fmt::Show for Token {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f.buf, "Line {}, Column {}: {}", self.line_number, self.column_number, self.data)
+	}
+}
+#[deriving(Clone)]
+#[deriving(Eq)]
 /// A single token of Javacript code - a single word, symbol or constant
-pub enum Token {
+pub enum TokenData {
 	/// A string literal
 	TString(~str),
 	/// A semicolon (;)
@@ -232,9 +258,9 @@ pub enum Token {
 	/// A bitwise operation
 	TBitOp(BitOp)
 }
-impl fmt::Show for Token {
+impl fmt::Show for TokenData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		return match *self {
+		match *self {
 			TString(ref s) => write!(f.buf, "\"{}\"", s),
 			TSemicolon => f.buf.write_str(";"),
 			TColon => f.buf.write_str(":"),
