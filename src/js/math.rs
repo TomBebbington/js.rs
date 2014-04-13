@@ -154,9 +154,9 @@ pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		f64::NAN
 	}))
 }
-/// Create a new 'Math' object
-pub fn _create() -> Value {
-	let math = ValueData::new_obj();
+/// Create a new `Math` object
+pub fn _create(global : Value) -> Value {
+	let math = ValueData::new_obj(Some(global));
 	math.borrow().set_field(~"E", to_value(f64::consts::E));
 	math.borrow().set_field(~"LN2", to_value(f64::consts::LN_2));
 	math.borrow().set_field(~"LN10", to_value(f64::consts::LN_10));
@@ -185,4 +185,8 @@ pub fn _create() -> Value {
 	math.borrow().set_field(~"sqrt", to_value(sqrt));
 	math.borrow().set_field(~"tan", to_value(tan));
 	math
+}
+/// Initialise the `Math` object on the global object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"Math", _create(global));
 }

@@ -37,7 +37,7 @@ impl Property {
 
 impl ValueConv for Property {
 	fn to_value(&self) -> Value {
-		let prop = ValueData::new_obj();
+		let prop = ValueData::new_obj(None);
 		let prop_ref = prop.borrow();
 		prop_ref.set_field(~"configurable", to_value(self.configurable));
 		prop_ref.set_field(~"enumerable", to_value(self.enumerable));
@@ -96,9 +96,9 @@ pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}))
 }
 /// Create a new `Object` object
-pub fn _create() -> Value {
+pub fn _create(global:Value) -> Value {
 	let obj = to_value(make_object);
-	let prototype = ValueData::new_obj();
+	let prototype = ValueData::new_obj(Some(global));
 	prototype.borrow().set_field(~"hasOwnProperty", to_value(has_own_prop));
 	prototype.borrow().set_field(~"toString", to_value(to_string));
 	obj.borrow().set_field(~"length", to_value(1i32));
@@ -107,4 +107,8 @@ pub fn _create() -> Value {
 	obj.borrow().set_field(~"getPrototypeOf", to_value(get_proto_of));
 	obj.borrow().set_field(~"defineProperty", to_value(define_prop));
 	obj
+}
+/// Initialise the `Object` object on the global object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"Object", _create(global));
 }

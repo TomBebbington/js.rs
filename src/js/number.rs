@@ -58,18 +58,9 @@ pub fn strict_is_nan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		}
 	}))
 }
-/// Initialise the parse functions on the global object
-pub fn init(obj:Value) {
-	obj.borrow().set_field(~"NaN", to_value(NAN));
-	obj.borrow().set_field(~"Infinity", to_value(INFINITY));
-	obj.borrow().set_field(~"parseFloat", to_value(parse_float));
-	obj.borrow().set_field(~"parseInt", to_value(parse_int));
-	obj.borrow().set_field(~"isFinite", to_value(is_finite));
-	obj.borrow().set_field(~"isNaN", to_value(is_nan));
-}
-/// Create a new 'Number' object
-pub fn _create() -> Value {
-	let number = ValueData::new_obj();
+/// Create a new `Number` object
+pub fn _create(global:Value) -> Value {
+	let number = ValueData::new_obj(Some(global));
 	number.borrow().set_field(~"NaN", to_value(NAN));
 	number.borrow().set_field(~"MAX_VALUE", to_value(MAX_VALUE));
 	number.borrow().set_field(~"MIN_VALUE", to_value(MIN_VALUE));
@@ -81,4 +72,14 @@ pub fn _create() -> Value {
 	number.borrow().set_field(~"isFinite", to_value(strict_is_finite));
 	number.borrow().set_field(~"isNaN", to_value(strict_is_nan));
 	number
+}
+/// Initialise the parse functions and `Number` on the global object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"NaN", to_value(NAN));
+	global.borrow().set_field(~"Infinity", to_value(INFINITY));
+	global.borrow().set_field(~"parseFloat", to_value(parse_float));
+	global.borrow().set_field(~"parseInt", to_value(parse_int));
+	global.borrow().set_field(~"isFinite", to_value(is_finite));
+	global.borrow().set_field(~"isNaN", to_value(is_nan));
+	global.borrow().set_field(~"Number", _create(global));
 }

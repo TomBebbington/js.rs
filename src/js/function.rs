@@ -68,8 +68,12 @@ impl NativeFunction {
 		NativeFunction {object: obj, data: data}
 	}
 }
-/// Create a new 'Function' object
-pub fn _create() -> Value {
+/// Create a new `Function` object
+pub fn _create(_ : Value) -> Value {
 	let function : ObjectData = TreeMap::new();
 	to_value(function)
+}
+/// Initialise the global object with the `Function` object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"Function", _create(global));
 }

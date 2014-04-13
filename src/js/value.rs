@@ -36,8 +36,13 @@ pub enum ValueData {
 }
 impl ValueData {
 	/// Returns a new empty object
-	pub fn new_obj() -> Value {
-		Gc::new(VObject(RefCell::new(TreeMap::new())))
+	pub fn new_obj(global: Option<Value>) -> Value {
+		let mut obj : ObjectData = TreeMap::new();
+		if global.is_some() {
+			println!("{}", global.unwrap().borrow().get_field(~"Object").borrow().get_field(~"prototype").borrow());
+			obj.insert(~"__proto__", Property::new(global.unwrap().borrow().get_field(~"Object").borrow().get_field(~"prototype")));
+		}
+		Gc::new(VObject(RefCell::new(obj)))
 	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {

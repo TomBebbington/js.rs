@@ -17,11 +17,15 @@ pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		Err(io_error) => Err(to_value(io_error.to_str()))
 	}
 }
-/// Create a new 'console' object
-pub fn _create() -> Value {
-	let console = ValueData::new_obj();
+/// Create a new `console` object
+pub fn _create(global : Value) -> Value {
+	let console = ValueData::new_obj(Some(global));
 	console.borrow().set_field(~"log", to_value(log));
 	console.borrow().set_field(~"error", to_value(error));
 	console.borrow().set_field(~"exception", to_value(error));
 	console
+}
+/// Initialise the global object with the `console` object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"console", _create(global));
 }

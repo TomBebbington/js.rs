@@ -14,13 +14,17 @@ pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	let message = this.borrow().get_field(~"message");
 	Ok(to_value(format!("{}: {}", name.borrow(), message.borrow())))
 }
-/// Create a new 'Error' object
-pub fn _create() -> Value {
+/// Create a new `Error` object
+pub fn _create(global: Value) -> Value {
 	let error = to_value(make_error);
-	let prototype = ValueData::new_obj();
+	let prototype = ValueData::new_obj(Some(global));
 	prototype.borrow().set_field(~"message", to_value(~""));
 	prototype.borrow().set_field(~"name", to_value(~"Error"));
 	prototype.borrow().set_field(~"toString", to_value(to_string));
 	error.borrow().set_field(~"prototype", prototype);
 	error
+}
+/// Initialise the global object with the `Error` object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"Error", _create(global));
 }

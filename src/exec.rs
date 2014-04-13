@@ -34,15 +34,15 @@ pub struct Interpreter {
 }
 impl Executor for Interpreter {
 	fn new() -> ~Interpreter {
-		let global = ValueData::new_obj();
-		global.borrow().set_field(~"console", console::_create());
-		global.borrow().set_field(~"Math", math::_create());
-		global.borrow().set_field(~"Object", object::_create());
-		global.borrow().set_field(~"Array", array::_create());
-		global.borrow().set_field(~"Function", function::_create());
-		global.borrow().set_field(~"JSON", json::_create());
-		global.borrow().set_field(~"Number", number::_create());
-		global.borrow().set_field(~"Error", error::_create());
+		let global = ValueData::new_obj(None);
+		object::init(global);
+		console::init(global);
+		math::init(global);
+		array::init(global);
+		function::init(global);
+		json::init(global);
+		number::init(global);
+		error::init(global);
 		number::init(global);
 		uri::init(global);
 		return ~Interpreter {global: global, scopes: Vec::new()};
@@ -177,15 +177,14 @@ impl Executor for Interpreter {
 				Ok(result)
 			},
 			ObjectDeclExpr(ref map) => {
-				let obj = ValueData::new_obj();
+				let obj = ValueData::new_obj(Some(self.global));
 				for (key, val) in map.iter() {
 					obj.borrow().set_field(key.clone(), try!(self.run(val.clone())));
 				}
-				obj.borrow().set_field(~"__proto__", self.get_global(~"Object").borrow().get_field(~"prototype"));
 				Ok(obj)
 			},
 			ArrayDeclExpr(ref arr) => {
-				let arr_map = ValueData::new_obj();
+				let arr_map = ValueData::new_obj(Some(self.global));
 				let mut index : i32 = 0;
 				for val in arr.iter() {
 					let val = try!(self.run(val.clone()));

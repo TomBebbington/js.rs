@@ -7,7 +7,11 @@ pub fn make_array(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VUndefined))
 }
 /// Create a new `Array` object
-pub fn _create() -> Value {
+pub fn _create(_: Value) -> Value {
 	let array = to_value(make_array);
 	array
+}
+/// Initialise the global object with the `Array` object
+pub fn init(global:Value) {
+	global.borrow().set_field(~"Array", _create(global));
 }
