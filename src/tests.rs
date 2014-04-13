@@ -64,3 +64,11 @@ fn test_constructor() {
 fn test_json() {
 	assert_eq(VNumber(42.0), run("JSON.parse(JSON.stringify({num: 42})).num"))
 }
+#[test]
+fn test_typeof() {
+	assert_eq(VString(~"number"), run("typeof Math.PI"));
+	assert_eq(VString(~"boolean"), run("typeof true"));
+	assert_eq(VString(~"undefined"), run("typeof undefined"));
+	assert_eq(VString(~"string"), run("typeof ''"));
+	assert_eq(VString(~"function"), run("typeof Object.prototype.hasOwnProperty"));
+}

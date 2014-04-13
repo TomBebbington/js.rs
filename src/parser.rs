@@ -1,5 +1,5 @@
 use ast::{Token, Expr};
-use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr, AssignExpr};
+use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TEqual};
 use collections::treemap::TreeMap;
@@ -88,7 +88,8 @@ impl Parser {
 					CallExpr(ref func, ref args) => Ok(Some(~ConstructExpr(func.clone(), args.clone()))),
 					_ => Err(ExpectedExpr(~"constructor", *call))
 				}
-			}
+			},
+			"typeof" => Ok(Some(~TypeOfExpr(try!(self.parse())))),
 			"if" => {
 				try!(self.expect(TOpenParen));
 				let cond = try!(self.parse());

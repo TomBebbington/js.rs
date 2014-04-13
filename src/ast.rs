@@ -120,7 +120,9 @@ pub enum Expr {
 	/// Throw an expression
 	ThrowExpr(~Expr),
 	/// Assign an expression to another expression
-	AssignExpr(~Expr, ~Expr)
+	AssignExpr(~Expr, ~Expr),
+	/// Return a string representing the type of the given expression
+	TypeOfExpr(~Expr)
 }
 impl fmt::Show for Expr {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -167,7 +169,8 @@ impl fmt::Show for Expr {
 			ReturnExpr(Some(ref ex)) => write!(f.buf, "return {}", ex),
 			ReturnExpr(None) => f.buf.write_str("return"),
 			ThrowExpr(ref ex) => write!(f.buf, "throw {}", ex),
-			AssignExpr(ref ref_e, ref val) => write!(f.buf, "{} = {}", ref_e, val)
+			AssignExpr(ref ref_e, ref val) => write!(f.buf, "{} = {}", ref_e, val),
+			TypeOfExpr(ref e) => write!(f.buf, "typeof {}", e)
 		}
 	}
 }

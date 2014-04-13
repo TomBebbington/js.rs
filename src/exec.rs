@@ -1,8 +1,8 @@
-use ast::{Expr, ConstExpr, BlockExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, BitOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, BitOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use js::value::{Value, ValueData, VNull, VUndefined, VString, VObject, VBoolean, VFunction, ResultValue, to_value};
+use js::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
@@ -262,6 +262,17 @@ impl Executor for Interpreter {
 					_ => ()
 				}
 				Ok(val)
+			},
+			TypeOfExpr(ref val_e) => {
+				let val = try!(self.run(*val_e));
+				Ok(to_value(match *val.borrow() {
+					VUndefined => ~"undefined",
+					VNull | VObject(_) => ~"object",
+					VBoolean(_) => ~"boolean",
+					VNumber(_) | VInteger(_) => ~"number",
+					VString(_) => ~"string",
+					VFunction(_) => ~"function"
+				}))
 			}
 		}
 	}
