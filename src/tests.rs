@@ -6,7 +6,7 @@ extern crate collections;
 use rust_js::lexer::Lexer;
 use rust_js::parser::{Parser, VerboseResult};
 use rust_js::exec::{Executor, Interpreter};
-use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString, from_value};
+use rust_js::js::value::{Value, ValueData, VNull, VNumber, VString, VBoolean, from_value};
 
 fn run(script:&str) -> Value {
 	let mut lexer = Lexer::new();
@@ -71,4 +71,14 @@ fn test_typeof() {
 	assert_eq(VString(~"undefined"), run("typeof undefined"));
 	assert_eq(VString(~"string"), run("typeof ''"));
 	assert_eq(VString(~"function"), run("typeof Object.prototype.hasOwnProperty"));
+}
+#[test]
+fn test_define_prop() {
+	assert_eq(VBoolean(true), run("{
+		var obj = {};
+		Object.defineProperty(obj, \"some_bool\", {
+			value: true
+		});
+		obj.some_bool
+	}"));
 }
