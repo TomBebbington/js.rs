@@ -39,7 +39,6 @@ impl ValueData {
 	pub fn new_obj(global: Option<Value>) -> Value {
 		let mut obj : ObjectData = TreeMap::new();
 		if global.is_some() {
-			println!("{}", global.unwrap().borrow().get_field(~"Object").borrow().get_field(~"prototype").borrow());
 			obj.insert(~"__proto__", Property::new(global.unwrap().borrow().get_field(~"Object").borrow().get_field(~"prototype")));
 		}
 		Gc::new(VObject(RefCell::new(obj)))
