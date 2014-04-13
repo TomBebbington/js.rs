@@ -7,7 +7,8 @@ before_install:
 install:
   - sudo apt-get install rust-nightly
 script:
-  - make build doc
+  - make build tests doc
+  - bin/tests
 notifications:
   email:
     - tophattedcoder@gmail.com
