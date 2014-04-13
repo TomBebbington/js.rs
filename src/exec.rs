@@ -1,8 +1,10 @@
-use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, BitOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, NumOpExpr, BitOpExpr, LogOpExpr, CompOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use js::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value};
+use ast::{LogAnd, LogOr};
+use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
+use js::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri};
@@ -225,6 +227,28 @@ impl Executor for Interpreter {
 					BitShl => v_a << v_b,
 					BitShr => v_a >> v_b
 				}))
+			},
+			CompOpExpr(ref op, ref a, ref b) => {
+				let v_a = try!(self.run(*a)).borrow().clone();
+				let v_b = try!(self.run(*b)).borrow().clone();
+				Ok(to_value(match *op {
+					CompEqual => v_a == v_b,
+					CompNotEqual => v_a != v_b,
+					CompStrictEqual => v_a == v_b,
+					CompStrictNotEqual => v_a != v_b,
+					CompGreaterThan => v_a.to_num() > v_b.to_num(),
+					CompGreaterThanOrEqual => v_a.to_num() >= v_b.to_num(),
+					CompLessThan => v_a.to_num() < v_b.to_num(),
+					CompLessThanOrEqual => v_a.to_num() <= v_b.to_num()
+				}))
+			},
+			LogOpExpr(ref op, ref a, ref b) => {
+				let v_a = from_value::<bool>(try!(self.run(*a))).unwrap();
+				let v_b = from_value::<bool>(try!(self.run(*b))).unwrap();
+				Ok(match *op {
+					LogAnd => to_value(v_a && v_b),
+					LogOr => to_value(v_a || v_b)
+				})
 			},
 			ConstructExpr(ref callee, ref args) => {
 				let func = try!(self.run(callee.clone()));

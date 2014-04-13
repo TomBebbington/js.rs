@@ -2,9 +2,11 @@ use std::io::{BufReader, BufferedReader, Reader};
 use std::strbuf::StrBuf;
 use std::char::from_u32;
 use std::num::FromStrRadix;
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor};
+use ast::{CompEqual, CompNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
+use ast::{LogAnd, LogOr};
 use ast::{Token, TokenData};
 use std::io::{IoResult, EndOfFile};
 use std::char::is_whitespace;
@@ -79,15 +81,13 @@ impl Lexer {
 	}
 	/// Processes an input stream from a BufferedReader into an array of tokens
 	pub fn lex<R : Reader>(&mut self, mut reader : BufferedReader<R>) -> IoResult<()> {
+		let mut iter = reader.chars().peekable();
 		loop {
-			let ch = match reader.read_char() {
-				Ok(c) => c,
-				Err(ref e) if e.kind == EndOfFile => {
-					self.clear_buffer();
-					return Ok(())
-				},
-				Err(ref e) =>
-					return Err(e.clone())
+			let ch = match iter.next() {
+				Some(Ok(ch)) => ch,
+				Some(Err(ref err)) if err.kind == EndOfFile => break,
+				Some(Err(err)) => return Err(err),
+				None => break
 			};
 			self.column_number += 1;
 			match ch {
@@ -104,7 +104,7 @@ impl Lexer {
 							'u' => {
 								let mut nums = ~"";
 								for _ in range(0, 4) {
-									nums = format!("{}{}", nums, try!(reader.read_char()));
+									nums = format!("{}{}", nums, try!(iter.next().unwrap().clone()));
 								}
 								self.column_number += 4;
 								let as_num = match FromStrRadix::from_str_radix(nums, 16) {
@@ -209,9 +209,19 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpMod));
 				},
+				'|' if try!(iter.peek().unwrap().clone()) == '|' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TLogOp(LogOr));
+				},
 				'|' => {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitOr));
+				},
+				'&' if try!(iter.peek().unwrap().clone()) == '&' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TLogOp(LogAnd));
 				},
 				'&' => {
 					self.clear_buffer();
@@ -221,9 +231,37 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitXor));
 				},
+				'=' if try!(iter.peek().unwrap().clone()) == '=' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TCompOp(CompEqual));
+				},
 				'=' => {
 					self.clear_buffer();
 					self.push_token(TEqual);
+				},
+				'<' if try!(iter.peek().unwrap().clone()) == '=' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TCompOp(CompLessThanOrEqual));
+				},
+				'<' => {
+					self.clear_buffer();
+					self.push_token(TCompOp(CompLessThan));
+				},
+				'>' if try!(iter.peek().unwrap().clone()) == '=' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TCompOp(CompGreaterThanOrEqual));
+				},
+				'>' => {
+					self.clear_buffer();
+					self.push_token(TCompOp(CompGreaterThan));
+				},
+				'!' if try!(iter.peek().unwrap().clone()) == '=' => {
+					iter.next();
+					self.clear_buffer();
+					self.push_token(TCompOp(CompNotEqual));
 				},
 				'\n' => {
 					self.clear_buffer();
@@ -238,5 +276,7 @@ impl Lexer {
 				_ => self.ident_buffer.push_char(ch)
 			};
 		}
+		self.clear_buffer();
+		Ok(())
 	}
 }

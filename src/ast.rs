@@ -83,12 +83,66 @@ impl fmt::Show for BitOp {
 	}
 }
 #[deriving(Clone, Eq)]
+/// A comparison operation between two values
+pub enum CompOp {
+	/// If they represent the same value or similar values
+	CompEqual,
+	/// If they represent distinct values
+	CompNotEqual,
+	/// If they represent the same value
+	CompStrictEqual,
+	/// If they represent very distinct values
+	CompStrictNotEqual,
+	/// If the first is greater than the second
+	CompGreaterThan,
+	/// If the first is greater than or equal to the second
+	CompGreaterThanOrEqual,
+	/// If the first is less than the second
+	CompLessThan,
+	/// If the first is less than or equal to the second
+	CompLessThanOrEqual,
+}
+impl fmt::Show for CompOp {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		return f.buf.write_str(match *self {
+			CompEqual => "==",
+			CompNotEqual => "!=",
+			CompStrictEqual => "===",
+			CompStrictNotEqual => "!==",
+			CompGreaterThan => ">",
+			CompGreaterThanOrEqual => ">=",
+			CompLessThan => "<",
+			CompLessThanOrEqual => "<="
+		});
+	}
+}
+#[deriving(Clone, Eq)]
+/// A logical operation between two booleans
+pub enum LogOp {
+	/// Logical and
+	LogAnd,
+	/// Logical or
+	LogOr
+}
+impl fmt::Show for LogOp {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		return f.buf.write_str(match *self {
+			LogAnd => "&&",
+			LogOr => "||"
+		});
+	}
+}
+#[deriving(Clone, Eq)]
 /// A Javscript Expression
 pub enum Expr {
 	/// Run a numeric operation on two numeric expressions
 	NumOpExpr(NumOp, ~Expr, ~Expr),
-	/// Run a bitwise operation on two numeric expressions
+	/// Run a bitwise operation on two integer expressions
 	BitOpExpr(BitOp, ~Expr, ~Expr),
+	/// Run a logical operation on two boolean expressions
+	LogOpExpr(LogOp, ~Expr, ~Expr),
+	/// Run a comparison operation on two expressions
+	CompOpExpr(CompOp, ~Expr, ~Expr),
 	/// Make a simple value
 	ConstExpr(Const),
 	/// Run several expressions
@@ -166,6 +220,8 @@ impl fmt::Show for Expr {
 			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f.buf, "function {}({}){}", name, args, expr),
 			NumOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
 			BitOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
+			LogOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
+			CompOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
 			ReturnExpr(Some(ref ex)) => write!(f.buf, "return {}", ex),
 			ReturnExpr(None) => f.buf.write_str("return"),
 			ThrowExpr(ref ex) => write!(f.buf, "throw {}", ex),
@@ -256,7 +312,11 @@ pub enum TokenData {
 	/// A numeric operation
 	TNumOp(NumOp),
 	/// A bitwise operation
-	TBitOp(BitOp)
+	TBitOp(BitOp),
+	/// A logical operation
+	TLogOp(LogOp),
+	/// A comparison operation
+	TCompOp(CompOp)
 }
 impl fmt::Show for TokenData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -277,7 +337,9 @@ impl fmt::Show for TokenData {
 			TNumber(num) => write!(f.buf, "{}", num),
 			TQuestion => f.buf.write_str("?"),
 			TNumOp(op) => write!(f.buf, "{}", op),
-			TBitOp(op) => write!(f.buf, "{}", op)
+			TBitOp(op) => write!(f.buf, "{}", op),
+			TLogOp(op) => write!(f.buf, "{}", op),
+			TCompOp(op) => write!(f.buf, "{}", op)
 		}
 	}
 }

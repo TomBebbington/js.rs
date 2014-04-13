@@ -1,7 +1,7 @@
 use ast::{Token, TokenData, Expr};
-use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, ConstExpr, AssignExpr};
+use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TEqual};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TEqual};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -261,7 +261,7 @@ impl Parser {
 				~BlockExpr(exprs)
 			},
 			TNumber(num) => ~ConstExpr(CNum(num)),
-			_ => return Err(Expected(Vec::new(), token.clone(), ~""))
+			_ => return Err(Expected(Vec::new(), token.clone(), ~"script"))
 		};
 		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};
 	}
@@ -326,6 +326,16 @@ impl Parser {
 				self.pos += 1;
 				let next = try!(self.parse());
 				result = ~BitOpExpr(op, expr, next);
+			},
+			TCompOp(op) => {
+				self.pos += 1;
+				let next = try!(self.parse());
+				result = ~CompOpExpr(op, expr, next);
+			},
+			TLogOp(op) => {
+				self.pos += 1;
+				let next = try!(self.parse());
+				result = ~LogOpExpr(op, expr, next);
 			},
 			TEqual => {
 				self.pos += 1;

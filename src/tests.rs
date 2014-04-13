@@ -86,7 +86,13 @@ fn test_define_prop() {
 #[bench]
 fn bench_fib(b: &mut Bencher) {
 	let code = "function fib(n) {
-		return n <= 1 ? 1 : fib(n - 2) + fib(n - 1);
+		if(n == 0) {
+			return 0;
+		} else if (n == 1) {
+			return 1;
+		} else {
+			return fib(n - 2) + fib(n - 1);
+		}
 	}";
 	let mut lexer = Lexer::new();
 	lexer.lex_str(code.to_owned()).v_unwrap();
@@ -98,7 +104,7 @@ fn bench_fib(b: &mut Bencher) {
 	b.iter(|| {
 		match *fib.borrow() {
 			VFunction(ref func) => {
-				func.borrow().call(&mut engine.clone(), ValueData::new_obj(None), Gc::new(VUndefined), vec!(to_value(40i32)));
+				assert_eq!(102334155i32, from_value(func.borrow().call(&mut engine.clone(), ValueData::new_obj(None), Gc::new(VUndefined), vec!(to_value(40i32))).unwrap()).unwrap());
 			},
 			_ => ()
 		}
