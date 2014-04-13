@@ -1,5 +1,5 @@
 use std::io::{BufReader, BufferedReader, Reader};
-use std::str::{from_char, with_capacity};
+use std::strbuf::StrBuf;
 use std::char::from_u32;
 use std::num::FromStrRadix;
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp};
@@ -23,11 +23,11 @@ pub struct Lexer {
 	/// The list of tokens generated so far
 	pub tokens : Vec<Token>,
 	/// The string buffer for identities
-	ident_buffer : ~str,
+	ident_buffer : StrBuf,
 	/// The string buffer for strings
-	string_buffer : ~str,
+	string_buffer : StrBuf,
 	/// The string buffer for numbers
-	num_buffer : ~str,
+	num_buffer : StrBuf,
 	/// The kind of string - i.e. double quote or single quote or none if it isn't in a string
 	string_start : Option<StringType>,
 	/// If the lexer is currently inside a number
@@ -40,9 +40,9 @@ impl Lexer {
 	pub fn new() -> ~Lexer {
 		return ~Lexer {
 			tokens: Vec::new(),
-			ident_buffer: with_capacity(32),
-			string_buffer: with_capacity(256),
-			num_buffer: with_capacity(16),
+			ident_buffer: StrBuf::with_capacity(32),
+			string_buffer: StrBuf::with_capacity(256),
+			num_buffer: StrBuf::with_capacity(16),
 			string_start: None,
 			in_num: false,
 			escaped: false
@@ -50,12 +50,12 @@ impl Lexer {
 	}
 	fn clear_buffer(&mut self) {
 		if self.ident_buffer.len() > 0 {
-			self.tokens.push(TIdent(self.ident_buffer.clone()));
-			self.ident_buffer.clear();
+			self.tokens.push(TIdent(self.ident_buffer.clone().into_owned()));
+			self.ident_buffer.truncate(0);
 		}
 		if self.in_num {
-			self.tokens.push(TNumber(from_str(self.num_buffer).unwrap()));
-			self.num_buffer.clear();
+			self.tokens.push(TNumber(from_str(self.num_buffer.as_slice()).unwrap()));
+			self.num_buffer.truncate(0);
 			self.in_num = false;
 		}
 	}
@@ -82,7 +82,7 @@ impl Lexer {
 				_ if self.escaped => {
 					self.escaped = false;
 					if ch != '\n' {
-						self.string_buffer = self.string_buffer + from_char(match ch {
+						self.string_buffer.push_char(match ch {
 							'n' => '\n',
 							'r' => '\r',
 							't' => '\t',
@@ -111,24 +111,24 @@ impl Lexer {
 				},
 				'"' if self.string_start.is_some() && self.string_start.unwrap() == DoubleQuote => {
 					self.string_start = None;
-					self.tokens.push(TString(self.string_buffer.clone()));
-					self.string_buffer.clear();
+					self.tokens.push(TString(self.string_buffer.clone().into_owned()));
+					self.string_buffer.truncate(0);
 				},
 				'\'' if self.string_start.is_some() && self.string_start.unwrap() == SingleQuote => {
 					self.string_start = None;
-					self.tokens.push(TString(self.string_buffer.clone()));
-					self.string_buffer.clear();
+					self.tokens.push(TString(self.string_buffer.clone().into_owned()));
+					self.string_buffer.truncate(0);
 				},
 				'\\' if self.string_start.is_some() => self.escaped = true,
-				_ if self.string_start.is_some() => self.string_buffer = format!("{}{}", self.string_buffer, ch),
+				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
 				'"' if self.string_start.is_none() => self.string_start = Some(DoubleQuote),
 				'0'.. '9' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
-					self.num_buffer = format!("{}{}", self.num_buffer.clone(), ch);
+					self.num_buffer.push_char(ch);
 					self.in_num = true;
 				},
 				'\'' if self.string_start.is_none() => self.string_start = Some(SingleQuote),
-				'.' if self.in_num && !self.num_buffer.contains(".") => {
-					self.num_buffer = format!("{}{}", self.num_buffer, ch);
+				'.' if self.in_num && !self.num_buffer.as_slice().contains(".") => {
+					self.num_buffer.push_char(ch);
 				},
 				';' => {
 					self.clear_buffer();
@@ -211,7 +211,7 @@ impl Lexer {
 					self.tokens.push(TEqual)
 				},
 				_ if is_whitespace(ch) => self.clear_buffer(),
-				_ => self.ident_buffer = format!("{}{}", self.ident_buffer, ch)
+				_ => self.ident_buffer.push_char(ch)
 			};
 		}
 	}
