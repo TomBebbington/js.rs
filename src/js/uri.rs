@@ -11,6 +11,7 @@ pub fn encode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}))
 }
 /// Encode a URI component
+/// Rust uses RFC 3986, but JS doesn't, this will need a fix
 pub fn encode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
@@ -27,6 +28,7 @@ pub fn decode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}))
 }
 /// Decode a URI component
+/// Rust uses RFC 3986, but JS doesn't, this will need a fix
 pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
