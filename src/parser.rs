@@ -9,22 +9,23 @@ use std::vec::Vec;
 #[deriving(Eq)]
 /// An error encountered during parsing an expression
 pub enum ParseError {
-	/// When it expected a certain kind of token, but got another
-	Expected(Vec<TokenData>, Token),
+	/// When it expected a certain kind of token, but got another as part of something
+	Expected(Vec<TokenData>, Token, ~str),
 	/// When it expected a certain expression, but got another
 	ExpectedExpr(~str, Expr)
 }
 impl fmt::Show for ParseError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
-			Expected(ref wanted, ref got) if wanted.len() == 0 => write!(f.buf, "Line {}, Column {}: Expected expression, got {}", got.line_number, got.column_number, got.data),
-			Expected(ref wanted, ref got) => {
+			Expected(ref wanted, ref got, ref routine) if wanted.len() == 0 => write!(f.buf, "Line {}, Column {}: Expected expression for {}, got {}", got.line_number, got.column_number, routine, got.data),
+			Expected(ref wanted, ref got, ref routine) => {
 				try!(write!(f.buf, "Line {}, Column {}: ", got.line_number, got.column_number));
 				try!(write!(f.buf, "Expected "));
 				let last = wanted.last().unwrap();
 				for wanted_token in wanted.iter() {
 					try!(write!(f.buf, "'{}'{}", wanted_token, if wanted_token == last {""} else {", "}));
 				}
+				try!(write!(f.buf, " for {}", routine));
 				write!(f.buf, " but got {}", got.data)
 			},
 			ExpectedExpr(ref wanted, ref got) => {
@@ -89,9 +90,9 @@ impl Parser {
 			},
 			"typeof" => Ok(Some(~TypeOfExpr(try!(self.parse())))),
 			"if" => {
-				try!(self.expect(TOpenParen));
+				try!(self.expect(TOpenParen, ~"if block"));
 				let cond = try!(self.parse());
-				try!(self.expect(TCloseParen));
+				try!(self.expect(TCloseParen, ~"if block"));
 				let expr = try!(self.parse());
 				let next = self.tokens.get(self.pos + 1).clone();
 				Ok(Some(~IfExpr(cond, expr, if next.data == TIdent(~"else") {
@@ -102,27 +103,27 @@ impl Parser {
 				})))
 			},
 			"while" => {
-				try!(self.expect(TOpenParen));
+				try!(self.expect(TOpenParen, ~"while condition"));
 				let cond = try!(self.parse());
-				try!(self.expect(TCloseParen));
+				try!(self.expect(TCloseParen, ~"while condition"));
 				let expr = try!(self.parse());
 				Ok(Some(~WhileLoopExpr(cond, expr)))
 			},
 			"switch" => {
-				try!(self.expect(TOpenParen));
+				try!(self.expect(TOpenParen, ~"switch value"));
 				let value = self.parse();
-				try!(self.expect(TCloseParen));
-				try!(self.expect(TOpenBlock));
+				try!(self.expect(TCloseParen, ~"switch value"));
+				try!(self.expect(TOpenBlock, ~"switch block"));
 				let mut cases = Vec::new();
 				let mut default = None;
 				while self.pos + 1 < self.tokens.len() {
-					let tok = self.tokens.get(self.pos).data.clone();
+					let tok = self.tokens.get(self.pos).clone();
 					self.pos += 1;
-					match tok {
+					match tok.data {
 						TIdent(ref id) if *id == ~"case" => {
 							let cond = self.parse();
 							let mut block = Vec::new();
-							try!(self.expect(TColon));
+							try!(self.expect(TColon, ~"switch case"));
 							loop {
 								match self.tokens.get(self.pos).data.clone() {
 									TIdent(ref id) if *id == ~"case" || *id == ~"default" => break,
@@ -134,7 +135,7 @@ impl Parser {
 						},
 						TIdent(ref id) if *id == ~"default" => {
 							let mut block = Vec::new();
-							try!(self.expect(TColon));
+							try!(self.expect(TColon, ~"default switch case"));
 							loop {
 								match self.tokens.get(self.pos).data.clone() {
 									TIdent(ref id) if *id == ~"case" || *id == ~"default" => break,
@@ -145,10 +146,10 @@ impl Parser {
 							default = Some(~BlockExpr(block));
 						},
 						TCloseBlock => break,
-						_ => fail!("Expected 'case', 'default' or '{}', not '{}'", '}', tok)
+						_ => return Err(Expected(vec!(TIdent(~"case"), TIdent(~"default"), TCloseBlock), tok, ~"switch block"))
 					}
 				}
-				try!(self.expect(TCloseBlock));
+				try!(self.expect(TCloseBlock, ~"switch block"));
 				Ok(Some(~SwitchExpr(value.unwrap(), cases, default)))
 			},
 			"function" => {
@@ -159,15 +160,15 @@ impl Parser {
 						Some(name.clone())
 					},
 					TOpenParen => None,
-					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone()))
+					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone(), ~"function name"))
 				};
-				try!(self.expect(TOpenParen));
+				try!(self.expect(TOpenParen, ~"function"));
 				let mut args:Vec<~str> = Vec::new();
 				let mut tk = self.tokens.get(self.pos).clone();
 				while tk.data != TCloseParen {
 					match tk.data {
 						TIdent(ref id) => args.push(id.to_owned()),
-						_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone()))
+						_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone(), ~"function arguments"))
 					}
 					self.pos += 1;
 					if self.tokens.get(self.pos).data == TComma {
@@ -198,7 +199,7 @@ impl Parser {
 			TString(ref s) => ~ConstExpr(CString(s.to_owned())),
 			TOpenParen => {
 				let nexte = try!(self.parse());
-				try!(self.expect(TCloseParen));
+				try!(self.expect(TCloseParen, ~"brackets"));
 				nexte
 			},
 			TOpenArray => {
@@ -215,7 +216,7 @@ impl Parser {
 						array.push(~ConstExpr(CNull));
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseArray), token.clone()));
+						return Err(Expected(vec!(TComma, TCloseArray), token.clone(), ~"array declaration"));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -237,10 +238,10 @@ impl Parser {
 					let name = match tk.data {
 						TIdent(ref id) => id,
 						TString(ref str) => str,
-						_ => return Err(Expected(vec!(TIdent(~"identifier"), TString(~"string")), tk))
+						_ => return Err(Expected(vec!(TIdent(~"identifier"), TString(~"string")), tk, ~"object declaration"))
 					};
 					self.pos += 1;
-					try!(self.expect(TColon));
+					try!(self.expect(TColon, ~"object declaration"));
 					let value = try!(self.parse());
 					map.insert(name.to_owned(), value);
 					self.pos += 1;
@@ -260,7 +261,7 @@ impl Parser {
 				~BlockExpr(exprs)
 			},
 			TNumber(num) => ~ConstExpr(CNum(num)),
-			_ => return Err(Expected(Vec::new(), token.clone()))
+			_ => return Err(Expected(Vec::new(), token.clone(), ~""))
 		};
 		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};
 	}
@@ -274,7 +275,7 @@ impl Parser {
 				let tk = self.tokens.get(self.pos).clone();
 				match tk.data {
 					TIdent(ref s) => result = ~GetConstFieldExpr(expr, s.to_owned()),
-					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk))
+					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk, ~"field access"))
 				}
 				self.pos += 1;
 			},
@@ -290,7 +291,7 @@ impl Parser {
 					} else if token.data == TComma && expect_comma_or_end {
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseParen), token));
+						return Err(Expected(vec!(TComma, TCloseParen), token, ~"function call arguments"));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -303,14 +304,14 @@ impl Parser {
 			TQuestion => {
 				self.pos += 1;
 				let if_e = try!(self.parse());
-				try!(self.expect(TColon));
+				try!(self.expect(TColon, ~"if expression"));
 				let else_e = try!(self.parse());
 				result = ~IfExpr(expr, if_e, Some(else_e));
 			},
 			TOpenArray => {
 				self.pos += 1;
 				let index = try!(self.parse());
-				try!(self.expect(TCloseArray));
+				try!(self.expect(TCloseArray, ~"array declaration"));
 				result = ~GetFieldExpr(expr, index);
 			},
 			TSemicolon => {
@@ -336,11 +337,11 @@ impl Parser {
 		return if carry_on && self.pos < self.tokens.len() { self.parse_next(result) } else {Ok(result)};
 	}
 	/// Returns an error if the next symbol is not [tk]
-	fn expect(&mut self, tk:TokenData) -> Result<(), ParseError> {
+	fn expect(&mut self, tk:TokenData, routine:~str) -> Result<(), ParseError> {
 		self.pos += 1;
 		let curr_tk = self.tokens.get(self.pos - 1).clone();
 		return if curr_tk.data != tk {
-			Err(Expected(vec!(tk), curr_tk))
+			Err(Expected(vec!(tk), curr_tk, routine))
 		} else {
 			Ok(())
 		};
