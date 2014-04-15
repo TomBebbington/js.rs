@@ -12,8 +12,8 @@ install:
   - git submodule update
   - make
   - cd ..
-  - mv cargo/target/cargo* /usr/local/bin
-  - mv cargo/target/lib* /usr/local/lib
+  - sudo mv cargo/target/cargo* /usr/local/bin
+  - sudo mv cargo/target/lib* /usr/local/lib
   - rm -rf cargo
 script:
   - make build doc
