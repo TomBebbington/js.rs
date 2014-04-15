@@ -16,8 +16,7 @@ install:
   - sudo mv cargo/target/lib* /usr/local/lib
   - rm -rf cargo
 script:
-  - make build tests doc
-  - ./target/tests
+  - make build doc
 notifications:
   email:
     - tophattedcoder@gmail.com
