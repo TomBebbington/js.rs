@@ -78,6 +78,7 @@ impl ValueData {
 			VString(ref s) if *s == "1".to_owned() => true,
 			VNumber(n) if n >= 1.0 && n % 1.0 == 0.0 => true,
 			VInteger(n) if n > 1 => true,
+			VBoolean(v) => v,
 			_ => false
 		};
 	}
@@ -242,8 +243,6 @@ impl Eq for ValueData {
 			(VString(ref a), VString(ref b)) if a == b => true,
 			(VNumber(a), VNumber(b)) if a == b => true,
 			(VInteger(a), VInteger(b)) if a == b => true,
-			(VObject(_), VObject(_)) if self == other => true,
-			(VFunction(_), VFunction(_)) if self == other => true,
 			_ => false
 		}
 	}
