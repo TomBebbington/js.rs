@@ -234,13 +234,15 @@ impl Executor for Interpreter {
 				}))
 			},
 			CompOpExpr(ref op, ref a, ref b) => {
-				let v_a = try!(self.run(*a)).borrow().clone();
-				let v_b = try!(self.run(*b)).borrow().clone();
+				let v_r_a = try!(self.run(*a));
+				let v_r_b = try!(self.run(*b));
+				let v_a = v_r_a.borrow();
+				let v_b = v_r_b.borrow();
 				Ok(to_value(match *op {
-					CompEqual => v_a == v_b,
-					CompNotEqual => v_a != v_b,
-					CompStrictEqual => v_a == v_b,
-					CompStrictNotEqual => v_a != v_b,
+					CompEqual => v_r_a.ptr_eq(&v_r_b) || v_a == v_b,
+					CompNotEqual => !v_r_a.ptr_eq(&v_r_b) || v_a != v_b,
+					CompStrictEqual => v_r_a.ptr_eq(&v_r_b) || v_a == v_b,
+					CompStrictNotEqual => !v_r_a.ptr_eq(&v_r_b) || v_a != v_b,
 					CompGreaterThan => v_a.to_num() > v_b.to_num(),
 					CompGreaterThanOrEqual => v_a.to_num() >= v_b.to_num(),
 					CompLessThan => v_a.to_num() < v_b.to_num(),
@@ -256,7 +258,7 @@ impl Executor for Interpreter {
 				})
 			},
 			ConstructExpr(ref callee, ref args) => {
-				let func = try!(self.run(callee.clone()));
+				let func = try!(self.run(*callee));
 				let mut v_args = Vec::with_capacity(args.len());
 				for arg in args.iter() {
 					v_args.push(try!(self.run(*arg)));
