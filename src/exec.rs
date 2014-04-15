@@ -265,7 +265,7 @@ impl Executor for Interpreter {
 				this.borrow().set_field(~"__proto__", func.borrow().get_field(~"prototype"));
 				Ok(match *func.borrow() {
 					VFunction(ref func) => {
-						func.borrow().call(self, this, Gc::new(VNull), v_args).unwrap();
+						try!(func.borrow().call(self, this, Gc::new(VNull), v_args));
 						this
 					},
 					_ => Gc::new(VUndefined)
