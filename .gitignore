@@ -1,4 +1,4 @@
 #ignore binaries
-bin/*
+target/*
 #ignore docs
 doc/

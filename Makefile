@@ -1,13 +1,8 @@
-.PHONY: all build interactive tests doc clean
-all: build interactive tests doc
+.PHONY: all build doc clean
+all: build doc
 build:
-	mkdir -p bin
-	rustc src/lib.rs --out-dir=bin --opt-level=3
-tests:
-	rustc src/tests.rs --out-dir=bin -L bin --test --opt-level=3
-interactive:
-	rustc src/interactive.rs --out-dir=bin -L bin --opt-level=3
+	cargo-compile --manifest-path Cargo.toml
 doc:
-	rustdoc src/lib.rs -o doc
+	rustdoc src/script.rs -o doc
 clean:
-	rm -rf bin/*
+	rm -rf target/*
