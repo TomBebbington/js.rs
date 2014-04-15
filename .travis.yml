@@ -6,9 +6,13 @@ before_install:
   - sudo apt-get update
 install:
   - sudo apt-get install rust-nightly
+  - git clone https://github.com/carlhuda/cargo
+  - cd cargo && make && cd ..
+  - mv cargo/target/cargo* /usr/local/bin
+  - mv cargo/target/lib* /usr/local/lib
+  - rm -rf cargo
 script:
-  - make build tests doc
-  - bin/tests
+  - make build doc
 notifications:
   email:
     - tophattedcoder@gmail.com
