@@ -50,4 +50,6 @@ pub mod js {
 	pub mod error;
 	/// Global methods concerning URIs
 	pub mod uri;
+	/// The global string object
+	pub mod string;
 }

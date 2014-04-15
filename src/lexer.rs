@@ -117,6 +117,21 @@ impl Lexer {
 							'b' => '\x08',
 							'f' => '\x0c',
 							'0' => '\0',
+							'x' => {
+								let mut nums = ~"";
+								for _ in range(0, 2) {
+									nums = format!("{}{}", nums, try!(iter.next().unwrap().clone()));
+								}
+								self.column_number += 2;
+								let as_num = match FromStrRadix::from_str_radix(nums, 16) {
+									Some(v) => v,
+									None => 0
+								};
+								match from_u32(as_num) {
+									Some(v) => v,
+									None => fail!("Line {}, Column {}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
+								}
+							},
 							'u' => {
 								let mut nums = ~"";
 								for _ in range(0, 4) {

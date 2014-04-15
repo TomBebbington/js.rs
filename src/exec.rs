@@ -7,7 +7,7 @@ use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGrea
 use js::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value};
 use js::object::ObjectData;
 use js::function::{RegularFunc, RegularFunction};
-use js::{console, math, object, array, function, json, number, error, uri};
+use js::{console, math, object, array, function, json, number, error, uri, string};
 use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::gc::Gc;
@@ -47,6 +47,7 @@ impl Executor for Interpreter {
 		number::init(global);
 		error::init(global);
 		number::init(global);
+		string::init(global);
 		uri::init(global);
 		return ~Interpreter {global: global, scopes: Vec::new()};
 	}
