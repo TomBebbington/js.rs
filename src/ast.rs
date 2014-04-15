@@ -321,7 +321,9 @@ pub enum TokenData {
 	/// A logical operation
 	TLogOp(LogOp),
 	/// A comparison operation
-	TCompOp(CompOp)
+	TCompOp(CompOp),
+	/// A comment
+	TComment(~str)
 }
 impl fmt::Show for TokenData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -345,7 +347,8 @@ impl fmt::Show for TokenData {
 			TNumOp(op) => write!(f.buf, "{}", op),
 			TBitOp(op) => write!(f.buf, "{}", op),
 			TLogOp(op) => write!(f.buf, "{}", op),
-			TCompOp(op) => write!(f.buf, "{}", op)
+			TCompOp(op) => write!(f.buf, "{}", op),
+			TComment(ref com) => write!(f.buf, "// {}", com)
 		}
 	}
 }

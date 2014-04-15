@@ -1,7 +1,7 @@
 use ast::{Token, TokenData, Expr};
 use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TEqual, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TEqual, TArrow};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -188,7 +188,8 @@ impl Parser {
 		let token = self.tokens.get(self.pos).clone();
 		self.pos += 1;
 		let expr : ~Expr = match token.data {
-			TSemicolon => try!(self.parse()),
+			TSemicolon | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
+			TSemicolon | TComment(_) => ~ConstExpr(CUndefined),
 			TIdent(ref s) => {
 				let structure = try!(self.parse_struct(s.clone()));
 				match structure {
@@ -359,7 +360,7 @@ impl Parser {
 				try!(self.expect(TCloseArray, ~"array declaration"));
 				result = ~GetFieldExpr(expr, index);
 			},
-			TSemicolon => {
+			TSemicolon | TComment(_) => {
 				self.pos += 1;
 			},
 			TNumOp(op) => {

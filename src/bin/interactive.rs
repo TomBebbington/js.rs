@@ -1,9 +1,9 @@
 #![feature(globs)]
 #![crate_type = "bin"]
-extern crate rust_js;
-use rust_js::lexer::Lexer;
-use rust_js::parser::{Parser, VerboseResult};
-use rust_js::exec::{Executor, Interpreter};
+extern crate script;
+use script::lexer::Lexer;
+use script::parser::{Parser, VerboseResult};
+use script::exec::{Executor, Interpreter};
 use std::io;
 
 fn main() {

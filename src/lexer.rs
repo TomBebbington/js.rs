@@ -2,7 +2,7 @@ use std::io::{BufReader, BufferedReader, Reader};
 use std::strbuf::StrBuf;
 use std::char::from_u32;
 use std::num::FromStrRadix;
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor};
 use ast::{CompEqual, CompNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
@@ -20,6 +20,16 @@ pub enum StringType {
 	/// Single-quoted
 	SingleQuote
 }
+#[deriving(Clone)]
+#[deriving(Eq)]
+#[deriving(Show)]
+/// The type of comment used
+pub enum CommentType {
+	/// Multi-line comment
+	MultiLineComment,
+	/// Single-line comment
+	SingleLineComment
+}
 /// The Javascript Lexer
 pub struct Lexer {
 	/// The list of tokens generated so far
@@ -28,10 +38,14 @@ pub struct Lexer {
 	ident_buffer : StrBuf,
 	/// The string buffer for strings
 	string_buffer : StrBuf,
+	/// The string buffer for comments
+	comment_buffer : StrBuf,
 	/// The string buffer for numbers
 	num_buffer : StrBuf,
 	/// The kind of string - i.e. double quote or single quote or none if it isn't in a string
 	string_start : Option<StringType>,
+	/// The kind of comment
+	current_comment : Option<CommentType>,
 	/// If the lexer is currently inside a number
 	in_num : bool,
 	/// If a backwards slash has just been read
@@ -49,7 +63,9 @@ impl Lexer {
 			ident_buffer: StrBuf::with_capacity(32),
 			string_buffer: StrBuf::with_capacity(256),
 			num_buffer: StrBuf::with_capacity(16),
+			comment_buffer: StrBuf::with_capacity(32),
 			string_start: None,
+			current_comment: None,
 			in_num: false,
 			escaped: false,
 			line_number: 1,
@@ -122,6 +138,22 @@ impl Lexer {
 						});
 					}
 				},
+				'\n' if self.current_comment == Some(SingleLineComment) => {
+					let comment = self.comment_buffer.clone().into_owned();
+					self.push_token(TComment(comment));
+					self.comment_buffer.truncate(0);
+					self.current_comment = None;
+				},
+				'*' if self.current_comment == Some(MultiLineComment) && try!(iter.peek().unwrap().clone()) == '/' => {
+					iter.next();
+					let comment = self.comment_buffer.clone().into_owned();
+					self.push_token(TComment(comment));
+					self.comment_buffer.truncate(0);
+					self.current_comment = None;
+				},
+				_ if self.current_comment.is_some() => {
+					self.comment_buffer.push_char(ch);
+				},
 				'"' if self.string_start == Some(DoubleQuote) => {
 					self.string_start = None;
 					let string = self.string_buffer.clone().into_owned();
@@ -188,6 +220,14 @@ impl Lexer {
 				'?' => {
 					self.clear_buffer();
 					self.push_token(TQuestion);
+				},
+				'/' if try!(iter.peek().unwrap().clone()) == '/' => {
+					iter.next();
+					self.current_comment = Some(SingleLineComment);
+				},
+				'/' if try!(iter.peek().unwrap().clone()) == '*' => {
+					iter.next();
+					self.current_comment = Some(MultiLineComment);
 				},
 				'/' => {
 					self.clear_buffer();

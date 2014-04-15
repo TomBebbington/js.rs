@@ -10,11 +10,12 @@ use script::js::value::Value;
 use std::path::posix::Path;
 use std::io::fs::{File, walk_dir};
 use std::io::BufferedReader;
+use std::task::{task};
 fn main() {
 	for file in walk_dir(&Path::new("../tests/test/suite")).unwrap() {
 		let file_name = file.to_c_str().as_str().unwrap().to_owned();
 		if file_name.ends_with(".js") {
-			spawn(proc() {
+			task().named(file_name.clone()).spawn(proc() {
 				let mut lexer = Lexer::new();
 				lexer.lex(BufferedReader::new(File::open(&file).unwrap())).unwrap();
 				let mut parser = Parser::new(lexer.tokens);
