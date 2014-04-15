@@ -7,7 +7,9 @@ before_install:
 install:
   - sudo apt-get install rust-nightly
   - git clone https://github.com/carlhuda/cargo
-  - cd cargo && make && cd ..
+  - cd cargo
+  - make
+  - cd ..
   - mv cargo/target/cargo* /usr/local/bin
   - mv cargo/target/lib* /usr/local/lib
   - rm -rf cargo
