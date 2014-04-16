@@ -1,6 +1,7 @@
 use js::value::{Value, ValueData, ValueConv, VUndefined, VObject, ResultValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
+use std::str::MaybeOwned;
 
 #[deriving(Clone)]
 pub type ObjectData = TreeMap<~str, Property>;
@@ -39,23 +40,23 @@ impl ValueConv for Property {
 	fn to_value(&self) -> Value {
 		let prop = ValueData::new_obj(None);
 		let prop_ref = prop.borrow();
-		prop_ref.set_field(~"configurable", to_value(self.configurable));
-		prop_ref.set_field(~"enumerable", to_value(self.enumerable));
-		prop_ref.set_field(~"writable", to_value(self.writable));
-		prop_ref.set_field(~"value", self.value);
-		prop_ref.set_field(~"get", self.get);
-		prop_ref.set_field(~"set", self.set);
+		prop_ref.set_field("configurable".into_maybe_owned(), to_value(self.configurable));
+		prop_ref.set_field("enumerable".into_maybe_owned(), to_value(self.enumerable));
+		prop_ref.set_field("writable".into_maybe_owned(), to_value(self.writable));
+		prop_ref.set_field("value".into_maybe_owned(), self.value);
+		prop_ref.set_field("get".into_maybe_owned(), self.get);
+		prop_ref.set_field("set".into_maybe_owned(), self.set);
 		prop
 	}
 	fn from_value(v:Value) -> Option<Property> {
 		let vb = v.borrow();
 		Some(Property {
-			configurable: from_value(vb.get_field(~"configurable")).unwrap(),
-			enumerable: from_value(vb.get_field(~"enumerable")).unwrap(),
-			writable: from_value(vb.get_field(~"writable")).unwrap(),
-			value: vb.get_field(~"value"),
-			get: vb.get_field(~"get"),
-			set: vb.get_field(~"set")
+			configurable: from_value(vb.get_field("configurable".into_maybe_owned())).unwrap(),
+			enumerable: from_value(vb.get_field("enumerable".into_maybe_owned())).unwrap(),
+			writable: from_value(vb.get_field("writable".into_maybe_owned())).unwrap(),
+			value: vb.get_field("value".into_maybe_owned()),
+			get: vb.get_field("get".into_maybe_owned()),
+			set: vb.get_field("set".into_maybe_owned())
 		})
 	}
 }
@@ -66,36 +67,36 @@ pub fn make_object(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
 /// Get the prototype
 pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
-	return Ok(obj.borrow().get_field(~"__proto__"));
+	return Ok(obj.borrow().get_field("__proto__".into_maybe_owned()));
 }
 /// Set the prototype
 pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let proto = args.get(1).clone();
 	let obj = args.get(0);
-	obj.borrow().set_field(~"__proto__", proto);
+	obj.borrow().set_field("__proto__".into_maybe_owned(), proto);
 	return Ok(*obj);
 }
 /// Define the property
 pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
-	let prop = from_value::<~str>(*args.get(1)).unwrap();
+	let prop = from_value::<MaybeOwned>(*args.get(1)).unwrap();
 	let desc = from_value::<Property>(*args.get(2)).unwrap();
 	obj.borrow().set_prop(prop, desc);
 	return Ok(Gc::new(VUndefined));
 }
 /// To string
 pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	return Ok(to_value(this.borrow().to_str()));
+	return Ok(to_value(this.borrow().to_str().into_maybe_owned()));
 }
 /// Check if it has a property
 pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let prop = if args.len() == 0 {
 		None
 	} else {
-		from_value::<~str>(*args.get(0))
+		from_value::<MaybeOwned>(*args.get(0))
 	};
 	Ok(to_value::<bool>(prop.is_some() && match *this.borrow() {
-		VObject(ref obj) => obj.borrow().find(&prop.unwrap()).is_some(),
+		VObject(ref obj) => obj.borrow().find(&prop.unwrap().into_owned()).is_some(),
 		_ => false
 	}))
 }
@@ -103,16 +104,16 @@ pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 pub fn _create(global:Value) -> Value {
 	let obj = to_value(make_object);
 	let prototype = ValueData::new_obj(Some(global));
-	prototype.borrow().set_field(~"hasOwnProperty", to_value(has_own_prop));
-	prototype.borrow().set_field(~"toString", to_value(to_string));
-	obj.borrow().set_field(~"length", to_value(1i32));
-	obj.borrow().set_field(~"prototype", prototype);
-	obj.borrow().set_field(~"setPrototypeOf", to_value(set_proto_of));
-	obj.borrow().set_field(~"getPrototypeOf", to_value(get_proto_of));
-	obj.borrow().set_field(~"defineProperty", to_value(define_prop));
+	prototype.borrow().set_field("hasOwnProperty".into_maybe_owned(), to_value(has_own_prop));
+	prototype.borrow().set_field("toString".into_maybe_owned(), to_value(to_string));
+	obj.borrow().set_field("length".into_maybe_owned(), to_value(1i32));
+	obj.borrow().set_field("prototype".into_maybe_owned(), prototype);
+	obj.borrow().set_field("setPrototypeOf".into_maybe_owned(), to_value(set_proto_of));
+	obj.borrow().set_field("getPrototypeOf".into_maybe_owned(), to_value(get_proto_of));
+	obj.borrow().set_field("defineProperty".into_maybe_owned(), to_value(define_prop));
 	obj
 }
 /// Initialise the `Object` object on the global object
 pub fn init(global:Value) {
-	global.borrow().set_field(~"Object", _create(global));
+	global.borrow().set_field("Object".into_maybe_owned(), _create(global));
 }

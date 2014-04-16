@@ -75,5 +75,5 @@ pub fn _create(_ : Value) -> Value {
 }
 /// Initialise the global object with the `Function` object
 pub fn init(global:Value) {
-	global.borrow().set_field(~"Function", _create(global));
+	global.borrow().set_field("Function".into_maybe_owned(), _create(global));
 }

@@ -3,7 +3,7 @@ use std::gc::Gc;
 
 /// Create new array
 pub fn make_array(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	this.borrow().set_field(~"length", to_value(0i32));
+	this.borrow().set_field("length".into_maybe_owned(), to_value(0i32));
 	Ok(Gc::new(VUndefined))
 }
 /// Create a new `Array` object
@@ -13,5 +13,5 @@ pub fn _create(_: Value) -> Value {
 }
 /// Initialise the global object with the `Array` object
 pub fn init(global:Value) {
-	global.borrow().set_field(~"Array", _create(global));
+	global.borrow().set_field("Array".into_maybe_owned(), _create(global));
 }

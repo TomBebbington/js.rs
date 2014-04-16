@@ -38,8 +38,8 @@ pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Initialise the URI functions on a global object
 pub fn init(obj:Value) {
-	obj.borrow().set_field(~"encodeURI", to_value(encode_uri));
-	obj.borrow().set_field(~"encodeURIComponent", to_value(encode_uri_component));
-	obj.borrow().set_field(~"decodeURI", to_value(decode_uri));
-	obj.borrow().set_field(~"decodeURIComponent", to_value(decode_uri_component));
+	obj.borrow().set_field("encodeURI".into_maybe_owned(), to_value(encode_uri));
+	obj.borrow().set_field("encodeURIComponent".into_maybe_owned(), to_value(encode_uri_component));
+	obj.borrow().set_field("decodeURI".into_maybe_owned(), to_value(decode_uri));
+	obj.borrow().set_field("decodeURIComponent".into_maybe_owned(), to_value(decode_uri_component));
 }

@@ -12,5 +12,5 @@ pub fn _create(global: Value) -> Value {
 }
 /// Initialise the global object with the `Error` object
 pub fn init(global:Value) {
-	global.borrow().set_field(~"Boolean", _create(global));
+	global.borrow().set_field("Boolean".into_maybe_owned(), _create(global));
 }

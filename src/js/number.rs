@@ -1,8 +1,9 @@
 use js::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from_value};
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
+use std::str::MaybeOwned;
 /// Parse a float into a value
 pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let parsed = from_str::<f64>(from_value::<~str>(*args.get(0)).unwrap());
+	let parsed = from_str::<f64>(from_value::<MaybeOwned>(*args.get(0)).unwrap().into_owned());
 	return Ok(to_value(match parsed {
 		Some(v) => v,
 		None => NAN
@@ -10,7 +11,7 @@ pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Parse an int into a value
 pub fn parse_int(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let parsed = from_str::<i32>(from_value::<~str>(*args.get(0)).unwrap());
+	let parsed = from_str::<i32>(from_value::<MaybeOwned>(*args.get(0)).unwrap().into_owned());
 	return Ok(match parsed {
 		Some(v) => to_value(v),
 		None => to_value(NAN)
@@ -61,25 +62,25 @@ pub fn strict_is_nan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new `Number` object
 pub fn _create(global:Value) -> Value {
 	let number = ValueData::new_obj(Some(global));
-	number.borrow().set_field(~"NaN", to_value(NAN));
-	number.borrow().set_field(~"MAX_VALUE", to_value(MAX_VALUE));
-	number.borrow().set_field(~"MIN_VALUE", to_value(MIN_VALUE));
-	number.borrow().set_field(~"POSITIVE_INFINITY", to_value(INFINITY));
-	number.borrow().set_field(~"NEGATIVE_INFINITY", to_value(NEG_INFINITY));
-	number.borrow().set_field(~"EPSILON", to_value(EPSILON));
-	number.borrow().set_field(~"parseFloat", to_value(parse_float));
-	number.borrow().set_field(~"parseInt", to_value(parse_int));
-	number.borrow().set_field(~"isFinite", to_value(strict_is_finite));
-	number.borrow().set_field(~"isNaN", to_value(strict_is_nan));
+	number.borrow().set_field("NaN".into_maybe_owned(), to_value(NAN));
+	number.borrow().set_field("MAX_VALUE".into_maybe_owned(), to_value(MAX_VALUE));
+	number.borrow().set_field("MIN_VALUE".into_maybe_owned(), to_value(MIN_VALUE));
+	number.borrow().set_field("POSITIVE_INFINITY".into_maybe_owned(), to_value(INFINITY));
+	number.borrow().set_field("NEGATIVE_INFINITY".into_maybe_owned(), to_value(NEG_INFINITY));
+	number.borrow().set_field("EPSILON".into_maybe_owned(), to_value(EPSILON));
+	number.borrow().set_field("parseFloat".into_maybe_owned(), to_value(parse_float));
+	number.borrow().set_field("parseInt".into_maybe_owned(), to_value(parse_int));
+	number.borrow().set_field("isFinite".into_maybe_owned(), to_value(strict_is_finite));
+	number.borrow().set_field("isNaN".into_maybe_owned(), to_value(strict_is_nan));
 	number
 }
 /// Initialise the parse functions and `Number` on the global object
 pub fn init(global:Value) {
-	global.borrow().set_field(~"NaN", to_value(NAN));
-	global.borrow().set_field(~"Infinity", to_value(INFINITY));
-	global.borrow().set_field(~"parseFloat", to_value(parse_float));
-	global.borrow().set_field(~"parseInt", to_value(parse_int));
-	global.borrow().set_field(~"isFinite", to_value(is_finite));
-	global.borrow().set_field(~"isNaN", to_value(is_nan));
-	global.borrow().set_field(~"Number", _create(global));
+	global.borrow().set_field("NaN".into_maybe_owned(), to_value(NAN));
+	global.borrow().set_field("Infinity".into_maybe_owned(), to_value(INFINITY));
+	global.borrow().set_field("parseFloat".into_maybe_owned(), to_value(parse_float));
+	global.borrow().set_field("parseInt".into_maybe_owned(), to_value(parse_int));
+	global.borrow().set_field("isFinite".into_maybe_owned(), to_value(is_finite));
+	global.borrow().set_field("isNaN".into_maybe_owned(), to_value(is_nan));
+	global.borrow().set_field("Number".into_maybe_owned(), _create(global));
 }

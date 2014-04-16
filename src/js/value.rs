@@ -5,6 +5,7 @@ use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null}
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
+use std::str::MaybeOwned;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::iter::FromIterator;
@@ -39,7 +40,8 @@ impl ValueData {
 	pub fn new_obj(global: Option<Value>) -> Value {
 		let mut obj : ObjectData = TreeMap::new();
 		if global.is_some() {
-			obj.insert(~"__proto__", Property::new(global.unwrap().borrow().get_field(~"Object").borrow().get_field(~"prototype")));
+			let obj_proto = global.unwrap().borrow().get_field("Object".into_maybe_owned()).borrow().get_field("prototype".into_maybe_owned());
+			obj.insert(~"__proto__", Property::new(obj_proto));
 		}
 		Gc::new(VObject(RefCell::new(obj)))
 	}
@@ -110,7 +112,7 @@ impl ValueData {
 		}
 	}
 	/// Resolve the property in the object
-	pub fn get_prop(&self, field:~str) -> Option<Property> {
+	pub fn get_prop(&self, field:MaybeOwned) -> Option<Property> {
 		let obj : ObjectData = match *self {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) => {
@@ -122,7 +124,7 @@ impl ValueData {
 			},
 			_ => return None
 		};
-		match obj.find(&field) {
+		match obj.find(&field.clone().into_owned()) {
 			Some(val) => Some(*val),
 			None => match obj.find(&PROTOTYPE.to_owned()) {
 				Some(prop) => 
@@ -132,22 +134,22 @@ impl ValueData {
 		}
 	}
 	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
-	pub fn get_field(&self, field:~str) -> Value {
+	pub fn get_field(&self, field:MaybeOwned) -> Value {
 		match self.get_prop(field) {
 			Some(prop) => prop.value,
 			None => Gc::new(VUndefined)
 		}
 	}
 	/// Set the field in the value
-	pub fn set_field(&self, field:~str, val:Value) -> Value {
+	pub fn set_field(&self, field:MaybeOwned, val:Value) -> Value {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().insert(field, Property::new(val));
+				obj.borrow_mut().insert(field.into_owned(), Property::new(val));
 			},
 			VFunction(ref func) => {
 				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field, Property::new(val)),
-					RegularFunc(ref mut f) => f.object.insert(field, Property::new(val))
+					NativeFunc(ref mut f) => f.object.insert(field.into_owned(), Property::new(val)),
+					RegularFunc(ref mut f) => f.object.insert(field.into_owned(), Property::new(val))
 				};
 			},
 			_ => ()
@@ -155,15 +157,15 @@ impl ValueData {
 		val
 	}
 	/// Set the property in the value
-	pub fn set_prop(&self, field:~str, prop:Property) -> Property {
+	pub fn set_prop(&self, field:MaybeOwned, prop:Property) -> Property {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().insert(field, prop);
+				obj.borrow_mut().insert(field.into_owned(), prop);
 			},
 			VFunction(ref func) => {
 				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field, prop),
-					RegularFunc(ref mut f) => f.object.insert(field, prop)
+					NativeFunc(ref mut f) => f.object.insert(field.into_owned(), prop),
+					RegularFunc(ref mut f) => f.object.insert(field.into_owned(), prop)
 				};
 			},
 			_ => ()
@@ -333,12 +335,12 @@ pub trait ValueConv {
 	/// Convert a Javascript value to a Rust value
 	fn from_value(v:Value) -> Option<Self>;
 }
-impl ValueConv for ~str {
+impl<'t> ValueConv for MaybeOwned<'t> {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(self.clone()))
+		Gc::new(VString(self.clone().into_owned()))
 	}
-	fn from_value(v:Value) -> Option<~str> {
-		Some(v.borrow().to_str())
+	fn from_value(v:Value) -> Option<MaybeOwned<'t>> {
+		Some(v.borrow().to_str().into_maybe_owned())
 	}
 }
 impl ValueConv for f64 {
@@ -374,10 +376,10 @@ impl<T:ValueConv> ValueConv for Vec<T> {
 		to_value(arr)
 	}
 	fn from_value(v:Value) -> Option<Vec<T>> {
-		let len = v.borrow().get_field(~"length").borrow().to_int();
+		let len = v.borrow().get_field("length".into_maybe_owned()).borrow().to_int();
 		let mut vec = Vec::with_capacity(len as uint);
 		for i in range(0, len) {
-			match ValueConv::from_value(v.borrow().get_field(i.to_str())) {
+			match ValueConv::from_value(v.borrow().get_field(i.to_str().into_maybe_owned())) {
 				Some(v) => vec.push(v),
 				None => ()
 			}
