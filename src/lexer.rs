@@ -1,13 +1,13 @@
-use std::io::{BufReader, BufferedReader, Reader};
-use std::strbuf::StrBuf;
-use std::char::from_u32;
-use std::num::FromStrRadix;
 use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor};
 use ast::{CompEqual, CompNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
 use ast::{LogAnd, LogOr};
 use ast::{Token, TokenData};
+use std::io::{BufReader, BufferedReader, Reader};
+use std::strbuf::StrBuf;
+use std::char::from_u32;
+use std::num::from_str_radix;
 use std::io::{IoResult, EndOfFile};
 use std::char::is_whitespace;
 #[deriving(Clone)]
@@ -30,6 +30,14 @@ pub enum CommentType {
 	/// Single-line comment
 	SingleLineComment
 }
+#[deriving(Clone, Eq, Show)]
+/// The type of number used
+pub enum NumberType {
+	/// Decimal number
+	DecimalNumber,
+	/// Hexadecimal number
+	HexadecimalNumber
+}
 /// The Javascript Lexer
 pub struct Lexer {
 	/// The list of tokens generated so far
@@ -46,8 +54,8 @@ pub struct Lexer {
 	string_start : Option<StringType>,
 	/// The kind of comment
 	current_comment : Option<CommentType>,
-	/// If the lexer is currently inside a number
-	in_num : bool,
+	/// The kind of number
+	current_number : Option<NumberType>,
 	/// If a backwards slash has just been read
 	escaped : bool,
 	/// The current line number
@@ -66,7 +74,7 @@ impl Lexer {
 			comment_buffer: StrBuf::with_capacity(32),
 			string_start: None,
 			current_comment: None,
-			in_num: false,
+			current_number: None,
 			escaped: false,
 			line_number: 1,
 			column_number: 0
@@ -78,11 +86,15 @@ impl Lexer {
 			self.push_token(TIdent(ident));
 			self.ident_buffer.truncate(0);
 		}
-		if self.in_num {
-			let num = from_str(self.num_buffer.clone().as_slice());
-			self.push_token(TNumber(num.unwrap()));
+		if self.current_number.is_some() {
+			let num : f64 = match self.current_number {
+				Some(HexadecimalNumber) => from_str_radix(self.num_buffer.as_slice(), 16).unwrap(),
+				Some(DecimalNumber) => from_str(self.num_buffer.as_slice()).unwrap(),
+				None => unreachable!()
+			};
+			self.push_token(TNumber(num));
 			self.num_buffer.truncate(0);
-			self.in_num = false;
+			self.current_number = None;
 		}
 	}
 	fn push_token(&mut self, tk:TokenData) {
@@ -123,7 +135,7 @@ impl Lexer {
 									nums = format!("{}{}", nums, try!(iter.next().unwrap().clone()));
 								}
 								self.column_number += 2;
-								let as_num = match FromStrRadix::from_str_radix(nums, 16) {
+								let as_num = match from_str_radix(nums, 16) {
 									Some(v) => v,
 									None => 0
 								};
@@ -138,7 +150,7 @@ impl Lexer {
 									nums = format!("{}{}", nums, try!(iter.next().unwrap().clone()));
 								}
 								self.column_number += 4;
-								let as_num = match FromStrRadix::from_str_radix(nums, 16) {
+								let as_num = match from_str_radix(nums, 16) {
 									Some(v) => v,
 									None => 0
 								};
@@ -184,12 +196,19 @@ impl Lexer {
 				'\\' if self.string_start.is_some() => self.escaped = true,
 				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
 				'"' if self.string_start.is_none() => self.string_start = Some(DoubleQuote),
+				'0' if try!(iter.peek().unwrap().clone()) == 'x' => {
+					iter.next();
+					self.current_number = Some(HexadecimalNumber);
+				},
 				'0'.. '9' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
 					self.num_buffer.push_char(ch);
-					self.in_num = true;
+					self.current_number = Some(DecimalNumber);
+				},
+				'A'.. 'F' | 'a' .. 'f' if self.current_number == Some(HexadecimalNumber) => {
+					self.num_buffer.push_char(ch);
 				},
 				'\'' if self.string_start.is_none() => self.string_start = Some(SingleQuote),
-				'.' if self.in_num && !self.num_buffer.as_slice().contains(".") => {
+				'.' if self.current_number.is_some() && !self.num_buffer.as_slice().contains(".") => {
 					self.num_buffer.push_char(ch);
 				},
 				';' => {
