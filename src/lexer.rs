@@ -89,11 +89,15 @@ impl Lexer {
 			self.ident_buffer.truncate(0);
 		}
 		if self.current_number.is_some() {
-			let num = from_str_radix(self.num_buffer.as_slice(), match self.current_number.unwrap() {
+			let radix = match self.current_number.unwrap() {
 				HexadecimalNumber => 16,
 				OctalNumber => 8,
 				DecimalNumber => 10
-			}).unwrap();
+			};
+			let num = match from_str_radix(self.num_buffer.as_slice(), radix) {
+				Some(v) => v,
+				None => fail!("{}:{}: Could not parse '{}' as a base {} number", self.line_number, self.column_number, self.num_buffer, radix)
+			};
 			self.push_token(TNumber(num));
 			self.num_buffer.truncate(0);
 			self.current_number = None;
