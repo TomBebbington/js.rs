@@ -71,7 +71,7 @@ impl Executor for Interpreter {
 			ConstExpr(CNull) => Ok(Gc::new(VNull)),
 			ConstExpr(CUndefined) => Ok(Gc::new(VUndefined)),
 			ConstExpr(CNum(num)) => Ok(to_value(num)),
-			ConstExpr(CInt(num)) => Ok(to_value(num as f64)),
+			ConstExpr(CInt(num)) => Ok(to_value(num)),
 			ConstExpr(CString(ref str)) => Ok(Gc::new(VString(str.to_owned()))),
 			ConstExpr(CBool(val)) => Ok(Gc::new(VBoolean(val))),
 			ConstExpr(CRegExp(_, _, _)) => Ok(Gc::new(VNull)),
