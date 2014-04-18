@@ -36,7 +36,9 @@ pub enum NumberType {
 	/// Decimal number
 	DecimalNumber,
 	/// Hexadecimal number
-	HexadecimalNumber
+	HexadecimalNumber,
+	/// Octal number
+	OctalNumber
 }
 /// The Javascript Lexer
 pub struct Lexer {
@@ -89,6 +91,7 @@ impl Lexer {
 		if self.current_number.is_some() {
 			let num : f64 = match self.current_number {
 				Some(HexadecimalNumber) => from_str_radix(self.num_buffer.as_slice(), 16).unwrap(),
+				Some(OctalNumber) => from_str_radix(self.num_buffer.as_slice(), 8).unwrap(),
 				Some(DecimalNumber) => from_str(self.num_buffer.as_slice()).unwrap(),
 				None => unreachable!()
 			};
@@ -199,6 +202,14 @@ impl Lexer {
 				'0' if try!(iter.peek().unwrap().clone()) == 'x' => {
 					iter.next();
 					self.current_number = Some(HexadecimalNumber);
+				},
+				'0' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
+					self.num_buffer.push_char(ch);
+					self.current_number = Some(OctalNumber);
+				},
+				'8' .. '9' if self.current_number == Some(OctalNumber) => {
+					self.num_buffer.push_char(ch);
+					self.current_number = Some(DecimalNumber);
 				},
 				'0'.. '9' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
 					self.num_buffer.push_char(ch);
