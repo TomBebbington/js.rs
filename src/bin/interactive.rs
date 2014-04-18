@@ -13,9 +13,9 @@ fn main() {
 		match line {
 			Ok(line) => {
 				let mut lexer = Lexer::new();
-				lexer.lex_str(line).v_unwrap();
+				lexer.lex_str(line).unwrap();
 				let mut parser = Parser::new(lexer.tokens);
-				let result_e = parser.parse_all().v_unwrap();
+				let result_e = parser.parse_all().unwrap();
 				let result = engine.run(result_e);
 				match result {
 					Ok(v) => print!("{}", v.borrow()),
