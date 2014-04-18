@@ -213,25 +213,29 @@ impl Executor for Interpreter {
 				Ok(Gc::new(VFunction(RefCell::new(function))))
 			},
 			NumOpExpr(ref op, ref a, ref b) => {
-				let v_a = try!(self.run(*a)).borrow().clone();
-				let v_b = try!(self.run(*b)).borrow().clone();
+				let v_r_a = try!(self.run(*a));
+				let v_r_b = try!(self.run(*b));
+				let v_a = v_r_a.borrow();
+				let v_b = v_r_b.borrow();
 				Ok(Gc::new(match *op {
-					OpAdd => v_a + v_b,
-					OpSub => v_a - v_b,
-					OpMul => v_a * v_b,
-					OpDiv => v_a / v_b,
-					OpMod => v_a % v_b
+					OpAdd => *v_a + *v_b,
+					OpSub => *v_a - *v_b,
+					OpMul => *v_a * *v_b,
+					OpDiv => *v_a / *v_b,
+					OpMod => *v_a % *v_b
 				}))
 			},
 			BitOpExpr(ref op, ref a, ref b) => {
-				let v_a = try!(self.run(*a)).borrow().clone();
-				let v_b = try!(self.run(*b)).borrow().clone();
+				let v_r_a = try!(self.run(*a));
+				let v_r_b = try!(self.run(*b));
+				let v_a = v_r_a.borrow();
+				let v_b = v_r_b.borrow();
 				Ok(Gc::new(match *op {
-					BitAnd => v_a & v_b,
-					BitOr => v_a | v_b,
-					BitXor => v_a ^ v_b,
-					BitShl => v_a << v_b,
-					BitShr => v_a >> v_b
+					BitAnd => *v_a & *v_b,
+					BitOr => *v_a | *v_b,
+					BitXor => *v_a ^ *v_b,
+					BitShl => *v_a << *v_b,
+					BitShr => *v_a >> *v_b
 				}))
 			},
 			CompOpExpr(ref op, ref a, ref b) => {
