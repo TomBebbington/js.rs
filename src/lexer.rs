@@ -89,12 +89,11 @@ impl Lexer {
 			self.ident_buffer.truncate(0);
 		}
 		if self.current_number.is_some() {
-			let num : f64 = match self.current_number {
-				Some(HexadecimalNumber) => from_str_radix(self.num_buffer.as_slice(), 16).unwrap(),
-				Some(OctalNumber) => from_str_radix(self.num_buffer.as_slice(), 8).unwrap(),
-				Some(DecimalNumber) => from_str(self.num_buffer.as_slice()).unwrap(),
-				None => unreachable!()
-			};
+			let num = from_str_radix(self.num_buffer.as_slice(), match self.current_number.unwrap() {
+				HexadecimalNumber => 16,
+				OctalNumber => 8,
+				DecimalNumber => 10
+			}).unwrap();
 			self.push_token(TNumber(num));
 			self.num_buffer.truncate(0);
 			self.current_number = None;
