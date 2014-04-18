@@ -206,24 +206,23 @@ impl Lexer {
 					iter.next();
 					self.current_number = Some(HexadecimalNumber);
 				},
-				'0' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
+				'0' if self.string_start.is_none() && self.ident_buffer.len() == 0 && self.current_number.is_none() => {
 					self.num_buffer.push_char(ch);
 					self.current_number = Some(OctalNumber);
 				},
-				'8' .. '9' if self.current_number == Some(OctalNumber) => {
+				'0' .. '7' if self.current_number == Some(OctalNumber) =>
+					self.num_buffer.push_char(ch),
+				'0'.. '9' | 'A'.. 'F' | 'a' .. 'f' if self.current_number == Some(HexadecimalNumber) => {
 					self.num_buffer.push_char(ch);
-					self.current_number = Some(DecimalNumber);
 				},
 				'0'.. '9' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
 					self.num_buffer.push_char(ch);
 					self.current_number = Some(DecimalNumber);
 				},
-				'A'.. 'F' | 'a' .. 'f' if self.current_number == Some(HexadecimalNumber) => {
-					self.num_buffer.push_char(ch);
-				},
 				'\'' if self.string_start.is_none() => self.string_start = Some(SingleQuote),
 				'.' if self.current_number.is_some() && !self.num_buffer.as_slice().contains(".") => {
 					self.num_buffer.push_char(ch);
+					self.current_number = Some(DecimalNumber);
 				},
 				';' => {
 					self.clear_buffer();
