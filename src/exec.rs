@@ -210,8 +210,7 @@ impl Executor for Interpreter {
 			},
 			ArrowFunctionDeclExpr(ref args, ref expr) => {
 				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));
-				let val = Gc::new(VFunction(RefCell::new(function)));
-				Ok(val)
+				Ok(Gc::new(VFunction(RefCell::new(function))))
 			},
 			NumOpExpr(ref op, ref a, ref b) => {
 				let v_a = try!(self.run(*a)).borrow().clone();
