@@ -2,7 +2,7 @@
 #![crate_type = "bin"]
 extern crate script;
 use script::lexer::Lexer;
-use script::parser::{Parser, VerboseResult};
+use script::parser::Parser;
 use script::exec::{Executor, Interpreter};
 use std::io;
 

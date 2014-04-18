@@ -42,19 +42,6 @@ impl fmt::Show for ParseError {
 		}
 	}
 }
-/// A result which gives a pretty-printed error if it fails
-pub trait VerboseResult<T> {
-	/// Unwrap the value if it's Ok and if not pretty-print the error
-	fn v_unwrap(&self) -> T;
-}
-impl<T : Clone, E : fmt::Show> VerboseResult<T> for Result<T, E> {
-	fn v_unwrap(&self) -> T {
-		match *self {
-			Ok(ref val) => val.clone(),
-			Err(ref err) => fail!("{}", err)
-		}
-	}
-}
 pub type ParseResult = Result<~Expr, ParseError>;
 pub type ParseStructResult = Result<Option<~Expr>, ParseError>;
 /// A Javascript parser
