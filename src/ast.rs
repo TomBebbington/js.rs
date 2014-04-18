@@ -126,15 +126,53 @@ pub enum LogOp {
 }
 impl fmt::Show for LogOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		return f.buf.write_str(match *self {
+		f.buf.write_str(match *self {
 			LogAnd => "&&",
 			LogOr => "||"
-		});
+		})
 	}
 }
 #[deriving(Clone, Eq)]
-/// A Javscript Expression
-pub enum Expr {
+/// A Javascript Expression, including position data
+pub struct Expr {
+	/// The expression definition
+	pub def : ExprDef,
+	/// The starting position
+	pub start : Position,
+	/// The ending position
+	pub end : Position
+}
+impl Expr {
+	/// Create a new expression with a position
+	pub fn new(def: ExprDef, start:Position, end:Position) -> ~Expr {
+		~ Expr{def: def, start: start, end: end}
+	}
+}
+impl fmt::Show for Expr {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f.buf, "{}:{}: {}", self.start.line_number, self.start.column_number, self.def)
+	}
+}
+#[deriving(Clone, Eq)]
+/// A position in Javascript source code
+pub struct Position {
+	/// The column number
+	pub column_number : uint,
+	/// The line number
+	pub line_number : uint
+}
+impl Position {
+	/// Create a new position
+	pub fn new(line_number: uint, column_number: uint) -> Position {
+		Position {
+			line_number: line_number,
+			column_number: column_number
+		}
+	}
+}
+#[deriving(Clone, Eq)]
+/// A Javascript Expression
+pub enum ExprDef {
 	/// Run a numeric operation on two numeric expressions
 	NumOpExpr(NumOp, ~Expr, ~Expr),
 	/// Run a bitwise operation on two integer expressions
@@ -180,7 +218,7 @@ pub enum Expr {
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(~Expr)
 }
-impl fmt::Show for Expr {
+impl fmt::Show for ExprDef {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
 			ConstExpr(ref c) => write!(f.buf, "{}", c),
@@ -254,28 +292,25 @@ impl fmt::Show for TreeMap<~str, ~Expr> {
 }
 #[deriving(Clone)]
 #[deriving(Eq)]
-/// A single of token of Javascript code including the line number and column number
+/// A single of token of Javascript code including the position
 pub struct Token {
 	/// The token
 	pub data : TokenData,
-	/// The line number
-	pub line_number : uint,
-	/// The column number
-	pub column_number : uint
+	/// The token's position
+	pub pos : Position
 }
 impl Token {
 	/// Create a new detailed token from the token data, line number and column number
 	pub fn new(data: TokenData, line_number: uint, column_number: uint) -> Token {
 		Token {
 			data: data,
-			line_number: line_number,
-			column_number: column_number
+			pos: Position::new(line_number, column_number)
 		}
 	}
 }
 impl fmt::Show for Token {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f.buf, "Line {}, Column {}: {}", self.line_number, self.column_number, self.data)
+		write!(f.buf, "{}:{}: {}", self.pos.line_number, self.pos.column_number, self.data)
 	}
 }
 #[deriving(Clone)]

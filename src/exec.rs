@@ -67,7 +67,7 @@ impl Executor for Interpreter {
 		self.scopes.pop();
 	}
 	fn run(&mut self, expr:&Expr) -> ResultValue {
-		match *expr {
+		match expr.def {
 			ConstExpr(CNull) => Ok(Gc::new(VNull)),
 			ConstExpr(CUndefined) => Ok(Gc::new(VUndefined)),
 			ConstExpr(CNum(num)) => Ok(to_value(num)),
@@ -112,7 +112,7 @@ impl Executor for Interpreter {
 				Ok(val_obj.borrow().get_field(val_field.borrow().to_str().into_maybe_owned()))
 			},
 			CallExpr(ref callee, ref args) => {
-				let (this, func) = match **callee {
+				let (this, func) = match callee.def {
 					GetConstFieldExpr(ref obj, ref field) => {
 						let obj = try!(self.run(*obj));
 						(obj, obj.borrow().get_field(field.clone().into_maybe_owned()))
@@ -285,7 +285,7 @@ impl Executor for Interpreter {
 			ThrowExpr(ref ex) => Err(try!(self.run(*ex))),
 			AssignExpr(ref ref_e, ref val_e) => {
 				let val = try!(self.run(*val_e));
-				match **ref_e {
+				match ref_e.def {
 					LocalExpr(ref name) => {
 						self.global.borrow().set_field(name.clone().into_maybe_owned(), val);
 					},

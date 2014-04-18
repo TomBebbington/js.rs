@@ -13,6 +13,7 @@
 #![deny(uppercase_variables)]
 #![deny(non_camel_case_types)]
 #![deny(unused_must_use)]
+#![feature(macro_rules)]
 
 //! A Javascript Parser / Interpreter library
 extern crate collections;

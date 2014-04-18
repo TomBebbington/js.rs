@@ -5,6 +5,14 @@ use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenPar
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
+macro_rules! mk (
+	($def:expr) => (
+		Expr::new($def, self.tokens.get(self.pos).pos, self.tokens.get(self.pos).pos)
+	);
+	($def:expr, $first:expr) => (
+		Expr::new($def, $first.pos, self.tokens.get(self.pos).pos)
+	);
+)
 #[deriving(Clone)]
 #[deriving(Eq)]
 /// An error encountered during parsing an expression
@@ -17,9 +25,9 @@ pub enum ParseError {
 impl fmt::Show for ParseError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
-			Expected(ref wanted, ref got, ref routine) if wanted.len() == 0 => write!(f.buf, "Line {}, Column {}: Expected expression for {}, got {}", got.line_number, got.column_number, routine, got.data),
+			Expected(ref wanted, ref got, ref routine) if wanted.len() == 0 => write!(f.buf, "{}:{}: Expected expression for {}, got {}", got.pos.line_number, got.pos.column_number, routine, got.data),
 			Expected(ref wanted, ref got, ref routine) => {
-				try!(write!(f.buf, "Line {}, Column {}: ", got.line_number, got.column_number));
+				try!(write!(f.buf, "{}:{}: ", got.pos.line_number, got.pos.column_number));
 				try!(write!(f.buf, "Expected "));
 				let last = wanted.last().unwrap();
 				for wanted_token in wanted.iter() {
@@ -68,46 +76,46 @@ impl Parser {
 			let result = try!(self.parse());
 			exprs.push(result);
 		}
-		return Ok(~BlockExpr(exprs));
+		return Ok(mk!(BlockExpr(exprs)));
 	}
 	fn parse_struct(&mut self, name:&str) -> ParseStructResult {
 		match name {
-			"true" => Ok(Some(~ConstExpr(CBool(true)))),
-			"false" => Ok(Some(~ConstExpr(CBool(false)))),
-			"null" => Ok(Some(~ConstExpr(CNull))),
-			"undefined" => Ok(Some(~ConstExpr(CUndefined))),
+			"true" => Ok(Some(mk!(ConstExpr(CBool(true))))),
+			"false" => Ok(Some(mk!(ConstExpr(CBool(false))))),
+			"null" => Ok(Some(mk!(ConstExpr(CNull)))),
+			"undefined" => Ok(Some(mk!(ConstExpr(CUndefined)))),
 			"throw" => {
 				let thrown = try!(self.parse());
-				Ok(Some(~ThrowExpr(thrown)))
+				Ok(Some(mk!(ThrowExpr(thrown))))
 			},
-			"return" => Ok(Some(~ReturnExpr(Some(try!(self.parse()))))),
+			"return" => Ok(Some(mk!(ReturnExpr(Some(try!(self.parse()).clone()))))),
 			"new" => {
 				let call = try!(self.parse());
-				match *call {
-					CallExpr(ref func, ref args) => Ok(Some(~ConstructExpr(func.clone(), args.clone()))),
+				match call.def {
+					CallExpr(ref func, ref args) => Ok(Some(mk!(ConstructExpr(func.clone(), args.clone())))),
 					_ => Err(ExpectedExpr(~"constructor", *call))
 				}
 			},
-			"typeof" => Ok(Some(~TypeOfExpr(try!(self.parse())))),
+			"typeof" => Ok(Some(mk!(TypeOfExpr(try!(self.parse()))))),
 			"if" => {
 				try!(self.expect(TOpenParen, ~"if block"));
 				let cond = try!(self.parse());
 				try!(self.expect(TCloseParen, ~"if block"));
 				let expr = try!(self.parse());
 				let next = self.tokens.get(self.pos + 1).clone();
-				Ok(Some(~IfExpr(cond, expr, if next.data == TIdent(~"else") {
+				Ok(Some(mk!(IfExpr(cond, expr, if next.data == TIdent(~"else") {
 					self.pos += 2;
 					Some(try!(self.parse()))
 				} else {
 					None
-				})))
+				}))))
 			},
 			"while" => {
 				try!(self.expect(TOpenParen, ~"while condition"));
 				let cond = try!(self.parse());
 				try!(self.expect(TCloseParen, ~"while condition"));
 				let expr = try!(self.parse());
-				Ok(Some(~WhileLoopExpr(cond, expr)))
+				Ok(Some(mk!(WhileLoopExpr(cond, expr))))
 			},
 			"switch" => {
 				try!(self.expect(TOpenParen, ~"switch value"));
@@ -143,14 +151,14 @@ impl Parser {
 									_ => block.push(try!(self.parse()))
 								}
 							}
-							default = Some(~BlockExpr(block));
+							default = Some(mk!(BlockExpr(block)));
 						},
 						TCloseBlock => break,
 						_ => return Err(Expected(vec!(TIdent(~"case"), TIdent(~"default"), TCloseBlock), tok, ~"switch block"))
 					}
 				}
 				try!(self.expect(TCloseBlock, ~"switch block"));
-				Ok(Some(~SwitchExpr(value.unwrap(), cases, default)))
+				Ok(Some(mk!(SwitchExpr(value.unwrap(), cases, default))))
 			},
 			"function" => {
 				let tk = self.tokens.get(self.pos).clone();
@@ -178,7 +186,7 @@ impl Parser {
 				}
 				self.pos += 1;
 				let block = try!(self.parse());
-				Ok(Some(~FunctionDeclExpr(name, args, block)))
+				Ok(Some(mk!(FunctionDeclExpr(name, args, block))))
 			},
 			_ => Ok(None)
 		}
@@ -189,21 +197,21 @@ impl Parser {
 		self.pos += 1;
 		let expr : ~Expr = match token.data {
 			TSemicolon | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
-			TSemicolon | TComment(_) => ~ConstExpr(CUndefined),
+			TSemicolon | TComment(_) => mk!(ConstExpr(CUndefined)),
 			TIdent(ref s) => {
 				let structure = try!(self.parse_struct(s.clone()));
 				match structure {
 					Some(v) => v,
-					None => ~LocalExpr(s.to_owned())
+					None => mk!(LocalExpr(s.to_owned()))
 				}
 			},
-			TString(ref s) => ~ConstExpr(CString(s.to_owned())),
+			TString(ref s) => mk!(ConstExpr(CString(s.to_owned()))),
 			TOpenParen => {
 				match self.tokens.get(self.pos).data.clone() {
 					TCloseParen if self.tokens.get(self.pos + 1).data == TArrow => {
 						self.pos += 2;
 						let expr = try!(self.parse());
-						~ArrowFunctionDeclExpr(Vec::new(), expr)
+						mk!(ArrowFunctionDeclExpr(Vec::new(), expr), token)
 					},
 					_ => {
 						let next = try!(self.parse());
@@ -212,7 +220,7 @@ impl Parser {
 						match next_tok.data.clone() {
 							TCloseParen => next,
 							TComma => { // at this point it's probably gonna be an arrow function
-								let mut args = vec!(match *next.clone() {
+								let mut args = vec!(match next.def {
 									LocalExpr(name) => name,
 									_ => ~""
 								}, match self.tokens.get(self.pos).data {
@@ -241,7 +249,7 @@ impl Parser {
 								}
 								try!(self.expect(TArrow, ~"arrow function"));
 								let expr = try!(self.parse());
-								~ArrowFunctionDeclExpr(args, expr)
+								mk!(ArrowFunctionDeclExpr(args, expr), token)
 							}
 							_ => return Err(Expected(vec!(TCloseParen), next_tok, ~"brackets"))
 						}
@@ -249,7 +257,7 @@ impl Parser {
 				}
 			},
 			TOpenArray => {
-				let mut array = Vec::new();
+				let mut array : Vec<~Expr> = Vec::new();
 				let mut expect_comma_or_end = self.tokens.get(self.pos).data == TCloseArray;
 				loop {
 					let token = self.tokens.get(self.pos).clone();
@@ -259,7 +267,7 @@ impl Parser {
 					} else if token.data == TComma && expect_comma_or_end {
 						expect_comma_or_end = false;
 					} else if token.data == TComma && !expect_comma_or_end {
-						array.push(~ConstExpr(CNull));
+						array.push(mk!(ConstExpr(CNull)));
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
 						return Err(Expected(vec!(TComma, TCloseArray), token.clone(), ~"array declaration"));
@@ -271,11 +279,11 @@ impl Parser {
 					}
 					self.pos += 1;
 				}
-				~ArrayDeclExpr(array)
+				mk!(ArrayDeclExpr(array), token)
 			},
 			TOpenBlock if self.tokens.get(self.pos).data == TCloseBlock => {
 				self.pos += 1;
-				~ObjectDeclExpr(~TreeMap::new())
+				mk!(ObjectDeclExpr(~TreeMap::new()), token)
 			},
 			TOpenBlock if self.tokens.get(self.pos + 1).data == TColon => {
 				let mut map = ~TreeMap::new();
@@ -292,7 +300,7 @@ impl Parser {
 					map.insert(name.to_owned(), value);
 					self.pos += 1;
 				}
-				~ObjectDeclExpr(map)
+				mk!(ObjectDeclExpr(map), token)
 			},
 			TOpenBlock => {
 				let mut exprs = Vec::new();
@@ -304,9 +312,9 @@ impl Parser {
 					}
 				}
 				self.pos += 1;
-				~BlockExpr(exprs)
+				mk!(BlockExpr(exprs), token)
 			},
-			TNumber(num) => ~ConstExpr(CNum(num)),
+			TNumber(num) => mk!(ConstExpr(CNum(num)), token),
 			_ => return Err(Expected(Vec::new(), token.clone(), ~"script"))
 		};
 		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};
@@ -320,7 +328,7 @@ impl Parser {
 				self.pos += 1;
 				let tk = self.tokens.get(self.pos).clone();
 				match tk.data {
-					TIdent(ref s) => result = ~GetConstFieldExpr(expr, s.to_owned()),
+					TIdent(ref s) => result = mk!(GetConstFieldExpr(expr, s.to_owned())),
 					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk, ~"field access"))
 				}
 				self.pos += 1;
@@ -345,20 +353,20 @@ impl Parser {
 						expect_comma_or_end = true;
 					}
 				}
-				result = ~CallExpr(expr, args);
+				result = mk!(CallExpr(expr, args));
 			},
 			TQuestion => {
 				self.pos += 1;
 				let if_e = try!(self.parse());
 				try!(self.expect(TColon, ~"if expression"));
 				let else_e = try!(self.parse());
-				result = ~IfExpr(expr, if_e, Some(else_e));
+				result = mk!(IfExpr(expr, if_e, Some(else_e)));
 			},
 			TOpenArray => {
 				self.pos += 1;
 				let index = try!(self.parse());
 				try!(self.expect(TCloseArray, ~"array declaration"));
-				result = ~GetFieldExpr(expr, index);
+				result = mk!(GetFieldExpr(expr, index));
 			},
 			TSemicolon | TComment(_) => {
 				self.pos += 1;
@@ -366,37 +374,37 @@ impl Parser {
 			TNumOp(op) => {
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = ~NumOpExpr(op, expr, next);
+				result = mk!(NumOpExpr(op, expr, next));
 			},
 			TBitOp(op) => {
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = ~BitOpExpr(op, expr, next);
+				result = mk!(BitOpExpr(op, expr, next));
 			},
 			TCompOp(op) => {
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = ~CompOpExpr(op, expr, next);
+				result = mk!(CompOpExpr(op, expr, next));
 			},
 			TLogOp(op) => {
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = ~LogOpExpr(op, expr, next);
+				result = mk!(LogOpExpr(op, expr, next));
 			},
 			TEqual => {
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = ~AssignExpr(expr, next);
+				result = mk!(AssignExpr(expr, next));
 			},
 			TArrow => {
 				self.pos += 1;
 				let mut args = Vec::with_capacity(1);
-				match *result.clone() {
+				match result.def {
 					LocalExpr(name) => args.push(name),
 					_ => return Err(ExpectedExpr(~"identifier", *result))
 				}
 				let next = try!(self.parse());
-				result = ~ArrowFunctionDeclExpr(args, next);
+				result = mk!(ArrowFunctionDeclExpr(args, next));
 			},
 			_ => carry_on = false
 		};
