@@ -96,7 +96,7 @@ impl Executor for Interpreter {
 						None => ()
 					}
 				}
-				Ok(if value.borrow() == &VUndefined {
+				Ok(if value.borrow().is_undefined() {
 					self.global.borrow().get_field(name.clone().into_maybe_owned())
 				} else {
 					value
