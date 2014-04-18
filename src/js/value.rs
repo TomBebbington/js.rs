@@ -1,4 +1,4 @@
-use js::object::{ObjectData, Property};
+use js::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
 use js::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
@@ -9,7 +9,6 @@ use std::str::MaybeOwned;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::iter::FromIterator;
-static PROTOTYPE : &'static str = "__proto__";
 #[must_use]
 /// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;
@@ -40,8 +39,8 @@ impl ValueData {
 	pub fn new_obj(global: Option<Value>) -> Value {
 		let mut obj : ObjectData = TreeMap::new();
 		if global.is_some() {
-			let obj_proto = global.unwrap().borrow().get_field("Object".into_maybe_owned()).borrow().get_field("prototype".into_maybe_owned());
-			obj.insert(~"__proto__", Property::new(obj_proto));
+			let obj_proto = global.unwrap().borrow().get_field("Object".into_maybe_owned()).borrow().get_field(PROTOTYPE.into_maybe_owned());
+			obj.insert(INSTANCE_PROTOTYPE.to_owned(), Property::new(obj_proto));
 		}
 		Gc::new(VObject(RefCell::new(obj)))
 	}
@@ -257,7 +256,7 @@ impl ToJson for ValueData {
 			VObject(ref obj) => {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
-					if *k != ~"__proto__" {
+					if *k != INSTANCE_PROTOTYPE.to_owned() {
 						nobj.insert(k.clone(), v.value.borrow().to_json());
 					}
 				}

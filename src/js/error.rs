@@ -1,3 +1,4 @@
+use js::object::PROTOTYPE;
 use js::value::{Value, ValueData, ResultValue, VUndefined, to_value};
 use std::gc::Gc;
 
@@ -21,7 +22,7 @@ pub fn _create(global: Value) -> Value {
 	prototype.borrow().set_field("message".into_maybe_owned(), to_value("".into_maybe_owned()));
 	prototype.borrow().set_field("name".into_maybe_owned(), to_value("Error".into_maybe_owned()));
 	prototype.borrow().set_field("toString".into_maybe_owned(), to_value(to_string));
-	error.borrow().set_field("prototype".into_maybe_owned(), prototype);
+	error.borrow().set_field(PROTOTYPE.into_maybe_owned(), prototype);
 	error
 }
 /// Initialise the global object with the `Error` object

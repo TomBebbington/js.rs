@@ -5,7 +5,7 @@ use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{LogAnd, LogOr};
 use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
 use js::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value};
-use js::object::ObjectData;
+use js::object::{INSTANCE_PROTOTYPE, PROTOTYPE, ObjectData};
 use js::function::{RegularFunc, RegularFunction};
 use js::{console, math, object, array, function, json, number, error, uri, string};
 use collections::treemap::TreeMap;
@@ -196,7 +196,7 @@ impl Executor for Interpreter {
 					arr_map.borrow().set_field(index.to_str().into_maybe_owned(), val);
 					index += 1;
 				}
-				arr_map.borrow().set_field("__proto__".into_maybe_owned(), self.get_global("Array".into_maybe_owned()).borrow().get_field("prototype".into_maybe_owned()));
+				arr_map.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), self.get_global("Array".into_maybe_owned()).borrow().get_field(PROTOTYPE.into_maybe_owned()));
 				arr_map.borrow().set_field("length".into_maybe_owned(), to_value(index));
 				Ok(arr_map)
 			},
@@ -266,7 +266,7 @@ impl Executor for Interpreter {
 					v_args.push(try!(self.run(*arg)));
 				}
 				let this = Gc::new(VObject(RefCell::new(TreeMap::new())));
-				this.borrow().set_field("__proto__".into_maybe_owned(), func.borrow().get_field("prototype".into_maybe_owned()));
+				this.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), func.borrow().get_field(PROTOTYPE.into_maybe_owned()));
 				Ok(match *func.borrow() {
 					VFunction(ref func) => {
 						try!(func.borrow().call(self, this, Gc::new(VNull), v_args));

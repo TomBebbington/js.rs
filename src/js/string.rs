@@ -1,5 +1,5 @@
 use js::value::{Value, ValueData, VUndefined, ResultValue, to_value, from_value};
-use js::object::Property;
+use js::object::{PROTOTYPE, Property};
 use std::gc::Gc;
 use std::str::MaybeOwned;
 
@@ -26,7 +26,7 @@ pub fn _create(global: Value) -> Value {
 		set: Gc::new(VUndefined)
 	};
 	proto.borrow().set_prop("length".into_maybe_owned(), prop);
-	string.borrow().set_field("prototype".into_maybe_owned(), proto);
+	string.borrow().set_field(PROTOTYPE.into_maybe_owned(), proto);
 	string
 }
 /// Initialise the global object with the `String` object

@@ -2,7 +2,8 @@ use js::value::{Value, ValueData, ValueConv, VUndefined, VObject, ResultValue, t
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::str::MaybeOwned;
-
+pub static PROTOTYPE: &'static str = "prototype";
+pub static INSTANCE_PROTOTYPE: &'static str = "__proto__";
 #[deriving(Clone)]
 pub type ObjectData = TreeMap<~str, Property>;
 
@@ -67,13 +68,13 @@ pub fn make_object(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
 /// Get the prototype
 pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
-	return Ok(obj.borrow().get_field("__proto__".into_maybe_owned()));
+	return Ok(obj.borrow().get_field(INSTANCE_PROTOTYPE.into_maybe_owned()));
 }
 /// Set the prototype
 pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let proto = args.get(1).clone();
 	let obj = args.get(0);
-	obj.borrow().set_field("__proto__".into_maybe_owned(), proto);
+	obj.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), proto);
 	return Ok(*obj);
 }
 /// Define the property
@@ -107,7 +108,7 @@ pub fn _create(global:Value) -> Value {
 	prototype.borrow().set_field("hasOwnProperty".into_maybe_owned(), to_value(has_own_prop));
 	prototype.borrow().set_field("toString".into_maybe_owned(), to_value(to_string));
 	obj.borrow().set_field("length".into_maybe_owned(), to_value(1i32));
-	obj.borrow().set_field("prototype".into_maybe_owned(), prototype);
+	obj.borrow().set_field(PROTOTYPE.into_maybe_owned(), prototype);
 	obj.borrow().set_field("setPrototypeOf".into_maybe_owned(), to_value(set_proto_of));
 	obj.borrow().set_field("getPrototypeOf".into_maybe_owned(), to_value(get_proto_of));
 	obj.borrow().set_field("defineProperty".into_maybe_owned(), to_value(define_prop));
