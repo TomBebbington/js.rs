@@ -115,25 +115,25 @@ impl Parser {
 					let tok = self.tokens.get(self.pos).clone();
 					self.pos += 1;
 					match tok.data {
-						TIdent(ref id) if *id == ~"case" => {
+						TIdent(ref id) if id.as_slice() == "case" => {
 							let cond = self.parse();
 							let mut block = Vec::new();
 							try!(self.expect(TColon, "switch case"));
 							loop {
 								match self.tokens.get(self.pos).data.clone() {
-									TIdent(ref id) if *id == ~"case" || *id == ~"default" => break,
+									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
 								}
 							}
 							cases.push((cond.unwrap(), block));
 						},
-						TIdent(ref id) if *id == ~"default" => {
+						TIdent(ref id) if id.as_slice() == "default" => {
 							let mut block = Vec::new();
 							try!(self.expect(TColon, "default switch case"));
 							loop {
 								match self.tokens.get(self.pos).data.clone() {
-									TIdent(ref id) if *id == ~"case" || *id == ~"default" => break,
+									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
 								}
@@ -209,10 +209,10 @@ impl Parser {
 							TComma => { // at this point it's probably gonna be an arrow function
 								let mut args = vec!(match next.def {
 									LocalExpr(name) => name,
-									_ => ~""
+									_ => "".into_owned()
 								}, match self.tokens.get(self.pos).data {
 									TIdent(ref id) => id.clone(),
-									_ => ~""
+									_ => "".into_owned()
 								});
 								let mut expect_ident = true;
 								loop {
