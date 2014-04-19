@@ -147,7 +147,7 @@ impl Lexer {
 								};
 								match from_u32(as_num) {
 									Some(v) => v,
-									None => fail!("Line {}, Column {}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
+									None => fail!("{}:{}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
 								}
 							},
 							'u' => {
@@ -162,12 +162,12 @@ impl Lexer {
 								};
 								match from_u32(as_num) {
 									Some(v) => v,
-									None => fail!("Line {}, Column {}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
+									None => fail!("{}:{}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
 								}
 							},
 							'\'' if self.string_start == Some(SingleQuote) => '\'',
 							'"' if self.string_start == Some(DoubleQuote) => '"',
-							_ => fail!("Line {}, Column {}: Invalid escape `{}`", self.line_number, self.column_number, ch)
+							_ => fail!("{}:{}: Invalid escape `{}`", self.line_number, self.column_number, ch)
 						});
 					}
 				},
