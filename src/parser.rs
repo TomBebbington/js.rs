@@ -61,6 +61,7 @@ impl Parser {
 		let mut exprs = Vec::new();
 		while self.pos < self.tokens.len() {
 			let result = try!(self.parse());
+			println!("{}", result);
 			exprs.push(result);
 		}
 		return Ok(mk!(BlockExpr(exprs)));
@@ -301,7 +302,7 @@ impl Parser {
 				self.pos += 1;
 				mk!(BlockExpr(exprs), token)
 			},
-			TNumber(num) => mk!(ConstExpr(CNum(num)), token),
+			TNumber(num) => mk!(ConstExpr(CNum(num))),
 			_ => return Err(Expected(Vec::new(), token.clone(), ~"script"))
 		};
 		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};

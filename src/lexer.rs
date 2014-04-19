@@ -202,20 +202,25 @@ impl Lexer {
 				'\\' if self.string_start.is_some() => self.escaped = true,
 				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
 				'"' if self.string_start.is_none() => self.string_start = Some(DoubleQuote),
-				'0' if try!(iter.peek().unwrap().clone()) == 'x' => {
+				'0' if iter.peek().is_some() && try!(iter.peek().unwrap().clone()) == 'x' => {
 					iter.next();
 					self.current_number = Some(HexadecimalNumber);
 				},
-				'0' if self.string_start.is_none() && self.ident_buffer.len() == 0 && self.current_number.is_none() => {
+				'0' if self.ident_buffer.len() == 0 && self.current_number.is_none() => {
 					self.num_buffer.push_char(ch);
 					self.current_number = Some(OctalNumber);
 				},
-				'0' .. '7' if self.current_number == Some(OctalNumber) =>
-					self.num_buffer.push_char(ch),
-				'0'.. '9' | 'A'.. 'F' | 'a' .. 'f' if self.current_number == Some(HexadecimalNumber) => {
-					self.num_buffer.push_char(ch);
+				'0'..'7' if self.current_number == Some(OctalNumber) => {
+					self.num_buffer.push_char(ch)
 				},
-				'0'.. '9' if self.string_start.is_none() && self.ident_buffer.len() == 0 => {
+				'8' | '9' if self.current_number == Some(OctalNumber) => {
+					self.num_buffer.push_char(ch);
+					self.current_number = Some(DecimalNumber);
+				},
+				'0'.. '9' | 'A'.. 'F' | 'a' .. 'f' if self.current_number == Some(HexadecimalNumber) => {
+					self.num_buffer.push_char(ch)
+				},
+				'0'.. '9' if self.ident_buffer.len() == 0 => {
 					self.num_buffer.push_char(ch);
 					self.current_number = Some(DecimalNumber);
 				},
