@@ -4,12 +4,10 @@ use ast::{BitAnd, BitOr, BitXor};
 use ast::{CompEqual, CompNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
 use ast::{LogAnd, LogOr};
 use ast::{Token, TokenData};
-use std::io::{BufReader, BufferedReader, Reader};
+use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
 use std::strbuf::StrBuf;
-use std::char::from_u32;
+use std::char::{from_u32, is_whitespace};
 use std::num::from_str_radix;
-use std::io::{IoResult, EndOfFile};
-use std::char::is_whitespace;
 #[deriving(Clone)]
 #[deriving(Eq)]
 #[deriving(Show)]
@@ -41,7 +39,7 @@ pub enum NumberType {
 	OctalNumber
 }
 /// The Javascript Lexer
-pub struct Lexer {
+pub struct Lexer<B> {
 	/// The list of tokens generated so far
 	pub tokens : Vec<Token>,
 	/// The string buffer for identities
@@ -63,12 +61,16 @@ pub struct Lexer {
 	/// The current line number
 	line_number : uint,
 	/// The current column number
-	column_number : uint
+	column_number : uint,
+	/// The reader
+	buffer: B,
+	/// The current character
+	current_char: Option<char>
 }
-impl Lexer {
+impl<B:Buffer> Lexer<B> {
 	/// Creates a new lexer with empty buffers
-	pub fn new() -> ~Lexer {
-		return ~Lexer {
+	pub fn new(buffer: B) -> Lexer<B> {
+		return Lexer {
 			tokens: Vec::new(),
 			ident_buffer: StrBuf::with_capacity(32),
 			string_buffer: StrBuf::with_capacity(256),
@@ -79,7 +81,9 @@ impl Lexer {
 			current_number: None,
 			escaped: false,
 			line_number: 1,
-			column_number: 0
+			column_number: 0,
+			buffer: buffer,
+			current_char: None
 		};
 	}
 	fn clear_buffer(&mut self) {
@@ -107,28 +111,42 @@ impl Lexer {
 		self.tokens.push(Token::new(tk, self.line_number, self.column_number))
 	}
 	/// Processes an input stream from a string into an array of tokens
-	pub fn lex_str(&mut self, script:~str) -> IoResult<()> {
+	pub fn lex_str(script:~str) -> Vec<Token> {
 		let script_bytes:&[u8] = script.as_bytes();
 		let reader = BufReader::new(script_bytes);
 		let buf_reader = BufferedReader::new(reader);
-		self.lex(buf_reader)
+		let mut lexer = Lexer::new(buf_reader);
+		lexer.lex().unwrap();
+		lexer.tokens
+	}
+	fn next(&mut self) -> IoResult<char> {
+		match self.current_char {
+			Some(c) => {
+				self.current_char = None;
+				Ok(c)
+			}
+			None => self.buffer.read_char()
+		}
+	}
+	fn peek(&mut self) -> IoResult<char> {
+		let ch = try!(self.buffer.read_char());
+		self.current_char = Some(ch);
+		Ok(ch)
 	}
 	/// Processes an input stream from a BufferedReader into an array of tokens
-	pub fn lex<R : Reader>(&mut self, mut reader : BufferedReader<R>) -> IoResult<()> {
-		let mut iter = reader.chars().peekable();
+	pub fn lex(&mut self) -> IoResult<()> {
 		loop {
-			let ch = match iter.next() {
-				Some(Ok(ch)) => ch,
-				Some(Err(ref err)) if err.kind == EndOfFile => break,
-				Some(Err(err)) => return Err(err),
-				None => break
+			let ch = match self.next() {
+				Ok(ch) => ch,
+				Err(ref err) if err.kind == EndOfFile => break,
+				Err(err) => return Err(err)
 			};
 			self.column_number += 1;
 			match ch {
 				_ if self.escaped => {
 					self.escaped = false;
 					if ch != '\n' {
-						self.string_buffer.push_char(match ch {
+						let escaped_ch = match ch {
 							'n' => '\n',
 							'r' => '\r',
 							't' => '\t',
@@ -136,12 +154,12 @@ impl Lexer {
 							'f' => '\x0c',
 							'0' => '\0',
 							'x' => {
-								let mut nums = ~"";
+								let mut nums = StrBuf::with_capacity(2);
 								for _ in range(0, 2) {
-									nums = format!("{}{}", nums, try!(iter.next().unwrap().clone()));
+									nums.push_char(try!(self.next()).clone());
 								}
 								self.column_number += 2;
-								let as_num = match from_str_radix(nums, 16) {
+								let as_num = match from_str_radix(nums.as_slice(), 16) {
 									Some(v) => v,
 									None => 0
 								};
@@ -151,12 +169,12 @@ impl Lexer {
 								}
 							},
 							'u' => {
-								let mut nums = ~"";
+								let mut nums = StrBuf::new();
 								for _ in range(0, 4) {
-									nums = format!("{}{}", nums, try!(iter.next().unwrap().clone()));
+									nums.push_char(try!(self.next()));
 								}
 								self.column_number += 4;
-								let as_num = match from_str_radix(nums, 16) {
+								let as_num = match from_str_radix(nums.as_slice(), 16) {
 									Some(v) => v,
 									None => 0
 								};
@@ -168,7 +186,8 @@ impl Lexer {
 							'\'' if self.string_start == Some(SingleQuote) => '\'',
 							'"' if self.string_start == Some(DoubleQuote) => '"',
 							_ => fail!("{}:{}: Invalid escape `{}`", self.line_number, self.column_number, ch)
-						});
+						};
+						self.string_buffer.push_char(escaped_ch);
 					}
 				},
 				'\n' if self.current_comment == Some(SingleLineComment) => {
@@ -177,8 +196,8 @@ impl Lexer {
 					self.comment_buffer.truncate(0);
 					self.current_comment = None;
 				},
-				'*' if self.current_comment == Some(MultiLineComment) && try!(iter.peek().unwrap().clone()) == '/' => {
-					iter.next();
+				'*' if self.current_comment == Some(MultiLineComment) && self.peek() == Ok('/') => {
+					self.current_char = None;
 					let comment = self.comment_buffer.clone().into_owned();
 					self.push_token(TComment(comment));
 					self.comment_buffer.truncate(0);
@@ -202,8 +221,8 @@ impl Lexer {
 				'\\' if self.string_start.is_some() => self.escaped = true,
 				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
 				'"' if self.string_start.is_none() => self.string_start = Some(DoubleQuote),
-				'0' if iter.peek().is_some() && try!(iter.peek().unwrap().clone()) == 'x' => {
-					iter.next();
+				'0' if self.peek() == Ok('x') => {
+					self.current_char = None;
 					self.current_number = Some(HexadecimalNumber);
 				},
 				'0' if self.ident_buffer.len() == 0 && self.current_number.is_none() => {
@@ -273,12 +292,12 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TQuestion);
 				},
-				'/' if try!(iter.peek().unwrap().clone()) == '/' => {
-					iter.next();
+				'/' if self.peek() == Ok('/') => {
+					self.current_char = None;
 					self.current_comment = Some(SingleLineComment);
 				},
-				'/' if try!(iter.peek().unwrap().clone()) == '*' => {
-					iter.next();
+				'/' if self.peek() == Ok('*') => {
+					self.current_char = None;
 					self.current_comment = Some(MultiLineComment);
 				},
 				'/' => {
@@ -301,8 +320,8 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpMod));
 				},
-				'|' if try!(iter.peek().unwrap().clone()) == '|' => {
-					iter.next();
+				'|' if self.peek() == Ok('|') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TLogOp(LogOr));
 				},
@@ -310,8 +329,8 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitOr));
 				},
-				'&' if try!(iter.peek().unwrap().clone()) == '&' => {
-					iter.next();
+				'&' if self.peek() == Ok('&') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TLogOp(LogAnd));
 				},
@@ -323,13 +342,13 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitXor));
 				},
-				'=' if try!(iter.peek().unwrap().clone()) == '>' => {
-					iter.next();
+				'=' if self.peek() == Ok('>') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TArrow);
 				},
-				'=' if try!(iter.peek().unwrap().clone()) == '=' => {
-					iter.next();
+				'=' if self.peek() == Ok('=') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TCompOp(CompEqual));
 				},
@@ -337,8 +356,8 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TEqual);
 				},
-				'<' if try!(iter.peek().unwrap().clone()) == '=' => {
-					iter.next();
+				'<' if self.peek() == Ok('=') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TCompOp(CompLessThanOrEqual));
 				},
@@ -346,8 +365,8 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompLessThan));
 				},
-				'>' if try!(iter.peek().unwrap().clone()) == '=' => {
-					iter.next();
+				'>' if self.peek() == Ok('=') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TCompOp(CompGreaterThanOrEqual));
 				},
@@ -355,8 +374,8 @@ impl Lexer {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompGreaterThan));
 				},
-				'!' if try!(iter.peek().unwrap().clone()) == '=' => {
-					iter.next();
+				'!' if self.peek() == Ok('=') => {
+					self.current_char = None;
 					self.clear_buffer();
 					self.push_token(TCompOp(CompNotEqual));
 				},

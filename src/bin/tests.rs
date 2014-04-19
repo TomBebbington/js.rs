@@ -38,8 +38,8 @@ fn main() {
 	for file in walk_dir(&Path::new("../tests/")).unwrap() {
 		let file_name = file.to_c_str().as_str().unwrap().to_owned();
 		if file_name.ends_with(".js") {
-			let mut lexer = Lexer::new();
-			lexer.lex(BufferedReader::new(File::open(&file).unwrap())).unwrap();
+			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
+			lexer.lex().unwrap();
 			let mut parser = Parser::new(lexer.tokens);
 			let parsed = match parser.parse_all() {
 				Ok(v) => v,

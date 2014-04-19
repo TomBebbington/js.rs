@@ -3,6 +3,7 @@
 extern crate script;
 use script::lexer::Lexer;
 use script::parser::Parser;
+use script::ast::Token;
 use script::exec::{Executor, Interpreter};
 use std::io;
 
@@ -12,9 +13,8 @@ fn main() {
 	for line in io::stdin().lines() {
 		match line {
 			Ok(line) => {
-				let mut lexer = Lexer::new();
-				lexer.lex_str(line).unwrap();
-				let mut parser = Parser::new(lexer.tokens);
+				let tokens = Lexer::<io::BufferedReader<io::BufReader>>::lex_str(line);
+				let mut parser = Parser::new(tokens);
 				let result_e = parser.parse_all().unwrap();
 				let result = engine.run(result_e);
 				match result {
