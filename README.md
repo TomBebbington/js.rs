@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/TopHattedCoder/rust_js.svg?branch=master)](https://travis-ci.org/TopHattedCoder/rust_js)
-This is a generic JS parser and interpreter written in Rust. Currently, it has very, very limited support for the JS language.
+This is a generic JS parser and interpreter written in Rust. Currently, it has very limited support for the JS language.
 
 Documentation
 -------------
@@ -22,7 +22,7 @@ Supported APIs
 + Math
 + Number
 + JSON
-+ Console.log
++ Console
 + URI decoding / encoding (partial, doesn't use JS rules)
 
 Roadmap
