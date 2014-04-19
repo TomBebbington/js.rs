@@ -7,10 +7,10 @@ use std::fmt;
 use std::vec::Vec;
 macro_rules! mk (
 	($def:expr) => (
-		Expr::new($def, self.tokens.get(self.pos).pos, self.tokens.get(self.pos).pos)
+		Expr::new($def, self.tokens.get(self.pos - 1).pos, self.tokens.get(self.pos - 1).pos)
 	);
 	($def:expr, $first:expr) => (
-		Expr::new($def, $first.pos, self.tokens.get(self.pos).pos)
+		Expr::new($def, $first.pos, self.tokens.get(self.pos - 1).pos)
 	);
 )
 #[deriving(Clone)]
@@ -61,7 +61,6 @@ impl Parser {
 		let mut exprs = Vec::new();
 		while self.pos < self.tokens.len() {
 			let result = try!(self.parse());
-			println!("{}", result);
 			exprs.push(result);
 		}
 		return Ok(mk!(BlockExpr(exprs)));
@@ -302,7 +301,8 @@ impl Parser {
 				self.pos += 1;
 				mk!(BlockExpr(exprs), token)
 			},
-			TNumber(num) => mk!(ConstExpr(CNum(num))),
+			TNumber(num) =>
+				mk!(ConstExpr(CNum(num))),
 			_ => return Err(Expected(Vec::new(), token.clone(), ~"script"))
 		};
 		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};
