@@ -3,7 +3,7 @@ This is a generic JS parser and interpreter written in Rust. Currently, it has v
 
 Documentation
 -------------
-[View here](http://www.rust-ci.org/TopHattedCoder/rust_js/doc/rust_js/)
+[View here](http://www.rust-ci.org/TopHattedCoder/rust_js/doc/script/)
 
 Supported language features
 ---------------------------
