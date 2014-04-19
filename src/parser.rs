@@ -16,13 +16,13 @@ macro_rules! mk (
 #[deriving(Clone)]
 #[deriving(Eq)]
 /// An error encountered during parsing an expression
-pub enum ParseError {
+pub enum ParseError<'t> {
 	/// When it expected a certain kind of token, but got another as part of something
-	Expected(Vec<TokenData>, Token, ~str),
+	Expected(Vec<TokenData>, Token, &'t str),
 	/// When it expected a certain expression, but got another
-	ExpectedExpr(~str, Expr)
+	ExpectedExpr(&'t str, Expr)
 }
-impl fmt::Show for ParseError {
+impl<'t> fmt::Show for ParseError<'t> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
 			Expected(ref wanted, ref got, ref routine) if wanted.len() == 0 => write!(f.buf, "{}:{}: Expected expression for {}, got {}", got.pos.line_number, got.pos.column_number, routine, got.data),
@@ -42,8 +42,8 @@ impl fmt::Show for ParseError {
 		}
 	}
 }
-pub type ParseResult = Result<~Expr, ParseError>;
-pub type ParseStructResult = Result<Option<~Expr>, ParseError>;
+pub type ParseResult<'t> = Result<~Expr, ParseError<'t>>;
+pub type ParseStructResult<'t> = Result<Option<~Expr>, ParseError<'t>>;
 /// A Javascript parser
 pub struct Parser {
 	/// The tokens being input
@@ -80,7 +80,7 @@ impl Parser {
 				let call = try!(self.parse());
 				match call.def {
 					CallExpr(ref func, ref args) => Ok(Some(mk!(ConstructExpr(func.clone(), args.clone())))),
-					_ => Err(ExpectedExpr(~"constructor", *call))
+					_ => Err(ExpectedExpr("constructor", *call))
 				}
 			},
 			"typeof" => Ok(Some(mk!(TypeOfExpr(try!(self.parse()))))),
@@ -141,7 +141,7 @@ impl Parser {
 							default = Some(mk!(BlockExpr(block)));
 						},
 						TCloseBlock => break,
-						_ => return Err(Expected(vec!(TIdent(~"case"), TIdent(~"default"), TCloseBlock), tok, ~"switch block"))
+						_ => return Err(Expected(vec!(TIdent(~"case"), TIdent(~"default"), TCloseBlock), tok, "switch block"))
 					}
 				}
 				try!(self.expect(TCloseBlock, "switch block"));
@@ -155,7 +155,7 @@ impl Parser {
 						Some(name.clone())
 					},
 					TOpenParen => None,
-					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone(), ~"function name"))
+					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone(), "function name"))
 				};
 				try!(self.expect(TOpenParen, "function"));
 				let mut args:Vec<~str> = Vec::new();
@@ -163,7 +163,7 @@ impl Parser {
 				while tk.data != TCloseParen {
 					match tk.data {
 						TIdent(ref id) => args.push(id.to_owned()),
-						_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone(), ~"function arguments"))
+						_ => return Err(Expected(vec!(TIdent(~"identifier")), tk.clone(), "function arguments"))
 					}
 					self.pos += 1;
 					if self.tokens.get(self.pos).data == TComma {
@@ -230,15 +230,15 @@ impl Parser {
 											self.pos += 1;
 											break;
 										},
-										_ if expect_ident => return Err(Expected(vec!(TIdent(~"identifier")), curr_tk, ~"arrow function")),
-										_ => return Err(Expected(vec!(TComma, TCloseParen), curr_tk, ~"arrow function"))
+										_ if expect_ident => return Err(Expected(vec!(TIdent(~"identifier")), curr_tk, "arrow function")),
+										_ => return Err(Expected(vec!(TComma, TCloseParen), curr_tk, "arrow function"))
 									}
 								}
 								try!(self.expect(TArrow, "arrow function"));
 								let expr = try!(self.parse());
 								mk!(ArrowFunctionDeclExpr(args, expr), token)
 							}
-							_ => return Err(Expected(vec!(TCloseParen), next_tok, ~"brackets"))
+							_ => return Err(Expected(vec!(TCloseParen), next_tok, "brackets"))
 						}
 					}
 				}
@@ -257,7 +257,7 @@ impl Parser {
 						array.push(mk!(ConstExpr(CNull)));
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseArray), token.clone(), ~"array declaration"));
+						return Err(Expected(vec!(TComma, TCloseArray), token.clone(), "array declaration"));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -279,7 +279,7 @@ impl Parser {
 					let name = match tk.data {
 						TIdent(ref id) => id,
 						TString(ref str) => str,
-						_ => return Err(Expected(vec!(TIdent(~"identifier"), TString(~"string")), tk, ~"object declaration"))
+						_ => return Err(Expected(vec!(TIdent(~"identifier"), TString(~"string")), tk, "object declaration"))
 					};
 					self.pos += 1;
 					try!(self.expect(TColon, "object declaration"));
@@ -303,7 +303,7 @@ impl Parser {
 			},
 			TNumber(num) =>
 				mk!(ConstExpr(CNum(num))),
-			_ => return Err(Expected(Vec::new(), token.clone(), ~"script"))
+			_ => return Err(Expected(Vec::new(), token.clone(), "script"))
 		};
 		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};
 	}
@@ -317,7 +317,7 @@ impl Parser {
 				let tk = self.tokens.get(self.pos).clone();
 				match tk.data {
 					TIdent(ref s) => result = mk!(GetConstFieldExpr(expr, s.to_owned())),
-					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk, ~"field access"))
+					_ => return Err(Expected(vec!(TIdent(~"identifier")), tk, "field access"))
 				}
 				self.pos += 1;
 			},
@@ -333,7 +333,7 @@ impl Parser {
 					} else if token.data == TComma && expect_comma_or_end {
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseParen), token, ~"function call arguments"));
+						return Err(Expected(vec!(TComma, TCloseParen), token, "function call arguments"));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -389,7 +389,7 @@ impl Parser {
 				let mut args = Vec::with_capacity(1);
 				match result.def {
 					LocalExpr(name) => args.push(name),
-					_ => return Err(ExpectedExpr(~"identifier", *result))
+					_ => return Err(ExpectedExpr("identifier", *result))
 				}
 				let next = try!(self.parse());
 				result = mk!(ArrowFunctionDeclExpr(args, next));
@@ -399,11 +399,11 @@ impl Parser {
 		return if carry_on && self.pos < self.tokens.len() { self.parse_next(result) } else {Ok(result)};
 	}
 	/// Returns an error if the next symbol is not tk
-	fn expect(&mut self, tk:TokenData, routine:&str) -> Result<(), ParseError> {
+	fn expect<'a>(&mut self, tk:TokenData, routine:&'a str) -> Result<(), ParseError<'a>> {
 		self.pos += 1;
 		let curr_tk = self.tokens.get(self.pos - 1).clone();
 		return if curr_tk.data != tk {
-			Err(Expected(vec!(tk), curr_tk, routine.into_owned()))
+			Err(Expected(vec!(tk), curr_tk, routine))
 		} else {
 			Ok(())
 		};
