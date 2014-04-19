@@ -50,8 +50,7 @@ fn main() {
 			let result : Result<Value, Value> = engine.run(parsed);
 			match result {
 				Ok(v) => println!("{}: {}", file_name, v.borrow()),
-				Err(v) => fail!("{}: Failed with {}", file_name, 
-					v.borrow())
+				Err(v) => fail!("{}: Failed with {}", file_name, v.borrow())
 			}
 		}
 	}

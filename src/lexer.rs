@@ -230,7 +230,7 @@ impl<B:Buffer> Lexer<B> {
 					self.current_number = Some(OctalNumber);
 				},
 				'0'..'7' if self.current_number == Some(OctalNumber) => {
-					self.num_buffer.push_char(ch)
+					self.num_buffer.push_char(ch);
 				},
 				'8' | '9' if self.current_number == Some(OctalNumber) => {
 					self.num_buffer.push_char(ch);
