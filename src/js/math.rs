@@ -37,7 +37,7 @@ pub fn atan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Get the arctangent of a numbers
 pub fn atan2(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(to_value(if args.len() >= 1 {
-		from_value::<f64>(*args.get(0)).unwrap().atan2(&args.get(1).borrow().to_num())
+		from_value::<f64>(*args.get(0)).unwrap().atan2(args.get(1).borrow().to_num())
 	} else {
 		f64::NAN
 	}))
@@ -85,7 +85,7 @@ pub fn floor(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Get the natural logarithm of a number
 pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(to_value(if args.len() >= 1 {
-		from_value::<f64>(*args.get(0)).unwrap().log(&f64::consts::E)
+		from_value::<f64>(*args.get(0)).unwrap().log(f64::consts::E)
 	} else {
 		f64::NAN
 	}))
@@ -113,7 +113,7 @@ pub fn pow(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(to_value(if args.len() >= 2 {
 		let num : f64 = from_value(*args.get(0)).unwrap();
 		let power : f64 = from_value(*args.get(1)).unwrap();
-		num.powf(&power)
+		num.powf(power)
 	} else {
 		f64::NAN
 	}))

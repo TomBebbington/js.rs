@@ -3,7 +3,6 @@
 extern crate script;
 use script::lexer::Lexer;
 use script::parser::Parser;
-use script::ast::Token;
 use script::exec::{Executor, Interpreter};
 use std::io;
 
