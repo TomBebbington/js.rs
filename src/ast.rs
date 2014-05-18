@@ -22,13 +22,13 @@ pub enum Const {
 impl fmt::Show for Const {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
-			CString(ref st) => write!(f.buf, "\"{}\"", st),
-			CRegExp(ref reg, _, _) => write!(f.buf, "~/{}/", reg),
-			CNum(num) => write!(f.buf, "{}", num),
-			CInt(num) => write!(f.buf, "{}", num),
-			CBool(v) => write!(f.buf, "{}", v),
-			CNull => write!(f.buf, "null"),
-			CUndefined => write!(f.buf, "undefined")
+			CString(ref st) => write!(f, "\"{}\"", st),
+			CRegExp(ref reg, _, _) => write!(f, "~/{}/", reg),
+			CNum(num) => write!(f, "{}", num),
+			CInt(num) => write!(f, "{}", num),
+			CBool(v) => write!(f, "{}", v),
+			CNull => write!(f, "null"),
+			CUndefined => write!(f, "undefined")
 		}
 	}
 }
@@ -48,13 +48,13 @@ pub enum NumOp {
 }
 impl fmt::Show for NumOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		return f.buf.write_str(match *self {
+		write!(f, "{}", match *self {
 			OpAdd => "+",
 			OpSub => "-",
 			OpDiv => "/",
 			OpMul => "*",
 			OpMod => "%"
-		});
+		})
 	}
 }
 #[deriving(Clone, Eq)]
@@ -73,13 +73,13 @@ pub enum BitOp {
 }
 impl fmt::Show for BitOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		return f.buf.write_str(match *self {
+		write!(f, "{}", match *self {
 			BitAnd => "&",
 			BitOr => "|",
 			BitXor => "^",
 			BitShl => "<<",
 			BitShr => ">>"
-		});
+		})
 	}
 }
 #[deriving(Clone, Eq)]
@@ -104,7 +104,7 @@ pub enum CompOp {
 }
 impl fmt::Show for CompOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		return f.buf.write_str(match *self {
+		write!(f, "{}", match *self {
 			CompEqual => "==",
 			CompNotEqual => "!=",
 			CompStrictEqual => "===",
@@ -113,7 +113,7 @@ impl fmt::Show for CompOp {
 			CompGreaterThanOrEqual => ">=",
 			CompLessThan => "<",
 			CompLessThanOrEqual => "<="
-		});
+		})
 	}
 }
 #[deriving(Clone, Eq)]
@@ -126,7 +126,7 @@ pub enum LogOp {
 }
 impl fmt::Show for LogOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		f.buf.write_str(match *self {
+		write!(f, "{}", match *self {
 			LogAnd => "&&",
 			LogOr => "||"
 		})
@@ -144,13 +144,13 @@ pub struct Expr {
 }
 impl Expr {
 	/// Create a new expression with a position
-	pub fn new(def: ExprDef, start:Position, end:Position) -> ~Expr {
-		~ Expr{def: def, start: start, end: end}
+	pub fn new(def: ExprDef, start:Position, end:Position) -> Expr {
+		Expr{def: def, start: start, end: end}
 	}
 }
 impl fmt::Show for Expr {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f.buf, "{}:{}: {}", self.start.line_number, self.start.column_number, self.def)
+		write!(f, "{}:{}: {}", self.start.line_number, self.start.column_number, self.def)
 	}
 }
 #[deriving(Clone, Eq)]
@@ -174,120 +174,120 @@ impl Position {
 /// A Javascript Expression
 pub enum ExprDef {
 	/// Run a numeric operation on two numeric expressions
-	NumOpExpr(NumOp, ~Expr, ~Expr),
+	NumOpExpr(NumOp, Box<Expr>, Box<Expr>),
 	/// Run a bitwise operation on two integer expressions
-	BitOpExpr(BitOp, ~Expr, ~Expr),
+	BitOpExpr(BitOp, Box<Expr>, Box<Expr>),
 	/// Run a logical operation on two boolean expressions
-	LogOpExpr(LogOp, ~Expr, ~Expr),
+	LogOpExpr(LogOp, Box<Expr>, Box<Expr>),
 	/// Run a comparison operation on two expressions
-	CompOpExpr(CompOp, ~Expr, ~Expr),
+	CompOpExpr(CompOp, Box<Expr>, Box<Expr>),
 	/// Make a simple value
 	ConstExpr(Const),
 	/// Run several expressions
-	BlockExpr(Vec<~Expr>),
+	BlockExpr(Vec<Expr>),
 	/// Load a reference to a value
 	LocalExpr(~str),
 	/// Gets the cosntant field of the expression
-	GetConstFieldExpr(~Expr, ~str),
+	GetConstFieldExpr(Box<Expr>, ~str),
 	/// Gets the field of an expression
-	GetFieldExpr(~Expr, ~Expr),
+	GetFieldExpr(Box<Expr>, Box<Expr>),
 	/// Call a function with some arguments
-	CallExpr(~Expr, Vec<~Expr>),
+	CallExpr(Box<Expr>, Vec<Expr>),
 	/// Repeatedly run an expression while the conditional expression resolves to true
-	WhileLoopExpr(~Expr, ~Expr),
+	WhileLoopExpr(Box<Expr>, Box<Expr>),
 	/// Check if a conditional expression is true and run an expression if it is and another expression if it isn't
-	IfExpr(~Expr, ~Expr, Option<~Expr>),
+	IfExpr(Box<Expr>, Box<Expr>, Option<Box<Expr>>),
 	/// Run blocks whose cases match the expression
-	SwitchExpr(~Expr, Vec<(~Expr, Vec<~Expr>)>, Option<~Expr>),
+	SwitchExpr(Box<Expr>, Vec<(Expr, Vec<Expr>)>, Option<Box<Expr>>),
 	/// Create an object
-	ObjectDeclExpr(~TreeMap<~str, ~Expr>),
+	ObjectDeclExpr(Box<TreeMap<~str, Expr>>),
 	/// Create an array with items inside
-	ArrayDeclExpr(Vec<~Expr>),
+	ArrayDeclExpr(Vec<Expr>),
 	/// Create a function with the given name, arguments, and expression
-	FunctionDeclExpr(Option<~str>, Vec<~str>, ~Expr),
+	FunctionDeclExpr(Option<~str>, Vec<~str>, Box<Expr>),
 	/// Create an arrow function with the fiven arguments and expression
-	ArrowFunctionDeclExpr(Vec<~str>, ~Expr),
+	ArrowFunctionDeclExpr(Vec<~str>, Box<Expr>),
 	/// Construct an object from the function and arguments given
-	ConstructExpr(~Expr, Vec<~Expr>),
+	ConstructExpr(Box<Expr>, Vec<Expr>),
 	/// Return the expression from a function
-	ReturnExpr(Option<~Expr>),
+	ReturnExpr(Option<Box<Expr>>),
 	/// Throw an expression
-	ThrowExpr(~Expr),
+	ThrowExpr(Box<Expr>),
 	/// Assign an expression to another expression
-	AssignExpr(~Expr, ~Expr),
+	AssignExpr(Box<Expr>, Box<Expr>),
 	/// Return a string representing the type of the given expression
-	TypeOfExpr(~Expr)
+	TypeOfExpr(Box<Expr>)
 }
 impl fmt::Show for ExprDef {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
-			ConstExpr(ref c) => write!(f.buf, "{}", c),
+			ConstExpr(ref c) => write!(f, "{}", c),
 			BlockExpr(ref block) => {
-				try!(f.buf.write_str("{"));
+				try!(write!(f, "{}", "{"));
 				for expr in block.iter() {
-					try!(write!(f.buf, "{};", expr));
+					try!(write!(f, "{};", expr));
 				}
-				f.buf.write_str("}")
+				write!(f, "{}", "}")
 			},
-			LocalExpr(ref s) => write!(f.buf, "{}", s),
-			GetConstFieldExpr(ref ex, ref field) => write!(f.buf, "{}.{}", ex, field),
-			GetFieldExpr(ref ex, ref field) => write!(f.buf, "{}[{}]", ex, field),
+			LocalExpr(ref s) => write!(f, "{}", s),
+			GetConstFieldExpr(ref ex, ref field) => write!(f, "{}.{}", ex, field),
+			GetFieldExpr(ref ex, ref field) => write!(f, "{}[{}]", ex, field),
 			CallExpr(ref ex, ref args) => {
-				try!(write!(f.buf, "{}", ex));
-				try!(f.buf.write_str("("));
+				try!(write!(f, "{}", ex));
+				try!(write!(f, "{}", "("));
 				let last = args.iter().last();
 				match last {
 					Some(last_arg) => {
 						for arg in args.iter() {
-							try!(write!(f.buf, "{}", arg));
+							try!(write!(f, "{}", arg));
 							if arg != last_arg {
-								try!(f.buf.write_str(", "));
+								try!(write!(f, "{}", ", "));
 							}
 						}
 					},
 					None => ()
 				}
-				f.buf.write_str(")")
+				write!(f, "{}", ")")
 			},
-			ConstructExpr(ref func, ref args) => write!(f.buf, "new {}({})", func, args),
-			WhileLoopExpr(ref cond, ref expr) => write!(f.buf, "while({}) {}", cond, expr),
-			IfExpr(ref cond, ref expr, None) => write!(f.buf, "if({}) {}", cond, expr),
-			IfExpr(ref cond, ref expr, Some(ref else_e)) => write!(f.buf, "if({}) {} else {}", cond, expr, else_e),
-			SwitchExpr(ref val, ref vals, None) => write!(f.buf, "switch({}){}", val, vals),
-			SwitchExpr(ref val, ref vals, Some(ref def)) => write!(f.buf, "switch({}){}default:{}", val, vals, def),
-			ObjectDeclExpr(ref map) => write!(f.buf, "{}", map),
-			ArrayDeclExpr(ref arr) => write!(f.buf, "{}", arr),
-			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f.buf, "function {}({}){}", name, args.connect(", "), expr),
-			ArrowFunctionDeclExpr(ref args, ref expr) => write!(f.buf, "({}) => {}", args.connect(", "), expr),
-			NumOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
-			BitOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
-			LogOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
-			CompOpExpr(ref op, ref a, ref b) => write!(f.buf, "{} {} {}", a, op, b),
-			ReturnExpr(Some(ref ex)) => write!(f.buf, "return {}", ex),
-			ReturnExpr(None) => f.buf.write_str("return"),
-			ThrowExpr(ref ex) => write!(f.buf, "throw {}", ex),
-			AssignExpr(ref ref_e, ref val) => write!(f.buf, "{} = {}", ref_e, val),
-			TypeOfExpr(ref e) => write!(f.buf, "typeof {}", e)
+			ConstructExpr(ref func, ref args) => write!(f, "new {}({})", func, args),
+			WhileLoopExpr(ref cond, ref expr) => write!(f, "while({}) {}", cond, expr),
+			IfExpr(ref cond, ref expr, None) => write!(f, "if({}) {}", cond, expr),
+			IfExpr(ref cond, ref expr, Some(ref else_e)) => write!(f, "if({}) {} else {}", cond, expr, else_e),
+			SwitchExpr(ref val, ref vals, None) => write!(f, "switch({}){}", val, vals),
+			SwitchExpr(ref val, ref vals, Some(ref def)) => write!(f, "switch({}){}default:{}", val, vals, def),
+			ObjectDeclExpr(ref map) => write!(f, "{}", map),
+			ArrayDeclExpr(ref arr) => write!(f, "{}", arr),
+			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f, "function {}({}){}", name, args.connect(", "), expr),
+			ArrowFunctionDeclExpr(ref args, ref expr) => write!(f, "({}) => {}", args.connect(", "), expr),
+			NumOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
+			BitOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
+			LogOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
+			CompOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
+			ReturnExpr(Some(ref ex)) => write!(f, "return {}", ex),
+			ReturnExpr(None) => write!(f, "{}", "return"),
+			ThrowExpr(ref ex) => write!(f, "throw {}", ex),
+			AssignExpr(ref ref_e, ref val) => write!(f, "{} = {}", ref_e, val),
+			TypeOfExpr(ref e) => write!(f, "typeof {}", e)
 		}
 	}
 }
 
-impl fmt::Show for TreeMap<~str, ~Expr> {
+impl fmt::Show for TreeMap<~str, Expr> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		try!(f.buf.write_str("{ "));
+		try!(write!(f, "{}", "{ "));
 		match self.iter().last() {
 			Some((last_key, _)) => {
 				for (k, v) in self.iter() {
-					try!(write!(f.buf, "{}: {}", k, v));
+					try!(write!(f, "{}: {}", k, v));
 					if k == last_key {
-						try!(f.buf.write_str(","));
+						try!(write!(f, "{}", ","));
 					}
-					try!(f.buf.write_str("\n"));
+					try!(write!(f, "{}", "\n"));
 				}
 			},
 			None => ()
 		}
-		f.buf.write_str("}")
+		write!(f, "{}", "}")
 	}
 }
 #[deriving(Clone)]
@@ -310,7 +310,7 @@ impl Token {
 }
 impl fmt::Show for Token {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f.buf, "{}:{}: {}", self.pos.line_number, self.pos.column_number, self.data)
+		write!(f, "{}:{}: {}", self.pos.line_number, self.pos.column_number, self.data)
 	}
 }
 #[deriving(Clone)]
@@ -363,27 +363,27 @@ pub enum TokenData {
 impl fmt::Show for TokenData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match *self {
-			TString(ref s) => write!(f.buf, "\"{}\"", s),
-			TSemicolon => f.buf.write_str(";"),
-			TColon => f.buf.write_str(":"),
-			TDot => f.buf.write_str("."),
-			TEqual => f.buf.write_str("="),
-			TComma => f.buf.write_str(","),
-			TIdent(ref ident) => f.buf.write_str(*ident),
-			TOpenParen => f.buf.write_str("("),
-			TCloseParen => f.buf.write_str(")"),
-			TOpenBlock => f.buf.write_str("{"),
-			TCloseBlock => f.buf.write_str("}"),
-			TOpenArray => f.buf.write_str("["),
-			TCloseArray => f.buf.write_str("]"),
-			TNumber(num) => write!(f.buf, "{}", num),
-			TQuestion => f.buf.write_str("?"),
-			TArrow => f.buf.write_str("=>"),
-			TNumOp(op) => write!(f.buf, "{}", op),
-			TBitOp(op) => write!(f.buf, "{}", op),
-			TLogOp(op) => write!(f.buf, "{}", op),
-			TCompOp(op) => write!(f.buf, "{}", op),
-			TComment(ref com) => write!(f.buf, "// {}", com)
+			TString(ref s) => write!(f, "\"{}\"", s),
+			TSemicolon => write!(f, "{}", ";"),
+			TColon => write!(f, "{}", ":"),
+			TDot => write!(f, "{}", "."),
+			TEqual => write!(f, "{}", "="),
+			TComma => write!(f, "{}", ","),
+			TIdent(ref ident) => write!(f, "{}", *ident),
+			TOpenParen => write!(f, "{}", "("),
+			TCloseParen => write!(f, "{}", ")"),
+			TOpenBlock => write!(f, "{}", "{"),
+			TCloseBlock => write!(f, "{}", "}"),
+			TOpenArray => write!(f, "{}", "["),
+			TCloseArray => write!(f, "{}", "]"),
+			TNumber(num) => write!(f, "{}", num),
+			TQuestion => write!(f, "{}", "?"),
+			TArrow => write!(f, "{}", "=>"),
+			TNumOp(op) => write!(f, "{}", op),
+			TBitOp(op) => write!(f, "{}", op),
+			TLogOp(op) => write!(f, "{}", op),
+			TCompOp(op) => write!(f, "{}", op),
+			TComment(ref com) => write!(f, "// {}", com)
 		}
 	}
 }

@@ -24,7 +24,7 @@ pub enum ValueData {
 	/// `boolean` - A `true` / `false` value, for if a certain criteria is met
 	VBoolean(bool),
 	/// `String` - A UTF-8 string, such as `"hello"`
-	VString(~str),
+	VString(StrBuf),
 	/// `Number` - A 64-bit floating point number, such as `-1293.0625`
 	VNumber(f64),
 	/// `Number` - A 32-bit integer, such as `0x5f3759df`
@@ -76,7 +76,7 @@ impl ValueData {
 	pub fn is_true(&self) -> bool {
 		return match *self {
 			VObject(_) => true,
-			VString(ref s) if *s == "1".to_owned() => true,
+			VString(ref s) if s.as_slice() == "1" => true,
 			VNumber(n) if n >= 1.0 && n % 1.0 == 0.0 => true,
 			VInteger(n) if n > 1 => true,
 			VBoolean(v) => v,
@@ -87,7 +87,7 @@ impl ValueData {
 	pub fn to_num(&self) -> f64 {
 		return match *self {
 			VObject(_) | VUndefined | VFunction(_) => f64::NAN,
-			VString(ref str) => match from_str(*str) {
+			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
 				None => f64::NAN
 			},
@@ -101,7 +101,7 @@ impl ValueData {
 	pub fn to_int(&self) -> i32 {
 		return match *self {
 			VObject(_) | VUndefined | VNull | VBoolean(false) | VFunction(_) => 0,
-			VString(ref str) => match from_str(*str) {
+			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
 				None => 0
 			},
@@ -183,12 +183,12 @@ impl ValueData {
 					i += 1;
 					((i - 1).to_str(), Property::new(to_value(json.clone())))
 				}));
-				data.insert(~"length", Property::new(to_value(vs.len() as i32)));
+				data.insert("length".to_owned(), Property::new(to_value(vs.len() as i32)));
 				VObject(RefCell::new(data))
 			},
 			Object(obj) => {
 				let data : ObjectData = FromIterator::from_iter(obj.iter().map(|(key, json)| {
-					(key.clone(), Property::new(to_value(json.clone())))
+					(key.to_owned(), Property::new(to_value(json.clone())))
 				}));
 				VObject(RefCell::new(data))
 			},
@@ -199,37 +199,34 @@ impl ValueData {
 impl fmt::Show for ValueData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match *self {
-			VNull => write!(f.buf, "null"),
-			VUndefined => write!(f.buf, "undefined"),
-			VBoolean(v) => write!(f.buf, "{}", v),
-			VString(ref v) => write!(f.buf, "{}", v),
-			VNumber(v) => write!(f.buf, "{}", v),
+			VNull => write!(f, "null"),
+			VUndefined => write!(f, "undefined"),
+			VBoolean(v) => write!(f, "{}", v),
+			VString(ref v) => write!(f, "{}", v),
+			VNumber(v) => write!(f, "{}", v),
 			VObject(ref v) => {
-				try!(f.buf.write_str("{"));
+				try!(write!(f, "{}", "{"));
 				match v.borrow().iter().last() {
 					Some((last_key, _)) => {
 						for (key, val) in v.borrow().iter() {
-							try!(write!(f.buf, "{}: {}", key, val.value.borrow()));
+							try!(write!(f, "{}: {}", key, val.value.borrow()));
 							if key != last_key {
-								try!(f.buf.write_str(", "));
+								try!(write!(f, "{}", ", "));
 							}
 						}
 					},
 					None => ()
 				}
-				f.buf.write_str("}")
+				write!(f, "{}", "}")
 			},
-			VInteger(v) => write!(f.buf, "{}", v),
+			VInteger(v) => write!(f, "{}", v),
 			VFunction(ref v) => {
 				match v.borrow().clone() {
 					NativeFunc(_) => {
-						f.buf.write_str("function() { [native code] }")
+						write!(f, "{}", "function() { [native code] }")
 					},
 					RegularFunc(rf) => {
-						try!(f.buf.write_str("function("));
-						try!(f.buf.write_str(rf.args.connect(", ")));
-						try!(f.buf.write_str(") "));
-						write!(f.buf, "{}", rf.expr)
+						write!(f, "function({}){}", rf.args.connect(", "), rf.expr)
 					}
 				}
 			}
@@ -256,13 +253,13 @@ impl ToJson for ValueData {
 			VObject(ref obj) => {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
-					if *k != INSTANCE_PROTOTYPE.to_owned() {
-						nobj.insert(k.clone(), v.value.borrow().to_json());
+					if k.as_slice() != INSTANCE_PROTOTYPE.as_slice() {
+						nobj.insert(StrBuf::from_str(*k), v.value.borrow().to_json());
 					}
 				}
-				Object(~nobj)
+				Object(box nobj)
 			},
-			VString(ref str) => String(str.to_owned()),
+			VString(ref str) => String(str.clone()),
 			VNumber(num) => Number(num),
 			VInteger(val) => Number(val as f64),
 			VFunction(_) => Null
@@ -272,7 +269,7 @@ impl ToJson for ValueData {
 impl Add<ValueData, ValueData> for ValueData {
 	fn add(&self, other:&ValueData) -> ValueData {
 		return match (self.clone(), other.clone()) {
-			(VString(s), other) | (other, VString(s)) => VString(s.to_owned() + other.to_str()),
+			(VString(s), other) | (other, VString(s)) => VString(StrBuf::from_str(s.as_slice() + other.to_str())),
 			(_, _) => VNumber(self.to_num() + other.to_num())
 		}
 	}
@@ -336,7 +333,7 @@ pub trait ValueConv {
 }
 impl<'t> ValueConv for MaybeOwned<'t> {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(self.clone().into_owned()))
+		Gc::new(VString(StrBuf::from_str(self.as_slice())))
 	}
 	fn from_value(v:Value) -> Option<MaybeOwned<'t>> {
 		Some(v.borrow().to_str().into_maybe_owned())

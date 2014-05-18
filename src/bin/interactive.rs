@@ -7,7 +7,7 @@ use script::exec::{Executor, Interpreter};
 use std::io;
 
 fn main() {
-	let mut engine : ~Interpreter = Executor::new();
+	let mut engine : Box<Interpreter> = Executor::new();
 	print!("> ");
 	for line in io::stdin().lines() {
 		match line {

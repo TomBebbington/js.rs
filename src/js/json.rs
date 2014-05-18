@@ -8,7 +8,7 @@ pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 			Ok(Gc::new(ValueData::from_json(json)))
 		},
 		Err(err) => {
-			Err(Gc::new(VString(err.to_str())))
+			Err(Gc::new(VString(StrBuf::from_str(err.to_str()))))
 		}
 	}
 }

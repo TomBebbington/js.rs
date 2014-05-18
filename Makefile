@@ -1,7 +1,7 @@
-.PHONY: all build doc tests interactive clean
-all: build tests interactive doc
+.PHONY: all build doc interactive tests clean
+all: build interactive tests doc
 build:
-	cargo-compile --manifest-path Cargo.toml
+	rustc src/script.rs -L target -o target/libscript
 tests:
 	rustc src/bin/tests.rs -L target -o target/tests
 interactive:

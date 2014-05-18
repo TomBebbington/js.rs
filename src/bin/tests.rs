@@ -16,7 +16,7 @@ fn find_attr(tokens: Vec<Token>, attr:~str) -> Option<~str> {
 		match tk.data {
 			TComment(ref comm) => {
 				let comm = comm.clone();
-				let desc_loc = comm.find_str(~"@" + attr);
+				let desc_loc = comm.find_str("@" + attr);
 				if desc_loc.is_some() {
 					return Some(comm.slice_from(desc_loc.unwrap() + attr.len() + 2).split('\n').next().unwrap().to_owned());
 				}
@@ -45,7 +45,7 @@ fn main() {
 				Ok(v) => v,
 				Err(v) => fail!("{}: {}", file_name, v)
 			};
-			let mut engine : ~Interpreter = Executor::new();
+			let mut engine : Box<Interpreter> = Executor::new();
 			engine.set_global("assert".into_maybe_owned(), to_value(assert));
 			let result : Result<Value, Value> = engine.run(parsed);
 			match result {

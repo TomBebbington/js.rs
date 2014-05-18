@@ -16,7 +16,7 @@ use std::str::MaybeOwned;
 /// An execution engine
 pub trait Executor {
 	/// Makes a new execution engine
-	fn new() -> ~Self;
+	fn new() -> Self;
 	/// Sets a global variable
 	fn set_global(&mut self, name:MaybeOwned, val:Value) -> Value;
 	/// Gets a global variable
@@ -37,7 +37,7 @@ pub struct Interpreter {
 	scopes: Vec<Gc<RefCell<ObjectData>>>,
 }
 impl Executor for Interpreter {
-	fn new() -> ~Interpreter {
+	fn new() -> Interpreter {
 		let global = ValueData::new_obj(None);
 		object::init(global);
 		console::init(global);
@@ -50,7 +50,7 @@ impl Executor for Interpreter {
 		number::init(global);
 		string::init(global);
 		uri::init(global);
-		return ~Interpreter {global: global, scopes: Vec::new()};
+		Interpreter {global: global, scopes: Vec::new()}
 	}
 	fn set_global(&mut self, name:MaybeOwned, val:Value) -> Value {
 		self.global.borrow().set_field(name, val)
@@ -72,13 +72,13 @@ impl Executor for Interpreter {
 			ConstExpr(CUndefined) => Ok(Gc::new(VUndefined)),
 			ConstExpr(CNum(num)) => Ok(to_value(num)),
 			ConstExpr(CInt(num)) => Ok(to_value(num)),
-			ConstExpr(CString(ref str)) => Ok(Gc::new(VString(str.to_owned()))),
+			ConstExpr(CString(ref str)) => Ok(Gc::new(VString(StrBuf::from_str(str.as_slice())))),
 			ConstExpr(CBool(val)) => Ok(Gc::new(VBoolean(val))),
 			ConstExpr(CRegExp(_, _, _)) => Ok(Gc::new(VNull)),
 			BlockExpr(ref es) => {
 				let mut obj = Gc::new(VNull);
 				for e in es.iter() {
-					let val = try!(self.run(*e));
+					let val = try!(self.run(e));
 					if e == es.last().unwrap() {
 						obj = val;
 					}
@@ -126,7 +126,7 @@ impl Executor for Interpreter {
 				};
 				let mut v_args = Vec::with_capacity(args.len());
 				for arg in args.iter() {
-					v_args.push(try!(self.run(*arg)));
+					v_args.push(try!(self.run(arg)));
 				}
 				match *func.borrow() {
 					VFunction(ref func) => {
@@ -149,7 +149,7 @@ impl Executor for Interpreter {
 					Gc::new(VUndefined)
 				})
 			},
-			IfExpr(ref cond, ref expr, Some(ref else_e)) => {
+			IfExpr(ref cond,ref expr, Some(ref else_e)) => {
 				Ok(if try!(self.run(*cond)).borrow().is_true() {
 					try!(self.run(*expr))
 				} else {
@@ -161,13 +161,13 @@ impl Executor for Interpreter {
 				let mut result = Gc::new(VNull);
 				let mut matched = false;
 				for tup in vals.iter() {
-					let tup:&(~Expr, Vec<~Expr>) = tup;
+					let tup:&(Expr, Vec<Expr>) = tup;
 					match *tup {
-						(ref cond, ref block) if(val == *try!(self.run(*cond)).borrow()) => {
+						(ref cond, ref block) if(val == *try!(self.run(cond)).borrow()) => {
 							matched = true;
 							let last_expr = block.last().unwrap();
 							for expr in block.iter() {
-								let e_result = try!(self.run(*expr));
+								let e_result = try!(self.run(expr));
 								if expr == last_expr {
 									result = e_result;
 								}
@@ -184,7 +184,7 @@ impl Executor for Interpreter {
 			ObjectDeclExpr(ref map) => {
 				let obj = ValueData::new_obj(Some(self.global));
 				for (key, val) in map.iter() {
-					obj.borrow().set_field(key.clone().into_maybe_owned(), try!(self.run(val.clone())));
+					obj.borrow().set_field(key.clone().into_maybe_owned(), try!(self.run(val)));
 				}
 				Ok(obj)
 			},
@@ -192,7 +192,7 @@ impl Executor for Interpreter {
 				let arr_map = ValueData::new_obj(Some(self.global));
 				let mut index : i32 = 0;
 				for val in arr.iter() {
-					let val = try!(self.run(val.clone()));
+					let val = try!(self.run(val));
 					arr_map.borrow().set_field(index.to_str().into_maybe_owned(), val);
 					index += 1;
 				}
@@ -266,7 +266,7 @@ impl Executor for Interpreter {
 				let func = try!(self.run(*callee));
 				let mut v_args = Vec::with_capacity(args.len());
 				for arg in args.iter() {
-					v_args.push(try!(self.run(*arg)));
+					v_args.push(try!(self.run(arg)));
 				}
 				let this = Gc::new(VObject(RefCell::new(TreeMap::new())));
 				this.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), func.borrow().get_field(PROTOTYPE.into_maybe_owned()));
@@ -281,7 +281,7 @@ impl Executor for Interpreter {
 			ReturnExpr(ref ret) => {
 				match *ret {
 					Some(ref v) =>
-						self.run(v.clone()),
+						self.run(*v),
 					None => Ok(Gc::new(VUndefined))
 				}
 			},

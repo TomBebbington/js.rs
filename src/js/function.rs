@@ -22,7 +22,7 @@ impl Function {
 				func(this, callee, args)
 			}, RegularFunc(ref data) => {
 				let scope = exe.make_scope();
-				scope.borrow().borrow_mut().insert(~"this", Property::new(this));
+				scope.borrow().borrow_mut().insert("this".to_owned(), Property::new(this));
 				for i in range(0, data.args.len()) {
 					let name = data.args.get(i);
 					let expr = args.get(i);
@@ -49,7 +49,7 @@ impl RegularFunction {
 	/// Make a new regular function
 	pub fn new(expr : Expr, args: Vec<~str>) -> RegularFunction {
 		let mut obj = TreeMap::new();
-		obj.insert(~"arguments", Property::new(Gc::new(VInteger(args.len() as i32))));
+		obj.insert("arguments".to_owned(), Property::new(Gc::new(VInteger(args.len() as i32))));
 		RegularFunction {object: obj, expr: expr, args: args}
 	}
 }
