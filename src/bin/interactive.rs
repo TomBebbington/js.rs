@@ -13,8 +13,7 @@ fn main() {
 		match line {
 			Ok(line) => {
 				let tokens = Lexer::<io::BufferedReader<io::BufReader>>::lex_str(line);
-				let mut parser = Parser::new(tokens);
-				let expr = parser.parse_all().unwrap();
+				let expr = Parser::new(tokens).parse_all().unwrap();
 				let result = engine.run(&expr);
 				match result {
 					Ok(v) => print!("{}", v.borrow()),
