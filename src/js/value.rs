@@ -339,6 +339,14 @@ impl<'t> ValueConv for MaybeOwned<'t> {
 		Some(v.borrow().to_str().into_maybe_owned())
 	}
 }
+impl ValueConv for char {
+	fn to_value(&self) -> Value {
+		Gc::new(VString(StrBuf::from_char(1, *self)))
+	}
+	fn from_value(v:Value) -> Option<char> {
+		Some(v.borrow().to_str().char_at(0))
+	}
+}
 impl ValueConv for f64 {
 	fn to_value(&self) -> Value {
 		Gc::new(VNumber(self.clone()))
