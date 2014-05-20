@@ -45,9 +45,9 @@ fn main() {
 				Ok(v) => v,
 				Err(v) => fail!("{}: {}", file_name, v)
 			};
-			let mut engine : Box<Interpreter> = Executor::new();
+			let mut engine : Interpreter = Executor::new();
 			engine.set_global("assert".into_maybe_owned(), to_value(assert));
-			let result : Result<Value, Value> = engine.run(parsed);
+			let result : Result<Value, Value> = engine.run(&parsed);
 			match result {
 				Ok(v) => println!("{}: {}", file_name, v.borrow()),
 				Err(v) => fail!("{}: Failed with {}", file_name, v.borrow())
