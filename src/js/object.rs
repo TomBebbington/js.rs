@@ -68,14 +68,14 @@ pub fn make_object(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
 /// Get the prototype
 pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
-	return Ok(obj.borrow().get_field(INSTANCE_PROTOTYPE.into_maybe_owned()));
+	Ok(obj.borrow().get_field(INSTANCE_PROTOTYPE.into_maybe_owned()))
 }
 /// Set the prototype
 pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let proto = args.get(1).clone();
 	let obj = args.get(0);
 	obj.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), proto);
-	return Ok(*obj);
+	Ok(*obj)
 }
 /// Define the property
 pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
@@ -83,11 +83,11 @@ pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let prop = from_value::<MaybeOwned>(*args.get(1)).unwrap();
 	let desc = from_value::<Property>(*args.get(2)).unwrap();
 	obj.borrow().set_prop(prop, desc);
-	return Ok(Gc::new(VUndefined));
+	Ok(Gc::new(VUndefined))
 }
 /// To string
 pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	return Ok(to_value(this.borrow().to_str().into_maybe_owned()));
+	Ok(to_value(this.borrow().to_str().into_maybe_owned()))
 }
 /// Check if it has a property
 pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {

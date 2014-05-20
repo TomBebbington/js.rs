@@ -24,7 +24,7 @@ fn find_attr(tokens: Vec<Token>, attr:~str) -> Option<~str> {
 			_ => ()
 		}
 	}
-	return None;
+	None
 }
 fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let val : bool = from_value(*args.get(0)).unwrap();

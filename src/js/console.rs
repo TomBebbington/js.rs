@@ -8,7 +8,7 @@ use time::{now, strftime};
 pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let args : Vec<MaybeOwned> = FromIterator::from_iter(args.iter().map(|x|from_value::<MaybeOwned>(*x).unwrap()));
 	println!("{}: {}", strftime("%X", &now()), args.connect(" "));
-	return Ok(Gc::new(VUndefined));
+	Ok(Gc::new(VUndefined))
 }
 /// Print a javascript value to the standard error stream
 pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
