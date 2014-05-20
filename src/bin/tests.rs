@@ -41,13 +41,13 @@ fn main() {
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
 			lexer.lex().unwrap();
 			let mut parser = Parser::new(lexer.tokens);
-			let parsed = match parser.parse_all() {
+			let expr = match parser.parse_all() {
 				Ok(v) => v,
 				Err(v) => fail!("{}: {}", file_name, v)
 			};
 			let mut engine : Interpreter = Executor::new();
 			engine.set_global("assert".into_maybe_owned(), to_value(assert));
-			let result : Result<Value, Value> = engine.run(&parsed);
+			let result : Result<Value, Value> = engine.run(&expr);
 			match result {
 				Ok(v) => println!("{}: {}", file_name, v.borrow()),
 				Err(v) => fail!("{}: Failed with {}", file_name, v.borrow())
