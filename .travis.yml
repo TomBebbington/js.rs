@@ -2,10 +2,10 @@ env:
   global:
     - secure: UDORPffOmJ4Ht0P9jGM8w2MhDpSBivIet4iJEW5q9Hx5tzTt7FUg2o9Tjl1EjGfM4khCBjjYQ9tmtOruY62wJoy4O91vo83iPhb58weaL81uvbd4WMUahcAwjB1U/qmS2UUmje5SO3pNswV49ZKK8aVy5QgGXLYbl+vc5ll89To=
 before_install:
-  - yes | sudo add-apt-repository ppa:hansjorg/rust
-  - sudo apt-get update
+  - wget http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - tar -xzvf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
 install:
-  - sudo apt-get install rust-nightly
+  - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
 script:
   - make build doc
 notifications:
