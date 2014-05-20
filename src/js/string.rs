@@ -16,7 +16,9 @@ pub fn get_string_length(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 /// Create a new `String` object
 pub fn _create(global: Value) -> Value {
 	let string = to_value(make_string);
+	let string_ptr = string.borrow();
 	let proto = ValueData::new_obj(Some(global));
+	let proto_ptr = proto.borrow();
 	let prop = Property {
 		configurable: false,
 		enumerable: false,
@@ -25,11 +27,12 @@ pub fn _create(global: Value) -> Value {
 		get: to_value(get_string_length),
 		set: Gc::new(VUndefined)
 	};
-	proto.borrow().set_prop("length".into_maybe_owned(), prop);
-	string.borrow().set_field(PROTOTYPE.into_maybe_owned(), proto);
+	proto_ptr.set_prop("length".into_maybe_owned(), prop);
+	string_ptr.set_field(PROTOTYPE.into_maybe_owned(), proto);
 	string
 }
 /// Initialise the global object with the `String` object
 pub fn init(global:Value) {
-	global.borrow().set_field("String".into_maybe_owned(), _create(global));
+	let global_ptr = global.borrow();
+	global_ptr.set_field("String".into_maybe_owned(), _create(global));
 }

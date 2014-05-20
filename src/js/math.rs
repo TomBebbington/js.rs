@@ -157,33 +157,34 @@ pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new `Math` object
 pub fn _create(global : Value) -> Value {
 	let math = ValueData::new_obj(Some(global));
-	math.borrow().set_field("E".into_maybe_owned(), to_value(f64::consts::E));
-	math.borrow().set_field("LN2".into_maybe_owned(), to_value(f64::consts::LN_2));
-	math.borrow().set_field("LN10".into_maybe_owned(), to_value(f64::consts::LN_10));
-	math.borrow().set_field("LOG2E".into_maybe_owned(), to_value(f64::consts::LOG2_E));
-	math.borrow().set_field("LOG10E".into_maybe_owned(), to_value(f64::consts::LOG10_E));
-	math.borrow().set_field("SQRT1_2".into_maybe_owned(), to_value(0.5f64.sqrt()));
-	math.borrow().set_field("SQRT2".into_maybe_owned(), to_value(f64::consts::SQRT2));
-	math.borrow().set_field("PI".into_maybe_owned(), to_value(f64::consts::PI));
-	math.borrow().set_field("abs".into_maybe_owned(), to_value(abs));
-	math.borrow().set_field("acos".into_maybe_owned(), to_value(acos));
-	math.borrow().set_field("asin".into_maybe_owned(), to_value(asin));
-	math.borrow().set_field("atan".into_maybe_owned(), to_value(atan));
-	math.borrow().set_field("atan2".into_maybe_owned(), to_value(atan2));
-	math.borrow().set_field("cbrt".into_maybe_owned(), to_value(cbrt));
-	math.borrow().set_field("ceil".into_maybe_owned(), to_value(ceil));
-	math.borrow().set_field("cos".into_maybe_owned(), to_value(cos));
-	math.borrow().set_field("exp".into_maybe_owned(), to_value(exp));
-	math.borrow().set_field("floor".into_maybe_owned(), to_value(floor));
-	math.borrow().set_field("log".into_maybe_owned(), to_value(log));
-	math.borrow().set_field("max".into_maybe_owned(), to_value(max));
-	math.borrow().set_field("min".into_maybe_owned(), to_value(min));
-	math.borrow().set_field("pow".into_maybe_owned(), to_value(pow));
-	math.borrow().set_field("random".into_maybe_owned(), to_value(_random));
-	math.borrow().set_field("round".into_maybe_owned(), to_value(round));
-	math.borrow().set_field("sin".into_maybe_owned(), to_value(sin));
-	math.borrow().set_field("sqrt".into_maybe_owned(), to_value(sqrt));
-	math.borrow().set_field("tan".into_maybe_owned(), to_value(tan));
+	let math_ptr = math.borrow();
+	math_ptr.set_field("E".into_maybe_owned(), to_value(f64::consts::E));
+	math_ptr.set_field("LN2".into_maybe_owned(), to_value(f64::consts::LN_2));
+	math_ptr.set_field("LN10".into_maybe_owned(), to_value(f64::consts::LN_10));
+	math_ptr.set_field("LOG2E".into_maybe_owned(), to_value(f64::consts::LOG2_E));
+	math_ptr.set_field("LOG10E".into_maybe_owned(), to_value(f64::consts::LOG10_E));
+	math_ptr.set_field("SQRT1_2".into_maybe_owned(), to_value(0.5f64.sqrt()));
+	math_ptr.set_field("SQRT2".into_maybe_owned(), to_value(f64::consts::SQRT2));
+	math_ptr.set_field("PI".into_maybe_owned(), to_value(f64::consts::PI));
+	math_ptr.set_field("abs".into_maybe_owned(), to_value(abs));
+	math_ptr.set_field("acos".into_maybe_owned(), to_value(acos));
+	math_ptr.set_field("asin".into_maybe_owned(), to_value(asin));
+	math_ptr.set_field("atan".into_maybe_owned(), to_value(atan));
+	math_ptr.set_field("atan2".into_maybe_owned(), to_value(atan2));
+	math_ptr.set_field("cbrt".into_maybe_owned(), to_value(cbrt));
+	math_ptr.set_field("ceil".into_maybe_owned(), to_value(ceil));
+	math_ptr.set_field("cos".into_maybe_owned(), to_value(cos));
+	math_ptr.set_field("exp".into_maybe_owned(), to_value(exp));
+	math_ptr.set_field("floor".into_maybe_owned(), to_value(floor));
+	math_ptr.set_field("log".into_maybe_owned(), to_value(log));
+	math_ptr.set_field("max".into_maybe_owned(), to_value(max));
+	math_ptr.set_field("min".into_maybe_owned(), to_value(min));
+	math_ptr.set_field("pow".into_maybe_owned(), to_value(pow));
+	math_ptr.set_field("random".into_maybe_owned(), to_value(_random));
+	math_ptr.set_field("round".into_maybe_owned(), to_value(round));
+	math_ptr.set_field("sin".into_maybe_owned(), to_value(sin));
+	math_ptr.set_field("sqrt".into_maybe_owned(), to_value(sqrt));
+	math_ptr.set_field("tan".into_maybe_owned(), to_value(tan));
 	math
 }
 /// Initialise the `Math` object on the global object

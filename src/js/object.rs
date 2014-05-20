@@ -103,18 +103,20 @@ pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new `Object` object
 pub fn _create(global:Value) -> Value {
-	let obj = to_value(make_object);
+	let object = to_value(make_object);
+	let object_ptr = object.borrow();
 	let prototype = ValueData::new_obj(Some(global));
 	prototype.borrow().set_field("hasOwnProperty".into_maybe_owned(), to_value(has_own_prop));
 	prototype.borrow().set_field("toString".into_maybe_owned(), to_value(to_string));
-	obj.borrow().set_field("length".into_maybe_owned(), to_value(1i32));
-	obj.borrow().set_field(PROTOTYPE.into_maybe_owned(), prototype);
-	obj.borrow().set_field("setPrototypeOf".into_maybe_owned(), to_value(set_proto_of));
-	obj.borrow().set_field("getPrototypeOf".into_maybe_owned(), to_value(get_proto_of));
-	obj.borrow().set_field("defineProperty".into_maybe_owned(), to_value(define_prop));
-	obj
+	object_ptr.set_field("length".into_maybe_owned(), to_value(1i32));
+	object_ptr.set_field(PROTOTYPE.into_maybe_owned(), prototype);
+	object_ptr.set_field("setPrototypeOf".into_maybe_owned(), to_value(set_proto_of));
+	object_ptr.set_field("getPrototypeOf".into_maybe_owned(), to_value(get_proto_of));
+	object_ptr.set_field("defineProperty".into_maybe_owned(), to_value(define_prop));
+	object
 }
 /// Initialise the `Object` object on the global object
 pub fn init(global:Value) {
-	global.borrow().set_field("Object".into_maybe_owned(), _create(global));
+	let global_ptr = global.borrow();
+	global_ptr.set_field("Object".into_maybe_owned(), _create(global));
 }

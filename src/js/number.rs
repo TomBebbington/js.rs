@@ -62,25 +62,27 @@ pub fn strict_is_nan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new `Number` object
 pub fn _create(global:Value) -> Value {
 	let number = ValueData::new_obj(Some(global));
-	number.borrow().set_field("NaN".into_maybe_owned(), to_value(NAN));
-	number.borrow().set_field("MAX_VALUE".into_maybe_owned(), to_value(MAX_VALUE));
-	number.borrow().set_field("MIN_VALUE".into_maybe_owned(), to_value(MIN_VALUE));
-	number.borrow().set_field("POSITIVE_INFINITY".into_maybe_owned(), to_value(INFINITY));
-	number.borrow().set_field("NEGATIVE_INFINITY".into_maybe_owned(), to_value(NEG_INFINITY));
-	number.borrow().set_field("EPSILON".into_maybe_owned(), to_value(EPSILON));
-	number.borrow().set_field("parseFloat".into_maybe_owned(), to_value(parse_float));
-	number.borrow().set_field("parseInt".into_maybe_owned(), to_value(parse_int));
-	number.borrow().set_field("isFinite".into_maybe_owned(), to_value(strict_is_finite));
-	number.borrow().set_field("isNaN".into_maybe_owned(), to_value(strict_is_nan));
+	let number_ptr = number.borrow();
+	number_ptr.set_field("NaN".into_maybe_owned(), to_value(NAN));
+	number_ptr.set_field("MAX_VALUE".into_maybe_owned(), to_value(MAX_VALUE));
+	number_ptr.set_field("MIN_VALUE".into_maybe_owned(), to_value(MIN_VALUE));
+	number_ptr.set_field("POSITIVE_INFINITY".into_maybe_owned(), to_value(INFINITY));
+	number_ptr.set_field("NEGATIVE_INFINITY".into_maybe_owned(), to_value(NEG_INFINITY));
+	number_ptr.set_field("EPSILON".into_maybe_owned(), to_value(EPSILON));
+	number_ptr.set_field("parseFloat".into_maybe_owned(), to_value(parse_float));
+	number_ptr.set_field("parseInt".into_maybe_owned(), to_value(parse_int));
+	number_ptr.set_field("isFinite".into_maybe_owned(), to_value(strict_is_finite));
+	number_ptr.set_field("isNaN".into_maybe_owned(), to_value(strict_is_nan));
 	number
 }
 /// Initialise the parse functions and `Number` on the global object
 pub fn init(global:Value) {
-	global.borrow().set_field("NaN".into_maybe_owned(), to_value(NAN));
-	global.borrow().set_field("Infinity".into_maybe_owned(), to_value(INFINITY));
-	global.borrow().set_field("parseFloat".into_maybe_owned(), to_value(parse_float));
-	global.borrow().set_field("parseInt".into_maybe_owned(), to_value(parse_int));
-	global.borrow().set_field("isFinite".into_maybe_owned(), to_value(is_finite));
-	global.borrow().set_field("isNaN".into_maybe_owned(), to_value(is_nan));
-	global.borrow().set_field("Number".into_maybe_owned(), _create(global));
+	let global_ptr = global.borrow();
+	global_ptr.set_field("NaN".into_maybe_owned(), to_value(NAN));
+	global_ptr.set_field("Infinity".into_maybe_owned(), to_value(INFINITY));
+	global_ptr.set_field("parseFloat".into_maybe_owned(), to_value(parse_float));
+	global_ptr.set_field("parseInt".into_maybe_owned(), to_value(parse_int));
+	global_ptr.set_field("isFinite".into_maybe_owned(), to_value(is_finite));
+	global_ptr.set_field("isNaN".into_maybe_owned(), to_value(is_nan));
+	global_ptr.set_field("Number".into_maybe_owned(), _create(global));
 }

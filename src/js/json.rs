@@ -20,12 +20,14 @@ pub fn stringify(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new `JSON` object
 pub fn _create(global:Value) -> Value {
-	let obj = ValueData::new_obj(Some(global));
-	obj.borrow().set_field("stringify".into_maybe_owned(), to_value(stringify));
-	obj.borrow().set_field("parse".into_maybe_owned(), to_value(parse));
-	obj
+	let object = ValueData::new_obj(Some(global));
+	let object_ptr = object.borrow();
+	object_ptr.set_field("stringify".into_maybe_owned(), to_value(stringify));
+	object_ptr.set_field("parse".into_maybe_owned(), to_value(parse));
+	object
 }
 /// Initialise the global object with the `JSON` object
 pub fn init(global:Value) {
-	global.borrow().set_field("JSON".into_maybe_owned(), _create(global));
+	let global_ptr = global.borrow();
+	global_ptr.set_field("JSON".into_maybe_owned(), _create(global));
 }

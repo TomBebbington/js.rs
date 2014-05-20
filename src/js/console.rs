@@ -21,12 +21,14 @@ pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Create a new `console` object
 pub fn _create(global : Value) -> Value {
 	let console = ValueData::new_obj(Some(global));
-	console.borrow().set_field("log".into_maybe_owned(), to_value(log));
-	console.borrow().set_field("error".into_maybe_owned(), to_value(error));
-	console.borrow().set_field("exception".into_maybe_owned(), to_value(error));
+	let console_ptr = console.borrow();
+	console_ptr.set_field("log".into_maybe_owned(), to_value(log));
+	console_ptr.set_field("error".into_maybe_owned(), to_value(error));
+	console_ptr.set_field("exception".into_maybe_owned(), to_value(error));
 	console
 }
 /// Initialise the global object with the `console` object
 pub fn init(global:Value) {
-	global.borrow().set_field("console".into_maybe_owned(), _create(global));
+	let global_ptr = global.borrow();
+	global_ptr.set_field("console".into_maybe_owned(), _create(global));
 }
