@@ -324,54 +324,92 @@ impl Not<ValueData> for ValueData {
 		return VInteger(!self.to_int());
 	}
 }
-/// Conversion between Rust and Javascript values
-pub trait ValueConv {
-	/// Convert this Rust value into a Javascript value
+/// Conversion to Javascript values from Rust values
+pub trait ToValue {
+	/// Convert this value to a Rust value
 	fn to_value(&self) -> Value;
-	/// Convert a Javascript value to a Rust value
-	fn from_value(v:Value) -> Option<Self>;
 }
-impl<'t> ValueConv for MaybeOwned<'t> {
+/// Conversion to Rust values from Javascript values
+pub trait FromValue {
+	/// Convert this value to a Javascript value
+	fn from_value(value:Value) -> Result<Self, &'static str>;
+}
+impl ToValue for StrBuf {
+	fn to_value(&self) -> Value {
+		Gc::new(VString(self.clone()))
+	}
+}
+impl FromValue for StrBuf {
+	fn from_value(v:Value) -> Result<StrBuf, &'static str> {
+		Ok(StrBuf::from_str(v.borrow().to_str()))
+	}
+}
+impl<'s> ToValue for &'s str {
+	fn to_value(&self) -> Value {
+		Gc::new(VString(StrBuf::from_str(*self)))
+	}
+}
+impl<'s> ToValue for ~str {
 	fn to_value(&self) -> Value {
 		Gc::new(VString(StrBuf::from_str(self.as_slice())))
 	}
-	fn from_value(v:Value) -> Option<MaybeOwned<'t>> {
-		Some(v.borrow().to_str().into_maybe_owned())
+}
+impl<'s> FromValue for ~str {
+	fn from_value(v:Value) -> Result<~str, &'static str> {
+		Ok(v.borrow().to_str())
 	}
 }
-impl ValueConv for char {
+impl<'s> ToValue for MaybeOwned<'s> {
+	fn to_value(&self) -> Value {
+		Gc::new(VString(StrBuf::from_str(self.as_slice())))
+	}
+}
+impl<'s> FromValue for MaybeOwned<'s> {
+	fn from_value(v:Value) -> Result<MaybeOwned<'s>, &'static str> {
+		Ok(v.borrow().to_str().into_maybe_owned())
+	}
+}
+impl ToValue for char {
 	fn to_value(&self) -> Value {
 		Gc::new(VString(StrBuf::from_char(1, *self)))
 	}
-	fn from_value(v:Value) -> Option<char> {
-		Some(v.borrow().to_str().char_at(0))
+}
+impl FromValue for char {
+	fn from_value(v:Value) -> Result<char, &'static str> {
+		Ok(v.borrow().to_str().char_at(0))
 	}
 }
-impl ValueConv for f64 {
+impl ToValue for f64 {
 	fn to_value(&self) -> Value {
 		Gc::new(VNumber(self.clone()))
 	}
-	fn from_value(v:Value) -> Option<f64> {
-		Some(v.borrow().to_num())
+}
+impl FromValue for f64 {
+	fn from_value(v:Value) -> Result<f64, &'static str> {
+		Ok(v.borrow().to_num())
 	}
 }
-impl ValueConv for i32 {
+impl ToValue for i32 {
 	fn to_value(&self) -> Value {
 		Gc::new(VInteger(self.clone()))
 	}
-	fn from_value(v:Value) -> Option<i32> {
-		Some(v.borrow().to_int())
+}
+impl FromValue for i32 {
+	fn from_value(v:Value) -> Result<i32, &'static str> {
+		Ok(v.borrow().to_int())
 	}
 }
-impl ValueConv for bool {
+impl ToValue for bool {
 	fn to_value(&self) -> Value {
 		Gc::new(VBoolean(self.clone()))
 	}
-	fn from_value(v:Value) -> Option<bool> {
-		Some(v.borrow().is_true())
+}
+impl FromValue for bool {
+	fn from_value(v:Value) -> Result<bool, &'static str> {
+		Ok(v.borrow().is_true())
 	}
 }
-impl<T:ValueConv> ValueConv for Vec<T> {
+impl<T:ToValue> ToValue for Vec<T> {
 	fn to_value(&self) -> Value {
 		let mut arr = TreeMap::new();
 		for i in range(0, self.len()) {
@@ -379,73 +417,80 @@ impl<T:ValueConv> ValueConv for Vec<T> {
 		}
 		to_value(arr)
 	}
-	fn from_value(v:Value) -> Option<Vec<T>> {
+}
+impl<T:FromValue> FromValue for Vec<T> {
+	fn from_value(v:Value) -> Result<Vec<T>, &'static str> {
 		let len = v.borrow().get_field("length".into_maybe_owned()).borrow().to_int();
 		let mut vec = Vec::with_capacity(len as uint);
 		for i in range(0, len) {
-			match ValueConv::from_value(v.borrow().get_field(i.to_str().into_maybe_owned())) {
-				Some(v) => vec.push(v),
-				None => ()
-			}
+			vec.push(try!(from_value(v.borrow().get_field(i.to_str().into_maybe_owned()))))
 		}
-		Some(vec)
+		Ok(vec)
 	}
 }
-impl ValueConv for NativeFunctionData {
+impl ToValue for NativeFunctionData {
 	fn to_value(&self) -> Value {
 		Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self)))))
 	}
-	fn from_value(v:Value) -> Option<NativeFunctionData> {
+}
+impl FromValue for NativeFunctionData {
+	fn from_value(v:Value) -> Result<NativeFunctionData, &'static str> {
 		match *v.borrow() {
 			VFunction(ref func) => {
 				match *func.borrow() {
-					NativeFunc(ref data) => Some(data.data),
-					_ => None
+					NativeFunc(ref data) => Ok(data.data),
+					_ => Err("Value is not a native function")
 				}
 			},
-			_ => None
+			_ => Err("Value is not a function")
 		}
 	}
 }
-impl ValueConv for ObjectData {
+impl ToValue for ObjectData {
 	fn to_value(&self) -> Value {
 		Gc::new(VObject(RefCell::new(self.clone())))
 	}
-	fn from_value(v:Value) -> Option<ObjectData> {
+}
+impl FromValue for ObjectData {
+	fn from_value(v:Value) -> Result<ObjectData, &'static str> {
 		match *v.borrow() {
-			VObject(ref obj) => Some(obj.clone().borrow().deref().clone()),
+			VObject(ref obj) => Ok(obj.clone().borrow().deref().clone()),
 			VFunction(ref func) => {
-				Some(match *func.borrow().deref() {
+				Ok(match *func.borrow().deref() {
 					NativeFunc(ref data) => data.object.clone(),
 					RegularFunc(ref data) => data.object.clone()
 				})
 			},
-			_ => None
+			_ => Err("Value is not a valid object")
 		}
 	}
 }
-impl ValueConv for Json {
+impl ToValue for Json {
 	fn to_value(&self) -> Value {
 		Gc::new(ValueData::from_json(self.clone()))
 	}
-	fn from_value(v:Value) -> Option<Json> {
-		Some(v.borrow().to_json())
+}
+impl FromValue for Json {
+	fn from_value(v:Value) -> Result<Json, &'static str> {
+		Ok(v.borrow().to_json())
 	}
 }
-impl ValueConv for () {
+impl ToValue for () {
 	fn to_value(&self) -> Value {
 		Gc::new(VNull)
 	}
-	fn from_value(_:Value) -> Option<()> {
-		Some(())
+}
+impl FromValue for () {
+	fn from_value(_:Value) -> Result<(), &'static str> {
+		Ok(())
 	}
 }
-/// A utility function that just calls ValueConv::from_value
-pub fn from_value<A: ValueConv>(v: Value) -> Option<A> {
-	ValueConv::from_value(v)
+/// A utility function that just calls FromValue::from_value
+pub fn from_value<A: FromValue>(v: Value) -> Result<A, &'static str> {
+	FromValue::from_value(v)
 }
 
-/// A utility function that just calls ValueConv::to_value
-pub fn to_value<A: ValueConv>(v: A) -> Value {
+/// A utility function that just calls ToValue::to_value
+pub fn to_value<A: ToValue>(v: A) -> Value {
 	v.to_value()
 }

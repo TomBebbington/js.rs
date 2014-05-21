@@ -1,4 +1,4 @@
-use js::value::{Value, ValueData, ValueConv, VUndefined, VObject, ResultValue, to_value, from_value};
+use js::value::{Value, ValueData, VUndefined, VObject, ResultValue, ToValue, FromValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 use std::str::MaybeOwned;
@@ -37,7 +37,7 @@ impl Property {
 	}
 }
 
-impl ValueConv for Property {
+impl ToValue for Property {
 	fn to_value(&self) -> Value {
 		let prop = ValueData::new_obj(None);
 		let prop_ref = prop.borrow();
@@ -49,9 +49,11 @@ impl ValueConv for Property {
 		prop_ref.set_field("set".into_maybe_owned(), self.set);
 		prop
 	}
-	fn from_value(v:Value) -> Option<Property> {
+}
+impl FromValue for Property {
+	fn from_value(v:Value) -> Result<Property, &'static str> {
 		let vb = v.borrow();
-		Some(Property {
+		Ok(Property {
 			configurable: from_value(vb.get_field("configurable".into_maybe_owned())).unwrap(),
 			enumerable: from_value(vb.get_field("enumerable".into_maybe_owned())).unwrap(),
 			writable: from_value(vb.get_field("writable".into_maybe_owned())).unwrap(),
@@ -94,7 +96,7 @@ pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let prop = if args.len() == 0 {
 		None
 	} else {
-		from_value::<MaybeOwned>(*args.get(0))
+		from_value::<MaybeOwned>(*args.get(0)).ok()
 	};
 	Ok(to_value::<bool>(prop.is_some() && match *this.borrow() {
 		VObject(ref obj) => obj.borrow().find(&prop.unwrap().into_owned()).is_some(),

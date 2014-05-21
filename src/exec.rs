@@ -309,7 +309,7 @@ impl Executor for Interpreter {
 					VNumber(_) | VInteger(_) => "number",
 					VString(_) => "string",
 					VFunction(_) => "function"
-				}.into_maybe_owned()))
+				}))
 			}
 		}
 	}
