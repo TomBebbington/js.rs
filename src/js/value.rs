@@ -349,12 +349,12 @@ impl<'s> ToValue for &'s str {
 		Gc::new(VString(StrBuf::from_str(*self)))
 	}
 }
-impl<'s> ToValue for ~str {
+impl ToValue for ~str {
 	fn to_value(&self) -> Value {
 		Gc::new(VString(StrBuf::from_str(self.as_slice())))
 	}
 }
-impl<'s> FromValue for ~str {
+impl FromValue for ~str {
 	fn from_value(v:Value) -> Result<~str, &'static str> {
 		Ok(v.borrow().to_str())
 	}
