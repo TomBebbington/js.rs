@@ -54,7 +54,7 @@ pub struct Parser {
 impl Parser {
 	/// Creates a new parser, using [tokens] as input
 	pub fn new(tokens: Vec<Token>) -> Parser {
-		return Parser {tokens: tokens, pos: 0};
+		Parser {tokens: tokens, pos: 0}
 	}
 	/// Parse all expressions in the token array
 	pub fn parse_all(&mut self) -> ParseResult {
@@ -308,7 +308,11 @@ impl Parser {
 				mk!(ConstExpr(CNum(num))),
 			_ => return Err(Expected(Vec::new(), token.clone(), "script"))
 		};
-		return if self.pos >= self.tokens.len() { Ok(expr) } else {self.parse_next(expr)};
+		if self.pos >= self.tokens.len() {
+			Ok(expr)
+		} else {
+			self.parse_next(expr)
+		}
 	}
 	fn parse_next(&mut self, expr:Expr) -> ParseResult {
 		let next = self.tokens.get(self.pos).clone();
@@ -399,16 +403,20 @@ impl Parser {
 			},
 			_ => carry_on = false
 		};
-		if carry_on && self.pos < self.tokens.len() { self.parse_next(result) } else {Ok(result)}
+		if carry_on && self.pos < self.tokens.len() {
+			self.parse_next(result)
+		} else {
+			Ok(result)
+		}
 	}
 	/// Returns an error if the next symbol is not tk
 	fn expect<'t>(&mut self, tk:TokenData, routine:&'t str) -> Result<(), ParseError<'t>> {
 		self.pos += 1;
 		let curr_tk = self.tokens.get(self.pos - 1).clone();
-		return if curr_tk.data != tk {
+		if curr_tk.data != tk {
 			Err(Expected(vec!(tk), curr_tk, routine))
 		} else {
 			Ok(())
-		};
+		}
 	}
 }

@@ -276,52 +276,52 @@ impl Add<ValueData, ValueData> for ValueData {
 }
 impl Sub<ValueData, ValueData> for ValueData {
 	fn sub(&self, other:&ValueData) -> ValueData {
-		return VNumber(self.to_num() - other.to_num());
+		VNumber(self.to_num() - other.to_num())
 	}
 }
 impl Mul<ValueData, ValueData> for ValueData {
 	fn mul(&self, other:&ValueData) -> ValueData {
-		return VNumber(self.to_num() * other.to_num());
+		VNumber(self.to_num() * other.to_num())
 	}
 }
 impl Div<ValueData, ValueData> for ValueData {
 	fn div(&self, other:&ValueData) -> ValueData {
-		return VNumber(self.to_num() / other.to_num());
+		VNumber(self.to_num() / other.to_num())
 	}
 }
 impl Rem<ValueData, ValueData> for ValueData {
 	fn rem(&self, other:&ValueData) -> ValueData {
-		return VNumber(self.to_num() % other.to_num());
+		VNumber(self.to_num() % other.to_num())
 	}
 }
 impl BitAnd<ValueData, ValueData> for ValueData {
 	fn bitand(&self, other:&ValueData) -> ValueData {
-		return VInteger(self.to_int() & other.to_int());
+		VInteger(self.to_int() & other.to_int())
 	}
 }
 impl BitOr<ValueData, ValueData> for ValueData {
 	fn bitor(&self, other:&ValueData) -> ValueData {
-		return VInteger(self.to_int() | other.to_int());
+		VInteger(self.to_int() | other.to_int())
 	}
 }
 impl BitXor<ValueData, ValueData> for ValueData {
 	fn bitxor(&self, other:&ValueData) -> ValueData {
-		return VInteger(self.to_int() ^ other.to_int());
+		VInteger(self.to_int() ^ other.to_int())
 	}
 }
 impl Shl<ValueData, ValueData> for ValueData {
 	fn shl(&self, other:&ValueData) -> ValueData {
-		return VInteger(self.to_int() << other.to_int());
+		VInteger(self.to_int() << other.to_int())
 	}
 }
 impl Shr<ValueData, ValueData> for ValueData {
 	fn shr(&self, other:&ValueData) -> ValueData {
-		return VInteger(self.to_int() >> other.to_int());
+		VInteger(self.to_int() >> other.to_int())
 	}
 }
 impl Not<ValueData> for ValueData {
 	fn not(&self) -> ValueData {
-		return VInteger(!self.to_int());
+		VInteger(!self.to_int())
 	}
 }
 /// Conversion to Javascript values from Rust values
