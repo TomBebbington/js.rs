@@ -29,6 +29,9 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<~str, ~str> {
 	map
 }
 fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+	if args.len() < 2 {
+		return Err(to_value("'assert' function expects assertion and description arguments"));
+	}
 	let val : bool = from_value(*args.get(0)).unwrap();
 	let desc : Value = *args.get(1);
 	if val {
