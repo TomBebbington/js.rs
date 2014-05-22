@@ -30,14 +30,22 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<~str, ~str> {
 }
 fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let val : bool = from_value(*args.get(0)).unwrap();
+	let desc : Value = *args.get(1);
 	if val {
-		Ok(to_value(true))
+		Ok(desc)
 	} else {
-		Err(to_value(false))
+		Err(desc)
 	}
 }
 fn main() {
-	for file in walk_dir(&Path::new("../tests/")).unwrap() {
+	let mut path = Path::new("tests");
+	if !path.is_dir() {
+		path = Path::new("../tests");
+	}
+	if !path.is_dir() {
+		fail!("Could not find tests directory");
+	}
+	for file in walk_dir(&path).unwrap() {
 		if file.is_file() && file.extension_str() == Some("js") {
 			let file_str = file.as_str().unwrap();
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
