@@ -1,7 +1,7 @@
 use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor};
-use ast::{CompEqual, CompNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
+use ast::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
 use ast::{LogAnd, LogOr};
 use ast::{Token, TokenData};
 use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
@@ -358,7 +358,11 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'=' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TCompOp(CompEqual));
+					if self.peek_for('=') {
+						self.push_token(TCompOp(CompStrictEqual));
+					} else {
+						self.push_token(TCompOp(CompEqual));
+					}
 				},
 				'=' => {
 					self.clear_buffer();
@@ -382,7 +386,11 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'!' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TCompOp(CompNotEqual));
+					if self.peek_for('=') {
+						self.push_token(TCompOp(CompStrictNotEqual));
+					} else {
+						self.push_token(TCompOp(CompNotEqual));
+					}
 				},
 				'\n' => {
 					self.clear_buffer();
