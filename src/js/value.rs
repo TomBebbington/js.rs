@@ -44,6 +44,13 @@ impl ValueData {
 		}
 		Gc::new(VObject(RefCell::new(obj)))
 	}
+	/// Returns true if the value is an object
+	pub fn is_object(&self) -> bool {
+		return match *self {
+			VObject(_) => true,
+			_ => false
+		}
+	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {
 		return match *self {
@@ -236,10 +243,12 @@ impl fmt::Show for ValueData {
 impl Eq for ValueData {
 	fn eq(&self, other:&ValueData) -> bool {
 		match (self.clone(), other.clone()) {
-			(VNull, VNull) | (VUndefined, VUndefined) => true,
-			(VBoolean(a), VBoolean(b)) if a == b => true,
+			(ref a, ref b) if a.is_null_or_undefined() && b.is_null_or_undefined() => true,
 			(VString(ref a), VString(ref b)) if a == b => true,
-			(VNumber(a), VNumber(b)) if a == b => true,
+			(VString(ref a), ref b) | (ref b, VString(ref a)) if a.as_slice() == b.to_str() => true,
+			(VBoolean(a), VBoolean(b)) if a == b => true,
+			(VNumber(a), VNumber(b)) if a == b && !a.is_nan() && !b.is_nan() => true,
+			(VNumber(a), ref b) | (ref b, VNumber(a)) if a == b.to_num() => true,
 			(VInteger(a), VInteger(b)) if a == b => true,
 			_ => false
 		}
