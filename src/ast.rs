@@ -58,6 +58,25 @@ impl fmt::Show for NumOp {
 	}
 }
 #[deriving(Clone, Eq)]
+/// An operation on a single value
+pub enum UnaryOp {
+	/// Unary increment (++) with the bool being true if it is before the variable
+	UnaryIncrement(bool),
+	/// Unary decrement (--) with the bool being true if it is before the variable
+	UnaryDecrement(bool),
+	/// Unary minus operator on a number or variable
+	UnaryMinus
+}
+impl fmt::Show for UnaryOp {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", match *self {
+			UnaryIncrement(_) => "++",
+			UnaryDecrement(_) => "--",
+			UnaryMinus => "-"
+		})
+	}
+}
+#[deriving(Clone, Eq)]
 /// A bitwise operation
 pub enum BitOp {
 	/// Bitwise and
@@ -175,6 +194,8 @@ impl Position {
 pub enum ExprDef {
 	/// Run a numeric operation on two numeric expressions
 	NumOpExpr(NumOp, Box<Expr>, Box<Expr>),
+	/// Run an operation on an expression
+	UnaryOpExpr(UnaryOp, Box<Expr>),
 	/// Run a bitwise operation on two integer expressions
 	BitOpExpr(BitOp, Box<Expr>, Box<Expr>),
 	/// Run a logical operation on two boolean expressions
@@ -260,6 +281,7 @@ impl fmt::Show for ExprDef {
 			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f, "function {}({}){}", name, args.connect(", "), expr),
 			ArrowFunctionDeclExpr(ref args, ref expr) => write!(f, "({}) => {}", args.connect(", "), expr),
 			NumOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
+			UnaryOpExpr(ref op, ref a) => write!(f, "{}{}", op, a),
 			BitOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
 			LogOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
 			CompOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),

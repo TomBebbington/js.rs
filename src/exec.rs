@@ -1,6 +1,7 @@
-use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, NumOpExpr, BitOpExpr, LogOpExpr, CompOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, NumOpExpr, BitOpExpr, LogOpExpr, CompOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
+use ast::UnaryMinus;
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{LogAnd, LogOr};
 use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
@@ -224,6 +225,14 @@ impl Executor for Interpreter {
 					OpDiv => *v_a / *v_b,
 					OpMod => *v_a % *v_b
 				}))
+			},
+			UnaryOpExpr(ref op, ref a) => {
+				let v_r_a = try!(self.run(*a));
+				let v_a = v_r_a.borrow();
+				Ok(match *op {
+					UnaryMinus => to_value(-v_a.to_num()),
+					_ => to_value(-1i32)
+				})
 			},
 			BitOpExpr(ref op, ref a, ref b) => {
 				let v_r_a = try!(self.run(*a));
