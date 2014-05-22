@@ -39,21 +39,21 @@ fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 fn main() {
 	for file in walk_dir(&Path::new("../tests/")).unwrap() {
-		let file_name = file.to_c_str().as_str().unwrap().to_owned();
-		if file_name.ends_with(".js") {
+		if file.is_file() && file.extension_str() == Some("js") {
+			let file_str = file.as_str();
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
 			lexer.lex().unwrap();
 			let mut parser = Parser::new(lexer.tokens);
 			let expr = match parser.parse_all() {
 				Ok(v) => v,
-				Err(v) => fail!("{}: {}", file_name, v)
+				Err(v) => fail!("{}: {}", file_str, v)
 			};
 			let mut engine : Interpreter = Executor::new();
 			engine.set_global("assert".into_maybe_owned(), to_value(assert));
 			let result : Result<Value, Value> = engine.run(&expr);
 			match result {
-				Ok(v) => println!("{}: {}", file_name, v.borrow()),
-				Err(v) => fail!("{}: Failed with {}", file_name, v.borrow())
+				Ok(v) => println!("{}: {}", file_str, v.borrow()),
+				Err(v) => fail!("{}: Failed with {}", file_str, v.borrow())
 			}
 		}
 	}
