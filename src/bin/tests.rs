@@ -67,8 +67,8 @@ fn main() {
 			engine.set_global("assert".into_maybe_owned(), to_value(assert));
 			let result : Result<Value, Value> = engine.run(&expr);
 			match result {
-				Ok(_) => println!("All tests passed: {} - {}", file_str, description),
-				Err(v) => fail!("Test failed: {} - {}: {}", file_str, description, v.borrow())
+				Ok(_) => println!("{}: All tests passed for {}", file_str, description),
+				Err(v) => fail!("{}: Test failed for {} in {}", file_str, v.borrow(), description)
 			}
 		}
 	}
