@@ -245,9 +245,9 @@ impl Executor for Interpreter {
 				let v_b = v_r_b.borrow();
 				Ok(to_value(match *op {
 					CompEqual => v_r_a.ptr_eq(&v_r_b) || v_a == v_b,
-					CompNotEqual => !v_r_a.ptr_eq(&v_r_b) || v_a != v_b,
+					CompNotEqual => !v_r_a.ptr_eq(&v_r_b) && v_a != v_b,
 					CompStrictEqual => v_r_a.ptr_eq(&v_r_b) || v_a == v_b,
-					CompStrictNotEqual => !v_r_a.ptr_eq(&v_r_b) || v_a != v_b,
+					CompStrictNotEqual => !v_r_a.ptr_eq(&v_r_b) && v_a != v_b,
 					CompGreaterThan => v_a.to_num() > v_b.to_num(),
 					CompGreaterThanOrEqual => v_a.to_num() >= v_b.to_num(),
 					CompLessThan => v_a.to_num() < v_b.to_num(),
