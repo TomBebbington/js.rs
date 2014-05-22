@@ -15,12 +15,11 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<~str, ~str> {
 	for tk in tokens.iter() {
 		match tk.data {
 			TComment(ref comm) => {
-				let comm = comm.as_slice();
-				for (_, to) in comm.match_indices("// @") {
-					let current = comm.slice_from(to);
-					let space_ind = current.find(' ').unwrap();
-					let key = comm.slice_to(space_ind);
-					let value = comm.slice_chars(space_ind, current.find('\n').unwrap());
+				let current = comm.as_slice();
+				if current.starts_with(" @") {
+					let space_ind = current.slice_from(1).find(' ').unwrap() + 1;
+					let key = comm.slice_chars(2, space_ind);
+					let value = comm.slice_from(space_ind);
 					map.insert(key.into_owned(), value.into_owned());
 				}
 			},
@@ -40,9 +39,14 @@ fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 fn main() {
 	for file in walk_dir(&Path::new("../tests/")).unwrap() {
 		if file.is_file() && file.extension_str() == Some("js") {
-			let file_str = file.as_str();
+			let file_str = file.as_str().unwrap();
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
 			lexer.lex().unwrap();
+			let attributes = find_attrs(lexer.tokens.clone());
+			let description = match attributes.find(&"description".into_owned()) {
+				Some(desc) => desc,
+				None => fail!("{} does not have @description metadata", file_str)
+			};
 			let mut parser = Parser::new(lexer.tokens);
 			let expr = match parser.parse_all() {
 				Ok(v) => v,
@@ -52,8 +56,8 @@ fn main() {
 			engine.set_global("assert".into_maybe_owned(), to_value(assert));
 			let result : Result<Value, Value> = engine.run(&expr);
 			match result {
-				Ok(v) => println!("{}: {}", file_str, v.borrow()),
-				Err(v) => fail!("{}: Failed with {}", file_str, v.borrow())
+				Ok(_) => println!("All tests passed: {} - {}", file_str, description),
+				Err(v) => fail!("Test failed: {} - {}: {}", file_str, description, v.borrow())
 			}
 		}
 	}
