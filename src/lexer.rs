@@ -64,8 +64,8 @@ pub struct Lexer<B> {
 	column_number : uint,
 	/// The reader
 	buffer: B,
-	/// The current character
-	current_char: Option<char>
+	/// The peeked character buffer
+	peek_buffer: StrBuf
 }
 impl<B:Buffer> Lexer<B> {
 	/// Creates a new lexer with empty buffers
@@ -83,7 +83,7 @@ impl<B:Buffer> Lexer<B> {
 			line_number: 1,
 			column_number: 0,
 			buffer: buffer,
-			current_char: None
+			peek_buffer: StrBuf::new()
 		};
 	}
 	fn clear_buffer(&mut self) {
@@ -120,18 +120,34 @@ impl<B:Buffer> Lexer<B> {
 		lexer.tokens
 	}
 	fn next(&mut self) -> IoResult<char> {
-		match self.current_char {
-			Some(c) => {
-				self.current_char = None;
-				Ok(c)
-			}
-			None => self.buffer.read_char()
+		if self.peek_buffer.len() == 0 {
+			self.buffer.read_char()
+		} else {
+			Ok(self.peek_buffer.pop_char().unwrap())
 		}
 	}
 	fn peek(&mut self) -> IoResult<char> {
-		let ch = try!(self.buffer.read_char());
-		self.current_char = Some(ch);
-		Ok(ch)
+		Ok(if self.peek_buffer.len() == 0 {
+			let ch = try!(self.buffer.read_char());
+			self.peek_buffer.push_char(ch);
+			ch
+		} else {
+			self.peek_buffer.as_slice().char_at(self.peek_buffer.len() - 1)
+		})
+	}
+	fn peek_for(&mut self, peek:char) -> bool {
+		if self.peek_buffer.len() > 0 {
+			self.peek_buffer.pop_char() == Some(peek)
+		} else {
+			match self.buffer.read_char() {
+				Ok(ch) if ch == peek => true,
+				Ok(ch) if ch != peek => {
+					self.peek_buffer.push_char(ch);
+					false
+				},
+				_ => false
+			}
+		}
 	}
 	/// Processes an input stream from a BufferedReader into an array of tokens
 	pub fn lex(&mut self) -> IoResult<()> {
@@ -197,7 +213,6 @@ impl<B:Buffer> Lexer<B> {
 					self.current_comment = None;
 				},
 				'*' if self.current_comment == Some(MultiLineComment) && self.peek() == Ok('/') => {
-					self.current_char = None;
 					let comment = self.comment_buffer.clone().into_owned();
 					self.push_token(TComment(comment));
 					self.comment_buffer.truncate(0);
@@ -221,8 +236,7 @@ impl<B:Buffer> Lexer<B> {
 				'\\' if self.string_start.is_some() => self.escaped = true,
 				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
 				'"' if self.string_start.is_none() => self.string_start = Some(DoubleQuote),
-				'0' if self.peek() == Ok('x') => {
-					self.current_char = None;
+				'0' if self.peek_for('x') => {
 					self.current_number = Some(HexadecimalNumber);
 				},
 				'0' if self.ident_buffer.len() == 0 && self.current_number.is_none() => {
@@ -292,12 +306,10 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TQuestion);
 				},
-				'/' if self.peek() == Ok('/') => {
-					self.current_char = None;
+				'/' if self.peek_for('/') => {
 					self.current_comment = Some(SingleLineComment);
 				},
-				'/' if self.peek() == Ok('*') => {
-					self.current_char = None;
+				'/' if self.peek_for('*') => {
 					self.current_comment = Some(MultiLineComment);
 				},
 				'/' => {
@@ -320,8 +332,7 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpMod));
 				},
-				'|' if self.peek() == Ok('|') => {
-					self.current_char = None;
+				'|' if self.peek_for('|') => {
 					self.clear_buffer();
 					self.push_token(TLogOp(LogOr));
 				},
@@ -329,8 +340,7 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitOr));
 				},
-				'&' if self.peek() == Ok('&') => {
-					self.current_char = None;
+				'&' if self.peek_for('&') => {
 					self.clear_buffer();
 					self.push_token(TLogOp(LogAnd));
 				},
@@ -342,13 +352,11 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitXor));
 				},
-				'=' if self.peek() == Ok('>') => {
-					self.current_char = None;
+				'=' if self.peek_for('>') => {
 					self.clear_buffer();
 					self.push_token(TArrow);
 				},
-				'=' if self.peek() == Ok('=') => {
-					self.current_char = None;
+				'=' if self.peek_for('=') => {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompEqual));
 				},
@@ -356,8 +364,7 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TEqual);
 				},
-				'<' if self.peek() == Ok('=') => {
-					self.current_char = None;
+				'<' if self.peek_for('=') => {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompLessThanOrEqual));
 				},
@@ -365,8 +372,7 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompLessThan));
 				},
-				'>' if self.peek() == Ok('=') => {
-					self.current_char = None;
+				'>' if self.peek_for('=') => {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompGreaterThanOrEqual));
 				},
@@ -374,8 +380,7 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompGreaterThan));
 				},
-				'!' if self.peek() == Ok('=') => {
-					self.current_char = None;
+				'!' if self.peek_for('=') => {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompNotEqual));
 				},
