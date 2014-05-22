@@ -1,6 +1,6 @@
 use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
-use ast::{BitAnd, BitOr, BitXor};
+use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
 use ast::{LogAnd, LogOr};
 use ast::{Token, TokenData};
@@ -372,6 +372,10 @@ impl<B:Buffer> Lexer<B> {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompLessThanOrEqual));
 				},
+				'<' if self.peek_for('<') => {
+					self.clear_buffer();
+					self.push_token(TBitOp(BitShl));
+				},
 				'<' => {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompLessThan));
@@ -379,6 +383,10 @@ impl<B:Buffer> Lexer<B> {
 				'>' if self.peek_for('=') => {
 					self.clear_buffer();
 					self.push_token(TCompOp(CompGreaterThanOrEqual));
+				},
+				'>' if self.peek_for('>') => {
+					self.clear_buffer();
+					self.push_token(TBitOp(BitShr));
 				},
 				'>' => {
 					self.clear_buffer();
