@@ -1,28 +1,33 @@
-#![feature(globs)]
 #![crate_type = "bin"]
 extern crate script;
+extern crate collections;
 use script::lexer::Lexer;
 use script::parser::Parser;
 use script::exec::{Executor, Interpreter};
 use script::ast::{Token, TComment};
 use script::js::value::{Value, ResultValue, to_value, from_value};
+use collections::treemap::TreeMap;
 use std::path::posix::Path;
 use std::io::fs::{File, walk_dir};
 use std::io::BufferedReader;
-fn find_attr(tokens: Vec<Token>, attr:~str) -> Option<~str> {
+fn find_attrs(tokens: Vec<Token>) -> TreeMap<~str, ~str> {
+	let mut map = TreeMap::new();
 	for tk in tokens.iter() {
 		match tk.data {
 			TComment(ref comm) => {
-				let comm = comm.clone();
-				let desc_loc = comm.find_str("@" + attr);
-				if desc_loc.is_some() {
-					return Some(comm.slice_from(desc_loc.unwrap() + attr.len() + 2).split('\n').next().unwrap().to_owned());
+				let comm = comm.as_slice();
+				for (_, to) in comm.match_indices("// @") {
+					let current = comm.slice_from(to);
+					let space_ind = current.find(' ').unwrap();
+					let key = comm.slice_to(space_ind);
+					let value = comm.slice_chars(space_ind, current.find('\n').unwrap());
+					map.insert(key.into_owned(), value.into_owned());
 				}
 			},
 			_ => ()
 		}
 	}
-	None
+	map
 }
 fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let val : bool = from_value(*args.get(0)).unwrap();
