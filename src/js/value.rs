@@ -409,11 +409,24 @@ impl FromValue for bool {
 		Ok(v.borrow().is_true())
 	}
 }
+impl<'s, T:ToValue> ToValue for &'s [T] {
+	fn to_value(&self) -> Value {
+		let mut arr = TreeMap::new();
+		let mut i = 0;
+		for item in self.iter() {
+			arr.insert(i.to_str(), Property::new(item.to_value()));
+			i += 1;
+		}
+		to_value(arr)
+	}
+}
 impl<T:ToValue> ToValue for Vec<T> {
 	fn to_value(&self) -> Value {
 		let mut arr = TreeMap::new();
-		for i in range(0, self.len()) {
-			arr.insert(i.to_str(), Property::new(self.get(i).to_value()));
+		let mut i = 0;
+		for item in self.iter() {
+			arr.insert(i.to_str(), Property::new(item.to_value()));
+			i += 1;
 		}
 		to_value(arr)
 	}
