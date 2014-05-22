@@ -1,8 +1,6 @@
 #![feature(globs)]
 #![crate_type = "bin"]
 extern crate script;
-extern crate test;
-extern crate collections;
 use script::lexer::Lexer;
 use script::parser::Parser;
 use script::exec::{Executor, Interpreter};
