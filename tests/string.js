@@ -1,4 +1,4 @@
-//@description String unit tests
+// @description String unit tests
 hello = "Hello, world!";
 assert(hello.length == 13, "String length");
 assert(hello[2] == 'l', "String index");
