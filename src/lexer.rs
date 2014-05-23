@@ -90,7 +90,7 @@ impl<B:Buffer> Lexer<B> {
 		if self.ident_buffer.len() > 0 {
 			let ident = self.ident_buffer.clone();
 			self.push_token(TIdent(ident));
-			self.ident_buffer.truncate(0);
+			self.ident_buffer.clear();
 		}
 		if self.current_number.is_some() {
 			let radix = match self.current_number.unwrap() {
@@ -103,7 +103,7 @@ impl<B:Buffer> Lexer<B> {
 				None => fail!("{}:{}: Could not parse '{}' as a base {} number", self.line_number, self.column_number, self.num_buffer, radix)
 			};
 			self.push_token(TNumber(num));
-			self.num_buffer.truncate(0);
+			self.num_buffer.clear();
 			self.current_number = None;
 		}
 	}
@@ -212,13 +212,13 @@ impl<B:Buffer> Lexer<B> {
 				'\n' if self.current_comment == Some(SingleLineComment) => {
 					let comment = self.comment_buffer.clone();
 					self.push_token(TComment(comment));
-					self.comment_buffer.truncate(0);
+					self.comment_buffer.clear();
 					self.current_comment = None;
 				},
 				'*' if self.current_comment == Some(MultiLineComment) && self.peek() == Ok('/') => {
 					let comment = self.comment_buffer.clone();
 					self.push_token(TComment(comment));
-					self.comment_buffer.truncate(0);
+					self.comment_buffer.clear();
 					self.current_comment = None;
 				},
 				_ if self.current_comment.is_some() => {
@@ -228,13 +228,13 @@ impl<B:Buffer> Lexer<B> {
 					self.string_start = None;
 					let string = self.string_buffer.clone();
 					self.push_token(TString(string));
-					self.string_buffer.truncate(0);
+					self.string_buffer.clear();
 				},
 				'\'' if self.string_start == Some(SingleQuote) => {
 					self.string_start = None;
 					let string = self.string_buffer.clone();
 					self.push_token(TString(string));
-					self.string_buffer.truncate(0);
+					self.string_buffer.clear();
 				},
 				'\\' if self.string_start.is_some() => self.escaped = true,
 				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
