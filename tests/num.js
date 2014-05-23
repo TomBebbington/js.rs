@@ -8,3 +8,4 @@ assert((5 + 2) == 7, "Number addition");
 assert((5 - 2) == 3, "Number subtraction");
 assert((5 / 2) == 2.5, "Number division");
 assert((5 * 2) == 10, "Number multiplication");
+assert((3 + 4 * 5) == 23, "Operator precedence");
