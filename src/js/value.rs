@@ -221,7 +221,7 @@ impl fmt::Show for ValueData {
 			VUndefined => write!(f, "undefined"),
 			VBoolean(v) => write!(f, "{}", v),
 			VString(ref v) => write!(f, "{}", v),
-			VNumber(v) => write!(f, "{}", v),
+			VNumber(v) => write!(f, "{}", f64::to_str_digits(v, 15)),
 			VObject(ref v) => {
 				try!(write!(f, "{}", "{"));
 				match v.borrow().iter().last() {
