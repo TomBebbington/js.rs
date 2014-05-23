@@ -13,15 +13,14 @@ use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::gc::Gc;
 use std::cell::RefCell;
-use std::str::MaybeOwned;
 /// An execution engine
 pub trait Executor {
 	/// Makes a new execution engine
 	fn new() -> Self;
 	/// Sets a global variable
-	fn set_global(&mut self, name:MaybeOwned, val:Value) -> Value;
+	fn set_global(&mut self, name:StrBuf, val:Value) -> Value;
 	/// Gets a global variable
-	fn get_global(&self, name:MaybeOwned) -> Value;
+	fn get_global(&self, name:StrBuf) -> Value;
 	/// Make a new scope
 	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>>;
 	/// Destroy the current scope
@@ -53,10 +52,10 @@ impl Executor for Interpreter {
 		uri::init(global);
 		Interpreter {global: global, scopes: Vec::new()}
 	}
-	fn set_global(&mut self, name:MaybeOwned, val:Value) -> Value {
+	fn set_global(&mut self, name:StrBuf, val:Value) -> Value {
 		self.global.borrow().set_field(name, val)
 	}
-	fn get_global(&self, name:MaybeOwned) -> Value {
+	fn get_global(&self, name:StrBuf) -> Value {
 		self.global.borrow().get_field(name)
 	}
 	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>> {
@@ -89,7 +88,7 @@ impl Executor for Interpreter {
 			LocalExpr(ref name) => {
 				let mut value = Gc::new(VUndefined);
 				for scope in self.scopes.iter().rev() {
-					match scope.borrow().borrow().find(&name.to_owned()) {
+					match scope.borrow().borrow().find(name) {
 						Some(v) => {
 							value = v.value.clone();
 							break;
@@ -98,30 +97,30 @@ impl Executor for Interpreter {
 					}
 				}
 				Ok(if value.borrow().is_undefined() {
-					self.global.borrow().get_field(name.clone().into_maybe_owned())
+					self.global.borrow().get_field(name.clone())
 				} else {
 					value
 				})
 			},
 			GetConstFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
-				Ok(val_obj.borrow().get_field(field.clone().into_maybe_owned()))
+				Ok(val_obj.borrow().get_field(field.clone()))
 			},
 			GetFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
 				let val_field = try!(self.run(*field));
-				Ok(val_obj.borrow().get_field(val_field.borrow().to_str().into_maybe_owned()))
+				Ok(val_obj.borrow().get_field_slice(val_field.borrow().to_str()))
 			},
 			CallExpr(ref callee, ref args) => {
 				let (this, func) = match callee.def {
 					GetConstFieldExpr(ref obj, ref field) => {
 						let obj = try!(self.run(*obj));
-						(obj, obj.borrow().get_field(field.clone().into_maybe_owned()))
+						(obj, obj.borrow().get_field(field.clone()))
 					},
 					GetFieldExpr(ref obj, ref field) => {
 						let obj = try!(self.run(*obj));
 						let field = try!(self.run(*field));
-						(obj, obj.borrow().get_field(field.borrow().to_str().into_maybe_owned()))
+						(obj, obj.borrow().get_field_slice(field.borrow().to_str()))
 					},
 					_ => (self.global.clone(), try!(self.run(callee.clone())))
 				};
@@ -185,7 +184,7 @@ impl Executor for Interpreter {
 			ObjectDeclExpr(ref map) => {
 				let obj = ValueData::new_obj(Some(self.global));
 				for (key, val) in map.iter() {
-					obj.borrow().set_field(key.clone().into_maybe_owned(), try!(self.run(val)));
+					obj.borrow().set_field(key.clone(), try!(self.run(val)));
 				}
 				Ok(obj)
 			},
@@ -194,18 +193,18 @@ impl Executor for Interpreter {
 				let mut index : i32 = 0;
 				for val in arr.iter() {
 					let val = try!(self.run(val));
-					arr_map.borrow().set_field(index.to_str().into_maybe_owned(), val);
+					arr_map.borrow().set_field_slice(index.to_str(), val);
 					index += 1;
 				}
-				arr_map.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), self.get_global("Array".into_maybe_owned()).borrow().get_field(PROTOTYPE.into_maybe_owned()));
-				arr_map.borrow().set_field("length".into_maybe_owned(), to_value(index));
+				arr_map.borrow().set_field_slice(INSTANCE_PROTOTYPE, self.get_global("Array".into_strbuf()).borrow().get_field_slice(PROTOTYPE));
+				arr_map.borrow().set_field_slice("length", to_value(index));
 				Ok(arr_map)
 			},
 			FunctionDeclExpr(ref name, ref args, ref expr) => {
 				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));
 				let val = Gc::new(VFunction(RefCell::new(function)));
 				if name.is_some() {
-					self.global.borrow().set_field(name.clone().unwrap().into_maybe_owned(), val);
+					self.global.borrow().set_field(name.clone().unwrap(), val);
 				}
 				Ok(val)
 			},
@@ -282,7 +281,7 @@ impl Executor for Interpreter {
 					v_args.push(try!(self.run(arg)));
 				}
 				let this = Gc::new(VObject(RefCell::new(TreeMap::new())));
-				this.borrow().set_field(INSTANCE_PROTOTYPE.into_maybe_owned(), func.borrow().get_field(PROTOTYPE.into_maybe_owned()));
+				this.borrow().set_field_slice(INSTANCE_PROTOTYPE, func.borrow().get_field_slice(PROTOTYPE));
 				Ok(match *func.borrow() {
 					VFunction(ref func) => {
 						try!(func.borrow().call(self, this, Gc::new(VNull), v_args));
@@ -303,11 +302,11 @@ impl Executor for Interpreter {
 				let val = try!(self.run(*val_e));
 				match ref_e.def {
 					LocalExpr(ref name) => {
-						self.global.borrow().set_field(name.clone().into_maybe_owned(), val);
+						self.global.borrow().set_field(name.clone(), val);
 					},
 					GetConstFieldExpr(ref obj, ref field) => {
 						let val_obj = try!(self.run(*obj));
-						val_obj.borrow().set_field(field.clone().into_maybe_owned(), val);
+						val_obj.borrow().set_field(field.clone(), val);
 					},
 					_ => ()
 				}

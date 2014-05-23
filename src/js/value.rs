@@ -5,7 +5,6 @@ use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null}
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
-use std::str::MaybeOwned;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::iter::FromIterator;
@@ -39,8 +38,8 @@ impl ValueData {
 	pub fn new_obj(global: Option<Value>) -> Value {
 		let mut obj : ObjectData = TreeMap::new();
 		if global.is_some() {
-			let obj_proto = global.unwrap().borrow().get_field("Object".into_maybe_owned()).borrow().get_field(PROTOTYPE.into_maybe_owned());
-			obj.insert(INSTANCE_PROTOTYPE.to_owned(), Property::new(obj_proto));
+			let obj_proto = global.unwrap().borrow().get_field_slice("Object").borrow().get_field_slice(PROTOTYPE);
+			obj.insert(INSTANCE_PROTOTYPE.into_strbuf(), Property::new(obj_proto));
 		}
 		Gc::new(VObject(RefCell::new(obj)))
 	}
@@ -118,7 +117,7 @@ impl ValueData {
 		}
 	}
 	/// Resolve the property in the object
-	pub fn get_prop(&self, field:MaybeOwned) -> Option<Property> {
+	pub fn get_prop(&self, field:StrBuf) -> Option<Property> {
 		let obj : ObjectData = match *self {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) => {
@@ -130,9 +129,9 @@ impl ValueData {
 			},
 			_ => return None
 		};
-		match obj.find(&field.clone().into_owned()) {
+		match obj.find(&field) {
 			Some(val) => Some(*val),
-			None => match obj.find(&PROTOTYPE.to_owned()) {
+			None => match obj.find(&PROTOTYPE.into_strbuf()) {
 				Some(prop) => 
 					prop.value.borrow().get_prop(field),
 				None => None
@@ -140,43 +139,55 @@ impl ValueData {
 		}
 	}
 	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
-	pub fn get_field(&self, field:MaybeOwned) -> Value {
+	pub fn get_field(&self, field:StrBuf) -> Value {
 		match self.get_prop(field) {
 			Some(prop) => prop.value,
 			None => Gc::new(VUndefined)
 		}
 	}
+	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
+	pub fn get_field_slice<'t>(&self, field:&'t str) -> Value {
+		self.get_field(field.into_strbuf())
+	}
 	/// Set the field in the value
-	pub fn set_field(&self, field:MaybeOwned, val:Value) -> Value {
+	pub fn set_field(&self, field:StrBuf, val:Value) -> Value {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().insert(field.into_owned(), Property::new(val));
+				obj.borrow_mut().insert(field.clone(), Property::new(val));
 			},
 			VFunction(ref func) => {
 				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field.into_owned(), Property::new(val)),
-					RegularFunc(ref mut f) => f.object.insert(field.into_owned(), Property::new(val))
+					NativeFunc(ref mut f) => f.object.insert(field.clone(), Property::new(val)),
+					RegularFunc(ref mut f) => f.object.insert(field.clone(), Property::new(val))
 				};
 			},
 			_ => ()
 		}
 		val
 	}
+	/// Set the field in the value
+	pub fn set_field_slice<'t>(&self, field:&'t str, val:Value) -> Value {
+		self.set_field(field.into_strbuf(), val)
+	}
 	/// Set the property in the value
-	pub fn set_prop(&self, field:MaybeOwned, prop:Property) -> Property {
+	pub fn set_prop(&self, field:StrBuf, prop:Property) -> Property {
 		match *self {
 			VObject(ref obj) => {
-				obj.borrow_mut().insert(field.into_owned(), prop);
+				obj.borrow_mut().insert(field.clone(), prop);
 			},
 			VFunction(ref func) => {
 				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field.into_owned(), prop),
-					RegularFunc(ref mut f) => f.object.insert(field.into_owned(), prop)
+					NativeFunc(ref mut f) => f.object.insert(field.clone(), prop),
+					RegularFunc(ref mut f) => f.object.insert(field.clone(), prop)
 				};
 			},
 			_ => ()
 		}
 		prop
+	}
+	/// Set the property in the value
+	pub fn set_prop_slice<'t>(&self, field:&'t str, prop:Property) -> Property {
+		self.set_prop(field.into_strbuf(), prop)
 	}
 	/// Convert from a JSON value to a JS value
 	pub fn from_json(json:Json) -> ValueData {
@@ -188,14 +199,14 @@ impl ValueData {
 				let mut i = 0;
 				let mut data : ObjectData = FromIterator::from_iter(vs.iter().map(|json| {
 					i += 1;
-					((i - 1).to_str(), Property::new(to_value(json.clone())))
+					((i - 1).to_str().into_strbuf(), Property::new(to_value(json.clone())))
 				}));
-				data.insert("length".to_owned(), Property::new(to_value(vs.len() as i32)));
+				data.insert("length".into_strbuf(), Property::new(to_value(vs.len() as i32)));
 				VObject(RefCell::new(data))
 			},
 			Object(obj) => {
 				let data : ObjectData = FromIterator::from_iter(obj.iter().map(|(key, json)| {
-					(key.to_owned(), Property::new(to_value(json.clone())))
+					(key.clone(), Property::new(to_value(json.clone())))
 				}));
 				VObject(RefCell::new(data))
 			},
@@ -263,7 +274,7 @@ impl ToJson for ValueData {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
 					if k.as_slice() != INSTANCE_PROTOTYPE.as_slice() {
-						nobj.insert(StrBuf::from_str(*k), v.value.borrow().to_json());
+						nobj.insert(k.clone(), v.value.borrow().to_json());
 					}
 				}
 				Object(box nobj)
@@ -358,26 +369,6 @@ impl<'s> ToValue for &'s str {
 		Gc::new(VString(StrBuf::from_str(*self)))
 	}
 }
-impl ToValue for ~str {
-	fn to_value(&self) -> Value {
-		Gc::new(VString(StrBuf::from_str(self.as_slice())))
-	}
-}
-impl FromValue for ~str {
-	fn from_value(v:Value) -> Result<~str, &'static str> {
-		Ok(v.borrow().to_str())
-	}
-}
-impl<'s> ToValue for MaybeOwned<'s> {
-	fn to_value(&self) -> Value {
-		Gc::new(VString(StrBuf::from_str(self.as_slice())))
-	}
-}
-impl<'s> FromValue for MaybeOwned<'s> {
-	fn from_value(v:Value) -> Result<MaybeOwned<'s>, &'static str> {
-		Ok(v.borrow().to_str().into_maybe_owned())
-	}
-}
 impl ToValue for char {
 	fn to_value(&self) -> Value {
 		Gc::new(VString(StrBuf::from_char(1, *self)))
@@ -423,7 +414,7 @@ impl<'s, T:ToValue> ToValue for &'s [T] {
 		let mut arr = TreeMap::new();
 		let mut i = 0;
 		for item in self.iter() {
-			arr.insert(i.to_str(), Property::new(item.to_value()));
+			arr.insert(i.to_str().into_strbuf(), Property::new(item.to_value()));
 			i += 1;
 		}
 		to_value(arr)
@@ -434,7 +425,7 @@ impl<T:ToValue> ToValue for Vec<T> {
 		let mut arr = TreeMap::new();
 		let mut i = 0;
 		for item in self.iter() {
-			arr.insert(i.to_str(), Property::new(item.to_value()));
+			arr.insert(i.to_str().into_strbuf(), Property::new(item.to_value()));
 			i += 1;
 		}
 		to_value(arr)
@@ -442,10 +433,10 @@ impl<T:ToValue> ToValue for Vec<T> {
 }
 impl<T:FromValue> FromValue for Vec<T> {
 	fn from_value(v:Value) -> Result<Vec<T>, &'static str> {
-		let len = v.borrow().get_field("length".into_maybe_owned()).borrow().to_int();
+		let len = v.borrow().get_field_slice("length").borrow().to_int();
 		let mut vec = Vec::with_capacity(len as uint);
 		for i in range(0, len) {
-			vec.push(try!(from_value(v.borrow().get_field(i.to_str().into_maybe_owned()))))
+			vec.push(try!(from_value(v.borrow().get_field_slice(i.to_str()))))
 		}
 		Ok(vec)
 	}

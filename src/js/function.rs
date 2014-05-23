@@ -22,11 +22,11 @@ impl Function {
 				func(this, callee, args)
 			}, RegularFunc(ref data) => {
 				let scope = exe.make_scope();
-				scope.borrow().borrow_mut().insert("this".to_owned(), Property::new(this));
+				scope.borrow().borrow_mut().insert("this".into_strbuf(), Property::new(this));
 				for i in range(0, data.args.len()) {
 					let name = data.args.get(i);
 					let expr = args.get(i);
-					scope.borrow().borrow_mut().insert(name.to_owned(), Property::new(*expr));
+					scope.borrow().borrow_mut().insert(name.to_strbuf(), Property::new(*expr));
 				}
 				let result = exe.run(&data.expr);
 				exe.destroy_scope();
@@ -49,7 +49,7 @@ impl RegularFunction {
 	/// Make a new regular function
 	pub fn new(expr : Expr, args: Vec<StrBuf>) -> RegularFunction {
 		let mut obj = TreeMap::new();
-		obj.insert("arguments".to_owned(), Property::new(Gc::new(VInteger(args.len() as i32))));
+		obj.insert("arguments".into_strbuf(), Property::new(Gc::new(VInteger(args.len() as i32))));
 		RegularFunction {object: obj, expr: expr, args: args}
 	}
 }
@@ -76,5 +76,5 @@ pub fn _create(_ : Value) -> Value {
 /// Initialise the global object with the `Function` object
 pub fn init(global:Value) {
 	let global_ptr = global.borrow();
-	global_ptr.set_field("Function".into_maybe_owned(), _create(global));
+	global_ptr.set_field_slice("Function", _create(global));
 }

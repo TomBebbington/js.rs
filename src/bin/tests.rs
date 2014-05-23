@@ -64,7 +64,7 @@ fn main() {
 				Err(v) => fail!("{}: {}", file_str, v)
 			};
 			let mut engine : Interpreter = Executor::new();
-			engine.set_global("assert".into_maybe_owned(), to_value(assert));
+			engine.set_global("assert".into_strbuf(), to_value(assert));
 			let result : Result<Value, Value> = engine.run(&expr);
 			match result {
 				Ok(_) => println!("{}: All tests passed for {}", file_str, description),
