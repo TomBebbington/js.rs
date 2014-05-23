@@ -5,9 +5,9 @@ use collections::treemap::TreeMap;
 /// A Javascript Constant
 pub enum Const {
 	/// A UTF-8 string
-	CString(~str),
+	CString(StrBuf),
 	/// A regular expression
-	CRegExp(~str, bool, bool),
+	CRegExp(StrBuf, bool, bool),
 	/// A 64-bit floating-point number
 	CNum(f64),
 	/// A 32-bit integer
@@ -207,9 +207,9 @@ pub enum ExprDef {
 	/// Run several expressions
 	BlockExpr(Vec<Expr>),
 	/// Load a reference to a value
-	LocalExpr(~str),
+	LocalExpr(StrBuf),
 	/// Gets the cosntant field of the expression
-	GetConstFieldExpr(Box<Expr>, ~str),
+	GetConstFieldExpr(Box<Expr>, StrBuf),
 	/// Gets the field of an expression
 	GetFieldExpr(Box<Expr>, Box<Expr>),
 	/// Call a function with some arguments
@@ -221,13 +221,13 @@ pub enum ExprDef {
 	/// Run blocks whose cases match the expression
 	SwitchExpr(Box<Expr>, Vec<(Expr, Vec<Expr>)>, Option<Box<Expr>>),
 	/// Create an object
-	ObjectDeclExpr(Box<TreeMap<~str, Expr>>),
+	ObjectDeclExpr(Box<TreeMap<StrBuf, Expr>>),
 	/// Create an array with items inside
 	ArrayDeclExpr(Vec<Expr>),
 	/// Create a function with the given name, arguments, and expression
-	FunctionDeclExpr(Option<~str>, Vec<~str>, Box<Expr>),
+	FunctionDeclExpr(Option<StrBuf>, Vec<StrBuf>, Box<Expr>),
 	/// Create an arrow function with the fiven arguments and expression
-	ArrowFunctionDeclExpr(Vec<~str>, Box<Expr>),
+	ArrowFunctionDeclExpr(Vec<StrBuf>, Box<Expr>),
 	/// Construct an object from the function and arguments given
 	ConstructExpr(Box<Expr>, Vec<Expr>),
 	/// Return the expression from a function
@@ -294,7 +294,7 @@ impl fmt::Show for ExprDef {
 	}
 }
 
-impl fmt::Show for TreeMap<~str, Expr> {
+impl fmt::Show for TreeMap<StrBuf, Expr> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		try!(write!(f, "{}", "{ "));
 		match self.iter().last() {
@@ -340,7 +340,7 @@ impl fmt::Show for Token {
 /// A single token of Javacript code - a single word, symbol or constant
 pub enum TokenData {
 	/// A string literal
-	TString(~str),
+	TString(StrBuf),
 	/// A semicolon (;)
 	TSemicolon,
 	/// A colon
@@ -352,7 +352,7 @@ pub enum TokenData {
 	/// A comma
 	TComma,
 	/// An identity literal
-	TIdent(~str),
+	TIdent(StrBuf),
 	/// An opening bracket
 	TOpenParen,
 	/// A closing bracket
@@ -380,7 +380,7 @@ pub enum TokenData {
 	/// A comparison operation
 	TCompOp(CompOp),
 	/// A comment
-	TComment(~str)
+	TComment(StrBuf)
 }
 impl fmt::Show for TokenData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

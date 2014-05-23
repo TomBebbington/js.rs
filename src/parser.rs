@@ -91,7 +91,7 @@ impl Parser {
 				try!(self.expect(TCloseParen, "if block"));
 				let expr = try!(self.parse());
 				let next = self.tokens.get(self.pos + 1).clone();
-				Ok(Some(mk!(IfExpr(box cond, box expr, if next.data == TIdent("else".to_owned()) {
+				Ok(Some(mk!(IfExpr(box cond, box expr, if next.data == TIdent("else".to_strbuf()) {
 					self.pos += 2;
 					Some(box try!(self.parse()))
 				} else {
@@ -142,7 +142,7 @@ impl Parser {
 							default = Some(mk!(BlockExpr(block)));
 						},
 						TCloseBlock => break,
-						_ => return Err(Expected(vec!(TIdent("case".to_owned()), TIdent("default".to_owned()), TCloseBlock), tok, "switch block"))
+						_ => return Err(Expected(vec!(TIdent("case".to_strbuf()), TIdent("default".to_strbuf()), TCloseBlock), tok, "switch block"))
 					}
 				}
 				try!(self.expect(TCloseBlock, "switch block"));
@@ -153,21 +153,21 @@ impl Parser {
 			},
 			"function" => {
 				let tk = self.tokens.get(self.pos).clone();
-				let name : Option<~str> = match tk.data {
+				let name = match tk.data {
 					TIdent(ref name) => {
 						self.pos += 1;
 						Some(name.clone())
 					},
 					TOpenParen => None,
-					_ => return Err(Expected(vec!(TIdent("identifier".to_owned())), tk.clone(), "function name"))
+					_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk.clone(), "function name"))
 				};
 				try!(self.expect(TOpenParen, "function"));
-				let mut args:Vec<~str> = Vec::new();
+				let mut args:Vec<StrBuf> = Vec::new();
 				let mut tk = self.tokens.get(self.pos).clone();
 				while tk.data != TCloseParen {
 					match tk.data {
-						TIdent(ref id) => args.push(id.to_owned()),
-						_ => return Err(Expected(vec!(TIdent("identifier".to_owned())), tk.clone(), "function arguments"))
+						TIdent(ref id) => args.push(id.clone()),
+						_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk.clone(), "function arguments"))
 					}
 					self.pos += 1;
 					if self.tokens.get(self.pos).data == TComma {
@@ -190,13 +190,13 @@ impl Parser {
 			TSemicolon | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
 			TSemicolon | TComment(_) => mk!(ConstExpr(CUndefined)),
 			TIdent(ref s) => {
-				let structure = try!(self.parse_struct(s.clone()));
+				let structure = try!(self.parse_struct(s.as_slice()));
 				match structure {
 					Some(v) => v,
-					None => mk!(LocalExpr(s.to_owned()))
+					None => mk!(LocalExpr(s.clone()))
 				}
 			},
-			TString(ref s) => mk!(ConstExpr(CString(s.to_owned()))),
+			TString(ref s) => mk!(ConstExpr(CString(s.clone()))),
 			TOpenParen => {
 				match self.tokens.get(self.pos).data.clone() {
 					TCloseParen if self.tokens.get(self.pos + 1).data == TArrow => {
@@ -213,10 +213,10 @@ impl Parser {
 							TComma => { // at this point it's probably gonna be an arrow function
 								let mut args = vec!(match next.def {
 									LocalExpr(name) => name,
-									_ => "".into_owned()
+									_ => "".to_strbuf()
 								}, match self.tokens.get(self.pos).data {
 									TIdent(ref id) => id.clone(),
-									_ => "".into_owned()
+									_ => "".to_strbuf()
 								});
 								let mut expect_ident = true;
 								loop {
@@ -234,7 +234,7 @@ impl Parser {
 											self.pos += 1;
 											break;
 										},
-										_ if expect_ident => return Err(Expected(vec!(TIdent("identifier".to_owned())), curr_tk, "arrow function")),
+										_ if expect_ident => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), curr_tk, "arrow function")),
 										_ => return Err(Expected(vec!(TComma, TCloseParen), curr_tk, "arrow function"))
 									}
 								}
@@ -281,14 +281,14 @@ impl Parser {
 				while self.tokens.get(self.pos - 1).data == TComma || map.len() == 0 {
 					let tk = self.tokens.get(self.pos).clone();
 					let name = match tk.data {
-						TIdent(ref id) => id,
-						TString(ref str) => str,
-						_ => return Err(Expected(vec!(TIdent("identifier".to_owned()), TString("string".to_owned())), tk, "object declaration"))
+						TIdent(ref id) => id.clone(),
+						TString(ref str) => str.clone(),
+						_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf()), TString("string".to_strbuf())), tk, "object declaration"))
 					};
 					self.pos += 1;
 					try!(self.expect(TColon, "object declaration"));
 					let value = try!(self.parse());
-					map.insert(name.to_owned(), value);
+					map.insert(name, value);
 					self.pos += 1;
 				}
 				mk!(ObjectDeclExpr(map), token)
@@ -327,8 +327,8 @@ impl Parser {
 				self.pos += 1;
 				let tk = self.tokens.get(self.pos).clone();
 				match tk.data {
-					TIdent(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_owned())),
-					_ => return Err(Expected(vec!(TIdent("identifier".to_owned())), tk, "field access"))
+					TIdent(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_strbuf())),
+					_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk, "field access"))
 				}
 				self.pos += 1;
 			},

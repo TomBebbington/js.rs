@@ -88,7 +88,7 @@ impl<B:Buffer> Lexer<B> {
 	}
 	fn clear_buffer(&mut self) {
 		if self.ident_buffer.len() > 0 {
-			let ident = self.ident_buffer.clone().into_owned();
+			let ident = self.ident_buffer.clone();
 			self.push_token(TIdent(ident));
 			self.ident_buffer.truncate(0);
 		}
@@ -207,13 +207,13 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'\n' if self.current_comment == Some(SingleLineComment) => {
-					let comment = self.comment_buffer.clone().into_owned();
+					let comment = self.comment_buffer.clone();
 					self.push_token(TComment(comment));
 					self.comment_buffer.truncate(0);
 					self.current_comment = None;
 				},
 				'*' if self.current_comment == Some(MultiLineComment) && self.peek() == Ok('/') => {
-					let comment = self.comment_buffer.clone().into_owned();
+					let comment = self.comment_buffer.clone();
 					self.push_token(TComment(comment));
 					self.comment_buffer.truncate(0);
 					self.current_comment = None;
@@ -223,13 +223,13 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'"' if self.string_start == Some(DoubleQuote) => {
 					self.string_start = None;
-					let string = self.string_buffer.clone().into_owned();
+					let string = self.string_buffer.clone();
 					self.push_token(TString(string));
 					self.string_buffer.truncate(0);
 				},
 				'\'' if self.string_start == Some(SingleQuote) => {
 					self.string_start = None;
-					let string = self.string_buffer.clone().into_owned();
+					let string = self.string_buffer.clone();
 					self.push_token(TString(string));
 					self.string_buffer.truncate(0);
 				},

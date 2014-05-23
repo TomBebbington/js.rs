@@ -26,7 +26,7 @@ impl Function {
 				for i in range(0, data.args.len()) {
 					let name = data.args.get(i);
 					let expr = args.get(i);
-					scope.borrow().borrow_mut().insert(name.clone(), Property::new(*expr));
+					scope.borrow().borrow_mut().insert(name.to_owned(), Property::new(*expr));
 				}
 				let result = exe.run(&data.expr);
 				exe.destroy_scope();
@@ -43,11 +43,11 @@ pub struct RegularFunction {
 	/// This function's expression
 	pub expr : Expr,
 	/// The argument names of the function
-	pub args : Vec<~str>
+	pub args : Vec<StrBuf>
 }
 impl RegularFunction {
 	/// Make a new regular function
-	pub fn new(expr : Expr, args: Vec<~str>) -> RegularFunction {
+	pub fn new(expr : Expr, args: Vec<StrBuf>) -> RegularFunction {
 		let mut obj = TreeMap::new();
 		obj.insert("arguments".to_owned(), Property::new(Gc::new(VInteger(args.len() as i32))));
 		RegularFunction {object: obj, expr: expr, args: args}
