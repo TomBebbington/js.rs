@@ -12,7 +12,7 @@ fn main() {
 	for line in io::stdin().lines() {
 		match line {
 			Ok(line) => {
-				let tokens = Lexer::<io::BufferedReader<io::BufReader>>::lex_str(line);
+				let tokens = Lexer::<io::BufferedReader<io::BufReader>>::lex_str(line.as_slice());
 				let expr = Parser::new(tokens).parse_all().unwrap();
 				let result = engine.run(&expr);
 				match result {

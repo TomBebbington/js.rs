@@ -3,12 +3,12 @@ use serialize::json::{ToJson, from_str};
 use std::gc::Gc;
 /// Parse a JSON string into a Javascript object
 pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	match from_str(args.get(0).borrow().to_str()) {
+	match from_str(args.get(0).borrow().to_str().as_slice()) {
 		Ok(json) => {
 			Ok(Gc::new(ValueData::from_json(json)))
 		},
 		Err(err) => {
-			Err(Gc::new(VString(StrBuf::from_str(err.to_str()))))
+			Err(Gc::new(VString(err.to_str())))
 		}
 	}
 }

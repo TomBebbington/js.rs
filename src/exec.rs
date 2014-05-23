@@ -109,7 +109,7 @@ impl Executor for Interpreter {
 			GetFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
 				let val_field = try!(self.run(*field));
-				Ok(val_obj.borrow().get_field_slice(val_field.borrow().to_str()))
+				Ok(val_obj.borrow().get_field(val_field.borrow().to_str()))
 			},
 			CallExpr(ref callee, ref args) => {
 				let (this, func) = match callee.def {
@@ -120,7 +120,7 @@ impl Executor for Interpreter {
 					GetFieldExpr(ref obj, ref field) => {
 						let obj = try!(self.run(*obj));
 						let field = try!(self.run(*field));
-						(obj, obj.borrow().get_field_slice(field.borrow().to_str()))
+						(obj, obj.borrow().get_field(field.borrow().to_str()))
 					},
 					_ => (self.global.clone(), try!(self.run(callee.clone())))
 				};
@@ -193,7 +193,7 @@ impl Executor for Interpreter {
 				let mut index : i32 = 0;
 				for val in arr.iter() {
 					let val = try!(self.run(val));
-					arr_map.borrow().set_field_slice(index.to_str(), val);
+					arr_map.borrow().set_field(index.to_str(), val);
 					index += 1;
 				}
 				arr_map.borrow().set_field_slice(INSTANCE_PROTOTYPE, self.get_global("Array".into_strbuf()).borrow().get_field_slice(PROTOTYPE));

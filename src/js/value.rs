@@ -256,7 +256,7 @@ impl Eq for ValueData {
 		match (self.clone(), other.clone()) {
 			(ref a, ref b) if a.is_null_or_undefined() && b.is_null_or_undefined() => true,
 			(VString(ref a), VString(ref b)) if a == b => true,
-			(VString(ref a), ref b) | (ref b, VString(ref a)) if a.as_slice() == b.to_str() => true,
+			(VString(ref a), ref b) | (ref b, VString(ref a)) if *a == b.to_str() => true,
 			(VBoolean(a), VBoolean(b)) if a == b => true,
 			(VNumber(a), VNumber(b)) if a == b && !a.is_nan() && !b.is_nan() => true,
 			(VNumber(a), ref b) | (ref b, VNumber(a)) if a == b.to_num() => true,
@@ -289,7 +289,8 @@ impl ToJson for ValueData {
 impl Add<ValueData, ValueData> for ValueData {
 	fn add(&self, other:&ValueData) -> ValueData {
 		return match (self.clone(), other.clone()) {
-			(VString(s), other) | (other, VString(s)) => VString(StrBuf::from_str(s.as_slice() + other.to_str())),
+			(VString(s), other) | (other, VString(s)) =>
+				VString(s.clone().append(other.to_str().as_slice())),
 			(_, _) => VNumber(self.to_num() + other.to_num())
 		}
 	}
@@ -361,7 +362,7 @@ impl ToValue for StrBuf {
 }
 impl FromValue for StrBuf {
 	fn from_value(v:Value) -> Result<StrBuf, &'static str> {
-		Ok(StrBuf::from_str(v.borrow().to_str()))
+		Ok(v.borrow().to_str())
 	}
 }
 impl<'s> ToValue for &'s str {
@@ -376,7 +377,7 @@ impl ToValue for char {
 }
 impl FromValue for char {
 	fn from_value(v:Value) -> Result<char, &'static str> {
-		Ok(v.borrow().to_str().char_at(0))
+		Ok(v.borrow().to_str().as_slice().char_at(0))
 	}
 }
 impl ToValue for f64 {
@@ -436,7 +437,7 @@ impl<T:FromValue> FromValue for Vec<T> {
 		let len = v.borrow().get_field_slice("length").borrow().to_int();
 		let mut vec = Vec::with_capacity(len as uint);
 		for i in range(0, len) {
-			vec.push(try!(from_value(v.borrow().get_field_slice(i.to_str()))))
+			vec.push(try!(from_value(v.borrow().get_field(i.to_str()))))
 		}
 		Ok(vec)
 	}

@@ -7,7 +7,7 @@ pub fn encode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
 	} else {
-		VString(encode(args.get(0).borrow().to_str()))
+		VString(encode(args.get(0).borrow().to_str().as_slice()))
 	}))
 }
 /// Encode a URI component
@@ -16,7 +16,7 @@ pub fn encode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
 	} else {
-		VString(encode_component(args.get(0).borrow().to_str()))
+		VString(encode_component(args.get(0).borrow().to_str().as_slice()))
 	}))
 }
 /// Decode a URI
@@ -24,7 +24,7 @@ pub fn decode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
 	} else {
-		VString(decode(args.get(0).borrow().to_str()))
+		VString(decode(args.get(0).borrow().to_str().as_slice()))
 	}))
 }
 /// Decode a URI component
@@ -33,7 +33,7 @@ pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
 	} else {
-		VString(decode_component(args.get(0).borrow().to_str()))
+		VString(decode_component(args.get(0).borrow().to_str().as_slice()))
 	}))
 }
 /// Initialise the URI functions on a global object
