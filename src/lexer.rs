@@ -126,15 +126,6 @@ impl<B:Buffer> Lexer<B> {
 			Ok(self.peek_buffer.pop_char().unwrap())
 		}
 	}
-	fn peek(&mut self) -> IoResult<char> {
-		Ok(if self.peek_buffer.len() == 0 {
-			let ch = try!(self.buffer.read_char());
-			self.peek_buffer.push_char(ch);
-			ch
-		} else {
-			self.peek_buffer.as_slice().char_at(self.peek_buffer.len() - 1)
-		})
-	}
 	fn peek_for(&mut self, peek:char) -> bool {
 		if self.peek_buffer.len() > 0 {
 			self.peek_buffer.pop_char() == Some(peek)
