@@ -111,7 +111,7 @@ impl<B:Buffer> Lexer<B> {
 		self.tokens.push(Token::new(tk, self.line_number, self.column_number))
 	}
 	/// Processes an input stream from a string into an array of tokens
-	pub fn lex_str(script:~str) -> Vec<Token> {
+	pub fn lex_str(script:&str) -> Vec<Token> {
 		let script_bytes:&[u8] = script.as_bytes();
 		let reader = BufReader::new(script_bytes);
 		let buf_reader = BufferedReader::new(reader);
