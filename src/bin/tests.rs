@@ -10,7 +10,7 @@ use collections::treemap::TreeMap;
 use std::path::posix::Path;
 use std::io::fs::{File, walk_dir};
 use std::io::BufferedReader;
-fn find_attrs(tokens: Vec<Token>) -> TreeMap<~str, ~str> {
+fn find_attrs(tokens: Vec<Token>) -> TreeMap<StrBuf, StrBuf> {
 	let mut map = TreeMap::new();
 	for tk in tokens.iter() {
 		match tk.data {
@@ -20,7 +20,7 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<~str, ~str> {
 					let space_ind = current.slice_from(1).find(' ').unwrap() + 1;
 					let key = current.slice_chars(2, space_ind);
 					let value = current.slice_from(space_ind);
-					map.insert(key.into_owned(), value.into_owned());
+					map.insert(key.into_strbuf(), value.into_strbuf());
 				}
 			},
 			_ => ()
@@ -54,7 +54,7 @@ fn main() {
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
 			lexer.lex().unwrap();
 			let attributes = find_attrs(lexer.tokens.clone());
-			let description = match attributes.find(&"description".into_owned()) {
+			let description = match attributes.find(&"description".into_strbuf()) {
 				Some(desc) => desc,
 				None => fail!("{} does not have @description metadata", file_str)
 			};
