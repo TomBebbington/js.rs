@@ -47,7 +47,6 @@ impl Executor for Interpreter {
 		json::init(global);
 		number::init(global);
 		error::init(global);
-		number::init(global);
 		string::init(global);
 		uri::init(global);
 		Interpreter {global: global, scopes: Vec::new()}
