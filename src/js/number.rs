@@ -2,7 +2,7 @@ use js::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
 /// Parse a float into a value
 pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let parsed = from_str::<f64>(from_value::<StrBuf>(*args.get(0)).unwrap().into_owned());
+	let parsed = from_str::<f64>(from_value::<StrBuf>(*args.get(0)).unwrap().as_slice());
 	return Ok(to_value(match parsed {
 		Some(v) => v,
 		None => NAN
@@ -10,7 +10,7 @@ pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Parse an int into a value
 pub fn parse_int(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let parsed = from_str::<i32>(from_value::<StrBuf>(*args.get(0)).unwrap().into_owned());
+	let parsed = from_str::<i32>(from_value::<StrBuf>(*args.get(0)).unwrap().as_slice());
 	return Ok(match parsed {
 		Some(v) => to_value(v),
 		None => to_value(NAN)
