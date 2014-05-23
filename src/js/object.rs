@@ -73,10 +73,10 @@ pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Set the prototype
 pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let proto = args.get(1).clone();
-	let obj = args.get(0);
+	let obj = *args.get(0);
+	let proto = *args.get(1);
 	obj.borrow().set_field_slice(INSTANCE_PROTOTYPE, proto);
-	Ok(*obj)
+	Ok(obj)
 }
 /// Define the property
 pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
