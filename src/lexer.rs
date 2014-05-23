@@ -140,7 +140,10 @@ impl<B:Buffer> Lexer<B> {
 			self.peek_buffer.pop_char() == Some(peek)
 		} else {
 			match self.buffer.read_char() {
-				Ok(ch) if ch == peek => true,
+				Ok(ch) if ch == peek => {
+					self.column_number += 1;
+					true
+				},
 				Ok(ch) if ch != peek => {
 					self.peek_buffer.push_char(ch);
 					false
