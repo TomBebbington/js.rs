@@ -19,7 +19,7 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<StrBuf, StrBuf> {
 				if current.starts_with(" @") {
 					let space_ind = current.slice_from(1).find(' ').unwrap() + 1;
 					let key = current.slice_chars(2, space_ind);
-					let value = current.slice_from(space_ind);
+					let value = current.slice_from(space_ind + 1);
 					map.insert(key.into_strbuf(), value.into_strbuf());
 				}
 			},
