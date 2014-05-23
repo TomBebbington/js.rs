@@ -1,8 +1,9 @@
-use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TUnaryOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
 use ast::{LogAnd, LogOr};
+use ast::{UnaryNot};
 use ast::{Token, TokenData};
 use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
 use std::strbuf::StrBuf;
@@ -441,6 +442,10 @@ impl<B:Buffer> Lexer<B> {
 					} else {
 						self.push_token(TCompOp(CompNotEqual));
 					}
+				},
+				'!' => {
+					self.clear_buffer();
+					self.push_token(TUnaryOp(UnaryNot));
 				},
 				'\n' => {
 					self.clear_buffer();

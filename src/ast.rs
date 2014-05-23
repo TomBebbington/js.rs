@@ -382,6 +382,8 @@ pub enum TokenData {
 	TLogOp(LogOp),
 	/// A comparison operation
 	TCompOp(CompOp),
+	/// A unary operation
+	TUnaryOp(UnaryOp),
 	/// An assign operation combined with something else
 	TAssignOp(Box<TokenData>),
 	/// A comment
@@ -410,6 +412,7 @@ impl fmt::Show for TokenData {
 			TBitOp(op) => write!(f, "{}", op),
 			TLogOp(op) => write!(f, "{}", op),
 			TCompOp(op) => write!(f, "{}", op),
+			TUnaryOp(op) => write!(f, "{}", op),
 			TAssignOp(op) => write!(f, "{}=", op),
 			TComment(ref com) => write!(f, "// {}", com)
 		}

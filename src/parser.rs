@@ -1,8 +1,8 @@
 use ast::{Token, TokenData, Expr};
 use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, UnaryOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TEqual, TArrow};
-use ast::{OpSub, UnaryMinus};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TUnaryOp, TEqual, TArrow};
+use ast::{OpSub, UnaryMinus, UnaryNot};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -307,9 +307,10 @@ impl Parser {
 			},
 			TNumber(num) =>
 				mk!(ConstExpr(CNum(num))),
-			TNumOp(OpSub) => {
-				mk!(UnaryOpExpr(UnaryMinus, box try!(self.parse())))
-			},
+			TNumOp(OpSub) =>
+				mk!(UnaryOpExpr(UnaryMinus, box try!(self.parse()))),
+			TUnaryOp(UnaryNot) =>
+				mk!(UnaryOpExpr(UnaryNot, box try!(self.parse()))),
 			_ => return Err(Expected(Vec::new(), token.clone(), "script"))
 		};
 		if self.pos >= self.tokens.len() {

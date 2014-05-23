@@ -347,7 +347,7 @@ impl Shr<ValueData, ValueData> for ValueData {
 }
 impl Not<ValueData> for ValueData {
 	fn not(&self) -> ValueData {
-		VInteger(!self.to_int())
+		VBoolean(!self.is_true())
 	}
 }
 /// Conversion to Javascript values from Rust values
