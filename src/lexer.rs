@@ -215,7 +215,7 @@ impl<B:Buffer> Lexer<B> {
 					self.comment_buffer.clear();
 					self.current_comment = None;
 				},
-				'*' if self.current_comment == Some(MultiLineComment) && self.peek() == Ok('/') => {
+				'*' if self.current_comment == Some(MultiLineComment) && self.peek_for('/') => {
 					let comment = self.comment_buffer.clone();
 					self.push_token(TComment(comment));
 					self.comment_buffer.clear();
