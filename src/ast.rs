@@ -65,14 +65,17 @@ pub enum UnaryOp {
 	/// Unary decrement (--) with the bool being true if it is before the variable
 	UnaryDecrement(bool),
 	/// Unary minus operator on a number or variable
-	UnaryMinus
+	UnaryMinus,
+	/// Unary not
+	UnaryNot
 }
 impl fmt::Show for UnaryOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "{}", match *self {
 			UnaryIncrement(_) => "++",
 			UnaryDecrement(_) => "--",
-			UnaryMinus => "-"
+			UnaryMinus => "-",
+			UnaryNot => "!"
 		})
 	}
 }
@@ -379,12 +382,14 @@ pub enum TokenData {
 	TLogOp(LogOp),
 	/// A comparison operation
 	TCompOp(CompOp),
+	/// An assign operation combined with something else
+	TAssignOp(Box<TokenData>),
 	/// A comment
 	TComment(StrBuf)
 }
 impl fmt::Show for TokenData {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		match *self {
+		match self.clone() {
 			TString(ref s) => write!(f, "\"{}\"", s),
 			TSemicolon => write!(f, "{}", ";"),
 			TColon => write!(f, "{}", ":"),
@@ -405,6 +410,7 @@ impl fmt::Show for TokenData {
 			TBitOp(op) => write!(f, "{}", op),
 			TLogOp(op) => write!(f, "{}", op),
 			TCompOp(op) => write!(f, "{}", op),
+			TAssignOp(op) => write!(f, "{}=", op),
 			TComment(ref com) => write!(f, "// {}", com)
 		}
 	}

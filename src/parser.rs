@@ -1,7 +1,7 @@
 use ast::{Token, TokenData, Expr};
 use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, UnaryOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TEqual, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TEqual, TArrow};
 use ast::{OpSub, UnaryMinus};
 use collections::treemap::TreeMap;
 use std::fmt;
@@ -374,6 +374,19 @@ impl Parser {
 				self.pos += 1;
 				let next = try!(self.parse());
 				result = mk!(NumOpExpr(op, box expr, box next));
+			},
+			TAssignOp(op) => {
+				self.pos += 1;
+				let next = try!(self.parse());
+				let boxed = box expr;
+				let op_result = mk!(match *op {
+					TNumOp(op) => NumOpExpr(op, boxed.clone(), box next),
+					TBitOp(op) => BitOpExpr(op, boxed.clone(), box next),
+					TCompOp(op) => CompOpExpr(op, boxed.clone(), box next),
+					TLogOp(op) => LogOpExpr(op, boxed.clone(), box next),
+					_ => unreachable!()
+				});
+				result = mk!(AssignExpr(boxed, box op_result))
 			},
 			TBitOp(op) => {
 				self.pos += 1;

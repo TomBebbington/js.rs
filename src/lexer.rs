@@ -1,4 +1,4 @@
-use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
@@ -315,21 +315,41 @@ impl<B:Buffer> Lexer<B> {
 				'/' if self.peek_for('*') => {
 					self.current_comment = Some(MultiLineComment);
 				},
+				'/' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TNumOp(OpDiv)));
+				},
 				'/' => {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpDiv));
+				},
+				'*' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TNumOp(OpMul)));
 				},
 				'*' => {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpMul));
 				},
+				'+' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TNumOp(OpAdd)));
+				},
 				'+' => {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpAdd));
 				},
+				'-' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TNumOp(OpSub)));
+				},
 				'-' => {
 					self.clear_buffer();
 					self.push_token(TNumOp(OpSub));
+				},
+				'%' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TNumOp(OpMod)));
 				},
 				'%' => {
 					self.clear_buffer();
@@ -337,7 +357,15 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'|' if self.peek_for('|') => {
 					self.clear_buffer();
-					self.push_token(TLogOp(LogOr));
+					if self.peek_for('=') {
+						self.push_token(TAssignOp(box TLogOp(LogOr)));
+					} else {
+						self.push_token(TLogOp(LogOr));
+					}
+				},
+				'|' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TBitOp(BitOr)));
 				},
 				'|' => {
 					self.clear_buffer();
@@ -345,11 +373,23 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'&' if self.peek_for('&') => {
 					self.clear_buffer();
-					self.push_token(TLogOp(LogAnd));
+					if self.peek_for('=') {
+						self.push_token(TAssignOp(box TLogOp(LogAnd)));
+					} else {
+						self.push_token(TLogOp(LogAnd));
+					}
+				},
+				'&' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TBitOp(BitAnd)));
 				},
 				'&' => {
 					self.clear_buffer();
 					self.push_token(TBitOp(BitAnd));
+				},
+				'^' if self.peek_for('=') => {
+					self.clear_buffer();
+					self.push_token(TAssignOp(box TBitOp(BitXor)));
 				},
 				'^' => {
 					self.clear_buffer();
@@ -377,7 +417,11 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'<' if self.peek_for('<') => {
 					self.clear_buffer();
-					self.push_token(TBitOp(BitShl));
+					if self.peek_for('=') {
+						self.push_token(TAssignOp(box TBitOp(BitShl)));
+					} else {
+						self.push_token(TBitOp(BitShl));
+					}
 				},
 				'<' => {
 					self.clear_buffer();
@@ -389,7 +433,11 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'>' if self.peek_for('>') => {
 					self.clear_buffer();
-					self.push_token(TBitOp(BitShr));
+					if self.peek_for('=') {
+						self.push_token(TAssignOp(box TBitOp(BitShr)));
+					} else {
+						self.push_token(TBitOp(BitShr));
+					}
 				},
 				'>' => {
 					self.clear_buffer();
