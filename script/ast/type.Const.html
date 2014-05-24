@@ -48,15 +48,15 @@
     CBool(bool),
     CNull,
     CUndefined,
-}</pre><div class='docblock'><p>A Javascript Constant</p>
+}</pre><div class='docblock'><p>A Javascript constant</p>
 </div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.CString'><code>CString</code></td><td><div class='docblock'><p>A UTF-8 string</p>
-</div></td></tr><tr><td id='variant.CRegExp'><code>CRegExp</code></td><td><div class='docblock'><p>A regular expression</p>
-</div></td></tr><tr><td id='variant.CNum'><code>CNum</code></td><td><div class='docblock'><p>A 64-bit floating-point number</p>
-</div></td></tr><tr><td id='variant.CInt'><code>CInt</code></td><td><div class='docblock'><p>A 32-bit integer</p>
-</div></td></tr><tr><td id='variant.CBool'><code>CBool</code></td><td><div class='docblock'><p>A boolean</p>
-</div></td></tr><tr><td id='variant.CNull'><code>CNull</code></td><td><div class='docblock'><p>Null</p>
-</div></td></tr><tr><td id='variant.CUndefined'><code>CUndefined</code></td><td><div class='docblock'><p>The infamous value returned when you access a non-existent field</p>
+<table><tr><td id='variant.CString'><code>CString</code></td><td><div class='docblock'><p>A UTF-8 string, such as <code>&quot;Hello, world&quot;</code></p>
+</div></td></tr><tr><td id='variant.CRegExp'><code>CRegExp</code></td><td><div class='docblock'><p>A regular expression, such as <code>/where(&#39;s| is) [wW]ally/</code></p>
+</div></td></tr><tr><td id='variant.CNum'><code>CNum</code></td><td><div class='docblock'><p>A 64-bit floating-point number, such as <code>3.1415</code></p>
+</div></td></tr><tr><td id='variant.CInt'><code>CInt</code></td><td><div class='docblock'><p>A 32-bit integer, such as <code>42</code></p>
+</div></td></tr><tr><td id='variant.CBool'><code>CBool</code></td><td><div class='docblock'><p>A boolean, which is either <code>true</code> or <code>false</code> and is used to check if criteria are met</p>
+</div></td></tr><tr><td id='variant.CNull'><code>CNull</code></td><td><div class='docblock'><p>The <code>null</code> value, which represents a non-existant value</p>
+</div></td></tr><tr><td id='variant.CUndefined'><code>CUndefined</code></td><td><div class='docblock'><p>The <code>undefined</code> value, which represents a field or index that doesn&#39;t exist</p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../script/ast/type.Const.html' title='script::ast::Const'>Const</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='type' href='../../script/ast/type.Const.html' title='script::ast::Const'>Const</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../script/ast/type.Const.html' title='script::ast::Const'>Const</a>) -&gt; bool</code></h4>
 <h4 id='method.ne' class='method'><code>fn <a href='#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../script/ast/type.Const.html' title='script::ast::Const'>Const</a>) -&gt; bool</code></h4>

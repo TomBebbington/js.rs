@@ -61,27 +61,27 @@
     ThrowExpr(<a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../script/ast/struct.Expr.html' title='script::ast::Expr'>Expr</a>&gt;),
     AssignExpr(<a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../script/ast/struct.Expr.html' title='script::ast::Expr'>Expr</a>&gt;, <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../script/ast/struct.Expr.html' title='script::ast::Expr'>Expr</a>&gt;),
     TypeOfExpr(<a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../../script/ast/struct.Expr.html' title='script::ast::Expr'>Expr</a>&gt;),
-}</pre><div class='docblock'><p>A Javascript Expression</p>
+}</pre><div class='docblock'><p>A Javascript expression</p>
 </div><h2 class='variants'>Variants</h2>
 <table><tr><td id='variant.BinOpExpr'><code>BinOpExpr</code></td><td><div class='docblock'><p>Run a operation between two expressions</p>
-</div></td></tr><tr><td id='variant.UnaryOpExpr'><code>UnaryOpExpr</code></td><td><div class='docblock'><p>Run an operation on an expression</p>
-</div></td></tr><tr><td id='variant.ConstExpr'><code>ConstExpr</code></td><td><div class='docblock'><p>Make a simple value</p>
-</div></td></tr><tr><td id='variant.BlockExpr'><code>BlockExpr</code></td><td><div class='docblock'><p>Run several expressions</p>
+</div></td></tr><tr><td id='variant.UnaryOpExpr'><code>UnaryOpExpr</code></td><td><div class='docblock'><p>Run an operation on a value</p>
+</div></td></tr><tr><td id='variant.ConstExpr'><code>ConstExpr</code></td><td><div class='docblock'><p>Make a constant value</p>
+</div></td></tr><tr><td id='variant.BlockExpr'><code>BlockExpr</code></td><td><div class='docblock'><p>Run several expressions from top-to-bottom</p>
 </div></td></tr><tr><td id='variant.LocalExpr'><code>LocalExpr</code></td><td><div class='docblock'><p>Load a reference to a value</p>
-</div></td></tr><tr><td id='variant.GetConstFieldExpr'><code>GetConstFieldExpr</code></td><td><div class='docblock'><p>Gets the cosntant field of the expression</p>
-</div></td></tr><tr><td id='variant.GetFieldExpr'><code>GetFieldExpr</code></td><td><div class='docblock'><p>Gets the field of an expression</p>
-</div></td></tr><tr><td id='variant.CallExpr'><code>CallExpr</code></td><td><div class='docblock'><p>Call a function with some arguments</p>
+</div></td></tr><tr><td id='variant.GetConstFieldExpr'><code>GetConstFieldExpr</code></td><td><div class='docblock'><p>Gets the constant field of a value</p>
+</div></td></tr><tr><td id='variant.GetFieldExpr'><code>GetFieldExpr</code></td><td><div class='docblock'><p>Gets the field of a value</p>
+</div></td></tr><tr><td id='variant.CallExpr'><code>CallExpr</code></td><td><div class='docblock'><p>Call a function with some values</p>
 </div></td></tr><tr><td id='variant.WhileLoopExpr'><code>WhileLoopExpr</code></td><td><div class='docblock'><p>Repeatedly run an expression while the conditional expression resolves to true</p>
 </div></td></tr><tr><td id='variant.IfExpr'><code>IfExpr</code></td><td><div class='docblock'><p>Check if a conditional expression is true and run an expression if it is and another expression if it isn&#39;t</p>
 </div></td></tr><tr><td id='variant.SwitchExpr'><code>SwitchExpr</code></td><td><div class='docblock'><p>Run blocks whose cases match the expression</p>
-</div></td></tr><tr><td id='variant.ObjectDeclExpr'><code>ObjectDeclExpr</code></td><td><div class='docblock'><p>Create an object</p>
+</div></td></tr><tr><td id='variant.ObjectDeclExpr'><code>ObjectDeclExpr</code></td><td><div class='docblock'><p>Create an object out of the binary tree given</p>
 </div></td></tr><tr><td id='variant.ArrayDeclExpr'><code>ArrayDeclExpr</code></td><td><div class='docblock'><p>Create an array with items inside</p>
 </div></td></tr><tr><td id='variant.FunctionDeclExpr'><code>FunctionDeclExpr</code></td><td><div class='docblock'><p>Create a function with the given name, arguments, and expression</p>
-</div></td></tr><tr><td id='variant.ArrowFunctionDeclExpr'><code>ArrowFunctionDeclExpr</code></td><td><div class='docblock'><p>Create an arrow function with the fiven arguments and expression</p>
+</div></td></tr><tr><td id='variant.ArrowFunctionDeclExpr'><code>ArrowFunctionDeclExpr</code></td><td><div class='docblock'><p>Create an arrow function with the given arguments and expression</p>
 </div></td></tr><tr><td id='variant.ConstructExpr'><code>ConstructExpr</code></td><td><div class='docblock'><p>Construct an object from the function and arguments given</p>
 </div></td></tr><tr><td id='variant.ReturnExpr'><code>ReturnExpr</code></td><td><div class='docblock'><p>Return the expression from a function</p>
-</div></td></tr><tr><td id='variant.ThrowExpr'><code>ThrowExpr</code></td><td><div class='docblock'><p>Throw an expression</p>
-</div></td></tr><tr><td id='variant.AssignExpr'><code>AssignExpr</code></td><td><div class='docblock'><p>Assign an expression to another expression</p>
+</div></td></tr><tr><td id='variant.ThrowExpr'><code>ThrowExpr</code></td><td><div class='docblock'><p>Throw a value</p>
+</div></td></tr><tr><td id='variant.AssignExpr'><code>AssignExpr</code></td><td><div class='docblock'><p>Assign an expression to a value</p>
 </div></td></tr><tr><td id='variant.TypeOfExpr'><code>TypeOfExpr</code></td><td><div class='docblock'><p>Return a string representing the type of the given expression</p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../script/ast/trait.GetPrecedence.html' title='script::ast::GetPrecedence'>GetPrecedence</a> for <a class='type' href='../../script/ast/type.ExprDef.html' title='script::ast::ExprDef'>ExprDef</a></code></h3><div class='methods'><h4 id='method.get_precedence' class='method'><code>fn <a href='#method.get_precedence' class='fnname'>get_precedence</a>(&amp;self) -&gt; uint</code></h4>
 </div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../script/ast/type.ExprDef.html' title='script::ast::ExprDef'>ExprDef</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>

@@ -43,7 +43,7 @@
 <pre class='rust struct'>pub struct Lexer&lt;B&gt; {
     pub tokens: <a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../script/ast/struct.Token.html' title='script::ast::Token'>Token</a>&gt;,
     // some fields omitted
-}</pre><div class='docblock'><p>The Javascript Lexer</p>
+}</pre><div class='docblock'><p>A Javascript lexer</p>
 </div><h2 class='fields'>Fields</h2>
 <table><tr><td id='structfield.tokens'><code>tokens</code></td><td><div class='docblock'><p>The list of tokens generated so far</p>
 </div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;B: <a class='trait' href='http://doc.rust-lang.org/std/io/trait.Buffer.html' title='std::io::Buffer'>Buffer</a>&gt; <a class='struct' href='../../script/lexer/struct.Lexer.html' title='script::lexer::Lexer'>Lexer</a>&lt;B&gt;</code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(buffer: B) -&gt; <a class='struct' href='../../script/lexer/struct.Lexer.html' title='script::lexer::Lexer'>Lexer</a>&lt;B&gt;</code></h4>
@@ -51,7 +51,7 @@
 </div><h4 id='method.lex_str' class='method'><code>fn <a href='#method.lex_str' class='fnname'>lex_str</a>(script: &amp;str) -&gt; <a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../script/ast/struct.Token.html' title='script::ast::Token'>Token</a>&gt;</code></h4>
 <div class='docblock'><p>Processes an input stream from a string into an array of tokens</p>
 </div><h4 id='method.lex' class='method'><code>fn <a href='#method.lex' class='fnname'>lex</a>(&amp;mut self) -&gt; <a class='type' href='http://doc.rust-lang.org/std/io/type.IoResult.html' title='std::io::IoResult'>IoResult</a>&lt;()&gt;</code></h4>
-<div class='docblock'><p>Processes an input stream from a BufferedReader into an array of tokens</p>
+<div class='docblock'><p>Processes an input stream from the <code>buffer</code> into a vector of tokens</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
 

@@ -523,9 +523,9 @@
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
 <span class='doccomment'>/// The type of string used
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StringType</span> {
-	<span class='doccomment'>/// Double-quoted
+	<span class='doccomment'>/// `&quot;` - Double-quoted
 </span>	<span class='ident'>DoubleQuote</span>,
-	<span class='doccomment'>/// Single-quoted
+	<span class='doccomment'>/// `&#39;` - Single-quoted
 </span>	<span class='ident'>SingleQuote</span>
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
@@ -533,22 +533,22 @@
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
 <span class='doccomment'>/// The type of comment used
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CommentType</span> {
-	<span class='doccomment'>/// Multi-line comment
+	<span class='doccomment'>/// `/*...*/` - A multi-line comment
 </span>	<span class='ident'>MultiLineComment</span>,
-	<span class='doccomment'>/// Single-line comment
+	<span class='doccomment'>/// `//...` - A single-line comment
 </span>	<span class='ident'>SingleLineComment</span>
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>, <span class='ident'>Show</span>)]</span>
 <span class='doccomment'>/// The type of number used
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>NumberType</span> {
-	<span class='doccomment'>/// Decimal number
+	<span class='doccomment'>/// A decimal number, such as `3.1415`
 </span>	<span class='ident'>DecimalNumber</span>,
-	<span class='doccomment'>/// Hexadecimal number
+	<span class='doccomment'>/// A hexadecimal number, such as `0xFF00FF`
 </span>	<span class='ident'>HexadecimalNumber</span>,
-	<span class='doccomment'>/// Octal number
+	<span class='doccomment'>/// An octal number, such as `011`
 </span>	<span class='ident'>OctalNumber</span>
 }
-<span class='doccomment'>/// The Javascript Lexer
+<span class='doccomment'>/// A Javascript lexer
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Lexer</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// The list of tokens generated so far
 </span>	<span class='kw'>pub</span> <span class='ident'>tokens</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>,
@@ -560,17 +560,17 @@
 </span>	<span class='ident'>comment_buffer</span> : <span class='ident'>StrBuf</span>,
 	<span class='doccomment'>/// The string buffer for numbers
 </span>	<span class='ident'>num_buffer</span> : <span class='ident'>StrBuf</span>,
-	<span class='doccomment'>/// The kind of string - i.e. double quote or single quote or none if it isn&#39;t in a string
+	<span class='doccomment'>/// The kind of string or `None` if it isn&#39;t in a string
 </span>	<span class='ident'>string_start</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>StringType</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// The kind of comment
+	<span class='doccomment'>/// The kind of comment or `None` if it isn&#39;t in a comment
 </span>	<span class='ident'>current_comment</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>CommentType</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// The kind of number
+	<span class='doccomment'>/// The kind of number or `None` if it isn&#39;t in a number
 </span>	<span class='ident'>current_number</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>NumberType</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// If a backwards slash has just been read
+	<span class='doccomment'>/// True if a backwards slash has just been read
 </span>	<span class='ident'>escaped</span> : <span class='ident'>bool</span>,
-	<span class='doccomment'>/// The current line number
+	<span class='doccomment'>/// The current line number in the script
 </span>	<span class='ident'>line_number</span> : <span class='ident'>uint</span>,
-	<span class='doccomment'>/// The current column number
+	<span class='doccomment'>/// The current column number in the script
 </span>	<span class='ident'>column_number</span> : <span class='ident'>uint</span>,
 	<span class='doccomment'>/// The reader
 </span>	<span class='ident'>buffer</span>: <span class='ident'>B</span>,
@@ -653,7 +653,7 @@
 			}
 		}
 	}
-	<span class='doccomment'>/// Processes an input stream from a BufferedReader into an array of tokens
+	<span class='doccomment'>/// Processes an input stream from the `buffer` into a vector of tokens
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>lex</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>IoResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
 		<span class='kw'>loop</span> {
 			<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>next</span>() {

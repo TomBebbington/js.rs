@@ -572,19 +572,19 @@
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='doccomment'>/// A Javascript value
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ValueData</span> {
-	<span class='doccomment'>/// `null` - A null value, such as the `parentNode` of a newly created HTML Element
+	<span class='doccomment'>/// `null` - A null value, for when a value doesn&#39;t exist
 </span>	<span class='ident'>VNull</span>,
-	<span class='doccomment'>/// `undefined` - An undefined value, such as `{}.children`
+	<span class='doccomment'>/// `undefined` - An undefined value, for when a field or index doesn&#39;t exist
 </span>	<span class='ident'>VUndefined</span>,
 	<span class='doccomment'>/// `boolean` - A `true` / `false` value, for if a certain criteria is met
 </span>	<span class='ident'>VBoolean</span>(<span class='ident'>bool</span>),
-	<span class='doccomment'>/// `String` - A UTF-8 string, such as `&quot;hello&quot;`
+	<span class='doccomment'>/// `String` - A UTF-8 string, such as `&quot;Hello, world&quot;`
 </span>	<span class='ident'>VString</span>(<span class='ident'>StrBuf</span>),
-	<span class='doccomment'>/// `Number` - A 64-bit floating point number, such as `-1293.0625`
+	<span class='doccomment'>/// `Number` - A 64-bit floating point number, such as `3.1415`
 </span>	<span class='ident'>VNumber</span>(<span class='ident'>f64</span>),
-	<span class='doccomment'>/// `Number` - A 32-bit integer, such as `0x5f3759df`
+	<span class='doccomment'>/// `Number` - A 32-bit integer, such as `42`
 </span>	<span class='ident'>VInteger</span>(<span class='ident'>i32</span>),
-	<span class='doccomment'>/// `Object` - An object, such as `Math`, represented by a binary tree of string keys to javascript values
+	<span class='doccomment'>/// `Object` - An object, such as `Math`, represented by a binary tree of string keys to Javascript values
 </span>	<span class='ident'>VObject</span>(<span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>ObjectData</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// `Function` - A runnable block of code, such as `Math.sqrt`, which can take some variables and return a useful value or act upon an object
 </span>	<span class='ident'>VFunction</span>(<span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>Function</span><span class='op'>&gt;</span>)

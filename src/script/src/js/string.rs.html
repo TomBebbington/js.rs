@@ -108,7 +108,7 @@
 	<span class='ident'>string_ptr</span>.<span class='ident'>set_field_slice</span>(<span class='ident'>PROTOTYPE</span>, <span class='ident'>proto</span>);
 	<span class='ident'>string</span>
 }
-<span class='doccomment'>/// Initialise the global object with the `String` object
+<span class='doccomment'>/// Initialise the `String` object on the global object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
 	<span class='kw'>let</span> <span class='ident'>global_ptr</span> <span class='op'>=</span> <span class='ident'>global</span>.<span class='ident'>borrow</span>();
 	<span class='ident'>global_ptr</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;String&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));

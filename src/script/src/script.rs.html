@@ -112,43 +112,43 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>unused_must_use</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
 
-<span class='doccomment'>//! A Javascript Parser / Interpreter library
+<span class='doccomment'>//! A Javascript lexing, parsing and execution library
 </span><span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>collections</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>serialize</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
-<span class='doccomment'>/// The Abstract Syntax Tree module
+<span class='doccomment'>/// Abstract syntax tree for lexing and parsing
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>ast</span>;
-<span class='doccomment'>/// The lexing module
+<span class='doccomment'>/// A lexer which transforms a stream into a seqeunce of tokens
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>lexer</span>;
-<span class='doccomment'>/// The parsing module
+<span class='doccomment'>/// A parser which transforms a sequence of tokens into Javascript expressions
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>parser</span>;
-<span class='doccomment'>/// The execution module
+<span class='doccomment'>/// An interpreter which runs Javascript expressions
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>exec</span>;
-<span class='doccomment'>/// The javascript core library module
+<span class='doccomment'>/// An implementation of the core Javascript library in Rust
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>js</span> {
-	<span class='doccomment'>/// Contains the Javascript value
+	<span class='doccomment'>/// Javascript values, utility methods and conversion between Javascript values and Rust values
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>value</span>;
-	<span class='doccomment'>/// Functions
+	<span class='doccomment'>/// The global `Function` object and function value representations
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>function</span>;
-	<span class='doccomment'>/// Contains the Javascript object
+	<span class='doccomment'>/// The global `Object` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>object</span>;
-	<span class='doccomment'>/// Contains the Javascript array
+	<span class='doccomment'>/// The global `Array` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>array</span>;
-	<span class='doccomment'>/// The global console object
+	<span class='doccomment'>/// The global `console` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>console</span>;
-	<span class='doccomment'>/// The global math object
+	<span class='doccomment'>/// The global `Math` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span>;
-	<span class='doccomment'>/// The global JSON object
+	<span class='doccomment'>/// The global `JSON` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>json</span>;
-	<span class='doccomment'>/// The global Number object and associated functions
+	<span class='doccomment'>/// The global `Number` object with related functions and constants
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>number</span>;
-	<span class='doccomment'>/// Errors
+	<span class='doccomment'>/// The global `Error` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>error</span>;
-	<span class='doccomment'>/// Global methods concerning URIs
+	<span class='doccomment'>/// Contains global methods concerning URIs
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>uri</span>;
-	<span class='doccomment'>/// The global string object
+	<span class='doccomment'>/// The global `String` object
 </span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>string</span>;
 }
 </pre>

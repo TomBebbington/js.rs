@@ -61,7 +61,7 @@
 <span class='kw'>use</span> <span class='ident'>js</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>VUndefined</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>Gc</span>;
 
-<span class='doccomment'>/// Create new array
+<span class='doccomment'>/// Create a new array
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make_array</span>(<span class='ident'>this</span>:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='kw'>let</span> <span class='ident'>this_ptr</span> <span class='op'>=</span> <span class='ident'>this</span>.<span class='ident'>borrow</span>();
 	<span class='ident'>this_ptr</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;length&quot;</span>, <span class='ident'>to_value</span>(<span class='number'>0i32</span>));

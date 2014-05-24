@@ -51,13 +51,13 @@
     VFunction(<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='type' href='../../../script/js/function/type.Function.html' title='script::js::function::Function'>Function</a>&gt;),
 }</pre><div class='docblock'><p>A Javascript value</p>
 </div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.VNull'><code>VNull</code></td><td><div class='docblock'><p><code>null</code> - A null value, such as the <code>parentNode</code> of a newly created HTML Element</p>
-</div></td></tr><tr><td id='variant.VUndefined'><code>VUndefined</code></td><td><div class='docblock'><p><code>undefined</code> - An undefined value, such as <code>{}.children</code></p>
+<table><tr><td id='variant.VNull'><code>VNull</code></td><td><div class='docblock'><p><code>null</code> - A null value, for when a value doesn&#39;t exist</p>
+</div></td></tr><tr><td id='variant.VUndefined'><code>VUndefined</code></td><td><div class='docblock'><p><code>undefined</code> - An undefined value, for when a field or index doesn&#39;t exist</p>
 </div></td></tr><tr><td id='variant.VBoolean'><code>VBoolean</code></td><td><div class='docblock'><p><code>boolean</code> - A <code>true</code> / <code>false</code> value, for if a certain criteria is met</p>
-</div></td></tr><tr><td id='variant.VString'><code>VString</code></td><td><div class='docblock'><p><code>String</code> - A UTF-8 string, such as <code>&quot;hello&quot;</code></p>
-</div></td></tr><tr><td id='variant.VNumber'><code>VNumber</code></td><td><div class='docblock'><p><code>Number</code> - A 64-bit floating point number, such as <code>-1293.0625</code></p>
-</div></td></tr><tr><td id='variant.VInteger'><code>VInteger</code></td><td><div class='docblock'><p><code>Number</code> - A 32-bit integer, such as <code>0x5f3759df</code></p>
-</div></td></tr><tr><td id='variant.VObject'><code>VObject</code></td><td><div class='docblock'><p><code>Object</code> - An object, such as <code>Math</code>, represented by a binary tree of string keys to javascript values</p>
+</div></td></tr><tr><td id='variant.VString'><code>VString</code></td><td><div class='docblock'><p><code>String</code> - A UTF-8 string, such as <code>&quot;Hello, world&quot;</code></p>
+</div></td></tr><tr><td id='variant.VNumber'><code>VNumber</code></td><td><div class='docblock'><p><code>Number</code> - A 64-bit floating point number, such as <code>3.1415</code></p>
+</div></td></tr><tr><td id='variant.VInteger'><code>VInteger</code></td><td><div class='docblock'><p><code>Number</code> - A 32-bit integer, such as <code>42</code></p>
+</div></td></tr><tr><td id='variant.VObject'><code>VObject</code></td><td><div class='docblock'><p><code>Object</code> - An object, such as <code>Math</code>, represented by a binary tree of string keys to Javascript values</p>
 </div></td></tr><tr><td id='variant.VFunction'><code>VFunction</code></td><td><div class='docblock'><p><code>Function</code> - A runnable block of code, such as <code>Math.sqrt</code>, which can take some variables and return a useful value or act upon an object</p>
 </div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='type' href='../../../script/js/value/type.ValueData.html' title='script::js::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.new_obj' class='method'><code>fn <a href='#method.new_obj' class='fnname'>new_obj</a>(global: <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../../script/js/value/type.Value.html' title='script::js::value::Value'>Value</a>&gt;) -&gt; <a class='type' href='../../../script/js/value/type.Value.html' title='script::js::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Returns a new empty object</p>

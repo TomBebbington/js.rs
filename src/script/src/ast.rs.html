@@ -503,27 +503,27 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>::<span class='ident'>Vec</span>;
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>treemap</span>::<span class='ident'>TreeMap</span>;
-<span class='doccomment'>/// A trait that allows the type to have its precedence found
+<span class='doccomment'>/// Represents an operator
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>GetPrecedence</span> {
-	<span class='doccomment'>/// Get the precedence
+	<span class='doccomment'>/// Get the precedence of an operator, where the lower it is, the more precedence it has
 </span>	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A Javascript Constant
+<span class='doccomment'>/// A Javascript constant
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Const</span> {
-	<span class='doccomment'>/// A UTF-8 string
+	<span class='doccomment'>/// A UTF-8 string, such as `&quot;Hello, world&quot;`
 </span>	<span class='ident'>CString</span>(<span class='ident'>StrBuf</span>),
-	<span class='doccomment'>/// A regular expression
+	<span class='doccomment'>/// A regular expression, such as `/where(&#39;s| is) [wW]ally/`
 </span>	<span class='ident'>CRegExp</span>(<span class='ident'>StrBuf</span>, <span class='ident'>bool</span>, <span class='ident'>bool</span>),
-	<span class='doccomment'>/// A 64-bit floating-point number
+	<span class='doccomment'>/// A 64-bit floating-point number, such as `3.1415`
 </span>	<span class='ident'>CNum</span>(<span class='ident'>f64</span>),
-	<span class='doccomment'>/// A 32-bit integer
+	<span class='doccomment'>/// A 32-bit integer, such as `42`
 </span>	<span class='ident'>CInt</span>(<span class='ident'>i32</span>),
-	<span class='doccomment'>/// A boolean
+	<span class='doccomment'>/// A boolean, which is either `true` or `false` and is used to check if criteria are met
 </span>	<span class='ident'>CBool</span>(<span class='ident'>bool</span>),
-	<span class='doccomment'>/// Null
+	<span class='doccomment'>/// The `null` value, which represents a non-existant value
 </span>	<span class='ident'>CNull</span>,
-	<span class='doccomment'>/// The infamous value returned when you access a non-existent field
+	<span class='doccomment'>/// The `undefined` value, which represents a field or index that doesn&#39;t exist
 </span>	<span class='ident'>CUndefined</span>
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Const</span> {
@@ -540,17 +540,17 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// An operation between 2 values
+<span class='doccomment'>/// A numeric operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>NumOp</span> {
-	<span class='doccomment'>/// Add them togther
+	<span class='doccomment'>/// `a + b` - Addition
 </span>	<span class='ident'>OpAdd</span>,
-	<span class='doccomment'>/// Subtract the second from the first
+	<span class='doccomment'>/// `a - b` - Subtraction
 </span>	<span class='ident'>OpSub</span>,
-	<span class='doccomment'>/// Divide the first by the second
+	<span class='doccomment'>/// `a / b` - Division
 </span>	<span class='ident'>OpDiv</span>,
-	<span class='doccomment'>/// Multiply them together
+	<span class='doccomment'>/// `a * b` - Multiplication
 </span>	<span class='ident'>OpMul</span>,
-	<span class='doccomment'>/// Get the modulus of a number and another
+	<span class='doccomment'>/// `a % b` - Modulus
 </span>	<span class='ident'>OpMod</span>
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>NumOp</span> {
@@ -565,15 +565,15 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// An operation on a single value
+<span class='doccomment'>/// A unary operation on a single value
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>UnaryOp</span> {
-	<span class='doccomment'>/// Unary increment (++) with the bool being true if it is before the variable
+	<span class='doccomment'>/// `a++` - increment the value
 </span>	<span class='ident'>UnaryIncrement</span>(<span class='ident'>bool</span>),
-	<span class='doccomment'>/// Unary decrement (--) with the bool being true if it is before the variable
+	<span class='doccomment'>/// `a--` - decrement the value
 </span>	<span class='ident'>UnaryDecrement</span>(<span class='ident'>bool</span>),
-	<span class='doccomment'>/// Unary minus operator on a number or variable
+	<span class='doccomment'>/// `-a` - negate the value
 </span>	<span class='ident'>UnaryMinus</span>,
-	<span class='doccomment'>/// Unary not
+	<span class='doccomment'>/// `!a` - get the opposite of the boolean value
 </span>	<span class='ident'>UnaryNot</span>
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>UnaryOp</span> {
@@ -587,17 +587,17 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A bitwise operation
+<span class='doccomment'>/// A bitwise operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BitOp</span> {
-	<span class='doccomment'>/// Bitwise and
+	<span class='doccomment'>/// `a &amp; b` - Bitwise and
 </span>	<span class='ident'>BitAnd</span>,
-	<span class='doccomment'>/// Bitwise or
+	<span class='doccomment'>/// `a | b` - Bitwise or
 </span>	<span class='ident'>BitOr</span>,
-	<span class='doccomment'>/// Bitwise xor
+	<span class='doccomment'>/// `a ^ b` - Bitwise xor
 </span>	<span class='ident'>BitXor</span>,
-	<span class='doccomment'>/// Bitwise shift left
+	<span class='doccomment'>/// `a &lt;&lt; b` - Bit-shift leftwards
 </span>	<span class='ident'>BitShl</span>,
-	<span class='doccomment'>/// Bitwise shift right
+	<span class='doccomment'>/// `a &gt;&gt; b` - Bit-shift rightrights
 </span>	<span class='ident'>BitShr</span>
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>BitOp</span> {
@@ -612,23 +612,23 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A comparison operation between two values
+<span class='doccomment'>/// A comparitive operation between two values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CompOp</span> {
-	<span class='doccomment'>/// If they represent the same value or similar values
+	<span class='doccomment'>/// `a == b` - Equality
 </span>	<span class='ident'>CompEqual</span>,
-	<span class='doccomment'>/// If they represent distinct values
+	<span class='doccomment'>/// `a != b` - Unequality
 </span>	<span class='ident'>CompNotEqual</span>,
-	<span class='doccomment'>/// If they represent the same value
+	<span class='doccomment'>/// `a === b` - Strict equality
 </span>	<span class='ident'>CompStrictEqual</span>,
-	<span class='doccomment'>/// If they represent very distinct values
+	<span class='doccomment'>/// `a !== b` - Strict unequality
 </span>	<span class='ident'>CompStrictNotEqual</span>,
-	<span class='doccomment'>/// If the first is greater than the second
+	<span class='doccomment'>/// `a &gt; b` - If `a` is greater than `b`
 </span>	<span class='ident'>CompGreaterThan</span>,
-	<span class='doccomment'>/// If the first is greater than or equal to the second
+	<span class='doccomment'>/// `a &gt;= b` - If `a` is greater than or equal to `b`
 </span>	<span class='ident'>CompGreaterThanOrEqual</span>,
-	<span class='doccomment'>/// If the first is less than the second
+	<span class='doccomment'>/// `a &lt; b` - If `a` is less than `b`
 </span>	<span class='ident'>CompLessThan</span>,
-	<span class='doccomment'>/// If the first is less than or equal to the second
+	<span class='doccomment'>/// `a &lt;= b` - If `a` is less than or equal to `b`
 </span>	<span class='ident'>CompLessThanOrEqual</span>,
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>CompOp</span> {
@@ -646,11 +646,11 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A logical operation between two booleans
+<span class='doccomment'>/// A logical operation between two boolean values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>LogOp</span> {
-	<span class='doccomment'>/// Logical and
+	<span class='doccomment'>/// `a &amp;&amp; b` - Logical and
 </span>	<span class='ident'>LogAnd</span>,
-	<span class='doccomment'>/// Logical or
+	<span class='doccomment'>/// `a || b` - Logical or
 </span>	<span class='ident'>LogOr</span>
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>LogOp</span> {
@@ -662,15 +662,15 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// Any operation between two values
+<span class='doccomment'>/// A binary operation between two values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BinOp</span> {
-	<span class='doccomment'>/// A numeric operation
+	<span class='doccomment'>/// Numeric operation
 </span>	<span class='ident'>BinNum</span>(<span class='ident'>NumOp</span>),
-	<span class='doccomment'>/// A bitwise operation
+	<span class='doccomment'>/// Bitwise operation
 </span>	<span class='ident'>BinBit</span>(<span class='ident'>BitOp</span>),
-	<span class='doccomment'>/// A comparitive operation
+	<span class='doccomment'>/// Comparitive operation
 </span>	<span class='ident'>BinComp</span>(<span class='ident'>CompOp</span>),
-	<span class='doccomment'>/// A logical operation
+	<span class='doccomment'>/// Logical operation
 </span>	<span class='ident'>BinLog</span>(<span class='ident'>LogOp</span>)
 }
 <span class='kw'>impl</span> <span class='ident'>GetPrecedence</span> <span class='kw'>for</span> <span class='ident'>BinOp</span> {
@@ -701,7 +701,7 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A Javascript Expression, including position data
+<span class='doccomment'>/// A Javascript expression, including its position
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Expr</span> {
 	<span class='doccomment'>/// The expression definition
 </span>	<span class='kw'>pub</span> <span class='ident'>def</span> : <span class='ident'>ExprDef</span>,
@@ -711,7 +711,7 @@
 </span>	<span class='kw'>pub</span> <span class='ident'>end</span> : <span class='ident'>Position</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Expr</span> {
-	<span class='doccomment'>/// Create a new expression with a position
+	<span class='doccomment'>/// Create a new expression with a starting and ending position
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>def</span>: <span class='ident'>ExprDef</span>, <span class='ident'>start</span>:<span class='ident'>Position</span>, <span class='ident'>end</span>:<span class='ident'>Position</span>) <span class='op'>-&gt;</span> <span class='ident'>Expr</span> {
 		<span class='ident'>Expr</span>{<span class='ident'>def</span>: <span class='ident'>def</span>, <span class='ident'>start</span>: <span class='ident'>start</span>, <span class='ident'>end</span>: <span class='ident'>end</span>}
 	}
@@ -739,23 +739,23 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A Javascript Expression
+<span class='doccomment'>/// A Javascript expression
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ExprDef</span> {
 	<span class='doccomment'>/// Run a operation between two expressions
 </span>	<span class='ident'>BinOpExpr</span>(<span class='ident'>BinOp</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
-	<span class='doccomment'>/// Run an operation on an expression
+	<span class='doccomment'>/// Run an operation on a value
 </span>	<span class='ident'>UnaryOpExpr</span>(<span class='ident'>UnaryOp</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
-	<span class='doccomment'>/// Make a simple value
+	<span class='doccomment'>/// Make a constant value
 </span>	<span class='ident'>ConstExpr</span>(<span class='ident'>Const</span>),
-	<span class='doccomment'>/// Run several expressions
+	<span class='doccomment'>/// Run several expressions from top-to-bottom
 </span>	<span class='ident'>BlockExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Load a reference to a value
 </span>	<span class='ident'>LocalExpr</span>(<span class='ident'>StrBuf</span>),
-	<span class='doccomment'>/// Gets the cosntant field of the expression
+	<span class='doccomment'>/// Gets the constant field of a value
 </span>	<span class='ident'>GetConstFieldExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>StrBuf</span>),
-	<span class='doccomment'>/// Gets the field of an expression
+	<span class='doccomment'>/// Gets the field of a value
 </span>	<span class='ident'>GetFieldExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
-	<span class='doccomment'>/// Call a function with some arguments
+	<span class='doccomment'>/// Call a function with some values
 </span>	<span class='ident'>CallExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Repeatedly run an expression while the conditional expression resolves to true
 </span>	<span class='ident'>WhileLoopExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
@@ -763,21 +763,21 @@
 </span>	<span class='ident'>IfExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
 	<span class='doccomment'>/// Run blocks whose cases match the expression
 </span>	<span class='ident'>SwitchExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
-	<span class='doccomment'>/// Create an object
+	<span class='doccomment'>/// Create an object out of the binary tree given
 </span>	<span class='ident'>ObjectDeclExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span>, <span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
 	<span class='doccomment'>/// Create an array with items inside
 </span>	<span class='ident'>ArrayDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Create a function with the given name, arguments, and expression
 </span>	<span class='ident'>FunctionDeclExpr</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
-	<span class='doccomment'>/// Create an arrow function with the fiven arguments and expression
+	<span class='doccomment'>/// Create an arrow function with the given arguments and expression
 </span>	<span class='ident'>ArrowFunctionDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Construct an object from the function and arguments given
 </span>	<span class='ident'>ConstructExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Return the expression from a function
 </span>	<span class='ident'>ReturnExpr</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
-	<span class='doccomment'>/// Throw an expression
+	<span class='doccomment'>/// Throw a value
 </span>	<span class='ident'>ThrowExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
-	<span class='doccomment'>/// Assign an expression to another expression
+	<span class='doccomment'>/// Assign an expression to a value
 </span>	<span class='ident'>AssignExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Return a string representing the type of the given expression
 </span>	<span class='ident'>TypeOfExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)
@@ -869,7 +869,7 @@
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A single of token of Javascript code including the position
+<span class='doccomment'>/// A single of token of Javascript code including its position
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Token</span> {
 	<span class='doccomment'>/// The token
 </span>	<span class='kw'>pub</span> <span class='ident'>data</span> : <span class='ident'>TokenData</span>,

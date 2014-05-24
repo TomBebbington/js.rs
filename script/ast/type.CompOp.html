@@ -49,16 +49,16 @@
     CompGreaterThanOrEqual,
     CompLessThan,
     CompLessThanOrEqual,
-}</pre><div class='docblock'><p>A comparison operation between two values</p>
+}</pre><div class='docblock'><p>A comparitive operation between two values</p>
 </div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.CompEqual'><code>CompEqual</code></td><td><div class='docblock'><p>If they represent the same value or similar values</p>
-</div></td></tr><tr><td id='variant.CompNotEqual'><code>CompNotEqual</code></td><td><div class='docblock'><p>If they represent distinct values</p>
-</div></td></tr><tr><td id='variant.CompStrictEqual'><code>CompStrictEqual</code></td><td><div class='docblock'><p>If they represent the same value</p>
-</div></td></tr><tr><td id='variant.CompStrictNotEqual'><code>CompStrictNotEqual</code></td><td><div class='docblock'><p>If they represent very distinct values</p>
-</div></td></tr><tr><td id='variant.CompGreaterThan'><code>CompGreaterThan</code></td><td><div class='docblock'><p>If the first is greater than the second</p>
-</div></td></tr><tr><td id='variant.CompGreaterThanOrEqual'><code>CompGreaterThanOrEqual</code></td><td><div class='docblock'><p>If the first is greater than or equal to the second</p>
-</div></td></tr><tr><td id='variant.CompLessThan'><code>CompLessThan</code></td><td><div class='docblock'><p>If the first is less than the second</p>
-</div></td></tr><tr><td id='variant.CompLessThanOrEqual'><code>CompLessThanOrEqual</code></td><td><div class='docblock'><p>If the first is less than or equal to the second</p>
+<table><tr><td id='variant.CompEqual'><code>CompEqual</code></td><td><div class='docblock'><p><code>a == b</code> - Equality</p>
+</div></td></tr><tr><td id='variant.CompNotEqual'><code>CompNotEqual</code></td><td><div class='docblock'><p><code>a != b</code> - Unequality</p>
+</div></td></tr><tr><td id='variant.CompStrictEqual'><code>CompStrictEqual</code></td><td><div class='docblock'><p><code>a === b</code> - Strict equality</p>
+</div></td></tr><tr><td id='variant.CompStrictNotEqual'><code>CompStrictNotEqual</code></td><td><div class='docblock'><p><code>a !== b</code> - Strict unequality</p>
+</div></td></tr><tr><td id='variant.CompGreaterThan'><code>CompGreaterThan</code></td><td><div class='docblock'><p><code>a &gt; b</code> - If <code>a</code> is greater than <code>b</code></p>
+</div></td></tr><tr><td id='variant.CompGreaterThanOrEqual'><code>CompGreaterThanOrEqual</code></td><td><div class='docblock'><p><code>a &gt;= b</code> - If <code>a</code> is greater than or equal to <code>b</code></p>
+</div></td></tr><tr><td id='variant.CompLessThan'><code>CompLessThan</code></td><td><div class='docblock'><p><code>a &lt; b</code> - If <code>a</code> is less than <code>b</code></p>
+</div></td></tr><tr><td id='variant.CompLessThanOrEqual'><code>CompLessThanOrEqual</code></td><td><div class='docblock'><p><code>a &lt;= b</code> - If <code>a</code> is less than or equal to <code>b</code></p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../script/ast/type.CompOp.html' title='script::ast::CompOp'>CompOp</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='type' href='../../script/ast/type.CompOp.html' title='script::ast::CompOp'>CompOp</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../script/ast/type.CompOp.html' title='script::ast::CompOp'>CompOp</a>) -&gt; bool</code></h4>
 <h4 id='method.ne' class='method'><code>fn <a href='#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../script/ast/type.CompOp.html' title='script::ast::CompOp'>CompOp</a>) -&gt; bool</code></h4>

@@ -40,13 +40,13 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'>Module <a href='../index.html'>script</a>::<a class='mod' href=''>ast</a><a class='source' href='../../src/script/src/ast.rs.html#1-461'>[src]</a></h1>
-<div class='docblock'><p>The Abstract Syntax Tree module</p>
+<div class='docblock'><p>Abstract syntax tree for lexing and parsing</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr>
                         <td><a class='struct' href='struct.Expr.html'
                                title='script::ast::Expr'>Expr</a></td>
-                        <td class='docblock short'><p>A Javascript Expression, including position data</p>
+                        <td class='docblock short'><p>A Javascript expression, including its position</p>
 </td>
                     </tr>
                 
@@ -60,7 +60,7 @@
                     <tr>
                         <td><a class='struct' href='struct.Token.html'
                                title='script::ast::Token'>Token</a></td>
-                        <td class='docblock short'><p>A single of token of Javascript code including the position</p>
+                        <td class='docblock short'><p>A single of token of Javascript code including its position</p>
 </td>
                     </tr>
                 </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
@@ -68,49 +68,49 @@
                     <tr>
                         <td><a class='type' href='type.BinOp.html'
                                title='script::ast::BinOp'>BinOp</a></td>
-                        <td class='docblock short'><p>Any operation between two values</p>
+                        <td class='docblock short'><p>A binary operation between two values</p>
 </td>
                     </tr>
                 
                     <tr>
                         <td><a class='type' href='type.BitOp.html'
                                title='script::ast::BitOp'>BitOp</a></td>
-                        <td class='docblock short'><p>A bitwise operation</p>
+                        <td class='docblock short'><p>A bitwise operation between 2 values</p>
 </td>
                     </tr>
                 
                     <tr>
                         <td><a class='type' href='type.CompOp.html'
                                title='script::ast::CompOp'>CompOp</a></td>
-                        <td class='docblock short'><p>A comparison operation between two values</p>
+                        <td class='docblock short'><p>A comparitive operation between two values</p>
 </td>
                     </tr>
                 
                     <tr>
                         <td><a class='type' href='type.Const.html'
                                title='script::ast::Const'>Const</a></td>
-                        <td class='docblock short'><p>A Javascript Constant</p>
+                        <td class='docblock short'><p>A Javascript constant</p>
 </td>
                     </tr>
                 
                     <tr>
                         <td><a class='type' href='type.ExprDef.html'
                                title='script::ast::ExprDef'>ExprDef</a></td>
-                        <td class='docblock short'><p>A Javascript Expression</p>
+                        <td class='docblock short'><p>A Javascript expression</p>
 </td>
                     </tr>
                 
                     <tr>
                         <td><a class='type' href='type.LogOp.html'
                                title='script::ast::LogOp'>LogOp</a></td>
-                        <td class='docblock short'><p>A logical operation between two booleans</p>
+                        <td class='docblock short'><p>A logical operation between two boolean values</p>
 </td>
                     </tr>
                 
                     <tr>
                         <td><a class='type' href='type.NumOp.html'
                                title='script::ast::NumOp'>NumOp</a></td>
-                        <td class='docblock short'><p>An operation between 2 values</p>
+                        <td class='docblock short'><p>A numeric operation between 2 values</p>
 </td>
                     </tr>
                 
@@ -124,7 +124,7 @@
                     <tr>
                         <td><a class='type' href='type.UnaryOp.html'
                                title='script::ast::UnaryOp'>UnaryOp</a></td>
-                        <td class='docblock short'><p>An operation on a single value</p>
+                        <td class='docblock short'><p>A unary operation on a single value</p>
 </td>
                     </tr>
                 </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
@@ -132,7 +132,7 @@
                     <tr>
                         <td><a class='trait' href='trait.GetPrecedence.html'
                                title='script::ast::GetPrecedence'>GetPrecedence</a></td>
-                        <td class='docblock short'><p>A trait that allows the type to have its precedence found</p>
+                        <td class='docblock short'><p>Represents an operator</p>
 </td>
                     </tr>
                 </table></section>

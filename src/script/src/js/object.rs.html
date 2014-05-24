@@ -226,23 +226,23 @@
 		})
 	}
 }
-<span class='doccomment'>/// Create new object
+<span class='doccomment'>/// Create a new object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make_object</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VUndefined</span>))
 }
-<span class='doccomment'>/// Get the prototype
+<span class='doccomment'>/// Get the prototype of an object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_proto_of</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='kw'>let</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
 	<span class='prelude-val'>Ok</span>(<span class='ident'>obj</span>.<span class='ident'>borrow</span>().<span class='ident'>get_field_slice</span>(<span class='ident'>INSTANCE_PROTOTYPE</span>))
 }
-<span class='doccomment'>/// Set the prototype
+<span class='doccomment'>/// Set the prototype of an object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_proto_of</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='kw'>let</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
 	<span class='kw'>let</span> <span class='ident'>proto</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>1</span>);
 	<span class='ident'>obj</span>.<span class='ident'>borrow</span>().<span class='ident'>set_field_slice</span>(<span class='ident'>INSTANCE_PROTOTYPE</span>, <span class='ident'>proto</span>);
 	<span class='prelude-val'>Ok</span>(<span class='ident'>obj</span>)
 }
-<span class='doccomment'>/// Define the property
+<span class='doccomment'>/// Define a property in an object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>define_prop</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='kw'>let</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
 	<span class='kw'>let</span> <span class='ident'>prop</span> <span class='op'>=</span> <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>1</span>)).<span class='ident'>unwrap</span>();

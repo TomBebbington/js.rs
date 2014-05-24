@@ -98,7 +98,7 @@
 	}))
 }
 <span class='doccomment'>/// Encode a URI component
-</span><span class='doccomment'>/// Rust uses RFC 3986, but JS doesn&#39;t, this will need a fix
+</span><span class='doccomment'>/// Rust uses RFC 3986, but standard Javascript doesn&#39;t, this will need a fix
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>encode_uri_component</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 		<span class='ident'>VUndefined</span>
@@ -115,7 +115,7 @@
 	}))
 }
 <span class='doccomment'>/// Decode a URI component
-</span><span class='doccomment'>/// Rust uses RFC 3986, but JS doesn&#39;t, this will need a fix
+</span><span class='doccomment'>/// Rust uses RFC 3986, but standard Javascript doesn&#39;t, this will need a fix
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>decode_uri_component</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 		<span class='ident'>VUndefined</span>
@@ -123,7 +123,7 @@
 		<span class='ident'>VString</span>(<span class='ident'>decode_component</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>borrow</span>().<span class='ident'>to_str</span>().<span class='ident'>as_slice</span>()))
 	}))
 }
-<span class='doccomment'>/// Initialise the URI functions on a global object
+<span class='doccomment'>/// Initialise the URI functions on the global object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
 	<span class='kw'>let</span> <span class='ident'>global_ptr</span> <span class='op'>=</span> <span class='ident'>global</span>.<span class='ident'>borrow</span>();
 	<span class='ident'>global_ptr</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;encodeURI&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>encode_uri</span>));
