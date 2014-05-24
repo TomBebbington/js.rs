@@ -406,7 +406,7 @@ impl<B:Buffer> Lexer<B> {
 				'\r' => {
 					self.column_number = 0;
 				},
-				_ => ()
+				ch => fail!("{}:{}: Unexpected '{}'", self.line_number, self.column_number, ch)
 			};
 		}
 		Ok(())
