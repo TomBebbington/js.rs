@@ -42,12 +42,8 @@ pub struct Lexer<B> {
 	pub tokens : Vec<Token>,
 	/// The string buffer for identities
 	ident_buffer : StrBuf,
-	/// The string buffer for comments
-	comment_buffer : StrBuf,
 	/// The string buffer for numbers
 	num_buffer : StrBuf,
-	/// The kind of comment or `None` if it isn't in a comment
-	current_comment : Option<CommentType>,
 	/// The kind of number or `None` if it isn't in a number
 	current_number : Option<NumberType>,
 	/// The current line number in the script
@@ -66,8 +62,6 @@ impl<B:Buffer> Lexer<B> {
 			tokens: Vec::new(),
 			ident_buffer: StrBuf::with_capacity(32),
 			num_buffer: StrBuf::with_capacity(16),
-			comment_buffer: StrBuf::with_capacity(32),
-			current_comment: None,
 			current_number: None,
 			line_number: 1,
 			column_number: 0,
@@ -142,21 +136,6 @@ impl<B:Buffer> Lexer<B> {
 			};
 			self.column_number += 1;
 			match ch {
-				'\n' if self.current_comment == Some(SingleLineComment) => {
-					let comment = self.comment_buffer.clone();
-					self.push_token(TComment(comment));
-					self.comment_buffer.clear();
-					self.current_comment = None;
-				},
-				'*' if self.current_comment == Some(MultiLineComment) && self.peek_for('/') => {
-					let comment = self.comment_buffer.clone();
-					self.push_token(TComment(comment));
-					self.comment_buffer.clear();
-					self.current_comment = None;
-				},
-				_ if self.current_comment.is_some() => {
-					self.comment_buffer.push_char(ch);
-				},
 				'"' | '\'' => {
 					let mut buf = StrBuf::new();
 					loop {
@@ -288,10 +267,25 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TQuestion);
 				},
 				'/' if self.peek_for('/') => {
-					self.current_comment = Some(SingleLineComment);
+					let mut buf = StrBuf::new();
+					loop {
+						match try!(self.next()) {
+							'\n' => break,
+							ch => buf.push_char(ch)
+						}
+					}
+					self.push_token(TComment(buf));
 				},
 				'/' if self.peek_for('*') => {
-					self.current_comment = Some(MultiLineComment);
+					let mut buf = StrBuf::new();
+					loop {
+						match try!(self.next()) {
+							'\n' => break,
+							'*' if self.peek_for('/') => break,
+							ch => buf.push_char(ch)
+						}
+					}
+					self.push_token(TComment(buf));
 				},
 				'/' if self.peek_for('=') => {
 					self.clear_buffer();
