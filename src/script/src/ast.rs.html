@@ -612,7 +612,7 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A comparitive operation between two values
+<span class='doccomment'>/// A comparitive operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CompOp</span> {
 	<span class='doccomment'>/// `a == b` - Equality
 </span>	<span class='ident'>CompEqual</span>,
@@ -646,7 +646,7 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A logical operation between two boolean values
+<span class='doccomment'>/// A logical operation between 2 boolean values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>LogOp</span> {
 	<span class='doccomment'>/// `a &amp;&amp; b` - Logical and
 </span>	<span class='ident'>LogAnd</span>,
@@ -662,7 +662,7 @@
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
-<span class='doccomment'>/// A binary operation between two values
+<span class='doccomment'>/// A binary operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BinOp</span> {
 	<span class='doccomment'>/// Numeric operation
 </span>	<span class='ident'>BinNum</span>(<span class='ident'>NumOp</span>),
@@ -741,7 +741,7 @@
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// A Javascript expression
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ExprDef</span> {
-	<span class='doccomment'>/// Run a operation between two expressions
+	<span class='doccomment'>/// Run a operation between 2 expressions
 </span>	<span class='ident'>BinOpExpr</span>(<span class='ident'>BinOp</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Run an operation on a value
 </span>	<span class='ident'>UnaryOpExpr</span>(<span class='ident'>UnaryOp</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
@@ -926,7 +926,7 @@
 </span>	<span class='ident'>TQuestion</span>,
 	<span class='doccomment'>/// An arrow
 </span>	<span class='ident'>TArrow</span>,
-	<span class='doccomment'>/// An operation between two values
+	<span class='doccomment'>/// An operation between 2 values
 </span>	<span class='ident'>TBinOp</span>(<span class='ident'>BinOp</span>),
 	<span class='doccomment'>/// A unary operation
 </span>	<span class='ident'>TUnaryOp</span>(<span class='ident'>UnaryOp</span>),
