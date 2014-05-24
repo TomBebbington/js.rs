@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/TopHattedCoder/rust_js.svg?branch=master)](https://travis-ci.org/TopHattedCoder/rust_js)
+[![Build Status](https://travis-ci.org/TomBebbington/rust_js.svg?branch=master)](https://travis-ci.org/TomBebbington/rust_js)
 This is a Javascript lexer, parser and interpreter written in Rust. Currently, it has support for some of the language.
 
 Documentation
 -------------
-[View here](http://tophattedcoder.github.io/rust_js/script/index.html)
+[View here](http://tombebbington.github.io/rust_js/script/index.html)
 
 Supported language features
 ---------------------------
