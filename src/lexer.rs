@@ -42,10 +42,6 @@ pub struct Lexer<B> {
 	pub tokens : Vec<Token>,
 	/// The string buffer for identities
 	ident_buffer : StrBuf,
-	/// The string buffer for numbers
-	num_buffer : StrBuf,
-	/// The kind of number or `None` if it isn't in a number
-	current_number : Option<NumberType>,
 	/// The current line number in the script
 	line_number : uint,
 	/// The current column number in the script
@@ -61,8 +57,6 @@ impl<B:Buffer> Lexer<B> {
 		return Lexer {
 			tokens: Vec::new(),
 			ident_buffer: StrBuf::with_capacity(32),
-			num_buffer: StrBuf::with_capacity(16),
-			current_number: None,
 			line_number: 1,
 			column_number: 0,
 			buffer: buffer,
@@ -74,20 +68,6 @@ impl<B:Buffer> Lexer<B> {
 			let ident = self.ident_buffer.clone();
 			self.push_token(TIdent(ident));
 			self.ident_buffer.clear();
-		}
-		if self.current_number.is_some() {
-			let radix = match self.current_number.unwrap() {
-				HexadecimalNumber => 16,
-				OctalNumber => 8,
-				DecimalNumber => 10
-			};
-			let num = match from_str_radix(self.num_buffer.as_slice(), radix) {
-				Some(v) => v,
-				None => fail!("{}:{}: Could not parse '{}' as a base {} number", self.line_number, self.column_number, self.num_buffer, radix)
-			};
-			self.push_token(TNumber(num));
-			self.num_buffer.clear();
-			self.current_number = None;
 		}
 	}
 	fn push_token(&mut self, tk:TokenData) {
@@ -198,29 +178,56 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TString(buf))
 				},
 				'0' if self.peek_for('x') => {
-					self.current_number = Some(HexadecimalNumber);
+					let mut buf = StrBuf::new();
+					loop {
+						match try!(self.next()) {
+							ch if ch.is_digit_radix(16) => buf.push_char(ch),
+							ch => {
+								self.peek_buffer.push_char(ch);
+								break;
+							}
+						}
+					}
+					self.push_token(TNumber(from_str_radix(buf.as_slice(), 16).unwrap()));
 				},
-				'0' if self.ident_buffer.len() == 0 && self.current_number.is_none() => {
-					self.num_buffer.push_char(ch);
-					self.current_number = Some(OctalNumber);
+				'0' if self.ident_buffer.len() == 0 => {
+					let mut buf = StrBuf::new();
+					let mut gone_decimal = false;
+					loop {
+						let ch = try!(self.next());
+						match ch {
+							_ if ch.is_digit_radix(8) => buf.push_char(ch),
+							'8' | '9' | '.' => {
+								gone_decimal = true;
+								buf.push_char(ch);
+							},
+							ch => {
+								self.peek_buffer.push_char(ch);
+								break;
+							}
+						}
+					}
+					self.push_token(TNumber(if gone_decimal {
+						from_str(buf.as_slice())
+					} else {
+						from_str_radix(buf.as_slice(), 8)
+					}.unwrap()));
 				},
-				'0'..'7' if self.current_number == Some(OctalNumber) => {
-					self.num_buffer.push_char(ch);
-				},
-				'8' | '9' if self.current_number == Some(OctalNumber) => {
-					self.num_buffer.push_char(ch);
-					self.current_number = Some(DecimalNumber);
-				},
-				'0'.. '9' | 'A'.. 'F' | 'a' .. 'f' if self.current_number == Some(HexadecimalNumber) => {
-					self.num_buffer.push_char(ch)
-				},
-				'0'.. '9' if self.ident_buffer.len() == 0 => {
-					self.num_buffer.push_char(ch);
-					self.current_number = Some(DecimalNumber);
-				},
-				'.' if self.current_number.is_some() && !self.num_buffer.as_slice().contains(".") => {
-					self.num_buffer.push_char(ch);
-					self.current_number = Some(DecimalNumber);
+				_ if ch.is_digit() && self.ident_buffer.len() == 0 => {
+					let mut buf = StrBuf::new();
+					buf.push_char(ch);
+					loop {
+						let ch = try!(self.next());
+						match ch {
+							'.' => buf.push_char(ch),
+							_ if ch.is_digit() => buf.push_char(ch),
+							_ => {
+								self.peek_buffer.push_char(ch);
+								break;
+							}
+						}
+					}
+					self.push_token(TNumber(from_str(buf.as_slice()).unwrap()));
 				},
 				';' => {
 					self.clear_buffer();
