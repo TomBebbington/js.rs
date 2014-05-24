@@ -110,7 +110,7 @@ impl fmt::Show for BitOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A comparitive operation between two values
+/// A comparitive operation between 2 values
 pub enum CompOp {
 	/// `a == b` - Equality
 	CompEqual,
@@ -144,7 +144,7 @@ impl fmt::Show for CompOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A logical operation between two boolean values
+/// A logical operation between 2 boolean values
 pub enum LogOp {
 	/// `a && b` - Logical and
 	LogAnd,
@@ -160,7 +160,7 @@ impl fmt::Show for LogOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A binary operation between two values
+/// A binary operation between 2 values
 pub enum BinOp {
 	/// Numeric operation
 	BinNum(NumOp),
@@ -239,7 +239,7 @@ impl Position {
 #[deriving(Clone, Eq)]
 /// A Javascript expression
 pub enum ExprDef {
-	/// Run a operation between two expressions
+	/// Run a operation between 2 expressions
 	BinOpExpr(BinOp, Box<Expr>, Box<Expr>),
 	/// Run an operation on a value
 	UnaryOpExpr(UnaryOp, Box<Expr>),
@@ -424,7 +424,7 @@ pub enum TokenData {
 	TQuestion,
 	/// An arrow
 	TArrow,
-	/// An operation between two values
+	/// An operation between 2 values
 	TBinOp(BinOp),
 	/// A unary operation
 	TUnaryOp(UnaryOp),
