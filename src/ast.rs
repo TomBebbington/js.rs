@@ -1,6 +1,11 @@
 use std::fmt;
 use std::vec::Vec;
 use collections::treemap::TreeMap;
+/// A trait that allows the type to have its precedence found
+pub trait GetPrecedence {
+	/// Get the precedence
+	fn get_precedence(&self) -> uint;
+}
 #[deriving(Clone, Eq)]
 /// A Javascript Constant
 pub enum Const {
@@ -166,6 +171,23 @@ pub enum BinOp {
 	/// A logical operation
 	BinLog(LogOp)
 }
+impl GetPrecedence for BinOp {
+	fn get_precedence(&self) -> uint {
+		match *self {
+			BinNum(OpMul) | BinNum(OpDiv) | BinNum(OpMod) => 5,
+			BinNum(OpAdd) | BinNum(OpSub) => 6,
+			BinBit(BitShl) | BinBit(BitShr) => 7,
+			BinComp(CompLessThan) | BinComp(CompLessThanOrEqual) | BinComp(CompGreaterThan) | BinComp(CompGreaterThanOrEqual) => 8,
+			BinComp(CompEqual) | BinComp(CompNotEqual) | BinComp(CompStrictEqual) | BinComp(CompStrictNotEqual) => 9,
+			BinBit(BitAnd) => 10,
+			BinBit(BitXor) => 11,
+			BinBit(BitOr) => 12,
+			BinLog(LogAnd) => 13,
+			BinLog(LogOr) => 14,
+			
+		}
+	}
+}
 impl fmt::Show for BinOp {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		write!(f, "{}", match *self {
@@ -258,24 +280,14 @@ pub enum ExprDef {
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(Box<Expr>)
 }
-impl ExprDef {
-	/// Find the precedence of this expression, 0 being the highest
-	pub fn get_precedence(&self) -> uint {
+impl GetPrecedence for ExprDef {
+	fn get_precedence(&self) -> uint {
 		match *self {
 			GetFieldExpr(_, _) | GetConstFieldExpr(_, _) => 1,
 			CallExpr(_, _) | ConstructExpr(_, _) => 2,
 			UnaryOpExpr(UnaryIncrement(_), _) | UnaryOpExpr(UnaryDecrement(_), _) => 3,
 			UnaryOpExpr(UnaryNot, _) | UnaryOpExpr(UnaryMinus, _) | TypeOfExpr(_) => 4,
-			BinOpExpr(BinNum(OpMul), _, _) | BinOpExpr(BinNum(OpDiv), _, _) | BinOpExpr(BinNum(OpMod), _, _) => 5,
-			BinOpExpr(BinNum(OpAdd), _, _) | BinOpExpr(BinNum(OpSub), _, _) => 6,
-			BinOpExpr(BinBit(BitShl), _, _) | BinOpExpr(BinBit(BitShr), _, _) => 7,
-			BinOpExpr(BinComp(CompLessThan), _, _) | BinOpExpr(BinComp(CompLessThanOrEqual), _, _) | BinOpExpr(BinComp(CompGreaterThan), _, _) | BinOpExpr(BinComp(CompGreaterThanOrEqual), _, _) => 8,
-			BinOpExpr(BinComp(CompEqual), _, _) | BinOpExpr(BinComp(CompNotEqual), _, _) | BinOpExpr(BinComp(CompStrictEqual), _, _) | BinOpExpr(BinComp(CompStrictNotEqual), _, _) => 9,
-			BinOpExpr(BinBit(BitAnd), _, _) => 10,
-			BinOpExpr(BinBit(BitXor), _, _) => 11,
-			BinOpExpr(BinBit(BitOr), _, _) => 12,
-			BinOpExpr(BinLog(LogAnd), _, _) => 13,
-			BinOpExpr(BinLog(LogOr), _, _) => 14,
+			BinOpExpr(op, _, _) => op.get_precedence(),
 			IfExpr(_, _, _) => 15,
 			// 16 should be yield
 			AssignExpr(_, _) => 17,
