@@ -76,7 +76,10 @@ impl<B:Buffer> Lexer<B> {
 		if self.peek_buffer.len() == 0 {
 			self.buffer.read_char()
 		} else {
-			Ok(self.peek_buffer.pop_char().unwrap())
+			Ok(match self.peek_buffer.pop_char() {
+				Some(v) => v,
+				None => unreachable!()
+			})
 		}
 	}
 	fn peek_for(&mut self, peek:char) -> bool {
