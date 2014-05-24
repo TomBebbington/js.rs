@@ -18,13 +18,13 @@ macro_rules! mk (
 #[deriving(Clone)]
 #[deriving(Eq)]
 /// An error encountered during parsing an expression
-pub enum ParseError<'t> {
+pub enum ParseError {
 	/// When it expected a certain kind of token, but got another as part of something
-	Expected(Vec<TokenData>, Token, &'t str),
+	Expected(Vec<TokenData>, Token, &'static str),
 	/// When it expected a certain expression, but got another
-	ExpectedExpr(&'t str, Expr)
+	ExpectedExpr(&'static str, Expr)
 }
-impl<'t> fmt::Show for ParseError<'t> {
+impl fmt::Show for ParseError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
 			Expected(ref wanted, ref got, ref routine) if wanted.len() == 0 => write!(f, "{}:{}: Expected expression for {}, got {}", got.pos.line_number, got.pos.column_number, routine, got.data),
@@ -44,8 +44,8 @@ impl<'t> fmt::Show for ParseError<'t> {
 		}
 	}
 }
-pub type ParseResult<'t> = Result<Expr, ParseError<'t>>;
-pub type ParseStructResult<'t> = Result<Option<Expr>, ParseError<'t>>;
+pub type ParseResult = Result<Expr, ParseError>;
+pub type ParseStructResult = Result<Option<Expr>, ParseError>;
 /// A Javascript parser
 pub struct Parser {
 	/// The tokens being input
@@ -413,7 +413,7 @@ impl Parser {
 		}
 	}
 	/// Returns an error if the next symbol is not `tk`
-	fn expect<'t>(&mut self, tk:TokenData, routine:&'t str) -> Result<(), ParseError<'t>> {
+	fn expect(&mut self, tk:TokenData, routine:&'static str) -> Result<(), ParseError> {
 		self.pos += 1;
 		let curr_tk = self.tokens.get(self.pos - 1).clone();
 		if curr_tk.data != tk {
