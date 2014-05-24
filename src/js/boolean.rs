@@ -1,7 +1,7 @@
 use js::value::{Value, VUndefined, ResultValue, to_value};
 use std::gc::Gc;
 
-/// Create new boolean
+/// Create a new boolean
 pub fn make_boolean(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VUndefined))
 }

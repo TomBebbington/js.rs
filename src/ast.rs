@@ -1,27 +1,27 @@
 use std::fmt;
 use std::vec::Vec;
 use collections::treemap::TreeMap;
-/// A trait that allows the type to have its precedence found
+/// Represents an operator
 pub trait GetPrecedence {
-	/// Get the precedence
+	/// Get the precedence of an operator, where the lower it is, the more precedence it has
 	fn get_precedence(&self) -> uint;
 }
 #[deriving(Clone, Eq)]
-/// A Javascript Constant
+/// A Javascript constant
 pub enum Const {
-	/// A UTF-8 string
+	/// A UTF-8 string, such as `"Hello, world"`
 	CString(StrBuf),
-	/// A regular expression
+	/// A regular expression, such as `/where('s| is) [wW]ally/`
 	CRegExp(StrBuf, bool, bool),
-	/// A 64-bit floating-point number
+	/// A 64-bit floating-point number, such as `3.1415`
 	CNum(f64),
-	/// A 32-bit integer
+	/// A 32-bit integer, such as `42`
 	CInt(i32),
-	/// A boolean
+	/// A boolean, which is either `true` or `false` and is used to check if criteria are met
 	CBool(bool),
-	/// Null
+	/// The `null` value, which represents a non-existant value
 	CNull,
-	/// The infamous value returned when you access a non-existent field
+	/// The `undefined` value, which represents a field or index that doesn't exist
 	CUndefined
 }
 impl fmt::Show for Const {
@@ -38,17 +38,17 @@ impl fmt::Show for Const {
 	}
 }
 #[deriving(Clone, Eq)]
-/// An operation between 2 values
+/// A numeric operation between 2 values
 pub enum NumOp {
-	/// Add them togther
+	/// `a + b` - Addition
 	OpAdd,
-	/// Subtract the second from the first
+	/// `a - b` - Subtraction
 	OpSub,
-	/// Divide the first by the second
+	/// `a / b` - Division
 	OpDiv,
-	/// Multiply them together
+	/// `a * b` - Multiplication
 	OpMul,
-	/// Get the modulus of a number and another
+	/// `a % b` - Modulus
 	OpMod
 }
 impl fmt::Show for NumOp {
@@ -63,15 +63,15 @@ impl fmt::Show for NumOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// An operation on a single value
+/// A unary operation on a single value
 pub enum UnaryOp {
-	/// Unary increment (++) with the bool being true if it is before the variable
+	/// `a++` - increment the value
 	UnaryIncrement(bool),
-	/// Unary decrement (--) with the bool being true if it is before the variable
+	/// `a--` - decrement the value
 	UnaryDecrement(bool),
-	/// Unary minus operator on a number or variable
+	/// `-a` - negate the value
 	UnaryMinus,
-	/// Unary not
+	/// `!a` - get the opposite of the boolean value
 	UnaryNot
 }
 impl fmt::Show for UnaryOp {
@@ -85,17 +85,17 @@ impl fmt::Show for UnaryOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A bitwise operation
+/// A bitwise operation between 2 values
 pub enum BitOp {
-	/// Bitwise and
+	/// `a & b` - Bitwise and
 	BitAnd,
-	/// Bitwise or
+	/// `a | b` - Bitwise or
 	BitOr,
-	/// Bitwise xor
+	/// `a ^ b` - Bitwise xor
 	BitXor,
-	/// Bitwise shift left
+	/// `a << b` - Bit-shift leftwards
 	BitShl,
-	/// Bitwise shift right
+	/// `a >> b` - Bit-shift rightrights
 	BitShr
 }
 impl fmt::Show for BitOp {
@@ -110,23 +110,23 @@ impl fmt::Show for BitOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A comparison operation between two values
+/// A comparitive operation between two values
 pub enum CompOp {
-	/// If they represent the same value or similar values
+	/// `a == b` - Equality
 	CompEqual,
-	/// If they represent distinct values
+	/// `a != b` - Unequality
 	CompNotEqual,
-	/// If they represent the same value
+	/// `a === b` - Strict equality
 	CompStrictEqual,
-	/// If they represent very distinct values
+	/// `a !== b` - Strict unequality
 	CompStrictNotEqual,
-	/// If the first is greater than the second
+	/// `a > b` - If `a` is greater than `b`
 	CompGreaterThan,
-	/// If the first is greater than or equal to the second
+	/// `a >= b` - If `a` is greater than or equal to `b`
 	CompGreaterThanOrEqual,
-	/// If the first is less than the second
+	/// `a < b` - If `a` is less than `b`
 	CompLessThan,
-	/// If the first is less than or equal to the second
+	/// `a <= b` - If `a` is less than or equal to `b`
 	CompLessThanOrEqual,
 }
 impl fmt::Show for CompOp {
@@ -144,11 +144,11 @@ impl fmt::Show for CompOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A logical operation between two booleans
+/// A logical operation between two boolean values
 pub enum LogOp {
-	/// Logical and
+	/// `a && b` - Logical and
 	LogAnd,
-	/// Logical or
+	/// `a || b` - Logical or
 	LogOr
 }
 impl fmt::Show for LogOp {
@@ -160,15 +160,15 @@ impl fmt::Show for LogOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// Any operation between two values
+/// A binary operation between two values
 pub enum BinOp {
-	/// A numeric operation
+	/// Numeric operation
 	BinNum(NumOp),
-	/// A bitwise operation
+	/// Bitwise operation
 	BinBit(BitOp),
-	/// A comparitive operation
+	/// Comparitive operation
 	BinComp(CompOp),
-	/// A logical operation
+	/// Logical operation
 	BinLog(LogOp)
 }
 impl GetPrecedence for BinOp {
@@ -199,7 +199,7 @@ impl fmt::Show for BinOp {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A Javascript Expression, including position data
+/// A Javascript expression, including its position
 pub struct Expr {
 	/// The expression definition
 	pub def : ExprDef,
@@ -209,7 +209,7 @@ pub struct Expr {
 	pub end : Position
 }
 impl Expr {
-	/// Create a new expression with a position
+	/// Create a new expression with a starting and ending position
 	pub fn new(def: ExprDef, start:Position, end:Position) -> Expr {
 		Expr{def: def, start: start, end: end}
 	}
@@ -237,23 +237,23 @@ impl Position {
 	}
 }
 #[deriving(Clone, Eq)]
-/// A Javascript Expression
+/// A Javascript expression
 pub enum ExprDef {
 	/// Run a operation between two expressions
 	BinOpExpr(BinOp, Box<Expr>, Box<Expr>),
-	/// Run an operation on an expression
+	/// Run an operation on a value
 	UnaryOpExpr(UnaryOp, Box<Expr>),
-	/// Make a simple value
+	/// Make a constant value
 	ConstExpr(Const),
-	/// Run several expressions
+	/// Run several expressions from top-to-bottom
 	BlockExpr(Vec<Expr>),
 	/// Load a reference to a value
 	LocalExpr(StrBuf),
-	/// Gets the cosntant field of the expression
+	/// Gets the constant field of a value
 	GetConstFieldExpr(Box<Expr>, StrBuf),
-	/// Gets the field of an expression
+	/// Gets the field of a value
 	GetFieldExpr(Box<Expr>, Box<Expr>),
-	/// Call a function with some arguments
+	/// Call a function with some values
 	CallExpr(Box<Expr>, Vec<Expr>),
 	/// Repeatedly run an expression while the conditional expression resolves to true
 	WhileLoopExpr(Box<Expr>, Box<Expr>),
@@ -261,21 +261,21 @@ pub enum ExprDef {
 	IfExpr(Box<Expr>, Box<Expr>, Option<Box<Expr>>),
 	/// Run blocks whose cases match the expression
 	SwitchExpr(Box<Expr>, Vec<(Expr, Vec<Expr>)>, Option<Box<Expr>>),
-	/// Create an object
+	/// Create an object out of the binary tree given
 	ObjectDeclExpr(Box<TreeMap<StrBuf, Expr>>),
 	/// Create an array with items inside
 	ArrayDeclExpr(Vec<Expr>),
 	/// Create a function with the given name, arguments, and expression
 	FunctionDeclExpr(Option<StrBuf>, Vec<StrBuf>, Box<Expr>),
-	/// Create an arrow function with the fiven arguments and expression
+	/// Create an arrow function with the given arguments and expression
 	ArrowFunctionDeclExpr(Vec<StrBuf>, Box<Expr>),
 	/// Construct an object from the function and arguments given
 	ConstructExpr(Box<Expr>, Vec<Expr>),
 	/// Return the expression from a function
 	ReturnExpr(Option<Box<Expr>>),
-	/// Throw an expression
+	/// Throw a value
 	ThrowExpr(Box<Expr>),
-	/// Assign an expression to another expression
+	/// Assign an expression to a value
 	AssignExpr(Box<Expr>, Box<Expr>),
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(Box<Expr>)
@@ -367,7 +367,7 @@ impl fmt::Show for TreeMap<StrBuf, Expr> {
 }
 #[deriving(Clone)]
 #[deriving(Eq)]
-/// A single of token of Javascript code including the position
+/// A single of token of Javascript code including its position
 pub struct Token {
 	/// The token
 	pub data : TokenData,

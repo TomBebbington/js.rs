@@ -15,9 +15,9 @@ use std::num::from_str_radix;
 #[deriving(Show)]
 /// The type of string used
 pub enum StringType {
-	/// Double-quoted
+	/// `"` - Double-quoted
 	DoubleQuote,
-	/// Single-quoted
+	/// `'` - Single-quoted
 	SingleQuote
 }
 #[deriving(Clone)]
@@ -25,22 +25,22 @@ pub enum StringType {
 #[deriving(Show)]
 /// The type of comment used
 pub enum CommentType {
-	/// Multi-line comment
+	/// `/*...*/` - A multi-line comment
 	MultiLineComment,
-	/// Single-line comment
+	/// `//...` - A single-line comment
 	SingleLineComment
 }
 #[deriving(Clone, Eq, Show)]
 /// The type of number used
 pub enum NumberType {
-	/// Decimal number
+	/// A decimal number, such as `3.1415`
 	DecimalNumber,
-	/// Hexadecimal number
+	/// A hexadecimal number, such as `0xFF00FF`
 	HexadecimalNumber,
-	/// Octal number
+	/// An octal number, such as `011`
 	OctalNumber
 }
-/// The Javascript Lexer
+/// A Javascript lexer
 pub struct Lexer<B> {
 	/// The list of tokens generated so far
 	pub tokens : Vec<Token>,
@@ -52,17 +52,17 @@ pub struct Lexer<B> {
 	comment_buffer : StrBuf,
 	/// The string buffer for numbers
 	num_buffer : StrBuf,
-	/// The kind of string - i.e. double quote or single quote or none if it isn't in a string
+	/// The kind of string or `None` if it isn't in a string
 	string_start : Option<StringType>,
-	/// The kind of comment
+	/// The kind of comment or `None` if it isn't in a comment
 	current_comment : Option<CommentType>,
-	/// The kind of number
+	/// The kind of number or `None` if it isn't in a number
 	current_number : Option<NumberType>,
-	/// If a backwards slash has just been read
+	/// True if a backwards slash has just been read
 	escaped : bool,
-	/// The current line number
+	/// The current line number in the script
 	line_number : uint,
-	/// The current column number
+	/// The current column number in the script
 	column_number : uint,
 	/// The reader
 	buffer: B,
@@ -145,7 +145,7 @@ impl<B:Buffer> Lexer<B> {
 			}
 		}
 	}
-	/// Processes an input stream from a BufferedReader into an array of tokens
+	/// Processes an input stream from the `buffer` into a vector of tokens
 	pub fn lex(&mut self) -> IoResult<()> {
 		loop {
 			let ch = match self.next() {

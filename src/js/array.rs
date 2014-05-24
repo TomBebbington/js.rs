@@ -1,7 +1,7 @@
 use js::value::{Value, VUndefined, ResultValue, to_value};
 use std::gc::Gc;
 
-/// Create new array
+/// Create a new array
 pub fn make_array(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	let this_ptr = this.borrow();
 	this_ptr.set_field_slice("length", to_value(0i32));

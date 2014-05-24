@@ -16,25 +16,25 @@ use std::gc::Gc;
 use std::cell::RefCell;
 /// An execution engine
 pub trait Executor {
-	/// Makes a new execution engine
+	/// Make a new execution engine
 	fn new() -> Self;
-	/// Sets a global variable
+	/// Set a global variable called `name` with the value `val`
 	fn set_global(&mut self, name:StrBuf, val:Value) -> Value;
-	/// Gets a global variable
+	/// Resolve the global variable `name`
 	fn get_global(&self, name:StrBuf) -> Value;
-	/// Make a new scope
+	/// Create a new scope and return it
 	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>>;
 	/// Destroy the current scope
 	fn destroy_scope(&mut self) -> ();
-	/// Runs the expression
+	/// Run an expression
 	fn run(&mut self, expr:&Expr) -> ResultValue;
 }
 #[deriving(Clone)]
-/// An intepreter
+/// A Javascript intepreter
 pub struct Interpreter {
-	/// An object representing the global variables
+	/// An object representing the global object
 	global: Value,
-	/// The scopes
+	/// The variable scopes
 	scopes: Vec<Gc<RefCell<ObjectData>>>,
 }
 impl Executor for Interpreter {

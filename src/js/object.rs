@@ -62,23 +62,23 @@ impl FromValue for Property {
 		})
 	}
 }
-/// Create new object
+/// Create a new object
 pub fn make_object(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(VUndefined))
 }
-/// Get the prototype
+/// Get the prototype of an object
 pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
 	Ok(obj.borrow().get_field_slice(INSTANCE_PROTOTYPE))
 }
-/// Set the prototype
+/// Set the prototype of an object
 pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = *args.get(0);
 	let proto = *args.get(1);
 	obj.borrow().set_field_slice(INSTANCE_PROTOTYPE, proto);
 	Ok(obj)
 }
-/// Define the property
+/// Define a property in an object
 pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
 	let prop = from_value::<StrBuf>(*args.get(1)).unwrap();

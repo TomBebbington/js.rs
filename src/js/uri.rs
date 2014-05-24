@@ -11,7 +11,7 @@ pub fn encode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}))
 }
 /// Encode a URI component
-/// Rust uses RFC 3986, but JS doesn't, this will need a fix
+/// Rust uses RFC 3986, but standard Javascript doesn't, this will need a fix
 pub fn encode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
@@ -28,7 +28,7 @@ pub fn decode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}))
 }
 /// Decode a URI component
-/// Rust uses RFC 3986, but JS doesn't, this will need a fix
+/// Rust uses RFC 3986, but standard Javascript doesn't, this will need a fix
 pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(Gc::new(if args.len() == 0 {
 		VUndefined
@@ -36,7 +36,7 @@ pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 		VString(decode_component(args.get(0).borrow().to_str().as_slice()))
 	}))
 }
-/// Initialise the URI functions on a global object
+/// Initialise the URI functions on the global object
 pub fn init(global:Value) {
 	let global_ptr = global.borrow();
 	global_ptr.set_field_slice("encodeURI", to_value(encode_uri));

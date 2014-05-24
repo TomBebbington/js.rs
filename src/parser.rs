@@ -54,7 +54,7 @@ pub struct Parser {
 	pos: uint
 }
 impl Parser {
-	/// Creates a new parser, using [tokens] as input
+	/// Creates a new parser, using `tokens` as input
 	pub fn new(tokens: Vec<Token>) -> Parser {
 		Parser {tokens: tokens, pos: 0}
 	}
@@ -412,7 +412,7 @@ impl Parser {
 			Ok(result)
 		}
 	}
-	/// Returns an error if the next symbol is not tk
+	/// Returns an error if the next symbol is not `tk`
 	fn expect<'t>(&mut self, tk:TokenData, routine:&'t str) -> Result<(), ParseError<'t>> {
 		self.pos += 1;
 		let curr_tk = self.tokens.get(self.pos - 1).clone();

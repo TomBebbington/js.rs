@@ -30,7 +30,7 @@ pub fn _create(global: Value) -> Value {
 	string_ptr.set_field_slice(PROTOTYPE, proto);
 	string
 }
-/// Initialise the global object with the `String` object
+/// Initialise the `String` object on the global object
 pub fn init(global:Value) {
 	let global_ptr = global.borrow();
 	global_ptr.set_field_slice("String", _create(global));

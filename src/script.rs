@@ -15,42 +15,42 @@
 #![deny(unused_must_use)]
 #![feature(macro_rules)]
 
-//! A Javascript Parser / Interpreter library
+//! A Javascript lexing, parsing and execution library
 extern crate collections;
 extern crate time;
 extern crate serialize;
 extern crate rand;
 extern crate url;
-/// The Abstract Syntax Tree module
+/// Abstract syntax tree for lexing and parsing
 pub mod ast;
-/// The lexing module
+/// A lexer which transforms a stream into a seqeunce of tokens
 pub mod lexer;
-/// The parsing module
+/// A parser which transforms a sequence of tokens into Javascript expressions
 pub mod parser;
-/// The execution module
+/// An interpreter which runs Javascript expressions
 pub mod exec;
-/// The javascript core library module
+/// An implementation of the core Javascript library in Rust
 pub mod js {
-	/// Contains the Javascript value
+	/// Javascript values, utility methods and conversion between Javascript values and Rust values
 	pub mod value;
-	/// Functions
+	/// The global `Function` object and function value representations
 	pub mod function;
-	/// Contains the Javascript object
+	/// The global `Object` object
 	pub mod object;
-	/// Contains the Javascript array
+	/// The global `Array` object
 	pub mod array;
-	/// The global console object
+	/// The global `console` object
 	pub mod console;
-	/// The global math object
+	/// The global `Math` object
 	pub mod math;
-	/// The global JSON object
+	/// The global `JSON` object
 	pub mod json;
-	/// The global Number object and associated functions
+	/// The global `Number` object with related functions and constants
 	pub mod number;
-	/// Errors
+	/// The global `Error` object
 	pub mod error;
-	/// Global methods concerning URIs
+	/// Contains global methods concerning URIs
 	pub mod uri;
-	/// The global string object
+	/// The global `String` object
 	pub mod string;
 }

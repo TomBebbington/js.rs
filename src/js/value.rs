@@ -16,19 +16,19 @@ pub type Value = Gc<ValueData>;
 #[deriving(Clone)]
 /// A Javascript value
 pub enum ValueData {
-	/// `null` - A null value, such as the `parentNode` of a newly created HTML Element
+	/// `null` - A null value, for when a value doesn't exist
 	VNull,
-	/// `undefined` - An undefined value, such as `{}.children`
+	/// `undefined` - An undefined value, for when a field or index doesn't exist
 	VUndefined,
 	/// `boolean` - A `true` / `false` value, for if a certain criteria is met
 	VBoolean(bool),
-	/// `String` - A UTF-8 string, such as `"hello"`
+	/// `String` - A UTF-8 string, such as `"Hello, world"`
 	VString(StrBuf),
-	/// `Number` - A 64-bit floating point number, such as `-1293.0625`
+	/// `Number` - A 64-bit floating point number, such as `3.1415`
 	VNumber(f64),
-	/// `Number` - A 32-bit integer, such as `0x5f3759df`
+	/// `Number` - A 32-bit integer, such as `42`
 	VInteger(i32),
-	/// `Object` - An object, such as `Math`, represented by a binary tree of string keys to javascript values
+	/// `Object` - An object, such as `Math`, represented by a binary tree of string keys to Javascript values
 	VObject(RefCell<ObjectData>),
 	/// `Function` - A runnable block of code, such as `Math.sqrt`, which can take some variables and return a useful value or act upon an object
 	VFunction(RefCell<Function>)

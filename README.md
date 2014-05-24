@@ -3,7 +3,7 @@ This is a Javascript lexer, parser and interpreter written in Rust. Currently, i
 
 Documentation
 -------------
-[View here](http://www.rust-ci.org/TopHattedCoder/rust_js/doc/script/)
+[View here](http://tophattedcoder.github.io/rust_js/script/index.html)
 
 Supported language features
 ---------------------------
