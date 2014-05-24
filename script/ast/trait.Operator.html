@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="The script library documentation.">
 
-    <title>script::parser - Rust</title>
+    <title>script::ast::Operator - Rust</title>
 
     <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
           rel='stylesheet' type='text/css'>
@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='../index.html'>script</a></p><div class='block mod'><h2>Modules</h2><a class='mod ' href='../ast/index.html'>ast</a><br/><a class='mod ' href='../exec/index.html'>exec</a><br/><a class='mod ' href='../js/index.html'>js</a><br/><a class='mod ' href='../lexer/index.html'>lexer</a><br/><a class='mod current' href='../parser/index.html'>parser</a><br/></div>
+        <p class='location'><a href='../index.html'>script</a>&#8203;::<a href='index.html'>ast</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Expr.html'>Expr</a><br/><a class='struct ' href='struct.Position.html'>Position</a><br/><a class='struct ' href='struct.Token.html'>Token</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.Operator.html'>Operator</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -38,39 +38,20 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'>Module <a href='../index.html'>script</a>::<a class='mod' href=''>parser</a><a class='source' href='../../src/script/src/parser.rs.html#1-440'>[src]</a></h1>
-<div class='docblock'><p>A parser which transforms a sequence of tokens into Javascript expressions</p>
-</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                    <tr>
-                        <td><a class='struct' href='struct.Parser.html'
-                               title='script::parser::Parser'>Parser</a></td>
-                        <td class='docblock short'><p>A Javascript parser</p>
-</td>
-                    </tr>
-                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                    <tr>
-                        <td><a class='type' href='type.ParseError.html'
-                               title='script::parser::ParseError'>ParseError</a></td>
-                        <td class='docblock short'><p>An error encountered during parsing an expression</p>
-</td>
-                    </tr>
-                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
-<table>
-                    <tr>
-                        <td><a class='type' href='type.ParseResult.html'
-                               title='script::parser::ParseResult'>ParseResult</a></td>
-                        <td class='docblock short'></td>
-                    </tr>
-                
-                    <tr>
-                        <td><a class='type' href='type.ParseStructResult.html'
-                               title='script::parser::ParseStructResult'>ParseStructResult</a></td>
-                        <td class='docblock short'></td>
-                    </tr>
-                </table></section>
+    <section id='main' class="content trait">
+<h1 class='fqn'>Trait <a href='../index.html'>script</a>::<a href='index.html'>ast</a>::<a class='trait' href=''>Operator</a><a class='source' href='../../src/script/src/ast.rs.html#5-8'>[src]</a></h1>
+<pre class='rust trait'>pub trait Operator {
+    fn <a href='#tymethod.get_precedence' class='fnname'>get_precedence</a>(&amp;self) -&gt; uint;
+}</pre><div class='docblock'><p>Represents an operator</p>
+</div>
+            <h2 id='required-methods'>Required Methods</h2>
+            <div class='methods'>
+        <h3 id='tymethod.get_precedence' class='method'><code>fn <a href='#tymethod.get_precedence' class='fnname'>get_precedence</a>(&amp;self) -&gt; uint</code></h3><div class='docblock'><p>Get the precedence as an unsignes integer, where the lower it is, the more precedence/priority it has</p>
+</div></div>
+                <h2 id='implementors'>Implementors</h2>
+                <ul class='item-list' id='implementors-list'>
+            <li><code><a class='type' href='../../script/ast/type.ExprDef.html' title='script::ast::ExprDef'>ExprDef</a></code></li><li><code><a class='type' href='../../script/ast/type.BinOp.html' title='script::ast::BinOp'>BinOp</a></code></li></ul><script type="text/javascript" async
+                                      src="../../implementors/script/ast/trait.Operator.js"></script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

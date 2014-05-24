@@ -504,8 +504,8 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>::<span class='ident'>Vec</span>;
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>treemap</span>::<span class='ident'>TreeMap</span>;
 <span class='doccomment'>/// Represents an operator
-</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>GetPrecedence</span> {
-	<span class='doccomment'>/// Get the precedence of an operator, where the lower it is, the more precedence it has
+</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Operator</span> {
+	<span class='doccomment'>/// Get the precedence as an unsignes integer, where the lower it is, the more precedence/priority it has
 </span>	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
@@ -673,7 +673,7 @@
 	<span class='doccomment'>/// Logical operation
 </span>	<span class='ident'>BinLog</span>(<span class='ident'>LogOp</span>)
 }
-<span class='kw'>impl</span> <span class='ident'>GetPrecedence</span> <span class='kw'>for</span> <span class='ident'>BinOp</span> {
+<span class='kw'>impl</span> <span class='ident'>Operator</span> <span class='kw'>for</span> <span class='ident'>BinOp</span> {
 	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
 		<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
 			<span class='ident'>BinNum</span>(<span class='ident'>OpMul</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpDiv</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpMod</span>) <span class='op'>=&gt;</span> <span class='number'>5</span>,
@@ -782,7 +782,7 @@
 	<span class='doccomment'>/// Return a string representing the type of the given expression
 </span>	<span class='ident'>TypeOfExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)
 }
-<span class='kw'>impl</span> <span class='ident'>GetPrecedence</span> <span class='kw'>for</span> <span class='ident'>ExprDef</span> {
+<span class='kw'>impl</span> <span class='ident'>Operator</span> <span class='kw'>for</span> <span class='ident'>ExprDef</span> {
 	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
 		<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
 			<span class='ident'>GetFieldExpr</span>(_, _) <span class='op'>|</span> <span class='ident'>GetConstFieldExpr</span>(_, _) <span class='op'>=&gt;</span> <span class='number'>1</span>,

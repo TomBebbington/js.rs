@@ -456,55 +456,6 @@
 <span id='416'>416</span>
 <span id='417'>417</span>
 <span id='418'>418</span>
-<span id='419'>419</span>
-<span id='420'>420</span>
-<span id='421'>421</span>
-<span id='422'>422</span>
-<span id='423'>423</span>
-<span id='424'>424</span>
-<span id='425'>425</span>
-<span id='426'>426</span>
-<span id='427'>427</span>
-<span id='428'>428</span>
-<span id='429'>429</span>
-<span id='430'>430</span>
-<span id='431'>431</span>
-<span id='432'>432</span>
-<span id='433'>433</span>
-<span id='434'>434</span>
-<span id='435'>435</span>
-<span id='436'>436</span>
-<span id='437'>437</span>
-<span id='438'>438</span>
-<span id='439'>439</span>
-<span id='440'>440</span>
-<span id='441'>441</span>
-<span id='442'>442</span>
-<span id='443'>443</span>
-<span id='444'>444</span>
-<span id='445'>445</span>
-<span id='446'>446</span>
-<span id='447'>447</span>
-<span id='448'>448</span>
-<span id='449'>449</span>
-<span id='450'>450</span>
-<span id='451'>451</span>
-<span id='452'>452</span>
-<span id='453'>453</span>
-<span id='454'>454</span>
-<span id='455'>455</span>
-<span id='456'>456</span>
-<span id='457'>457</span>
-<span id='458'>458</span>
-<span id='459'>459</span>
-<span id='460'>460</span>
-<span id='461'>461</span>
-<span id='462'>462</span>
-<span id='463'>463</span>
-<span id='464'>464</span>
-<span id='465'>465</span>
-<span id='466'>466</span>
-<span id='467'>467</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>TIdent</span>, <span class='ident'>TNumber</span>, <span class='ident'>TString</span>, <span class='ident'>TSemicolon</span>, <span class='ident'>TComment</span>, <span class='ident'>TColon</span>, <span class='ident'>TDot</span>, <span class='ident'>TEqual</span>, <span class='ident'>TOpenParen</span>, <span class='ident'>TCloseParen</span>, <span class='ident'>TComma</span>, <span class='ident'>TOpenBlock</span>, <span class='ident'>TCloseBlock</span>, <span class='ident'>TOpenArray</span>, <span class='ident'>TCloseArray</span>, <span class='ident'>TQuestion</span>, <span class='ident'>TBinOp</span>, <span class='ident'>TAssignOp</span>, <span class='ident'>TUnaryOp</span>, <span class='ident'>TArrow</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>OpAdd</span>, <span class='ident'>OpSub</span>, <span class='ident'>OpMul</span>, <span class='ident'>OpDiv</span>, <span class='ident'>OpMod</span>};
@@ -516,11 +467,9 @@
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>Token</span>, <span class='ident'>TokenData</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufReader</span>, <span class='ident'>BufferedReader</span>, <span class='ident'>Buffer</span>, <span class='ident'>IoResult</span>, <span class='ident'>EndOfFile</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>strbuf</span>::<span class='ident'>StrBuf</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>char</span>::{<span class='ident'>from_u32</span>, <span class='ident'>is_whitespace</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>char</span>::<span class='ident'>from_u32</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>from_str_radix</span>;
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// The type of string used
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>StringType</span> {
 	<span class='doccomment'>/// `&quot;` - Double-quoted
@@ -528,9 +477,7 @@
 	<span class='doccomment'>/// `&#39;` - Single-quoted
 </span>	<span class='ident'>SingleQuote</span>
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// The type of comment used
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CommentType</span> {
 	<span class='doccomment'>/// `/*...*/` - A multi-line comment
@@ -538,7 +485,7 @@
 	<span class='doccomment'>/// `//...` - A single-line comment
 </span>	<span class='ident'>SingleLineComment</span>
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>, <span class='ident'>Show</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// The type of number used
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>NumberType</span> {
 	<span class='doccomment'>/// A decimal number, such as `3.1415`
@@ -552,22 +499,6 @@
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Lexer</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// The list of tokens generated so far
 </span>	<span class='kw'>pub</span> <span class='ident'>tokens</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// The string buffer for identities
-</span>	<span class='ident'>ident_buffer</span> : <span class='ident'>StrBuf</span>,
-	<span class='doccomment'>/// The string buffer for strings
-</span>	<span class='ident'>string_buffer</span> : <span class='ident'>StrBuf</span>,
-	<span class='doccomment'>/// The string buffer for comments
-</span>	<span class='ident'>comment_buffer</span> : <span class='ident'>StrBuf</span>,
-	<span class='doccomment'>/// The string buffer for numbers
-</span>	<span class='ident'>num_buffer</span> : <span class='ident'>StrBuf</span>,
-	<span class='doccomment'>/// The kind of string or `None` if it isn&#39;t in a string
-</span>	<span class='ident'>string_start</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>StringType</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// The kind of comment or `None` if it isn&#39;t in a comment
-</span>	<span class='ident'>current_comment</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>CommentType</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// The kind of number or `None` if it isn&#39;t in a number
-</span>	<span class='ident'>current_number</span> : <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>NumberType</span><span class='op'>&gt;</span>,
-	<span class='doccomment'>/// True if a backwards slash has just been read
-</span>	<span class='ident'>escaped</span> : <span class='ident'>bool</span>,
 	<span class='doccomment'>/// The current line number in the script
 </span>	<span class='ident'>line_number</span> : <span class='ident'>uint</span>,
 	<span class='doccomment'>/// The current column number in the script
@@ -582,40 +513,11 @@
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>buffer</span>: <span class='ident'>B</span>) <span class='op'>-&gt;</span> <span class='ident'>Lexer</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
 		<span class='kw'>return</span> <span class='ident'>Lexer</span> {
 			<span class='ident'>tokens</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
-			<span class='ident'>ident_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>32</span>),
-			<span class='ident'>string_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>256</span>),
-			<span class='ident'>num_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>16</span>),
-			<span class='ident'>comment_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>32</span>),
-			<span class='ident'>string_start</span>: <span class='prelude-val'>None</span>,
-			<span class='ident'>current_comment</span>: <span class='prelude-val'>None</span>,
-			<span class='ident'>current_number</span>: <span class='prelude-val'>None</span>,
-			<span class='ident'>escaped</span>: <span class='boolval'>false</span>,
 			<span class='ident'>line_number</span>: <span class='number'>1</span>,
 			<span class='ident'>column_number</span>: <span class='number'>0</span>,
 			<span class='ident'>buffer</span>: <span class='ident'>buffer</span>,
 			<span class='ident'>peek_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>new</span>()
 		};
-	}
-	<span class='kw'>fn</span> <span class='ident'>clear_buffer</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-		<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>ident_buffer</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-			<span class='kw'>let</span> <span class='ident'>ident</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>ident_buffer</span>.<span class='ident'>clone</span>();
-			<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TIdent</span>(<span class='ident'>ident</span>));
-			<span class='self'>self</span>.<span class='ident'>ident_buffer</span>.<span class='ident'>clear</span>();
-		}
-		<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_number</span>.<span class='ident'>is_some</span>() {
-			<span class='kw'>let</span> <span class='ident'>radix</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>current_number</span>.<span class='ident'>unwrap</span>() {
-				<span class='ident'>HexadecimalNumber</span> <span class='op'>=&gt;</span> <span class='number'>16</span>,
-				<span class='ident'>OctalNumber</span> <span class='op'>=&gt;</span> <span class='number'>8</span>,
-				<span class='ident'>DecimalNumber</span> <span class='op'>=&gt;</span> <span class='number'>10</span>
-			};
-			<span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>from_str_radix</span>(<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>as_slice</span>(), <span class='ident'>radix</span>) {
-				<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
-				<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: Could not parse &#39;{}&#39; as a base {} number&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='self'>self</span>.<span class='ident'>num_buffer</span>, <span class='ident'>radix</span>)
-			};
-			<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TNumber</span>(<span class='ident'>num</span>));
-			<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>clear</span>();
-			<span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-		}
 	}
 	<span class='kw'>fn</span> <span class='ident'>push_token</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>tk</span>:<span class='ident'>TokenData</span>) {
 		<span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>push</span>(<span class='ident'>Token</span>::<span class='ident'>new</span>(<span class='ident'>tk</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>))
@@ -633,12 +535,15 @@
 		<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 			<span class='self'>self</span>.<span class='ident'>buffer</span>.<span class='ident'>read_char</span>()
 		} <span class='kw'>else</span> {
-			<span class='prelude-val'>Ok</span>(<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>pop_char</span>().<span class='ident'>unwrap</span>())
+			<span class='prelude-val'>Ok</span>(<span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>pop_char</span>() {
+				<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
+				<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>()
+			})
 		}
 	}
 	<span class='kw'>fn</span> <span class='ident'>peek_for</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>peek</span>:<span class='ident'>char</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
 		<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-			<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>pop_char</span>() <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>peek</span>)
+			<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>as_slice</span>().<span class='ident'>char_at</span>(<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>) <span class='op'>==</span> <span class='ident'>peek</span>
 		} <span class='kw'>else</span> {
 			<span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>buffer</span>.<span class='ident'>read_char</span>() {
 				<span class='prelude-val'>Ok</span>(<span class='ident'>ch</span>) <span class='kw'>if</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='ident'>peek</span> <span class='op'>=&gt;</span> {
@@ -663,201 +568,219 @@
 			};
 			<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>1</span>;
 			<span class='kw'>match</span> <span class='ident'>ch</span> {
-				_ <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>escaped</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>escaped</span> <span class='op'>=</span> <span class='boolval'>false</span>;
-					<span class='kw'>if</span> <span class='ident'>ch</span> <span class='op'>!=</span> <span class='string'>&#39;\n&#39;</span> {
-						<span class='kw'>let</span> <span class='ident'>escaped_ch</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>ch</span> {
-							<span class='string'>&#39;n&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\n&#39;</span>,
-							<span class='string'>&#39;r&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\r&#39;</span>,
-							<span class='string'>&#39;t&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\t&#39;</span>,
-							<span class='string'>&#39;b&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\x08&#39;</span>,
-							<span class='string'>&#39;f&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\x0c&#39;</span>,
-							<span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\0&#39;</span>,
-							<span class='string'>&#39;x&#39;</span> <span class='op'>=&gt;</span> {
-								<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>);
-								<span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>2</span>) {
-									<span class='ident'>nums</span>.<span class='ident'>push_char</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()).<span class='ident'>clone</span>());
-								}
-								<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>2</span>;
-								<span class='kw'>let</span> <span class='ident'>as_num</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>from_str_radix</span>(<span class='ident'>nums</span>.<span class='ident'>as_slice</span>(), <span class='number'>16</span>) {
-									<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
-									<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='number'>0</span>
-								};
-								<span class='kw'>match</span> <span class='ident'>from_u32</span>(<span class='ident'>as_num</span>) {
-									<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
-									<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: {} is not a valid unicode scalar value&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>as_num</span>)
+				<span class='string'>&#39;&quot;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> {
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>loop</span> {
+						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
+							<span class='string'>&#39;\&#39;&#39;</span> <span class='kw'>if</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> {
+								<span class='kw'>break</span>;
+							},
+							<span class='string'>&#39;&quot;&#39;</span> <span class='kw'>if</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;&quot;&#39;</span> <span class='op'>=&gt;</span> {
+								<span class='kw'>break</span>;
+							},
+							<span class='string'>&#39;\\&#39;</span> <span class='op'>=&gt;</span> {
+								<span class='kw'>let</span> <span class='ident'>escape</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
+								<span class='kw'>if</span> <span class='ident'>escape</span> <span class='op'>!=</span> <span class='string'>&#39;\n&#39;</span> {
+									<span class='kw'>let</span> <span class='ident'>escaped_ch</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>escape</span> {
+										<span class='string'>&#39;n&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\n&#39;</span>,
+										<span class='string'>&#39;r&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\r&#39;</span>,
+										<span class='string'>&#39;t&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\t&#39;</span>,
+										<span class='string'>&#39;b&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\x08&#39;</span>,
+										<span class='string'>&#39;f&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\x0c&#39;</span>,
+										<span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\0&#39;</span>,
+										<span class='string'>&#39;x&#39;</span> <span class='op'>=&gt;</span> {
+											<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>);
+											<span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>2</span>) {
+												<span class='ident'>nums</span>.<span class='ident'>push_char</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()));
+											}
+											<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>2</span>;
+											<span class='kw'>let</span> <span class='ident'>as_num</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>from_str_radix</span>(<span class='ident'>nums</span>.<span class='ident'>as_slice</span>(), <span class='number'>16</span>) {
+												<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
+												<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='number'>0</span>
+											};
+											<span class='kw'>match</span> <span class='ident'>from_u32</span>(<span class='ident'>as_num</span>) {
+												<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
+												<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: {} is not a valid unicode scalar value&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>as_num</span>)
+											}
+										},
+										<span class='string'>&#39;u&#39;</span> <span class='op'>=&gt;</span> {
+											<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+											<span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>4</span>) {
+												<span class='ident'>nums</span>.<span class='ident'>push_char</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()));
+											}
+											<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>4</span>;
+											<span class='kw'>let</span> <span class='ident'>as_num</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>from_str_radix</span>(<span class='ident'>nums</span>.<span class='ident'>as_slice</span>(), <span class='number'>16</span>) {
+												<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
+												<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='number'>0</span>
+											};
+											<span class='kw'>match</span> <span class='ident'>from_u32</span>(<span class='ident'>as_num</span>) {
+												<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
+												<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: {} is not a valid unicode scalar value&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>as_num</span>)
+											}
+										},
+										<span class='string'>&#39;\&#39;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;&quot;&#39;</span> <span class='op'>=&gt;</span> <span class='ident'>escape</span>,
+										_ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: Invalid escape `{}`&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>ch</span>)
+									};
+									<span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>escaped_ch</span>);
 								}
 							},
-							<span class='string'>&#39;u&#39;</span> <span class='op'>=&gt;</span> {
-								<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
-								<span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>4</span>) {
-									<span class='ident'>nums</span>.<span class='ident'>push_char</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()));
-								}
-								<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>4</span>;
-								<span class='kw'>let</span> <span class='ident'>as_num</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>from_str_radix</span>(<span class='ident'>nums</span>.<span class='ident'>as_slice</span>(), <span class='number'>16</span>) {
-									<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
-									<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='number'>0</span>
-								};
-								<span class='kw'>match</span> <span class='ident'>from_u32</span>(<span class='ident'>as_num</span>) {
-									<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
-									<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: {} is not a valid unicode scalar value&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>as_num</span>)
-								}
-							},
-							<span class='string'>&#39;\&#39;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>SingleQuote</span>) <span class='op'>=&gt;</span> <span class='string'>&#39;\&#39;&#39;</span>,
-							<span class='string'>&#39;&quot;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>DoubleQuote</span>) <span class='op'>=&gt;</span> <span class='string'>&#39;&quot;&#39;</span>,
-							_ <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: Invalid escape `{}`&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>ch</span>)
-						};
-						<span class='self'>self</span>.<span class='ident'>string_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>escaped_ch</span>);
+							<span class='ident'>ch</span> <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>)
+						}
 					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TString</span>(<span class='ident'>buf</span>))
 				},
-				<span class='string'>&#39;\n&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_comment</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>SingleLineComment</span>) <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='ident'>comment</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>comment_buffer</span>.<span class='ident'>clone</span>();
-					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TComment</span>(<span class='ident'>comment</span>));
-					<span class='self'>self</span>.<span class='ident'>comment_buffer</span>.<span class='ident'>clear</span>();
-					<span class='self'>self</span>.<span class='ident'>current_comment</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-				},
-				<span class='string'>&#39;*&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_comment</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>MultiLineComment</span>) <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;/&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='ident'>comment</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>comment_buffer</span>.<span class='ident'>clone</span>();
-					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TComment</span>(<span class='ident'>comment</span>));
-					<span class='self'>self</span>.<span class='ident'>comment_buffer</span>.<span class='ident'>clear</span>();
-					<span class='self'>self</span>.<span class='ident'>current_comment</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-				},
-				_ <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_comment</span>.<span class='ident'>is_some</span>() <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>comment_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
-				},
-				<span class='string'>&#39;&quot;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>DoubleQuote</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-					<span class='kw'>let</span> <span class='ident'>string</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>string_buffer</span>.<span class='ident'>clone</span>();
-					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TString</span>(<span class='ident'>string</span>));
-					<span class='self'>self</span>.<span class='ident'>string_buffer</span>.<span class='ident'>clear</span>();
-				},
-				<span class='string'>&#39;\&#39;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>SingleQuote</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>=</span> <span class='prelude-val'>None</span>;
-					<span class='kw'>let</span> <span class='ident'>string</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>string_buffer</span>.<span class='ident'>clone</span>();
-					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TString</span>(<span class='ident'>string</span>));
-					<span class='self'>self</span>.<span class='ident'>string_buffer</span>.<span class='ident'>clear</span>();
-				},
-				<span class='string'>&#39;\\&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span>.<span class='ident'>is_some</span>() <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>escaped</span> <span class='op'>=</span> <span class='boolval'>true</span>,
-				_ <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span>.<span class='ident'>is_some</span>() <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>string_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
-				<span class='string'>&#39;&quot;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span>.<span class='ident'>is_none</span>() <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>DoubleQuote</span>),
 				<span class='string'>&#39;0&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;x&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>HexadecimalNumber</span>);
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>loop</span> {
+						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
+							<span class='ident'>ch</span> <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_digit_radix</span>(<span class='number'>16</span>) <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
+							<span class='ident'>ch</span> <span class='op'>=&gt;</span> {
+								<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+								<span class='kw'>break</span>;
+							}
+						}
+					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TNumber</span>(<span class='ident'>from_str_radix</span>(<span class='ident'>buf</span>.<span class='ident'>as_slice</span>(), <span class='number'>16</span>).<span class='ident'>unwrap</span>()));
 				},
-				<span class='string'>&#39;0&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>ident_buffer</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> <span class='op'>&amp;&amp;</span> <span class='self'>self</span>.<span class='ident'>current_number</span>.<span class='ident'>is_none</span>() <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
-					<span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>OctalNumber</span>);
+				<span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> {
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gone_decimal</span> <span class='op'>=</span> <span class='boolval'>false</span>;
+					<span class='kw'>loop</span> {
+						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
+						<span class='kw'>match</span> <span class='ident'>ch</span> {
+							_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_digit_radix</span>(<span class='number'>8</span>) <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
+							<span class='string'>&#39;8&#39;</span> <span class='op'>|</span> <span class='string'>&#39;9&#39;</span> <span class='op'>|</span> <span class='string'>&#39;.&#39;</span> <span class='op'>=&gt;</span> {
+								<span class='ident'>gone_decimal</span> <span class='op'>=</span> <span class='boolval'>true</span>;
+								<span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+							},
+							<span class='ident'>ch</span> <span class='op'>=&gt;</span> {
+								<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+								<span class='kw'>break</span>;
+							}
+						}
+					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TNumber</span>(<span class='kw'>if</span> <span class='ident'>gone_decimal</span> {
+						<span class='ident'>from_str</span>(<span class='ident'>buf</span>.<span class='ident'>as_slice</span>())
+					} <span class='kw'>else</span> {
+						<span class='ident'>from_str_radix</span>(<span class='ident'>buf</span>.<span class='ident'>as_slice</span>(), <span class='number'>8</span>)
+					}.<span class='ident'>unwrap</span>()));
 				},
-				<span class='string'>&#39;0&#39;</span>..<span class='string'>&#39;7&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>OctalNumber</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+				_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_digit</span>() <span class='op'>=&gt;</span> {
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+					<span class='kw'>loop</span> {
+						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
+						<span class='kw'>match</span> <span class='ident'>ch</span> {
+							<span class='string'>&#39;.&#39;</span> <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
+							_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_digit</span>() <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
+							_ <span class='op'>=&gt;</span> {
+								<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+								<span class='kw'>break</span>;
+							}
+						}
+					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TNumber</span>(<span class='ident'>from_str</span>(<span class='ident'>buf</span>.<span class='ident'>as_slice</span>()).<span class='ident'>unwrap</span>()));
 				},
-				<span class='string'>&#39;8&#39;</span> <span class='op'>|</span> <span class='string'>&#39;9&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>OctalNumber</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
-					<span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>DecimalNumber</span>);
-				},
-				<span class='string'>&#39;0&#39;</span>.. <span class='string'>&#39;9&#39;</span> <span class='op'>|</span> <span class='string'>&#39;A&#39;</span>.. <span class='string'>&#39;F&#39;</span> <span class='op'>|</span> <span class='string'>&#39;a&#39;</span> .. <span class='string'>&#39;f&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>==</span> <span class='prelude-val'>Some</span>(<span class='ident'>HexadecimalNumber</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>)
-				},
-				<span class='string'>&#39;0&#39;</span>.. <span class='string'>&#39;9&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>ident_buffer</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
-					<span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>DecimalNumber</span>);
-				},
-				<span class='string'>&#39;\&#39;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>string_start</span>.<span class='ident'>is_none</span>() <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>string_start</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>SingleQuote</span>),
-				<span class='string'>&#39;.&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>current_number</span>.<span class='ident'>is_some</span>() <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>as_slice</span>().<span class='ident'>contains</span>(<span class='string'>&quot;.&quot;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>num_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
-					<span class='self'>self</span>.<span class='ident'>current_number</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>DecimalNumber</span>);
+				_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_alphabetic</span>() <span class='op'>||</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;$&#39;</span> <span class='op'>||</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;_&#39;</span> <span class='op'>=&gt;</span> {
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+					<span class='kw'>loop</span> {
+						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
+						<span class='kw'>match</span> <span class='ident'>ch</span> {
+							_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_alphabetic</span>() <span class='op'>||</span> <span class='ident'>ch</span>.<span class='ident'>is_digit</span>() <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
+							_ <span class='op'>=&gt;</span> {
+								<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
+								<span class='kw'>break</span>;
+							}
+						}
+					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TIdent</span>(<span class='ident'>buf</span>));
 				},
 				<span class='string'>&#39;;&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TSemicolon</span>);
 				},
 				<span class='string'>&#39;:&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TColon</span>);
 				},
 				<span class='string'>&#39;.&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TDot</span>);
 				},
 				<span class='string'>&#39;(&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TOpenParen</span>);
 				},
 				<span class='string'>&#39;)&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TCloseParen</span>);
 				},
 				<span class='string'>&#39;,&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TComma</span>);
 				},
 				<span class='string'>&#39;{&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TOpenBlock</span>);
 				},
 				<span class='string'>&#39;}&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TCloseBlock</span>);
 				},
 				<span class='string'>&#39;[&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TOpenArray</span>);
 				},
 				<span class='string'>&#39;]&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TCloseArray</span>);
 				},
 				<span class='string'>&#39;?&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TQuestion</span>);
 				},
 				<span class='string'>&#39;/&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;/&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>current_comment</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>SingleLineComment</span>);
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>loop</span> {
+						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
+							<span class='string'>&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='kw'>break</span>,
+							<span class='ident'>ch</span> <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>)
+						}
+					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TComment</span>(<span class='ident'>buf</span>));
 				},
 				<span class='string'>&#39;/&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;*&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>current_comment</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>MultiLineComment</span>);
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>loop</span> {
+						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
+							<span class='string'>&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='kw'>break</span>,
+							<span class='string'>&#39;*&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;/&#39;</span>) <span class='op'>=&gt;</span> <span class='kw'>break</span>,
+							<span class='ident'>ch</span> <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>)
+						}
+					}
+					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TComment</span>(<span class='ident'>buf</span>));
 				},
 				<span class='string'>&#39;/&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpDiv</span>)));
 				},
 				<span class='string'>&#39;/&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpDiv</span>)));
 				},
 				<span class='string'>&#39;*&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpMul</span>)));
 				},
 				<span class='string'>&#39;*&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpMul</span>)));
 				},
 				<span class='string'>&#39;+&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpAdd</span>)));
 				},
 				<span class='string'>&#39;+&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpAdd</span>)));
 				},
 				<span class='string'>&#39;-&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpSub</span>)));
 				},
 				<span class='string'>&#39;-&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpSub</span>)));
 				},
 				<span class='string'>&#39;%&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpMod</span>)));
 				},
 				<span class='string'>&#39;%&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpMod</span>)));
 				},
 				<span class='string'>&#39;|&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;|&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) {
 						<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinLog</span>(<span class='ident'>LogOr</span>)));
 					} <span class='kw'>else</span> {
@@ -865,15 +788,12 @@
 					}
 				},
 				<span class='string'>&#39;|&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitOr</span>)));
 				},
 				<span class='string'>&#39;|&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitOr</span>)));
 				},
 				<span class='string'>&#39;&amp;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;&amp;&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) {
 						<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinLog</span>(<span class='ident'>LogAnd</span>)));
 					} <span class='kw'>else</span> {
@@ -881,27 +801,21 @@
 					}
 				},
 				<span class='string'>&#39;&amp;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitAnd</span>)));
 				},
 				<span class='string'>&#39;&amp;&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitAnd</span>)));
 				},
 				<span class='string'>&#39;^&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitXor</span>)));
 				},
 				<span class='string'>&#39;^&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitXor</span>)));
 				},
 				<span class='string'>&#39;=&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;&gt;&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TArrow</span>);
 				},
 				<span class='string'>&#39;=&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) {
 						<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinComp</span>(<span class='ident'>CompStrictEqual</span>)));
 					} <span class='kw'>else</span> {
@@ -909,15 +823,12 @@
 					}
 				},
 				<span class='string'>&#39;=&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TEqual</span>);
 				},
 				<span class='string'>&#39;&lt;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinComp</span>(<span class='ident'>CompLessThanOrEqual</span>)));
 				},
 				<span class='string'>&#39;&lt;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;&lt;&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) {
 						<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitShl</span>)));
 					} <span class='kw'>else</span> {
@@ -925,15 +836,12 @@
 					}
 				},
 				<span class='string'>&#39;&lt;&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinComp</span>(<span class='ident'>CompLessThan</span>)));
 				},
 				<span class='string'>&#39;&gt;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinComp</span>(<span class='ident'>CompGreaterThanOrEqual</span>)));
 				},
 				<span class='string'>&#39;&gt;&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;&gt;&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) {
 						<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TAssignOp</span>(<span class='ident'>BinBit</span>(<span class='ident'>BitShr</span>)));
 					} <span class='kw'>else</span> {
@@ -941,11 +849,9 @@
 					}
 				},
 				<span class='string'>&#39;&gt;&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinComp</span>(<span class='ident'>CompGreaterThan</span>)));
 				},
 				<span class='string'>&#39;!&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;=&#39;</span>) {
 						<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TBinOp</span>(<span class='ident'>BinComp</span>(<span class='ident'>CompStrictNotEqual</span>)));
 					} <span class='kw'>else</span> {
@@ -953,23 +859,19 @@
 					}
 				},
 				<span class='string'>&#39;!&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TUnaryOp</span>(<span class='ident'>UnaryNot</span>));
 				},
 				<span class='string'>&#39;\n&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>line_number</span> <span class='op'>+=</span> <span class='number'>1</span>;
 					<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>=</span> <span class='number'>0</span>;
 				},
 				<span class='string'>&#39;\r&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 					<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>=</span> <span class='number'>0</span>;
 				},
-				_ <span class='kw'>if</span> <span class='ident'>is_whitespace</span>(<span class='ident'>ch</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>clear_buffer</span>(),
-				_ <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>ident_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>)
+				<span class='string'>&#39; &#39;</span> <span class='op'>=&gt;</span> (),
+				<span class='ident'>ch</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;{}:{}: Unexpected &#39;{}&#39;&quot;</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>, <span class='ident'>ch</span>)
 			};
 		}
-		<span class='self'>self</span>.<span class='ident'>clear_buffer</span>();
 		<span class='prelude-val'>Ok</span>(())
 	}
 }
