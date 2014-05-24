@@ -9,10 +9,10 @@ use std::fmt;
 use std::vec::Vec;
 macro_rules! mk (
 	($def:expr) => (
-		Expr::new($def, self.tokens.get(self.pos - 1).pos, self.tokens.get(self.pos - 1).pos)
+		Expr::new($def, try!(self.get_token(self.pos - 1)).pos, try!(self.get_token(self.pos - 1)).pos)
 	);
 	($def:expr, $first:expr) => (
-		Expr::new($def, $first.pos, self.tokens.get(self.pos - 1).pos)
+		Expr::new($def, $first.pos, try!(self.get_token(self.pos - 1)).pos)
 	);
 )
 #[deriving(Clone)]
@@ -22,7 +22,9 @@ pub enum ParseError {
 	/// When it expected a certain kind of token, but got another as part of something
 	Expected(Vec<TokenData>, Token, &'static str),
 	/// When it expected a certain expression, but got another
-	ExpectedExpr(&'static str, Expr)
+	ExpectedExpr(&'static str, Expr),
+	/// When there is an abrupt end to the parsing
+	AbruptEnd
 }
 impl fmt::Show for ParseError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -40,6 +42,9 @@ impl fmt::Show for ParseError {
 			},
 			ExpectedExpr(ref wanted, ref got) => {
 				write!(f, "Expected {}, but got {}", wanted, got)
+			},
+			AbruptEnd => {
+				write!(f, "Abrupt end")
 			}
 		}
 	}
@@ -91,7 +96,7 @@ impl Parser {
 				let cond = try!(self.parse());
 				try!(self.expect(TCloseParen, "if block"));
 				let expr = try!(self.parse());
-				let next = self.tokens.get(self.pos + 1).clone();
+				let next = try!(self.get_token(self.pos + 1));
 				Ok(Some(mk!(IfExpr(box cond, box expr, if next.data == TIdent("else".to_strbuf()) {
 					self.pos += 2;
 					Some(box try!(self.parse()))
@@ -114,7 +119,7 @@ impl Parser {
 				let mut cases = Vec::new();
 				let mut default = None;
 				while self.pos + 1 < self.tokens.len() {
-					let tok = self.tokens.get(self.pos).clone();
+					let tok = try!(self.get_token(self.pos));
 					self.pos += 1;
 					match tok.data {
 						TIdent(ref id) if id.as_slice() == "case" => {
@@ -122,7 +127,7 @@ impl Parser {
 							let mut block = Vec::new();
 							try!(self.expect(TColon, "switch case"));
 							loop {
-								match self.tokens.get(self.pos).data.clone() {
+								match try!(self.get_token(self.pos)).data.clone() {
 									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
@@ -134,7 +139,7 @@ impl Parser {
 							let mut block = Vec::new();
 							try!(self.expect(TColon, "default switch case"));
 							loop {
-								match self.tokens.get(self.pos).data.clone() {
+								match try!(self.get_token(self.pos)).data.clone() {
 									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
@@ -153,7 +158,7 @@ impl Parser {
 				}))))
 			},
 			"function" => {
-				let tk = self.tokens.get(self.pos).clone();
+				let tk = try!(self.get_token(self.pos));
 				let name = match tk.data {
 					TIdent(ref name) => {
 						self.pos += 1;
@@ -164,17 +169,17 @@ impl Parser {
 				};
 				try!(self.expect(TOpenParen, "function"));
 				let mut args:Vec<StrBuf> = Vec::new();
-				let mut tk = self.tokens.get(self.pos).clone();
+				let mut tk = try!(self.get_token(self.pos));
 				while tk.data != TCloseParen {
 					match tk.data {
 						TIdent(ref id) => args.push(id.clone()),
 						_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk.clone(), "function arguments"))
 					}
 					self.pos += 1;
-					if self.tokens.get(self.pos).data == TComma {
+					if try!(self.get_token(self.pos)).data == TComma {
 						self.pos += 1;
 					}
-					tk = self.tokens.get(self.pos).clone();
+					tk = try!(self.get_token(self.pos));
 				}
 				self.pos += 1;
 				let block = try!(self.parse());
@@ -185,7 +190,10 @@ impl Parser {
 	}
 	/// Parse a single expression
 	pub fn parse(&mut self) -> ParseResult {
-		let token = self.tokens.get(self.pos).clone();
+		if self.pos > self.tokens.len() {
+			return Err(AbruptEnd);
+		}
+		let token = try!(self.get_token(self.pos));
 		self.pos += 1;
 		let expr : Expr = match token.data {
 			TSemicolon | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
@@ -199,15 +207,15 @@ impl Parser {
 			},
 			TString(ref s) => mk!(ConstExpr(CString(s.clone()))),
 			TOpenParen => {
-				match self.tokens.get(self.pos).data.clone() {
-					TCloseParen if self.tokens.get(self.pos + 1).data == TArrow => {
+				match try!(self.get_token(self.pos)).data.clone() {
+					TCloseParen if try!(self.get_token(self.pos + 1)).data == TArrow => {
 						self.pos += 2;
 						let expr = try!(self.parse());
 						mk!(ArrowFunctionDeclExpr(Vec::new(), box expr), token)
 					},
 					_ => {
 						let next = try!(self.parse());
-						let next_tok = self.tokens.get(self.pos).clone();
+						let next_tok = try!(self.get_token(self.pos));
 						self.pos += 1;
 						match next_tok.data.clone() {
 							TCloseParen => next,
@@ -215,14 +223,14 @@ impl Parser {
 								let mut args = vec!(match next.def {
 									LocalExpr(name) => name,
 									_ => "".to_strbuf()
-								}, match self.tokens.get(self.pos).data {
+								}, match try!(self.get_token(self.pos)).data {
 									TIdent(ref id) => id.clone(),
 									_ => "".to_strbuf()
 								});
 								let mut expect_ident = true;
 								loop {
 									self.pos += 1;
-									let curr_tk = self.tokens.get(self.pos).clone();
+									let curr_tk = try!(self.get_token(self.pos));
 									match curr_tk.data {
 										TIdent(ref id) if expect_ident => {
 											args.push(id.clone());
@@ -250,9 +258,9 @@ impl Parser {
 			},
 			TOpenArray => {
 				let mut array : Vec<Expr> = Vec::new();
-				let mut expect_comma_or_end = self.tokens.get(self.pos).data == TCloseArray;
+				let mut expect_comma_or_end = try!(self.get_token(self.pos)).data == TCloseArray;
 				loop {
-					let token = self.tokens.get(self.pos).clone();
+					let token = try!(self.get_token(self.pos));
 					if token.data == TCloseArray && expect_comma_or_end {
 						self.pos += 1;
 						break;
@@ -273,14 +281,14 @@ impl Parser {
 				}
 				mk!(ArrayDeclExpr(array), token)
 			},
-			TOpenBlock if self.tokens.get(self.pos).data == TCloseBlock => {
+			TOpenBlock if try!(self.get_token(self.pos)).data == TCloseBlock => {
 				self.pos += 1;
 				mk!(ObjectDeclExpr(box TreeMap::new()), token)
 			},
-			TOpenBlock if self.tokens.get(self.pos + 1).data == TColon => {
+			TOpenBlock if try!(self.get_token(self.pos + 1)).data == TColon => {
 				let mut map = box TreeMap::new();
-				while self.tokens.get(self.pos - 1).data == TComma || map.len() == 0 {
-					let tk = self.tokens.get(self.pos).clone();
+				while try!(self.get_token(self.pos - 1)).data == TComma || map.len() == 0 {
+					let tk = try!(self.get_token(self.pos));
 					let name = match tk.data {
 						TIdent(ref id) => id.clone(),
 						TString(ref str) => str.clone(),
@@ -297,7 +305,7 @@ impl Parser {
 			TOpenBlock => {
 				let mut exprs = Vec::new();
 				loop {
-					if self.tokens.get(self.pos).data == TCloseBlock {
+					if try!(self.get_token(self.pos)).data == TCloseBlock {
 						break;
 					} else {
 						exprs.push(try!(self.parse()));
@@ -320,14 +328,21 @@ impl Parser {
 			self.parse_next(expr)
 		}
 	}
+	fn get_token(&self, pos:uint) -> Result<Token, ParseError> {
+		if pos < self.tokens.len() {
+			Ok(self.tokens.get(pos).clone())
+		} else {
+			Err(AbruptEnd)
+		}
+	}
 	fn parse_next(&mut self, expr:Expr) -> ParseResult {
-		let next = self.tokens.get(self.pos).clone();
+		let next = try!(self.get_token(self.pos));
 		let mut carry_on = true;
 		let mut result = expr.clone();
 		match next.data {
 			TDot => {
 				self.pos += 1;
-				let tk = self.tokens.get(self.pos).clone();
+				let tk = try!(self.get_token(self.pos));
 				match tk.data {
 					TIdent(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_strbuf())),
 					_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk, "field access"))
@@ -336,10 +351,10 @@ impl Parser {
 			},
 			TOpenParen => {
 				let mut args = Vec::new();
-				let mut expect_comma_or_end = self.tokens.get(self.pos + 1).data == TCloseParen;
+				let mut expect_comma_or_end = try!(self.get_token(self.pos + 1)).data == TCloseParen;
 				loop {
 					self.pos += 1;
-					let token = self.tokens.get(self.pos).clone();
+					let token = try!(self.get_token(self.pos));
 					if token.data == TCloseParen && expect_comma_or_end {
 						self.pos += 1;
 						break;
@@ -415,7 +430,7 @@ impl Parser {
 	/// Returns an error if the next symbol is not `tk`
 	fn expect(&mut self, tk:TokenData, routine:&'static str) -> Result<(), ParseError> {
 		self.pos += 1;
-		let curr_tk = self.tokens.get(self.pos - 1).clone();
+		let curr_tk = try!(self.get_token(self.pos - 1));
 		if curr_tk.data != tk {
 			Err(Expected(vec!(tk), curr_tk, routine))
 		} else {
