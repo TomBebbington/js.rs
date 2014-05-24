@@ -10,9 +10,7 @@ use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
 use std::strbuf::StrBuf;
 use std::char::{from_u32, is_whitespace};
 use std::num::from_str_radix;
-#[deriving(Clone)]
-#[deriving(Eq)]
-#[deriving(Show)]
+#[deriving(Clone, Eq)]
 /// The type of string used
 pub enum StringType {
 	/// `"` - Double-quoted
@@ -20,9 +18,7 @@ pub enum StringType {
 	/// `'` - Single-quoted
 	SingleQuote
 }
-#[deriving(Clone)]
-#[deriving(Eq)]
-#[deriving(Show)]
+#[deriving(Clone, Eq)]
 /// The type of comment used
 pub enum CommentType {
 	/// `/*...*/` - A multi-line comment
@@ -30,7 +26,7 @@ pub enum CommentType {
 	/// `//...` - A single-line comment
 	SingleLineComment
 }
-#[deriving(Clone, Eq, Show)]
+#[deriving(Clone, Eq)]
 /// The type of number used
 pub enum NumberType {
 	/// A decimal number, such as `3.1415`
