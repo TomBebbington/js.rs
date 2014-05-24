@@ -84,7 +84,7 @@ impl<B:Buffer> Lexer<B> {
 	}
 	fn peek_for(&mut self, peek:char) -> bool {
 		if self.peek_buffer.len() > 0 {
-			self.peek_buffer.pop_char() == Some(peek)
+			self.peek_buffer.as_slice().char_at(self.peek_buffer.len() - 1) == peek
 		} else {
 			match self.buffer.read_char() {
 				Ok(ch) if ch == peek => {
