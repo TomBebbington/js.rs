@@ -8,7 +8,7 @@ use ast::{BinNum, BinBit, BinComp, BinLog};
 use ast::{Token, TokenData};
 use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
 use std::strbuf::StrBuf;
-use std::char::{from_u32, is_whitespace};
+use std::char::from_u32;
 use std::num::from_str_radix;
 #[deriving(Clone, Eq)]
 /// The type of string used
@@ -40,8 +40,6 @@ pub enum NumberType {
 pub struct Lexer<B> {
 	/// The list of tokens generated so far
 	pub tokens : Vec<Token>,
-	/// The string buffer for identities
-	ident_buffer : StrBuf,
 	/// The current line number in the script
 	line_number : uint,
 	/// The current column number in the script
@@ -56,19 +54,11 @@ impl<B:Buffer> Lexer<B> {
 	pub fn new(buffer: B) -> Lexer<B> {
 		return Lexer {
 			tokens: Vec::new(),
-			ident_buffer: StrBuf::with_capacity(32),
 			line_number: 1,
 			column_number: 0,
 			buffer: buffer,
 			peek_buffer: StrBuf::new()
 		};
-	}
-	fn clear_buffer(&mut self) {
-		if self.ident_buffer.len() > 0 {
-			let ident = self.ident_buffer.clone();
-			self.push_token(TIdent(ident));
-			self.ident_buffer.clear();
-		}
 	}
 	fn push_token(&mut self, tk:TokenData) {
 		self.tokens.push(Token::new(tk, self.line_number, self.column_number))
@@ -190,7 +180,7 @@ impl<B:Buffer> Lexer<B> {
 					}
 					self.push_token(TNumber(from_str_radix(buf.as_slice(), 16).unwrap()));
 				},
-				'0' if self.ident_buffer.len() == 0 => {
+				'0' => {
 					let mut buf = StrBuf::new();
 					let mut gone_decimal = false;
 					loop {
@@ -213,7 +203,7 @@ impl<B:Buffer> Lexer<B> {
 						from_str_radix(buf.as_slice(), 8)
 					}.unwrap()));
 				},
-				_ if ch.is_digit() && self.ident_buffer.len() == 0 => {
+				_ if ch.is_digit() => {
 					let mut buf = StrBuf::new();
 					buf.push_char(ch);
 					loop {
@@ -229,48 +219,52 @@ impl<B:Buffer> Lexer<B> {
 					}
 					self.push_token(TNumber(from_str(buf.as_slice()).unwrap()));
 				},
+				_ if ch.is_alphabetic() || ch == '$' || ch == '_' => {
+					let mut buf = StrBuf::new();
+					buf.push_char(ch);
+					loop {
+						let ch = try!(self.next());
+						match ch {
+							_ if ch.is_alphabetic() || ch.is_digit() => buf.push_char(ch),
+							_ => {
+								self.peek_buffer.push_char(ch);
+								break;
+							}
+						}
+					}
+					self.push_token(TIdent(buf));
+				},
 				';' => {
-					self.clear_buffer();
 					self.push_token(TSemicolon);
 				},
 				':' => {
-					self.clear_buffer();
 					self.push_token(TColon);
 				},
 				'.' => {
-					self.clear_buffer();
 					self.push_token(TDot);
 				},
 				'(' => {
-					self.clear_buffer();
 					self.push_token(TOpenParen);
 				},
 				')' => {
-					self.clear_buffer();
 					self.push_token(TCloseParen);
 				},
 				',' => {
-					self.clear_buffer();
 					self.push_token(TComma);
 				},
 				'{' => {
-					self.clear_buffer();
 					self.push_token(TOpenBlock);
 				},
 				'}' => {
-					self.clear_buffer();
 					self.push_token(TCloseBlock);
 				},
 				'[' => {
-					self.clear_buffer();
 					self.push_token(TOpenArray);
 				},
 				']' => {
-					self.clear_buffer();
 					self.push_token(TCloseArray);
 				},
 				'?' => {
-					self.clear_buffer();
 					self.push_token(TQuestion);
 				},
 				'/' if self.peek_for('/') => {
@@ -295,47 +289,36 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TComment(buf));
 				},
 				'/' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinNum(OpDiv)));
 				},
 				'/' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinNum(OpDiv)));
 				},
 				'*' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinNum(OpMul)));
 				},
 				'*' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinNum(OpMul)));
 				},
 				'+' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinNum(OpAdd)));
 				},
 				'+' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinNum(OpAdd)));
 				},
 				'-' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinNum(OpSub)));
 				},
 				'-' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinNum(OpSub)));
 				},
 				'%' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinNum(OpMod)));
 				},
 				'%' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinNum(OpMod)));
 				},
 				'|' if self.peek_for('|') => {
-					self.clear_buffer();
 					if self.peek_for('=') {
 						self.push_token(TAssignOp(BinLog(LogOr)));
 					} else {
@@ -343,15 +326,12 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'|' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinBit(BitOr)));
 				},
 				'|' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinBit(BitOr)));
 				},
 				'&' if self.peek_for('&') => {
-					self.clear_buffer();
 					if self.peek_for('=') {
 						self.push_token(TAssignOp(BinLog(LogAnd)));
 					} else {
@@ -359,27 +339,21 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'&' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinBit(BitAnd)));
 				},
 				'&' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinBit(BitAnd)));
 				},
 				'^' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TAssignOp(BinBit(BitXor)));
 				},
 				'^' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinBit(BitXor)));
 				},
 				'=' if self.peek_for('>') => {
-					self.clear_buffer();
 					self.push_token(TArrow);
 				},
 				'=' if self.peek_for('=') => {
-					self.clear_buffer();
 					if self.peek_for('=') {
 						self.push_token(TBinOp(BinComp(CompStrictEqual)));
 					} else {
@@ -387,15 +361,12 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'=' => {
-					self.clear_buffer();
 					self.push_token(TEqual);
 				},
 				'<' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinComp(CompLessThanOrEqual)));
 				},
 				'<' if self.peek_for('<') => {
-					self.clear_buffer();
 					if self.peek_for('=') {
 						self.push_token(TAssignOp(BinBit(BitShl)));
 					} else {
@@ -403,15 +374,12 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'<' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinComp(CompLessThan)));
 				},
 				'>' if self.peek_for('=') => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinComp(CompGreaterThanOrEqual)));
 				},
 				'>' if self.peek_for('>') => {
-					self.clear_buffer();
 					if self.peek_for('=') {
 						self.push_token(TAssignOp(BinBit(BitShr)));
 					} else {
@@ -419,11 +387,9 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'>' => {
-					self.clear_buffer();
 					self.push_token(TBinOp(BinComp(CompGreaterThan)));
 				},
 				'!' if self.peek_for('=') => {
-					self.clear_buffer();
 					if self.peek_for('=') {
 						self.push_token(TBinOp(BinComp(CompStrictNotEqual)));
 					} else {
@@ -431,23 +397,18 @@ impl<B:Buffer> Lexer<B> {
 					}
 				},
 				'!' => {
-					self.clear_buffer();
 					self.push_token(TUnaryOp(UnaryNot));
 				},
 				'\n' => {
-					self.clear_buffer();
 					self.line_number += 1;
 					self.column_number = 0;
 				},
 				'\r' => {
-					self.clear_buffer();
 					self.column_number = 0;
 				},
-				_ if is_whitespace(ch) => self.clear_buffer(),
-				_ => self.ident_buffer.push_char(ch)
+				_ => ()
 			};
 		}
-		self.clear_buffer();
 		Ok(())
 	}
 }
