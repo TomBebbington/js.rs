@@ -2,8 +2,8 @@ use std::fmt;
 use std::vec::Vec;
 use collections::treemap::TreeMap;
 /// Represents an operator
-pub trait GetPrecedence {
-	/// Get the precedence of an operator, where the lower it is, the more precedence it has
+pub trait Operator {
+	/// Get the precedence as an unsignes integer, where the lower it is, the more precedence/priority it has
 	fn get_precedence(&self) -> uint;
 }
 #[deriving(Clone, Eq)]
@@ -171,7 +171,7 @@ pub enum BinOp {
 	/// Logical operation
 	BinLog(LogOp)
 }
-impl GetPrecedence for BinOp {
+impl Operator for BinOp {
 	fn get_precedence(&self) -> uint {
 		match *self {
 			BinNum(OpMul) | BinNum(OpDiv) | BinNum(OpMod) => 5,
@@ -280,7 +280,7 @@ pub enum ExprDef {
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(Box<Expr>)
 }
-impl GetPrecedence for ExprDef {
+impl Operator for ExprDef {
 	fn get_precedence(&self) -> uint {
 		match *self {
 			GetFieldExpr(_, _) | GetConstFieldExpr(_, _) => 1,

@@ -3,7 +3,7 @@ use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, Whi
 use ast::{CBool, CNull, CUndefined, CString, CNum};
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
 use ast::{OpSub, UnaryMinus, UnaryNot};
-use ast::{BinNum, GetPrecedence};
+use ast::{BinNum, Operator};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
