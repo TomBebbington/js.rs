@@ -242,6 +242,31 @@ pub enum ExprDef {
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(Box<Expr>)
 }
+impl ExprDef {
+	/// Find the precedence of this expression, 0 being the highest
+	pub fn get_precedence(&self) -> uint {
+		match *self {
+			GetFieldExpr(_, _) | GetConstFieldExpr(_, _) => 1,
+			CallExpr(_, _) | ConstructExpr(_, _) => 2,
+			UnaryOpExpr(UnaryIncrement(_), _) | UnaryOpExpr(UnaryDecrement(_), _) => 3,
+			UnaryOpExpr(UnaryNot, _) | UnaryOpExpr(UnaryMinus, _) | TypeOfExpr(_) => 4,
+			NumOpExpr(OpMul, _, _) | NumOpExpr(OpDiv, _, _) | NumOpExpr(OpMod, _, _) => 5,
+			NumOpExpr(OpAdd, _, _) | NumOpExpr(OpSub, _, _) => 6,
+			BitOpExpr(BitShl, _, _) | BitOpExpr(BitShr, _, _) => 7,
+			CompOpExpr(CompLessThan, _, _) | CompOpExpr(CompLessThanOrEqual, _, _) | CompOpExpr(CompGreaterThan, _, _) | CompOpExpr(CompGreaterThanOrEqual, _, _) => 8,
+			CompOpExpr(CompEqual, _, _) | CompOpExpr(CompNotEqual, _, _) | CompOpExpr(CompStrictEqual, _, _) | CompOpExpr(CompStrictNotEqual, _, _) => 9,
+			BitOpExpr(BitAnd, _, _) => 10,
+			BitOpExpr(BitXor, _, _) => 11,
+			BitOpExpr(BitOr, _, _) => 12,
+			LogOpExpr(LogAnd, _, _) => 13,
+			LogOpExpr(LogOr, _, _) => 14,
+			IfExpr(_, _, _) => 15,
+			// 16 should be yield
+			AssignExpr(_, _) => 17,
+			_ => 19
+		}
+	}
+}
 impl fmt::Show for ExprDef {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		return match *self {
