@@ -3,7 +3,7 @@ use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, Whi
 use ast::{CBool, CNull, CUndefined, CString, CNum};
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
 use ast::{OpSub, UnaryMinus, UnaryNot};
-use ast::BinNum;
+use ast::{BinNum, GetPrecedence};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -373,9 +373,14 @@ impl Parser {
 				self.pos += 1;
 			},
 			TBinOp(op) => {
+				let precedence = op.get_precedence();
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = mk!(BinOpExpr(op, box expr, box next));
+				result = match (next.clone()).def {
+					BinOpExpr(ref op2, ref a, ref b) if precedence <= op2.get_precedence() =>
+						mk!(BinOpExpr(*op2, b.clone(), box mk!(BinOpExpr(op.clone(), box expr, a.clone())))),
+					_ => mk!(BinOpExpr(op, box expr, box next))
+				}
 			},
 			TAssignOp(op) => {
 				self.pos += 1;
