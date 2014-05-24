@@ -1,7 +1,8 @@
-use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, NumOpExpr, BitOpExpr, LogOpExpr, CompOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{UnaryMinus, UnaryNot};
+use ast::{BinNum, BinBit, BinLog, BinComp};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{LogAnd, LogOr};
 use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
@@ -211,7 +212,7 @@ impl Executor for Interpreter {
 				let function = RegularFunc(RegularFunction::new(*expr.clone(), args.clone()));
 				Ok(Gc::new(VFunction(RefCell::new(function))))
 			},
-			NumOpExpr(ref op, ref a, ref b) => {
+			BinOpExpr(BinNum(ref op), ref a, ref b) => {
 				let v_r_a = try!(self.run(*a));
 				let v_r_b = try!(self.run(*b));
 				let v_a = v_r_a.borrow();
@@ -233,7 +234,7 @@ impl Executor for Interpreter {
 					_ => unreachable!()
 				})
 			},
-			BitOpExpr(ref op, ref a, ref b) => {
+			BinOpExpr(BinBit(ref op), ref a, ref b) => {
 				let v_r_a = try!(self.run(*a));
 				let v_r_b = try!(self.run(*b));
 				let v_a = v_r_a.borrow();
@@ -246,7 +247,7 @@ impl Executor for Interpreter {
 					BitShr => *v_a >> *v_b
 				}))
 			},
-			CompOpExpr(ref op, ref a, ref b) => {
+			BinOpExpr(BinComp(ref op), ref a, ref b) => {
 				let v_r_a = try!(self.run(*a));
 				let v_r_b = try!(self.run(*b));
 				let v_a = v_r_a.borrow();
@@ -266,7 +267,7 @@ impl Executor for Interpreter {
 					CompLessThanOrEqual => v_a.to_num() <= v_b.to_num()
 				}))
 			},
-			LogOpExpr(ref op, ref a, ref b) => {
+			BinOpExpr(BinLog(ref op), ref a, ref b) => {
 				let v_a = from_value::<bool>(try!(self.run(*a))).unwrap();
 				let v_b = from_value::<bool>(try!(self.run(*b))).unwrap();
 				Ok(match *op {

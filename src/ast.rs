@@ -155,6 +155,28 @@ impl fmt::Show for LogOp {
 	}
 }
 #[deriving(Clone, Eq)]
+/// Any operation between two values
+pub enum BinOp {
+	/// A numeric operation
+	BinNum(NumOp),
+	/// A bitwise operation
+	BinBit(BitOp),
+	/// A comparitive operation
+	BinComp(CompOp),
+	/// A logical operation
+	BinLog(LogOp)
+}
+impl fmt::Show for BinOp {
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{}", match *self {
+			BinNum(op) => op.to_str(),
+			BinBit(op) => op.to_str(),
+			BinComp(op) => op.to_str(),
+			BinLog(op) => op.to_str()
+		})
+	}
+}
+#[deriving(Clone, Eq)]
 /// A Javascript Expression, including position data
 pub struct Expr {
 	/// The expression definition
@@ -195,16 +217,10 @@ impl Position {
 #[deriving(Clone, Eq)]
 /// A Javascript Expression
 pub enum ExprDef {
-	/// Run a numeric operation on two numeric expressions
-	NumOpExpr(NumOp, Box<Expr>, Box<Expr>),
+	/// Run a operation between two expressions
+	BinOpExpr(BinOp, Box<Expr>, Box<Expr>),
 	/// Run an operation on an expression
 	UnaryOpExpr(UnaryOp, Box<Expr>),
-	/// Run a bitwise operation on two integer expressions
-	BitOpExpr(BitOp, Box<Expr>, Box<Expr>),
-	/// Run a logical operation on two boolean expressions
-	LogOpExpr(LogOp, Box<Expr>, Box<Expr>),
-	/// Run a comparison operation on two expressions
-	CompOpExpr(CompOp, Box<Expr>, Box<Expr>),
 	/// Make a simple value
 	ConstExpr(Const),
 	/// Run several expressions
@@ -250,16 +266,16 @@ impl ExprDef {
 			CallExpr(_, _) | ConstructExpr(_, _) => 2,
 			UnaryOpExpr(UnaryIncrement(_), _) | UnaryOpExpr(UnaryDecrement(_), _) => 3,
 			UnaryOpExpr(UnaryNot, _) | UnaryOpExpr(UnaryMinus, _) | TypeOfExpr(_) => 4,
-			NumOpExpr(OpMul, _, _) | NumOpExpr(OpDiv, _, _) | NumOpExpr(OpMod, _, _) => 5,
-			NumOpExpr(OpAdd, _, _) | NumOpExpr(OpSub, _, _) => 6,
-			BitOpExpr(BitShl, _, _) | BitOpExpr(BitShr, _, _) => 7,
-			CompOpExpr(CompLessThan, _, _) | CompOpExpr(CompLessThanOrEqual, _, _) | CompOpExpr(CompGreaterThan, _, _) | CompOpExpr(CompGreaterThanOrEqual, _, _) => 8,
-			CompOpExpr(CompEqual, _, _) | CompOpExpr(CompNotEqual, _, _) | CompOpExpr(CompStrictEqual, _, _) | CompOpExpr(CompStrictNotEqual, _, _) => 9,
-			BitOpExpr(BitAnd, _, _) => 10,
-			BitOpExpr(BitXor, _, _) => 11,
-			BitOpExpr(BitOr, _, _) => 12,
-			LogOpExpr(LogAnd, _, _) => 13,
-			LogOpExpr(LogOr, _, _) => 14,
+			BinOpExpr(BinNum(OpMul), _, _) | BinOpExpr(BinNum(OpDiv), _, _) | BinOpExpr(BinNum(OpMod), _, _) => 5,
+			BinOpExpr(BinNum(OpAdd), _, _) | BinOpExpr(BinNum(OpSub), _, _) => 6,
+			BinOpExpr(BinBit(BitShl), _, _) | BinOpExpr(BinBit(BitShr), _, _) => 7,
+			BinOpExpr(BinComp(CompLessThan), _, _) | BinOpExpr(BinComp(CompLessThanOrEqual), _, _) | BinOpExpr(BinComp(CompGreaterThan), _, _) | BinOpExpr(BinComp(CompGreaterThanOrEqual), _, _) => 8,
+			BinOpExpr(BinComp(CompEqual), _, _) | BinOpExpr(BinComp(CompNotEqual), _, _) | BinOpExpr(BinComp(CompStrictEqual), _, _) | BinOpExpr(BinComp(CompStrictNotEqual), _, _) => 9,
+			BinOpExpr(BinBit(BitAnd), _, _) => 10,
+			BinOpExpr(BinBit(BitXor), _, _) => 11,
+			BinOpExpr(BinBit(BitOr), _, _) => 12,
+			BinOpExpr(BinLog(LogAnd), _, _) => 13,
+			BinOpExpr(BinLog(LogOr), _, _) => 14,
 			IfExpr(_, _, _) => 15,
 			// 16 should be yield
 			AssignExpr(_, _) => 17,
@@ -308,11 +324,8 @@ impl fmt::Show for ExprDef {
 			ArrayDeclExpr(ref arr) => write!(f, "{}", arr),
 			FunctionDeclExpr(ref name, ref args, ref expr) => write!(f, "function {}({}){}", name, args.connect(", "), expr),
 			ArrowFunctionDeclExpr(ref args, ref expr) => write!(f, "({}) => {}", args.connect(", "), expr),
-			NumOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
+			BinOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
 			UnaryOpExpr(ref op, ref a) => write!(f, "{}{}", op, a),
-			BitOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
-			LogOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
-			CompOpExpr(ref op, ref a, ref b) => write!(f, "{} {} {}", a, op, b),
 			ReturnExpr(Some(ref ex)) => write!(f, "return {}", ex),
 			ReturnExpr(None) => write!(f, "{}", "return"),
 			ThrowExpr(ref ex) => write!(f, "throw {}", ex),
@@ -399,18 +412,12 @@ pub enum TokenData {
 	TQuestion,
 	/// An arrow
 	TArrow,
-	/// A numeric operation
-	TNumOp(NumOp),
-	/// A bitwise operation
-	TBitOp(BitOp),
-	/// A logical operation
-	TLogOp(LogOp),
-	/// A comparison operation
-	TCompOp(CompOp),
+	/// An operation between two values
+	TBinOp(BinOp),
 	/// A unary operation
 	TUnaryOp(UnaryOp),
 	/// An assign operation combined with something else
-	TAssignOp(Box<TokenData>),
+	TAssignOp(BinOp),
 	/// A comment
 	TComment(StrBuf)
 }
@@ -433,10 +440,7 @@ impl fmt::Show for TokenData {
 			TNumber(num) => write!(f, "{}", num),
 			TQuestion => write!(f, "{}", "?"),
 			TArrow => write!(f, "{}", "=>"),
-			TNumOp(op) => write!(f, "{}", op),
-			TBitOp(op) => write!(f, "{}", op),
-			TLogOp(op) => write!(f, "{}", op),
-			TCompOp(op) => write!(f, "{}", op),
+			TBinOp(op) => write!(f, "{}", op),
 			TUnaryOp(op) => write!(f, "{}", op),
 			TAssignOp(op) => write!(f, "{}=", op),
 			TComment(ref com) => write!(f, "// {}", com)

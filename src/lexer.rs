@@ -1,9 +1,10 @@
-use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TUnaryOp, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TComment, TColon, TDot, TEqual, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TBinOp, TAssignOp, TUnaryOp, TArrow};
 use ast::{OpAdd, OpSub, OpMul, OpDiv, OpMod};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, CompLessThan, CompGreaterThan, CompLessThanOrEqual, CompGreaterThanOrEqual};
 use ast::{LogAnd, LogOr};
 use ast::{UnaryNot};
+use ast::{BinNum, BinBit, BinComp, BinLog};
 use ast::{Token, TokenData};
 use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
 use std::strbuf::StrBuf;
@@ -309,83 +310,83 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'/' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TNumOp(OpDiv)));
+					self.push_token(TAssignOp(BinNum(OpDiv)));
 				},
 				'/' => {
 					self.clear_buffer();
-					self.push_token(TNumOp(OpDiv));
+					self.push_token(TBinOp(BinNum(OpDiv)));
 				},
 				'*' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TNumOp(OpMul)));
+					self.push_token(TAssignOp(BinNum(OpMul)));
 				},
 				'*' => {
 					self.clear_buffer();
-					self.push_token(TNumOp(OpMul));
+					self.push_token(TBinOp(BinNum(OpMul)));
 				},
 				'+' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TNumOp(OpAdd)));
+					self.push_token(TAssignOp(BinNum(OpAdd)));
 				},
 				'+' => {
 					self.clear_buffer();
-					self.push_token(TNumOp(OpAdd));
+					self.push_token(TBinOp(BinNum(OpAdd)));
 				},
 				'-' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TNumOp(OpSub)));
+					self.push_token(TAssignOp(BinNum(OpSub)));
 				},
 				'-' => {
 					self.clear_buffer();
-					self.push_token(TNumOp(OpSub));
+					self.push_token(TBinOp(BinNum(OpSub)));
 				},
 				'%' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TNumOp(OpMod)));
+					self.push_token(TAssignOp(BinNum(OpMod)));
 				},
 				'%' => {
 					self.clear_buffer();
-					self.push_token(TNumOp(OpMod));
+					self.push_token(TBinOp(BinNum(OpMod)));
 				},
 				'|' if self.peek_for('|') => {
 					self.clear_buffer();
 					if self.peek_for('=') {
-						self.push_token(TAssignOp(box TLogOp(LogOr)));
+						self.push_token(TAssignOp(BinLog(LogOr)));
 					} else {
-						self.push_token(TLogOp(LogOr));
+						self.push_token(TBinOp(BinLog(LogOr)));
 					}
 				},
 				'|' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TBitOp(BitOr)));
+					self.push_token(TAssignOp(BinBit(BitOr)));
 				},
 				'|' => {
 					self.clear_buffer();
-					self.push_token(TBitOp(BitOr));
+					self.push_token(TBinOp(BinBit(BitOr)));
 				},
 				'&' if self.peek_for('&') => {
 					self.clear_buffer();
 					if self.peek_for('=') {
-						self.push_token(TAssignOp(box TLogOp(LogAnd)));
+						self.push_token(TAssignOp(BinLog(LogAnd)));
 					} else {
-						self.push_token(TLogOp(LogAnd));
+						self.push_token(TBinOp(BinLog(LogAnd)));
 					}
 				},
 				'&' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TBitOp(BitAnd)));
+					self.push_token(TAssignOp(BinBit(BitAnd)));
 				},
 				'&' => {
 					self.clear_buffer();
-					self.push_token(TBitOp(BitAnd));
+					self.push_token(TBinOp(BinBit(BitAnd)));
 				},
 				'^' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TAssignOp(box TBitOp(BitXor)));
+					self.push_token(TAssignOp(BinBit(BitXor)));
 				},
 				'^' => {
 					self.clear_buffer();
-					self.push_token(TBitOp(BitXor));
+					self.push_token(TBinOp(BinBit(BitXor)));
 				},
 				'=' if self.peek_for('>') => {
 					self.clear_buffer();
@@ -394,9 +395,9 @@ impl<B:Buffer> Lexer<B> {
 				'=' if self.peek_for('=') => {
 					self.clear_buffer();
 					if self.peek_for('=') {
-						self.push_token(TCompOp(CompStrictEqual));
+						self.push_token(TBinOp(BinComp(CompStrictEqual)));
 					} else {
-						self.push_token(TCompOp(CompEqual));
+						self.push_token(TBinOp(BinComp(CompEqual)));
 					}
 				},
 				'=' => {
@@ -405,42 +406,42 @@ impl<B:Buffer> Lexer<B> {
 				},
 				'<' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TCompOp(CompLessThanOrEqual));
+					self.push_token(TBinOp(BinComp(CompLessThanOrEqual)));
 				},
 				'<' if self.peek_for('<') => {
 					self.clear_buffer();
 					if self.peek_for('=') {
-						self.push_token(TAssignOp(box TBitOp(BitShl)));
+						self.push_token(TAssignOp(BinBit(BitShl)));
 					} else {
-						self.push_token(TBitOp(BitShl));
+						self.push_token(TBinOp(BinBit(BitShl)));
 					}
 				},
 				'<' => {
 					self.clear_buffer();
-					self.push_token(TCompOp(CompLessThan));
+					self.push_token(TBinOp(BinComp(CompLessThan)));
 				},
 				'>' if self.peek_for('=') => {
 					self.clear_buffer();
-					self.push_token(TCompOp(CompGreaterThanOrEqual));
+					self.push_token(TBinOp(BinComp(CompGreaterThanOrEqual)));
 				},
 				'>' if self.peek_for('>') => {
 					self.clear_buffer();
 					if self.peek_for('=') {
-						self.push_token(TAssignOp(box TBitOp(BitShr)));
+						self.push_token(TAssignOp(BinBit(BitShr)));
 					} else {
-						self.push_token(TBitOp(BitShr));
+						self.push_token(TBinOp(BinBit(BitShr)));
 					}
 				},
 				'>' => {
 					self.clear_buffer();
-					self.push_token(TCompOp(CompGreaterThan));
+					self.push_token(TBinOp(BinComp(CompGreaterThan)));
 				},
 				'!' if self.peek_for('=') => {
 					self.clear_buffer();
 					if self.peek_for('=') {
-						self.push_token(TCompOp(CompStrictNotEqual));
+						self.push_token(TBinOp(BinComp(CompStrictNotEqual)));
 					} else {
-						self.push_token(TCompOp(CompNotEqual));
+						self.push_token(TBinOp(BinComp(CompNotEqual)));
 					}
 				},
 				'!' => {

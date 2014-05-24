@@ -1,8 +1,9 @@
 use ast::{Token, TokenData, Expr};
-use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, NumOpExpr, UnaryOpExpr, BitOpExpr, CompOpExpr, LogOpExpr, ConstExpr, AssignExpr};
+use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TNumOp, TBitOp, TCompOp, TLogOp, TAssignOp, TUnaryOp, TEqual, TArrow};
+use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
 use ast::{OpSub, UnaryMinus, UnaryNot};
+use ast::BinNum;
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -307,7 +308,7 @@ impl Parser {
 			},
 			TNumber(num) =>
 				mk!(ConstExpr(CNum(num))),
-			TNumOp(OpSub) =>
+			TBinOp(BinNum(OpSub)) =>
 				mk!(UnaryOpExpr(UnaryMinus, box try!(self.parse()))),
 			TUnaryOp(UnaryNot) =>
 				mk!(UnaryOpExpr(UnaryNot, box try!(self.parse()))),
@@ -371,38 +372,17 @@ impl Parser {
 			TSemicolon | TComment(_) => {
 				self.pos += 1;
 			},
-			TNumOp(op) => {
+			TBinOp(op) => {
 				self.pos += 1;
 				let next = try!(self.parse());
-				result = mk!(NumOpExpr(op, box expr, box next));
+				result = mk!(BinOpExpr(op, box expr, box next));
 			},
 			TAssignOp(op) => {
 				self.pos += 1;
 				let next = try!(self.parse());
 				let boxed = box expr;
-				let op_result = mk!(match *op {
-					TNumOp(op) => NumOpExpr(op, boxed.clone(), box next),
-					TBitOp(op) => BitOpExpr(op, boxed.clone(), box next),
-					TCompOp(op) => CompOpExpr(op, boxed.clone(), box next),
-					TLogOp(op) => LogOpExpr(op, boxed.clone(), box next),
-					_ => unreachable!()
-				});
+				let op_result = mk!(BinOpExpr(op, boxed.clone(), box next));
 				result = mk!(AssignExpr(boxed, box op_result))
-			},
-			TBitOp(op) => {
-				self.pos += 1;
-				let next = try!(self.parse());
-				result = mk!(BitOpExpr(op, box expr, box next));
-			},
-			TCompOp(op) => {
-				self.pos += 1;
-				let next = try!(self.parse());
-				result = mk!(CompOpExpr(op, box expr, box next));
-			},
-			TLogOp(op) => {
-				self.pos += 1;
-				let next = try!(self.parse());
-				result = mk!(LogOpExpr(op, box expr, box next));
 			},
 			TEqual => {
 				self.pos += 1;
