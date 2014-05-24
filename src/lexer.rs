@@ -42,20 +42,14 @@ pub struct Lexer<B> {
 	pub tokens : Vec<Token>,
 	/// The string buffer for identities
 	ident_buffer : StrBuf,
-	/// The string buffer for strings
-	string_buffer : StrBuf,
 	/// The string buffer for comments
 	comment_buffer : StrBuf,
 	/// The string buffer for numbers
 	num_buffer : StrBuf,
-	/// The kind of string or `None` if it isn't in a string
-	string_start : Option<StringType>,
 	/// The kind of comment or `None` if it isn't in a comment
 	current_comment : Option<CommentType>,
 	/// The kind of number or `None` if it isn't in a number
 	current_number : Option<NumberType>,
-	/// True if a backwards slash has just been read
-	escaped : bool,
 	/// The current line number in the script
 	line_number : uint,
 	/// The current column number in the script
@@ -71,13 +65,10 @@ impl<B:Buffer> Lexer<B> {
 		return Lexer {
 			tokens: Vec::new(),
 			ident_buffer: StrBuf::with_capacity(32),
-			string_buffer: StrBuf::with_capacity(256),
 			num_buffer: StrBuf::with_capacity(16),
 			comment_buffer: StrBuf::with_capacity(32),
-			string_start: None,
 			current_comment: None,
 			current_number: None,
-			escaped: false,
 			line_number: 1,
 			column_number: 0,
 			buffer: buffer,
@@ -151,53 +142,6 @@ impl<B:Buffer> Lexer<B> {
 			};
 			self.column_number += 1;
 			match ch {
-				_ if self.escaped => {
-					self.escaped = false;
-					if ch != '\n' {
-						let escaped_ch = match ch {
-							'n' => '\n',
-							'r' => '\r',
-							't' => '\t',
-							'b' => '\x08',
-							'f' => '\x0c',
-							'0' => '\0',
-							'x' => {
-								let mut nums = StrBuf::with_capacity(2);
-								for _ in range(0, 2) {
-									nums.push_char(try!(self.next()).clone());
-								}
-								self.column_number += 2;
-								let as_num = match from_str_radix(nums.as_slice(), 16) {
-									Some(v) => v,
-									None => 0
-								};
-								match from_u32(as_num) {
-									Some(v) => v,
-									None => fail!("{}:{}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
-								}
-							},
-							'u' => {
-								let mut nums = StrBuf::new();
-								for _ in range(0, 4) {
-									nums.push_char(try!(self.next()));
-								}
-								self.column_number += 4;
-								let as_num = match from_str_radix(nums.as_slice(), 16) {
-									Some(v) => v,
-									None => 0
-								};
-								match from_u32(as_num) {
-									Some(v) => v,
-									None => fail!("{}:{}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
-								}
-							},
-							'\'' if self.string_start == Some(SingleQuote) => '\'',
-							'"' if self.string_start == Some(DoubleQuote) => '"',
-							_ => fail!("{}:{}: Invalid escape `{}`", self.line_number, self.column_number, ch)
-						};
-						self.string_buffer.push_char(escaped_ch);
-					}
-				},
 				'\n' if self.current_comment == Some(SingleLineComment) => {
 					let comment = self.comment_buffer.clone();
 					self.push_token(TComment(comment));
@@ -213,21 +157,67 @@ impl<B:Buffer> Lexer<B> {
 				_ if self.current_comment.is_some() => {
 					self.comment_buffer.push_char(ch);
 				},
-				'"' if self.string_start == Some(DoubleQuote) => {
-					self.string_start = None;
-					let string = self.string_buffer.clone();
-					self.push_token(TString(string));
-					self.string_buffer.clear();
+				'"' | '\'' => {
+					let mut buf = StrBuf::new();
+					loop {
+						match try!(self.next()) {
+							'\'' if ch == '\'' => {
+								break;
+							},
+							'"' if ch == '"' => {
+								break;
+							},
+							'\\' => {
+								let escape = try!(self.next());
+								if escape != '\n' {
+									let escaped_ch = match escape {
+										'n' => '\n',
+										'r' => '\r',
+										't' => '\t',
+										'b' => '\x08',
+										'f' => '\x0c',
+										'0' => '\0',
+										'x' => {
+											let mut nums = StrBuf::with_capacity(2);
+											for _ in range(0, 2) {
+												nums.push_char(try!(self.next()));
+											}
+											self.column_number += 2;
+											let as_num = match from_str_radix(nums.as_slice(), 16) {
+												Some(v) => v,
+												None => 0
+											};
+											match from_u32(as_num) {
+												Some(v) => v,
+												None => fail!("{}:{}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
+											}
+										},
+										'u' => {
+											let mut nums = StrBuf::new();
+											for _ in range(0, 4) {
+												nums.push_char(try!(self.next()));
+											}
+											self.column_number += 4;
+											let as_num = match from_str_radix(nums.as_slice(), 16) {
+												Some(v) => v,
+												None => 0
+											};
+											match from_u32(as_num) {
+												Some(v) => v,
+												None => fail!("{}:{}: {} is not a valid unicode scalar value", self.line_number, self.column_number, as_num)
+											}
+										},
+										'\'' | '"' => escape,
+										_ => fail!("{}:{}: Invalid escape `{}`", self.line_number, self.column_number, ch)
+									};
+									buf.push_char(escaped_ch);
+								}
+							},
+							ch => buf.push_char(ch)
+						}
+					}
+					self.push_token(TString(buf))
 				},
-				'\'' if self.string_start == Some(SingleQuote) => {
-					self.string_start = None;
-					let string = self.string_buffer.clone();
-					self.push_token(TString(string));
-					self.string_buffer.clear();
-				},
-				'\\' if self.string_start.is_some() => self.escaped = true,
-				_ if self.string_start.is_some() => self.string_buffer.push_char(ch),
-				'"' if self.string_start.is_none() => self.string_start = Some(DoubleQuote),
 				'0' if self.peek_for('x') => {
 					self.current_number = Some(HexadecimalNumber);
 				},
@@ -249,7 +239,6 @@ impl<B:Buffer> Lexer<B> {
 					self.num_buffer.push_char(ch);
 					self.current_number = Some(DecimalNumber);
 				},
-				'\'' if self.string_start.is_none() => self.string_start = Some(SingleQuote),
 				'.' if self.current_number.is_some() && !self.num_buffer.as_slice().contains(".") => {
 					self.num_buffer.push_char(ch);
 					self.current_number = Some(DecimalNumber);
