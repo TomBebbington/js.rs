@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TomBebbington/rust_js.svg?branch=master)](https://travis-ci.org/TomBebbington/rust_js)
+[![Build Status](https://travis-ci.org/TomBebbington/js.rs.svg?branch=master)](https://travis-ci.org/TomBebbington/js.rs)
 This is a Javascript lexer, parser and interpreter written in Rust. Currently, it has support for some of the language.
 
 Documentation
