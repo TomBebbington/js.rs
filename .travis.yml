@@ -7,7 +7,7 @@ before_install:
 install:
   - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
 script:
-  - make lib build doc
+  - make libs build doc
 notifications:
   email:
     - tophattedcoder@gmail.com
