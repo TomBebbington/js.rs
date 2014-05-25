@@ -456,6 +456,10 @@
 <span id='416'>416</span>
 <span id='417'>417</span>
 <span id='418'>418</span>
+<span id='419'>419</span>
+<span id='420'>420</span>
+<span id='421'>421</span>
+<span id='422'>422</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>TIdent</span>, <span class='ident'>TNumber</span>, <span class='ident'>TString</span>, <span class='ident'>TSemicolon</span>, <span class='ident'>TComment</span>, <span class='ident'>TColon</span>, <span class='ident'>TDot</span>, <span class='ident'>TEqual</span>, <span class='ident'>TOpenParen</span>, <span class='ident'>TCloseParen</span>, <span class='ident'>TComma</span>, <span class='ident'>TOpenBlock</span>, <span class='ident'>TCloseBlock</span>, <span class='ident'>TOpenArray</span>, <span class='ident'>TCloseArray</span>, <span class='ident'>TQuestion</span>, <span class='ident'>TBinOp</span>, <span class='ident'>TAssignOp</span>, <span class='ident'>TUnaryOp</span>, <span class='ident'>TArrow</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>OpAdd</span>, <span class='ident'>OpSub</span>, <span class='ident'>OpMul</span>, <span class='ident'>OpDiv</span>, <span class='ident'>OpMod</span>};
@@ -543,7 +547,11 @@
 	}
 	<span class='kw'>fn</span> <span class='ident'>peek_for</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>peek</span>:<span class='ident'>char</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
 		<span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-			<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>as_slice</span>().<span class='ident'>char_at</span>(<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>) <span class='op'>==</span> <span class='ident'>peek</span>
+			<span class='kw'>let</span> <span class='ident'>matched</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>as_slice</span>().<span class='ident'>char_at</span>(<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>) <span class='op'>==</span> <span class='ident'>peek</span>;
+			<span class='kw'>if</span> <span class='ident'>matched</span> {
+				<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>pop_char</span>();
+			}
+			<span class='ident'>matched</span>
 		} <span class='kw'>else</span> {
 			<span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>buffer</span>.<span class='ident'>read_char</span>() {
 				<span class='prelude-val'>Ok</span>(<span class='ident'>ch</span>) <span class='kw'>if</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='ident'>peek</span> <span class='op'>=&gt;</span> {
@@ -687,7 +695,7 @@
 					<span class='kw'>loop</span> {
 						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
 						<span class='kw'>match</span> <span class='ident'>ch</span> {
-							_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_alphabetic</span>() <span class='op'>||</span> <span class='ident'>ch</span>.<span class='ident'>is_digit</span>() <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
+							_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_alphabetic</span>() <span class='op'>||</span> <span class='ident'>ch</span>.<span class='ident'>is_digit</span>() <span class='op'>||</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;_&#39;</span> <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
 							_ <span class='op'>=&gt;</span> {
 								<span class='self'>self</span>.<span class='ident'>peek_buffer</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
 								<span class='kw'>break</span>;

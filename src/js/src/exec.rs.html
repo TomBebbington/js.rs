@@ -367,17 +367,26 @@
 <span id='327'>327</span>
 <span id='328'>328</span>
 <span id='329'>329</span>
+<span id='330'>330</span>
+<span id='331'>331</span>
+<span id='332'>332</span>
+<span id='333'>333</span>
+<span id='334'>334</span>
+<span id='335'>335</span>
+<span id='336'>336</span>
+<span id='337'>337</span>
+<span id='338'>338</span>
 </pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>Expr</span>, <span class='ident'>ConstExpr</span>, <span class='ident'>BlockExpr</span>, <span class='ident'>TypeOfExpr</span>, <span class='ident'>LocalExpr</span>, <span class='ident'>GetConstFieldExpr</span>, <span class='ident'>GetFieldExpr</span>, <span class='ident'>CallExpr</span>, <span class='ident'>WhileLoopExpr</span>, <span class='ident'>IfExpr</span>, <span class='ident'>SwitchExpr</span>, <span class='ident'>ObjectDeclExpr</span>, <span class='ident'>ArrayDeclExpr</span>, <span class='ident'>FunctionDeclExpr</span>, <span class='ident'>ArrowFunctionDeclExpr</span>, <span class='ident'>UnaryOpExpr</span>, <span class='ident'>BinOpExpr</span>, <span class='ident'>ConstructExpr</span>, <span class='ident'>ReturnExpr</span>, <span class='ident'>ThrowExpr</span>, <span class='ident'>AssignExpr</span>};
+<span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>Expr</span>, <span class='ident'>ConstExpr</span>, <span class='ident'>BlockExpr</span>, <span class='ident'>TypeOfExpr</span>, <span class='ident'>LocalExpr</span>, <span class='ident'>VarDeclExpr</span>, <span class='ident'>GetConstFieldExpr</span>, <span class='ident'>GetFieldExpr</span>, <span class='ident'>CallExpr</span>, <span class='ident'>WhileLoopExpr</span>, <span class='ident'>IfExpr</span>, <span class='ident'>SwitchExpr</span>, <span class='ident'>ObjectDeclExpr</span>, <span class='ident'>ArrayDeclExpr</span>, <span class='ident'>FunctionDeclExpr</span>, <span class='ident'>ArrowFunctionDeclExpr</span>, <span class='ident'>UnaryOpExpr</span>, <span class='ident'>BinOpExpr</span>, <span class='ident'>ConstructExpr</span>, <span class='ident'>ReturnExpr</span>, <span class='ident'>ThrowExpr</span>, <span class='ident'>AssignExpr</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>CNum</span>, <span class='ident'>CInt</span>, <span class='ident'>CString</span>, <span class='ident'>CBool</span>, <span class='ident'>CRegExp</span>, <span class='ident'>CNull</span>, <span class='ident'>CUndefined</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>OpSub</span>, <span class='ident'>OpAdd</span>, <span class='ident'>OpMul</span>, <span class='ident'>OpDiv</span>, <span class='ident'>OpMod</span>};
-<span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>UnaryMinus</span>, <span class='ident'>UnaryNot</span>};
+<span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>UnaryMinus</span>, <span class='ident'>UnaryPlus</span>, <span class='ident'>UnaryNot</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>BinNum</span>, <span class='ident'>BinBit</span>, <span class='ident'>BinLog</span>, <span class='ident'>BinComp</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>BitAnd</span>, <span class='ident'>BitOr</span>, <span class='ident'>BitXor</span>, <span class='ident'>BitShl</span>, <span class='ident'>BitShr</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>LogAnd</span>, <span class='ident'>LogOr</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>CompEqual</span>, <span class='ident'>CompNotEqual</span>, <span class='ident'>CompStrictEqual</span>, <span class='ident'>CompStrictNotEqual</span>, <span class='ident'>CompGreaterThan</span>, <span class='ident'>CompGreaterThanOrEqual</span>, <span class='ident'>CompLessThan</span>, <span class='ident'>CompLessThanOrEqual</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>ValueData</span>, <span class='ident'>VNull</span>, <span class='ident'>VUndefined</span>, <span class='ident'>VString</span>, <span class='ident'>VNumber</span>, <span class='ident'>VInteger</span>, <span class='ident'>VObject</span>, <span class='ident'>VBoolean</span>, <span class='ident'>VFunction</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>, <span class='ident'>from_value</span>};
-<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>INSTANCE_PROTOTYPE</span>, <span class='ident'>PROTOTYPE</span>, <span class='ident'>ObjectData</span>};
+<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>INSTANCE_PROTOTYPE</span>, <span class='ident'>PROTOTYPE</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::{<span class='ident'>RegularFunc</span>, <span class='ident'>RegularFunction</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::{<span class='ident'>console</span>, <span class='ident'>math</span>, <span class='ident'>object</span>, <span class='ident'>array</span>, <span class='ident'>function</span>, <span class='ident'>json</span>, <span class='ident'>number</span>, <span class='ident'>error</span>, <span class='ident'>uri</span>, <span class='ident'>string</span>};
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>treemap</span>::<span class='ident'>TreeMap</span>;
@@ -393,9 +402,9 @@
 	<span class='doccomment'>/// Resolve the global variable `name`
 </span>	<span class='kw'>fn</span> <span class='ident'>get_global</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>:<span class='ident'>StrBuf</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
 	<span class='doccomment'>/// Create a new scope and return it
-</span>	<span class='kw'>fn</span> <span class='ident'>make_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Gc</span><span class='op'>&lt;</span><span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>ObjectData</span><span class='op'>&gt;&gt;</span>;
+</span>	<span class='kw'>fn</span> <span class='ident'>make_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
 	<span class='doccomment'>/// Destroy the current scope
-</span>	<span class='kw'>fn</span> <span class='ident'>destroy_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> ();
+</span>	<span class='kw'>fn</span> <span class='ident'>destroy_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
 	<span class='doccomment'>/// Run an expression
 </span>	<span class='kw'>fn</span> <span class='ident'>run</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span>;
 }
@@ -404,8 +413,8 @@
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Interpreter</span> {
 	<span class='doccomment'>/// An object representing the global object
 </span>	<span class='ident'>global</span>: <span class='ident'>Value</span>,
-	<span class='doccomment'>/// The variable scopes
-</span>	<span class='ident'>scopes</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Gc</span><span class='op'>&lt;</span><span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>ObjectData</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span>,
+	<span class='doccomment'>/// The variable scope
+</span>	<span class='ident'>scope</span>: <span class='ident'>Value</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Executor</span> <span class='kw'>for</span> <span class='ident'>Interpreter</span> {
 	<span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Interpreter</span> {
@@ -420,7 +429,7 @@
 		<span class='ident'>error</span>::<span class='ident'>init</span>(<span class='ident'>global</span>);
 		<span class='ident'>string</span>::<span class='ident'>init</span>(<span class='ident'>global</span>);
 		<span class='ident'>uri</span>::<span class='ident'>init</span>(<span class='ident'>global</span>);
-		<span class='ident'>Interpreter</span> {<span class='ident'>global</span>: <span class='ident'>global</span>, <span class='ident'>scopes</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>()}
+		<span class='ident'>Interpreter</span> {<span class='ident'>global</span>: <span class='ident'>global</span>, <span class='ident'>scope</span>: <span class='ident'>global</span>}
 	}
 	<span class='kw'>fn</span> <span class='ident'>set_global</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>name</span>:<span class='ident'>StrBuf</span>, <span class='ident'>val</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>global</span>.<span class='ident'>borrow</span>().<span class='ident'>set_field</span>(<span class='ident'>name</span>, <span class='ident'>val</span>)
@@ -428,13 +437,24 @@
 	<span class='kw'>fn</span> <span class='ident'>get_global</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>:<span class='ident'>StrBuf</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>global</span>.<span class='ident'>borrow</span>().<span class='ident'>get_field</span>(<span class='ident'>name</span>)
 	}
-	<span class='kw'>fn</span> <span class='ident'>make_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Gc</span><span class='op'>&lt;</span><span class='ident'>RefCell</span><span class='op'>&lt;</span><span class='ident'>ObjectData</span><span class='op'>&gt;&gt;</span> {
-		<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>TreeMap</span>::<span class='ident'>new</span>()));
-		<span class='self'>self</span>.<span class='ident'>scopes</span>.<span class='ident'>push</span>(<span class='ident'>value</span>.<span class='ident'>clone</span>());
-		<span class='ident'>value</span>
+	<span class='kw'>fn</span> <span class='ident'>make_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+		<span class='kw'>let</span> <span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>ValueData</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>None</span>);
+		<span class='ident'>scope</span>.<span class='ident'>borrow</span>().<span class='ident'>set_field_slice</span>(<span class='ident'>INSTANCE_PROTOTYPE</span>, <span class='self'>self</span>.<span class='ident'>scope</span>);
+		<span class='self'>self</span>.<span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>scope</span>;
+		<span class='ident'>scope</span>
 	}
-	<span class='kw'>fn</span> <span class='ident'>destroy_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> () {
-		<span class='self'>self</span>.<span class='ident'>scopes</span>.<span class='ident'>pop</span>();
+	<span class='kw'>fn</span> <span class='ident'>destroy_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+		<span class='kw'>let</span> <span class='ident'>scope</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>scope</span>;
+		<span class='kw'>let</span> <span class='ident'>scope_ptr</span> <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>borrow</span>();
+		<span class='self'>self</span>.<span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>scope_ptr</span>.<span class='ident'>get_field_slice</span>(<span class='ident'>INSTANCE_PROTOTYPE</span>);
+		<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>scope_ptr</span> {
+			<span class='ident'>VObject</span>(<span class='kw-2'>ref</span> <span class='ident'>obj</span>) <span class='op'>=&gt;</span> {
+				<span class='ident'>obj</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='ident'>INSTANCE_PROTOTYPE</span>.<span class='ident'>into_strbuf</span>());
+				<span class='ident'>obj</span>.<span class='ident'>borrow_mut</span>().<span class='ident'>remove</span>(<span class='kw-2'>&amp;</span><span class='string'>&quot;this&quot;</span>.<span class='ident'>into_strbuf</span>());
+			},
+			_ <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>()
+		}
+		<span class='ident'>scope</span>
 	}
 	<span class='kw'>fn</span> <span class='ident'>run</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 		<span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>def</span> {
@@ -456,21 +476,7 @@
 				<span class='prelude-val'>Ok</span>(<span class='ident'>obj</span>)
 			},
 			<span class='ident'>LocalExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>) <span class='op'>=&gt;</span> {
-				<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VUndefined</span>);
-				<span class='kw'>for</span> <span class='ident'>scope</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>scopes</span>.<span class='ident'>iter</span>().<span class='ident'>rev</span>() {
-					<span class='kw'>match</span> <span class='ident'>scope</span>.<span class='ident'>borrow</span>().<span class='ident'>borrow</span>().<span class='ident'>find</span>(<span class='ident'>name</span>) {
-						<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> {
-							<span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>v</span>.<span class='ident'>value</span>.<span class='ident'>clone</span>();
-							<span class='kw'>break</span>;
-						}
-						<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> ()
-					}
-				}
-				<span class='prelude-val'>Ok</span>(<span class='kw'>if</span> <span class='ident'>value</span>.<span class='ident'>borrow</span>().<span class='ident'>is_undefined</span>() {
-					<span class='self'>self</span>.<span class='ident'>global</span>.<span class='ident'>borrow</span>().<span class='ident'>get_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>())
-				} <span class='kw'>else</span> {
-					<span class='ident'>value</span>
-				})
+				<span class='prelude-val'>Ok</span>(<span class='self'>self</span>.<span class='ident'>scope</span>.<span class='ident'>borrow</span>().<span class='ident'>get_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>()))
 			},
 			<span class='ident'>GetConstFieldExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>obj</span>, <span class='kw-2'>ref</span> <span class='ident'>field</span>) <span class='op'>=&gt;</span> {
 				<span class='kw'>let</span> <span class='ident'>val_obj</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>run</span>(<span class='op'>*</span><span class='ident'>obj</span>));
@@ -600,6 +606,7 @@
 				<span class='kw'>let</span> <span class='ident'>v_a</span> <span class='op'>=</span> <span class='ident'>v_r_a</span>.<span class='ident'>borrow</span>();
 				<span class='prelude-val'>Ok</span>(<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>op</span> {
 					<span class='ident'>UnaryMinus</span> <span class='op'>=&gt;</span> <span class='ident'>to_value</span>(<span class='op'>-</span><span class='ident'>v_a</span>.<span class='ident'>to_num</span>()),
+					<span class='ident'>UnaryPlus</span> <span class='op'>=&gt;</span> <span class='ident'>to_value</span>(<span class='ident'>v_a</span>.<span class='ident'>to_num</span>()),
 					<span class='ident'>UnaryNot</span> <span class='op'>=&gt;</span> <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='op'>!</span><span class='ident'>v_a</span>),
 					_ <span class='op'>=&gt;</span> <span class='macro'>unreachable</span><span class='macro'>!</span>()
 				})
@@ -673,7 +680,7 @@
 				<span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>run</span>(<span class='op'>*</span><span class='ident'>val_e</span>));
 				<span class='kw'>match</span> <span class='ident'>ref_e</span>.<span class='ident'>def</span> {
 					<span class='ident'>LocalExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>) <span class='op'>=&gt;</span> {
-						<span class='self'>self</span>.<span class='ident'>global</span>.<span class='ident'>borrow</span>().<span class='ident'>set_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>(), <span class='ident'>val</span>);
+						<span class='self'>self</span>.<span class='ident'>scope</span>.<span class='ident'>borrow</span>().<span class='ident'>set_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>(), <span class='ident'>val</span>);
 					},
 					<span class='ident'>GetConstFieldExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>obj</span>, <span class='kw-2'>ref</span> <span class='ident'>field</span>) <span class='op'>=&gt;</span> {
 						<span class='kw'>let</span> <span class='ident'>val_obj</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>run</span>(<span class='op'>*</span><span class='ident'>obj</span>));
@@ -682,6 +689,17 @@
 					_ <span class='op'>=&gt;</span> ()
 				}
 				<span class='prelude-val'>Ok</span>(<span class='ident'>val</span>)
+			},
+			<span class='ident'>VarDeclExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>) <span class='op'>=&gt;</span> {
+				<span class='kw'>for</span> <span class='ident'>var</span> <span class='kw'>in</span> <span class='ident'>vars</span>.<span class='ident'>iter</span>() {
+					<span class='kw'>let</span> (<span class='ident'>name</span>, <span class='ident'>value</span>) <span class='op'>=</span> <span class='ident'>var</span>.<span class='ident'>clone</span>();
+					<span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>value</span> {
+						<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>run</span>(<span class='kw-2'>&amp;</span><span class='ident'>v</span>)),
+						<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VNull</span>)
+					};
+					<span class='self'>self</span>.<span class='ident'>scope</span>.<span class='ident'>borrow</span>().<span class='ident'>set_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>(), <span class='ident'>val</span>);
+				}
+				<span class='prelude-val'>Ok</span>(<span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VUndefined</span>))
 			},
 			<span class='ident'>TypeOfExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>val_e</span>) <span class='op'>=&gt;</span> {
 				<span class='kw'>let</span> <span class='ident'>val</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>run</span>(<span class='op'>*</span><span class='ident'>val_e</span>));

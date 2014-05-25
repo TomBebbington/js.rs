@@ -499,6 +499,12 @@
 <span id='459'>459</span>
 <span id='460'>460</span>
 <span id='461'>461</span>
+<span id='462'>462</span>
+<span id='463'>463</span>
+<span id='464'>464</span>
+<span id='465'>465</span>
+<span id='466'>466</span>
+<span id='467'>467</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>::<span class='ident'>Vec</span>;
@@ -573,6 +579,8 @@
 </span>	<span class='ident'>UnaryDecrement</span>(<span class='ident'>bool</span>),
 	<span class='doccomment'>/// `-a` - negate the value
 </span>	<span class='ident'>UnaryMinus</span>,
+	<span class='doccomment'>/// `+a` - convert to a number
+</span>	<span class='ident'>UnaryPlus</span>,
 	<span class='doccomment'>/// `!a` - get the opposite of the boolean value
 </span>	<span class='ident'>UnaryNot</span>
 }
@@ -581,6 +589,7 @@
 		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
 			<span class='ident'>UnaryIncrement</span>(_) <span class='op'>=&gt;</span> <span class='string'>&quot;++&quot;</span>,
 			<span class='ident'>UnaryDecrement</span>(_) <span class='op'>=&gt;</span> <span class='string'>&quot;--&quot;</span>,
+			<span class='ident'>UnaryPlus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;+&quot;</span>,
 			<span class='ident'>UnaryMinus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;-&quot;</span>,
 			<span class='ident'>UnaryNot</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!&quot;</span>
 		})
@@ -718,7 +727,7 @@
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Expr</span> {
 	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}:{}: {}&quot;</span>, <span class='self'>self</span>.<span class='ident'>start</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>start</span>.<span class='ident'>column_number</span>, <span class='self'>self</span>.<span class='ident'>def</span>)
+		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>def</span>)
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
@@ -779,6 +788,8 @@
 </span>	<span class='ident'>ThrowExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Assign an expression to a value
 </span>	<span class='ident'>AssignExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
+	<span class='doccomment'>/// A variable declaration
+</span>	<span class='ident'>VarDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>StrBuf</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Return a string representing the type of the given expression
 </span>	<span class='ident'>TypeOfExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)
 }
@@ -844,7 +855,8 @@
 			<span class='ident'>ReturnExpr</span>(<span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;return&quot;</span>),
 			<span class='ident'>ThrowExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>ex</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;throw {}&quot;</span>, <span class='ident'>ex</span>),
 			<span class='ident'>AssignExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>ref_e</span>, <span class='kw-2'>ref</span> <span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{} = {}&quot;</span>, <span class='ident'>ref_e</span>, <span class='ident'>val</span>),
-			<span class='ident'>TypeOfExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;typeof {}&quot;</span>, <span class='ident'>e</span>)
+			<span class='ident'>VarDeclExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>vars</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;var {}&quot;</span>, <span class='ident'>vars</span>),
+			<span class='ident'>TypeOfExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>e</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;typeof {}&quot;</span>, <span class='ident'>e</span>),
 		}
 	}
 }
@@ -887,7 +899,7 @@
 }
 <span class='kw'>impl</span> <span class='ident'>fmt</span>::<span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Token</span> {
 	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='ident'>fmt</span>::<span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}:{}: {}&quot;</span>, <span class='self'>self</span>.<span class='ident'>pos</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>pos</span>.<span class='ident'>column_number</span>, <span class='self'>self</span>.<span class='ident'>data</span>)
+		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>data</span>)
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
