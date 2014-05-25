@@ -45,53 +45,53 @@ impl ValueData {
 	}
 	/// Returns true if the value is an object
 	pub fn is_object(&self) -> bool {
-		return match *self {
+		match *self {
 			VObject(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {
-		return match *self {
+		match *self {
 			VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null
 	pub fn is_null(&self) -> bool {
-		return match *self {
+		match *self {
 			VNull => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null or undefined
 	pub fn is_null_or_undefined(&self) -> bool {
-		return match *self {
+		match *self {
 			VNull | VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is a 64-bit floating-point number
 	pub fn is_double(&self) -> bool {
-		return match *self {
+		match *self {
 			VNumber(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is true
 	pub fn is_true(&self) -> bool {
-		return match *self {
+		match *self {
 			VObject(_) => true,
 			VString(ref s) if s.as_slice() == "1" => true,
 			VNumber(n) if n >= 1.0 && n % 1.0 == 0.0 => true,
 			VInteger(n) if n > 1 => true,
 			VBoolean(v) => v,
 			_ => false
-		};
+		}
 	}
 	/// Converts the value into a 64-bit floating point number
 	pub fn to_num(&self) -> f64 {
-		return match *self {
+		match *self {
 			VObject(_) | VUndefined | VFunction(_) => f64::NAN,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -105,7 +105,7 @@ impl ValueData {
 	}
 	/// Converts the value into a 32-bit integer
 	pub fn to_int(&self) -> i32 {
-		return match *self {
+		match *self {
 			VObject(_) | VUndefined | VNull | VBoolean(false) | VFunction(_) => 0,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
