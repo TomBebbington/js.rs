@@ -4,6 +4,8 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 
+#![experimental]
+
 #![deny(non_uppercase_statics)]
 #![deny(missing_doc)]
 #![deny(unnecessary_parens)]

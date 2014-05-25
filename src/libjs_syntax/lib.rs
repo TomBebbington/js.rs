@@ -4,6 +4,8 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 
+#![experimental]
+
 #![deny(non_uppercase_statics)]
 #![deny(missing_doc)]
 #![deny(unnecessary_parens)]
@@ -18,7 +20,7 @@
 
 #![feature(macro_rules)]
 
-//! Javascript parsing library
+//! This crate provides a complete Javascript parsing library
 
 extern crate collections;
 pub use lexer::Lexer;
