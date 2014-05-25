@@ -280,6 +280,8 @@ pub enum ExprDef {
 	ThrowExpr(Box<Expr>),
 	/// Assign an expression to a value
 	AssignExpr(Box<Expr>, Box<Expr>),
+	/// A variable declaration
+	VarDeclExpr(Vec<(StrBuf, Option<Expr>)>),
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(Box<Expr>)
 }
@@ -345,7 +347,8 @@ impl fmt::Show for ExprDef {
 			ReturnExpr(None) => write!(f, "{}", "return"),
 			ThrowExpr(ref ex) => write!(f, "throw {}", ex),
 			AssignExpr(ref ref_e, ref val) => write!(f, "{} = {}", ref_e, val),
-			TypeOfExpr(ref e) => write!(f, "typeof {}", e)
+			VarDeclExpr(ref vars) => write!(f, "var {}", vars),
+			TypeOfExpr(ref e) => write!(f, "typeof {}", e),
 		}
 	}
 }

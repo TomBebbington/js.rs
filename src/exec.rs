@@ -1,4 +1,4 @@
-use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, VarDeclExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use ast::{UnaryMinus, UnaryPlus, UnaryNot};
@@ -310,6 +310,17 @@ impl Executor for Interpreter {
 					_ => ()
 				}
 				Ok(val)
+			},
+			VarDeclExpr(ref vars) => {
+				for var in vars.iter() {
+					let (name, value) = var.clone();
+					let val = match value {
+						Some(v) => try!(self.run(&v)),
+						None => Gc::new(VNull)
+					};
+					self.scope.borrow().set_field(name.clone(), val);
+				}
+				Ok(Gc::new(VUndefined))
 			},
 			TypeOfExpr(ref val_e) => {
 				let val = try!(self.run(*val_e));

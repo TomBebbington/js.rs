@@ -1,5 +1,5 @@
 use ast::{Token, TokenData, Expr};
-use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
+use ast::{VarDeclExpr, BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
 use ast::{OpSub, OpAdd, UnaryMinus, UnaryPlus, UnaryNot};
@@ -81,6 +81,38 @@ impl Parser {
 			"throw" => {
 				let thrown = try!(self.parse());
 				Ok(Some(mk!(ThrowExpr(box thrown))))
+			},
+			"var" => {
+				let mut vars = Vec::new();
+				loop {
+					let name = match self.get_token(self.pos) {
+						Ok(Token{data: TIdent(ref name), ..}) => name.clone(),
+						Ok(tok) => return Err(Expected(vec!(TIdent("identifier".into_strbuf())), tok, "var statement")),
+						Err(AbruptEnd) => break,
+						Err(e) => return Err(e)
+					};
+					self.pos += 1;
+					match self.get_token(self.pos) {
+						Ok(Token {data: TEqual, ..}) => {
+							self.pos += 1;
+							let val = try!(self.parse());
+							vars.push((name, Some(val)));
+							match self.get_token(self.pos) {
+								Ok(Token {data: TComma, ..}) => self.pos += 1,
+								_ => break
+							}
+						},
+						Ok(Token {data: TComma, ..}) => {
+							self.pos += 1;
+							vars.push((name, None));
+						},
+						_ => {
+							vars.push((name, None));
+							break;
+						}
+					}
+				}
+				Ok(Some(mk!(VarDeclExpr(vars))))
 			},
 			"return" => Ok(Some(mk!(ReturnExpr(Some(box try!(self.parse()).clone()))))),
 			"new" => {
