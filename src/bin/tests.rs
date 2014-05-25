@@ -1,11 +1,11 @@
 #![crate_type = "bin"]
-extern crate script;
+extern crate js;
 extern crate collections;
-use script::lexer::Lexer;
-use script::parser::Parser;
-use script::exec::{Executor, Interpreter};
-use script::ast::{Token, TComment};
-use script::js::value::{Value, ResultValue, to_value, from_value};
+use js::lexer::Lexer;
+use js::parser::Parser;
+use js::exec::{Executor, Interpreter};
+use js::ast::{Token, TComment};
+use js::js::value::{Value, ResultValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::path::posix::Path;
 use std::io::fs::{File, walk_dir};

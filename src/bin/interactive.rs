@@ -1,9 +1,9 @@
 #![feature(globs)]
 #![crate_type = "bin"]
-extern crate script;
-use script::lexer::Lexer;
-use script::parser::Parser;
-use script::exec::{Executor, Interpreter};
+extern crate js;
+use js::lexer::Lexer;
+use js::parser::Parser;
+use js::exec::{Executor, Interpreter};
 use std::io;
 
 fn main() {
