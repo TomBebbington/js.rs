@@ -1,7 +1,7 @@
 use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
 use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
 use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
-use ast::{UnaryMinus, UnaryNot};
+use ast::{UnaryMinus, UnaryPlus, UnaryNot};
 use ast::{BinNum, BinBit, BinLog, BinComp};
 use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{LogAnd, LogOr};
@@ -230,6 +230,7 @@ impl Executor for Interpreter {
 				let v_a = v_r_a.borrow();
 				Ok(match *op {
 					UnaryMinus => to_value(-v_a.to_num()),
+					UnaryPlus => to_value(v_a.to_num()),
 					UnaryNot => Gc::new(!v_a),
 					_ => unreachable!()
 				})

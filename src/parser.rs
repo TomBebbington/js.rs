@@ -2,7 +2,7 @@ use ast::{Token, TokenData, Expr};
 use ast::{BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
 use ast::{CBool, CNull, CUndefined, CString, CNum};
 use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
-use ast::{OpSub, UnaryMinus, UnaryNot};
+use ast::{OpSub, OpAdd, UnaryMinus, UnaryPlus, UnaryNot};
 use ast::{BinNum, Operator};
 use collections::treemap::TreeMap;
 use std::fmt;
@@ -318,6 +318,8 @@ impl Parser {
 				mk!(ConstExpr(CNum(num))),
 			TBinOp(BinNum(OpSub)) =>
 				mk!(UnaryOpExpr(UnaryMinus, box try!(self.parse()))),
+			TBinOp(BinNum(OpAdd)) =>
+				mk!(UnaryOpExpr(UnaryPlus, box try!(self.parse()))),
 			TUnaryOp(UnaryNot) =>
 				mk!(UnaryOpExpr(UnaryNot, box try!(self.parse()))),
 			_ => return Err(Expected(Vec::new(), token.clone(), "script"))

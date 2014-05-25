@@ -71,6 +71,8 @@ pub enum UnaryOp {
 	UnaryDecrement(bool),
 	/// `-a` - negate the value
 	UnaryMinus,
+	/// `+a` - convert to a number
+	UnaryPlus,
 	/// `!a` - get the opposite of the boolean value
 	UnaryNot
 }
@@ -79,6 +81,7 @@ impl fmt::Show for UnaryOp {
 		write!(f, "{}", match *self {
 			UnaryIncrement(_) => "++",
 			UnaryDecrement(_) => "--",
+			UnaryPlus => "+",
 			UnaryMinus => "-",
 			UnaryNot => "!"
 		})
