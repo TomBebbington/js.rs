@@ -12,7 +12,8 @@
 
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 
-//! A Javascript execution library
+//! This crate provides a Javascript execution library with an
+//! Interpreter and a Javascript standard library.
 extern crate collections;
 extern crate syntax = "js_syntax";
 extern crate rand;

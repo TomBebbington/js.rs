@@ -14,7 +14,13 @@
 
 #![feature(macro_rules)]
 
-//! This crate provides a complete Javascript parsing library
+//! This crate provides a Javascript parsing library with a parser, 
+//! a lexer, and Abstract Syntax Tree. The lexer started off based
+//! off the Kaleidocope OCaml tutorial, then it evolved off there.
+//! 
+//! The parser is based on my work on the [`hscript` project from 
+//! Haxe](https://github.com/TomBebbington/hscript), but it's still
+//! very premature and some important things are missing for now.
 
 extern crate collections;
 pub use lexer::Lexer;
