@@ -35,7 +35,9 @@ impl Interactive {
 				println!("Parsing");
 			}
 			let expr = Parser::new(tokens).parse_all().unwrap();
-			println!("Expression: {}", expr);
+			if verbose {
+				println!("Expression: {}", expr);
+			}
 			let result = engine.run(&expr);
 			match result {
 				Ok(v) =>
