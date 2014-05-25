@@ -159,7 +159,7 @@ impl Parser {
 							let mut block = Vec::new();
 							try!(self.expect(TColon, "switch case"));
 							loop {
-								match try!(self.get_token(self.pos)).data.clone() {
+								match try!(self.get_token(self.pos)).data {
 									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
@@ -171,7 +171,7 @@ impl Parser {
 							let mut block = Vec::new();
 							try!(self.expect(TColon, "default switch case"));
 							loop {
-								match try!(self.get_token(self.pos)).data.clone() {
+								match try!(self.get_token(self.pos)).data {
 									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
 									TCloseBlock => break,
 									_ => block.push(try!(self.parse()))
@@ -239,7 +239,7 @@ impl Parser {
 			},
 			TString(ref s) => mk!(ConstExpr(CString(s.clone()))),
 			TOpenParen => {
-				match try!(self.get_token(self.pos)).data.clone() {
+				match try!(self.get_token(self.pos)).data {
 					TCloseParen if try!(self.get_token(self.pos + 1)).data == TArrow => {
 						self.pos += 2;
 						let expr = try!(self.parse());
@@ -249,7 +249,7 @@ impl Parser {
 						let next = try!(self.parse());
 						let next_tok = try!(self.get_token(self.pos));
 						self.pos += 1;
-						match next_tok.data.clone() {
+						match next_tok.data {
 							TCloseParen => next,
 							TComma => { // at this point it's probably gonna be an arrow function
 								let mut args = vec!(match next.def {
