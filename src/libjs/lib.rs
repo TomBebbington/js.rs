@@ -6,17 +6,7 @@
 
 #![experimental]
 
-#![deny(non_uppercase_statics)]
-#![deny(missing_doc)]
-#![deny(unnecessary_parens)]
-#![deny(unrecognized_lint)]
-#![deny(unreachable_code)]
-#![deny(unnecessary_allocation)]
-#![deny(unnecessary_typecast)]
-#![deny(unnecessary_allocation)]
-#![deny(uppercase_variables)]
-#![deny(non_camel_case_types)]
-#![deny(unused_must_use)]
+#![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 
 //! A Javascript execution library
 extern crate collections;
