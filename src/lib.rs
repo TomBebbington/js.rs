@@ -1,4 +1,4 @@
-#![crate_id = "script"]
+#![crate_id = "js"]
 #![crate_type = "lib"]
 #![comment = "Rust Javascript parsing and interpretation library"]
 #![license = "MIT"]
