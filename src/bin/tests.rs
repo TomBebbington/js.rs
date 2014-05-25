@@ -55,6 +55,9 @@ fn main() {
 		if file.is_file() && file.extension_str() == Some("js") {
 			let file_str = file.as_str().unwrap();
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
+			if verbose {
+				println!("{}: Lexing", file_str);
+			}
 			lexer.lex().unwrap();
 			if verbose {
 				println!("{}", lexer.tokens.clone().iter().map(|tk| tk.to_str()).collect::<Vec<StrBuf>>().connect("\n"));
@@ -65,12 +68,18 @@ fn main() {
 				None => fail!("{} does not have @description metadata", file_str)
 			};
 			let mut parser = Parser::new(lexer.tokens);
+			if verbose {
+				println!("{}: Parsing", file_str);
+			}
 			let expr = match parser.parse_all() {
 				Ok(v) => v,
 				Err(v) => fail!("{}: {}", file_str, v)
 			};
 			let mut engine : Interpreter = Executor::new();
 			engine.set_global("assert".into_strbuf(), to_value(assert));
+			if verbose {
+				println!("{}: Executing", file_str);
+			}
 			let result : Result<Value, Value> = engine.run(&expr);
 			match result {
 				Ok(_) => println!("{}: All tests passed for {}", file_str, description),
