@@ -76,6 +76,12 @@
 <span id='36'>36</span>
 <span id='37'>37</span>
 <span id='38'>38</span>
+<span id='39'>39</span>
+<span id='40'>40</span>
+<span id='41'>41</span>
+<span id='42'>42</span>
+<span id='43'>43</span>
+<span id='44'>44</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js_syntax&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript lexing and parsing&quot;</span>]</span>
@@ -93,7 +99,13 @@
 
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>macro_rules</span>)]</span>
 
-<span class='doccomment'>//! This crate provides a complete Javascript parsing library
+<span class='doccomment'>//! This crate provides a Javascript parsing library with a parser, 
+</span><span class='doccomment'>//! a lexer, and Abstract Syntax Tree. The lexer started off based
+</span><span class='doccomment'>//! off the Kaleidocope OCaml tutorial, then it evolved off there.
+</span><span class='doccomment'>//! 
+</span><span class='doccomment'>//! The parser is based on my work on the [`hscript` project from 
+</span><span class='doccomment'>//! Haxe](https://github.com/TomBebbington/hscript), but it&#39;s still
+</span><span class='doccomment'>//! very premature and some important things are missing for now.
 </span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>collections</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>lexer</span>::<span class='ident'>Lexer</span>;
