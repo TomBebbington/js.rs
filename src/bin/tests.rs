@@ -10,6 +10,7 @@ use collections::treemap::TreeMap;
 use std::path::posix::Path;
 use std::io::fs::{File, walk_dir};
 use std::io::BufferedReader;
+use std::os;
 fn find_attrs(tokens: Vec<Token>) -> TreeMap<StrBuf, StrBuf> {
 	let mut map = TreeMap::new();
 	for tk in tokens.iter() {
@@ -41,6 +42,8 @@ fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	}
 }
 fn main() {
+	let args = os::args();
+	let verbose = args.contains(&"-v".into_strbuf()) || args.contains(&"--verbose".into_strbuf());
 	let mut path = Path::new("tests");
 	if !path.is_dir() {
 		path = Path::new("../tests");
@@ -53,6 +56,9 @@ fn main() {
 			let file_str = file.as_str().unwrap();
 			let mut lexer = Lexer::new(BufferedReader::new(File::open(&file).unwrap()));
 			lexer.lex().unwrap();
+			if verbose {
+				println!("{}", lexer.tokens.clone().iter().map(|tk| tk.to_str()).collect::<Vec<StrBuf>>().connect("\n"));
+			}
 			let attributes = find_attrs(lexer.tokens.clone());
 			let description = match attributes.find(&"description".into_strbuf()) {
 				Some(desc) => desc,
