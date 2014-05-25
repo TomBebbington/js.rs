@@ -69,6 +69,17 @@
 <span id='29'>29</span>
 <span id='30'>30</span>
 <span id='31'>31</span>
+<span id='32'>32</span>
+<span id='33'>33</span>
+<span id='34'>34</span>
+<span id='35'>35</span>
+<span id='36'>36</span>
+<span id='37'>37</span>
+<span id='38'>38</span>
+<span id='39'>39</span>
+<span id='40'>40</span>
+<span id='41'>41</span>
+<span id='42'>42</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js_syntax&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript lexing and parsing&quot;</span>]</span>
@@ -96,7 +107,18 @@
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>lexer</span>::<span class='ident'>Lexer</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>parser</span>::<span class='ident'>Parser</span>;
 <span class='doccomment'>/// The Abstract Syntax Trees for Javascript tokens and expressions
-</span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>ast</span>;
+</span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>ast</span> {
+	<span class='doccomment'>/// Constant AST
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>constant</span>;
+	<span class='doccomment'>/// Expression AST
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>expr</span>;
+	<span class='doccomment'>/// Operation AST
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>op</span>;
+	<span class='doccomment'>/// Position AST
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>pos</span>;
+	<span class='doccomment'>/// Token AST
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>token</span>;
+}
 <span class='doccomment'>/// The lexer, which transforms a string stream into a sequence of tokens
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>lexer</span>;
 <span class='doccomment'>/// The parser, which transforms a sequence of tokens into expressions

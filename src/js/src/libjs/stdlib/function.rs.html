@@ -98,7 +98,7 @@
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>ObjectData</span>, <span class='ident'>Property</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>VInteger</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
-<span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>Expr</span>;
+<span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>expr</span>::<span class='ident'>Expr</span>;
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>treemap</span>::<span class='ident'>TreeMap</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>Gc</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>NativeFunctionData</span> <span class='op'>=</span> <span class='kw'>fn</span>(<span class='ident'>Value</span>, <span class='ident'>Value</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span>;

@@ -39,10 +39,10 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../index.html'>js_syntax</a>::<a href='index.html'>parser</a>::<a class='type' href=''>ParseError</a><a class='source' href='../../src/js_syntax/src/libjs_syntax/parser.rs.html#21-28'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../index.html'>js_syntax</a>::<a href='index.html'>parser</a>::<a class='type' href=''>ParseError</a><a class='source' href='../../src/js_syntax/src/libjs_syntax/parser.rs.html#23-30'>[src]</a></h1>
 <pre class='rust enum'>pub enum ParseError {
-    Expected(<a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='type' href='../../js_syntax/ast/type.TokenData.html' title='js_syntax::ast::TokenData'>TokenData</a>&gt;, <a class='struct' href='../../js_syntax/ast/struct.Token.html' title='js_syntax::ast::Token'>Token</a>, &amp;'static str),
-    ExpectedExpr(&amp;'static str, <a class='struct' href='../../js_syntax/ast/struct.Expr.html' title='js_syntax::ast::Expr'>Expr</a>),
+    Expected(<a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='type' href='../../js_syntax/ast/token/type.TokenData.html' title='js_syntax::ast::token::TokenData'>TokenData</a>&gt;, <a class='struct' href='../../js_syntax/ast/token/struct.Token.html' title='js_syntax::ast::token::Token'>Token</a>, &amp;'static str),
+    ExpectedExpr(&amp;'static str, <a class='struct' href='../../js_syntax/ast/expr/struct.Expr.html' title='js_syntax::ast::expr::Expr'>Expr</a>),
     AbruptEnd,
 }</pre><div class='docblock'><p>An error encountered during parsing an expression</p>
 </div><h2 class='variants'>Variants</h2>
