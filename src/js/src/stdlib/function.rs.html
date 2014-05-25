@@ -118,7 +118,6 @@
 <span id='78'>78</span>
 <span id='79'>79</span>
 <span id='80'>80</span>
-<span id='81'>81</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>ObjectData</span>, <span class='ident'>Property</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>VInteger</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
@@ -143,13 +142,12 @@
 				<span class='kw'>let</span> <span class='ident'>func</span> <span class='op'>=</span> <span class='ident'>ntv</span>.<span class='ident'>data</span>;
 				<span class='ident'>func</span>(<span class='ident'>this</span>, <span class='ident'>callee</span>, <span class='ident'>args</span>)
 			}, <span class='ident'>RegularFunc</span>(<span class='kw-2'>ref</span> <span class='ident'>data</span>) <span class='op'>=&gt;</span> {
-				<span class='kw'>let</span> <span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>exe</span>.<span class='ident'>make_scope</span>();
-				<span class='kw'>let</span> <span class='ident'>scope_ptr</span> <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>borrow</span>();
-				<span class='ident'>scope_ptr</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;this&quot;</span>, <span class='ident'>this</span>);
+				<span class='kw'>let</span> <span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>exe</span>.<span class='ident'>make_scope</span>(<span class='ident'>this</span>);
+				<span class='kw'>let</span> <span class='ident'>scope_vars_ptr</span> <span class='op'>=</span> <span class='ident'>scope</span>.<span class='ident'>vars</span>.<span class='ident'>borrow</span>();
 				<span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>data</span>.<span class='ident'>args</span>.<span class='ident'>len</span>()) {
 					<span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='ident'>i</span>);
 					<span class='kw'>let</span> <span class='ident'>expr</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='ident'>i</span>);
-					<span class='ident'>scope_ptr</span>.<span class='ident'>set_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>(), <span class='op'>*</span><span class='ident'>expr</span>);
+					<span class='ident'>scope_vars_ptr</span>.<span class='ident'>set_field</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>(), <span class='op'>*</span><span class='ident'>expr</span>);
 				}
 				<span class='kw'>let</span> <span class='ident'>result</span> <span class='op'>=</span> <span class='ident'>exe</span>.<span class='ident'>run</span>(<span class='kw-2'>&amp;</span><span class='ident'>data</span>.<span class='ident'>expr</span>);
 				<span class='ident'>exe</span>.<span class='ident'>destroy_scope</span>();

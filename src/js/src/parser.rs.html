@@ -512,6 +512,7 @@
 <span id='472'>472</span>
 <span id='473'>473</span>
 <span id='474'>474</span>
+<span id='475'>475</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>Token</span>, <span class='ident'>TokenData</span>, <span class='ident'>Expr</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>VarDeclExpr</span>, <span class='ident'>BlockExpr</span>, <span class='ident'>ThrowExpr</span>, <span class='ident'>ReturnExpr</span>, <span class='ident'>CallExpr</span>, <span class='ident'>ConstructExpr</span>, <span class='ident'>IfExpr</span>, <span class='ident'>WhileLoopExpr</span>, <span class='ident'>SwitchExpr</span>, <span class='ident'>TypeOfExpr</span>, <span class='ident'>FunctionDeclExpr</span>, <span class='ident'>ArrowFunctionDeclExpr</span>, <span class='ident'>LocalExpr</span>, <span class='ident'>ArrayDeclExpr</span>, <span class='ident'>ObjectDeclExpr</span>, <span class='ident'>GetConstFieldExpr</span>, <span class='ident'>GetFieldExpr</span>, <span class='ident'>BinOpExpr</span>, <span class='ident'>UnaryOpExpr</span>, <span class='ident'>ConstExpr</span>, <span class='ident'>AssignExpr</span>};
@@ -574,6 +575,7 @@
 </span>	<span class='ident'>pos</span>: <span class='ident'>uint</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Parser</span> {
+	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
 	<span class='doccomment'>/// Creates a new parser, using `tokens` as input
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>tokens</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Parser</span> {
 		<span class='ident'>Parser</span> {<span class='ident'>tokens</span>: <span class='ident'>tokens</span>, <span class='ident'>pos</span>: <span class='number'>0</span>}

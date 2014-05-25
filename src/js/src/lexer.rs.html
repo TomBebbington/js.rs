@@ -460,6 +460,7 @@
 <span id='420'>420</span>
 <span id='421'>421</span>
 <span id='422'>422</span>
+<span id='423'>423</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>TIdent</span>, <span class='ident'>TNumber</span>, <span class='ident'>TString</span>, <span class='ident'>TSemicolon</span>, <span class='ident'>TComment</span>, <span class='ident'>TColon</span>, <span class='ident'>TDot</span>, <span class='ident'>TEqual</span>, <span class='ident'>TOpenParen</span>, <span class='ident'>TCloseParen</span>, <span class='ident'>TComma</span>, <span class='ident'>TOpenBlock</span>, <span class='ident'>TCloseBlock</span>, <span class='ident'>TOpenArray</span>, <span class='ident'>TCloseArray</span>, <span class='ident'>TQuestion</span>, <span class='ident'>TBinOp</span>, <span class='ident'>TAssignOp</span>, <span class='ident'>TUnaryOp</span>, <span class='ident'>TArrow</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::{<span class='ident'>OpAdd</span>, <span class='ident'>OpSub</span>, <span class='ident'>OpMul</span>, <span class='ident'>OpDiv</span>, <span class='ident'>OpMod</span>};
@@ -515,14 +516,15 @@
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>B</span>:<span class='ident'>Buffer</span><span class='op'>&gt;</span> <span class='ident'>Lexer</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// Creates a new lexer with empty buffers
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>buffer</span>: <span class='ident'>B</span>) <span class='op'>-&gt;</span> <span class='ident'>Lexer</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
-		<span class='kw'>return</span> <span class='ident'>Lexer</span> {
+		<span class='ident'>Lexer</span> {
 			<span class='ident'>tokens</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
 			<span class='ident'>line_number</span>: <span class='number'>1</span>,
 			<span class='ident'>column_number</span>: <span class='number'>0</span>,
 			<span class='ident'>buffer</span>: <span class='ident'>buffer</span>,
 			<span class='ident'>peek_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>new</span>()
-		};
+		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
 	<span class='kw'>fn</span> <span class='ident'>push_token</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>tk</span>:<span class='ident'>TokenData</span>) {
 		<span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>push</span>(<span class='ident'>Token</span>::<span class='ident'>new</span>(<span class='ident'>tk</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>))
 	}
