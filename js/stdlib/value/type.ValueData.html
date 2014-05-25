@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The js library documentation.">
+
+    <title>js::stdlib::value::ValueData - Rust</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+          rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    
+</head>
+<body>
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <section class="sidebar">
+        
+
+        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>value</a></p><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.FromValue.html'>FromValue</a><br/><a class='trait ' href='trait.ToValue.html'>ToValue</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.from_value.html'>from_value</a><br/><a class='fn ' href='fn.to_value.html'>to_value</a><br/></div>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Search documentation..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content type">
+<h1 class='fqn'>Enum <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='type' href=''>ValueData</a><a class='source' href='../../../src/js/src/stdlib/value.rs.html#18-35'>[src]</a></h1>
+<pre class='rust enum'>pub enum ValueData {
+    VNull,
+    VUndefined,
+    VBoolean(bool),
+    VString(<a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>),
+    VNumber(f64),
+    VInteger(i32),
+    VObject(<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='type' href='../../../js/stdlib/object/type.ObjectData.html' title='js::stdlib::object::ObjectData'>ObjectData</a>&gt;),
+    VFunction(<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='type' href='../../../js/stdlib/function/type.Function.html' title='js::stdlib::function::Function'>Function</a>&gt;),
+}</pre><div class='docblock'><p>A Javascript value</p>
+</div><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.VNull'><code>VNull</code></td><td><div class='docblock'><p><code>null</code> - A null value, for when a value doesn&#39;t exist</p>
+</div></td></tr><tr><td id='variant.VUndefined'><code>VUndefined</code></td><td><div class='docblock'><p><code>undefined</code> - An undefined value, for when a field or index doesn&#39;t exist</p>
+</div></td></tr><tr><td id='variant.VBoolean'><code>VBoolean</code></td><td><div class='docblock'><p><code>boolean</code> - A <code>true</code> / <code>false</code> value, for if a certain criteria is met</p>
+</div></td></tr><tr><td id='variant.VString'><code>VString</code></td><td><div class='docblock'><p><code>String</code> - A UTF-8 string, such as <code>&quot;Hello, world&quot;</code></p>
+</div></td></tr><tr><td id='variant.VNumber'><code>VNumber</code></td><td><div class='docblock'><p><code>Number</code> - A 64-bit floating point number, such as <code>3.1415</code></p>
+</div></td></tr><tr><td id='variant.VInteger'><code>VInteger</code></td><td><div class='docblock'><p><code>Number</code> - A 32-bit integer, such as <code>42</code></p>
+</div></td></tr><tr><td id='variant.VObject'><code>VObject</code></td><td><div class='docblock'><p><code>Object</code> - An object, such as <code>Math</code>, represented by a binary tree of string keys to Javascript values</p>
+</div></td></tr><tr><td id='variant.VFunction'><code>VFunction</code></td><td><div class='docblock'><p><code>Function</code> - A runnable block of code, such as <code>Math.sqrt</code>, which can take some variables and return a useful value or act upon an object</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.new_obj' class='method'><code>fn <a href='#method.new_obj' class='fnname'>new_obj</a>(global: <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a>&gt;) -&gt; <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+<div class='docblock'><p>Returns a new empty object</p>
+</div><h4 id='method.is_object' class='method'><code>fn <a href='#method.is_object' class='fnname'>is_object</a>(&amp;self) -&gt; bool</code></h4>
+<div class='docblock'><p>Returns true if the value is an object</p>
+</div><h4 id='method.is_undefined' class='method'><code>fn <a href='#method.is_undefined' class='fnname'>is_undefined</a>(&amp;self) -&gt; bool</code></h4>
+<div class='docblock'><p>Returns true if the value is undefined</p>
+</div><h4 id='method.is_null' class='method'><code>fn <a href='#method.is_null' class='fnname'>is_null</a>(&amp;self) -&gt; bool</code></h4>
+<div class='docblock'><p>Returns true if the value is null</p>
+</div><h4 id='method.is_null_or_undefined' class='method'><code>fn <a href='#method.is_null_or_undefined' class='fnname'>is_null_or_undefined</a>(&amp;self) -&gt; bool</code></h4>
+<div class='docblock'><p>Returns true if the value is null or undefined</p>
+</div><h4 id='method.is_double' class='method'><code>fn <a href='#method.is_double' class='fnname'>is_double</a>(&amp;self) -&gt; bool</code></h4>
+<div class='docblock'><p>Returns true if the value is a 64-bit floating-point number</p>
+</div><h4 id='method.is_true' class='method'><code>fn <a href='#method.is_true' class='fnname'>is_true</a>(&amp;self) -&gt; bool</code></h4>
+<div class='docblock'><p>Returns true if the value is true</p>
+</div><h4 id='method.to_num' class='method'><code>fn <a href='#method.to_num' class='fnname'>to_num</a>(&amp;self) -&gt; f64</code></h4>
+<div class='docblock'><p>Converts the value into a 64-bit floating point number</p>
+</div><h4 id='method.to_int' class='method'><code>fn <a href='#method.to_int' class='fnname'>to_int</a>(&amp;self) -&gt; i32</code></h4>
+<div class='docblock'><p>Converts the value into a 32-bit integer</p>
+</div><h4 id='method.get_prop' class='method'><code>fn <a href='#method.get_prop' class='fnname'>get_prop</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a>&gt;</code></h4>
+<div class='docblock'><p>Resolve the property in the object</p>
+</div><h4 id='method.get_field' class='method'><code>fn <a href='#method.get_field' class='fnname'>get_field</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+<div class='docblock'><p>Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn&#39;t exist</p>
+</div><h4 id='method.get_field_slice' class='method'><code>fn <a href='#method.get_field_slice' class='fnname'>get_field_slice</a>&lt;'t&gt;(&amp;self, field: &amp;'t str) -&gt; <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+<div class='docblock'><p>Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn&#39;t exist</p>
+</div><h4 id='method.set_field' class='method'><code>fn <a href='#method.set_field' class='fnname'>set_field</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>, val: <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+<div class='docblock'><p>Set the field in the value</p>
+</div><h4 id='method.set_field_slice' class='method'><code>fn <a href='#method.set_field_slice' class='fnname'>set_field_slice</a>&lt;'t&gt;(&amp;self, field: &amp;'t str, val: <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+<div class='docblock'><p>Set the field in the value</p>
+</div><h4 id='method.set_prop' class='method'><code>fn <a href='#method.set_prop' class='fnname'>set_prop</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>, prop: <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a>) -&gt; <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a></code></h4>
+<div class='docblock'><p>Set the property in the value</p>
+</div><h4 id='method.set_prop_slice' class='method'><code>fn <a href='#method.set_prop_slice' class='fnname'>set_prop_slice</a>&lt;'t&gt;(&amp;self, field: &amp;'t str, prop: <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a>) -&gt; <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a></code></h4>
+<div class='docblock'><p>Set the property in the value</p>
+</div><h4 id='method.from_json' class='method'><code>fn <a href='#method.from_json' class='fnname'>from_json</a>(json: <a class='type' href='http://doc.rust-lang.org/serialize/json/type.Json.html' title='serialize::json::Json'>Json</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+<div class='docblock'><p>Convert from a JSON value to a JS value</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; bool</code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='#tymethod.ne' class='fnname'>ne</a>(&amp;self, &amp;Self) -&gt; bool</code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/serialize/json/trait.ToJson.html' title='serialize::json::ToJson'>ToJson</a> for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.to_json' class='method'><code>fn <a href='#method.to_json' class='fnname'>to_json</a>(&amp;self) -&gt; <a class='type' href='http://doc.rust-lang.org/serialize/json/type.Json.html' title='serialize::json::Json'>Json</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.add' class='method'><code>fn <a href='#method.add' class='fnname'>add</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Sub.html' title='core::ops::Sub'>Sub</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.sub' class='method'><code>fn <a href='#method.sub' class='fnname'>sub</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.mul' class='method'><code>fn <a href='#method.mul' class='fnname'>mul</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Div.html' title='core::ops::Div'>Div</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.div' class='method'><code>fn <a href='#method.div' class='fnname'>div</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Rem.html' title='core::ops::Rem'>Rem</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.rem' class='method'><code>fn <a href='#method.rem' class='fnname'>rem</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.BitAnd.html' title='core::ops::BitAnd'>BitAnd</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.bitand' class='method'><code>fn <a href='#method.bitand' class='fnname'>bitand</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.BitOr.html' title='core::ops::BitOr'>BitOr</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.bitor' class='method'><code>fn <a href='#method.bitor' class='fnname'>bitor</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.BitXor.html' title='core::ops::BitXor'>BitXor</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.bitxor' class='method'><code>fn <a href='#method.bitxor' class='fnname'>bitxor</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Shl.html' title='core::ops::Shl'>Shl</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.shl' class='method'><code>fn <a href='#method.shl' class='fnname'>shl</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Shr.html' title='core::ops::Shr'>Shr</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>, <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.shr' class='method'><code>fn <a href='#method.shr' class='fnname'>shr</a>(&amp;self, other: &amp;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Not.html' title='core::ops::Not'>Not</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt; for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.not' class='method'><code>fn <a href='#method.not' class='fnname'>not</a>(&amp;self) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, &amp;Self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&uarr;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&darr;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    <script>
+        var rootPath = "../../../";
+        var currentCrate = "js";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>

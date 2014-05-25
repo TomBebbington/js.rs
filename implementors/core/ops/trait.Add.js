@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors['js'] = {ValueData:"js/js/value/type.ValueData.html",};
+implementors['js'] = {ValueData:"js/stdlib/value/type.ValueData.html",};
 
                 if (window.register_implementors) {
                     window.register_implementors(implementors);
