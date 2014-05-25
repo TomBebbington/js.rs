@@ -31,9 +31,10 @@ If you want to contribute just file a pull request with your changes. If it pass
 
 Building
 --------
-To build this project, clone it then run `make all` in the root
+To build this project, clone it then run `make libs all` in the root
 
 Running
 -------
-+ To run the test suite, run `target/tests` from the project root.
-+ To run the interactive (REPL) interpreter, run `target/interactive` from the project root
++ To run the test suite, run `target/js.rs test` from the project root.
++ To run the interactive (REPL) interpreter, run `target/js.rs interactive` from the project root
++ To run a specific script, run `target/js.rs [script path]` from the project root
