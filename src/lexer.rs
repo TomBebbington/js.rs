@@ -232,7 +232,7 @@ impl<B:Buffer> Lexer<B> {
 					loop {
 						let ch = try!(self.next());
 						match ch {
-							_ if ch.is_alphabetic() || ch.is_digit() => buf.push_char(ch),
+							_ if ch.is_alphabetic() || ch.is_digit() || ch == '_' => buf.push_char(ch),
 							_ => {
 								self.peek_buffer.push_char(ch);
 								break;
