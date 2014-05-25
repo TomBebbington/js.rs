@@ -22,7 +22,7 @@ pub struct Scope {
 	pub vars: Value
 }
 /// An execution engine
-pub trait Executor {
+pub trait Executor<T> {
 	/// Make a new execution engine
 	fn new() -> Self;
 	/// Set a global variable called `name` with the value `val`
@@ -33,6 +33,8 @@ pub trait Executor {
 	fn make_scope(&mut self, this:Value) -> Scope;
 	/// Destroy the current scope
 	fn destroy_scope(&mut self) -> Scope;
+	/// Compile the expression
+	fn compile<'a>(&self, expr:&'a Expr) -> &'a T;
 	/// Run an expression
 	fn run(&mut self, expr:&Expr) -> ResultValue;
 }
@@ -50,7 +52,7 @@ impl Interpreter {
 		*self.scopes.get(self.scopes.len() - 1)
 	}
 }
-impl Executor for Interpreter {
+impl Executor<Expr> for Interpreter {
 	fn new() -> Interpreter {
 		let global = ValueData::new_obj(None);
 		object::init(global);
@@ -87,6 +89,9 @@ impl Executor for Interpreter {
 	#[inline(always)]
 	fn destroy_scope(&mut self) -> Scope {
 		self.scopes.pop().unwrap()
+	}
+	fn compile<'a>(&self, expr:&'a Expr) -> &'a Expr {
+		expr
 	}
 	fn run(&mut self, expr:&Expr) -> ResultValue {
 		match expr.def {
