@@ -437,6 +437,11 @@
 <span id='397'>397</span>
 <span id='398'>398</span>
 <span id='399'>399</span>
+<span id='400'>400</span>
+<span id='401'>401</span>
+<span id='402'>402</span>
+<span id='403'>403</span>
+<span id='404'>404</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>expr</span>::{<span class='ident'>Expr</span>, <span class='ident'>ConstExpr</span>, <span class='ident'>BlockExpr</span>, <span class='ident'>TypeOfExpr</span>, <span class='ident'>LocalExpr</span>, <span class='ident'>VarDeclExpr</span>, <span class='ident'>GetConstFieldExpr</span>, <span class='ident'>GetFieldExpr</span>, <span class='ident'>CallExpr</span>, <span class='ident'>WhileLoopExpr</span>, <span class='ident'>IfExpr</span>, <span class='ident'>SwitchExpr</span>, <span class='ident'>ObjectDeclExpr</span>, <span class='ident'>ArrayDeclExpr</span>, <span class='ident'>FunctionDeclExpr</span>, <span class='ident'>ArrowFunctionDeclExpr</span>, <span class='ident'>UnaryOpExpr</span>, <span class='ident'>BinOpExpr</span>, <span class='ident'>ConstructExpr</span>, <span class='ident'>ReturnExpr</span>, <span class='ident'>ThrowExpr</span>, <span class='ident'>AssignExpr</span>};
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>constant</span>::{<span class='ident'>CNum</span>, <span class='ident'>CInt</span>, <span class='ident'>CString</span>, <span class='ident'>CBool</span>, <span class='ident'>CRegExp</span>, <span class='ident'>CNull</span>, <span class='ident'>CUndefined</span>};
@@ -462,7 +467,7 @@
 </span>	<span class='kw'>pub</span> <span class='ident'>vars</span>: <span class='ident'>Value</span>
 }
 <span class='doccomment'>/// An execution engine
-</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Executor</span> {
+</span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Executor</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// Make a new execution engine
 </span>	<span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Self</span>;
 	<span class='doccomment'>/// Set a global variable called `name` with the value `val`
@@ -473,6 +478,8 @@
 </span>	<span class='kw'>fn</span> <span class='ident'>make_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>this</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Scope</span>;
 	<span class='doccomment'>/// Destroy the current scope
 </span>	<span class='kw'>fn</span> <span class='ident'>destroy_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Scope</span>;
+	<span class='doccomment'>/// Compile the expression
+</span>	<span class='kw'>fn</span> <span class='ident'>compile</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span>;
 	<span class='doccomment'>/// Run an expression
 </span>	<span class='kw'>fn</span> <span class='ident'>run</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span>;
 }
@@ -490,7 +497,7 @@
 		<span class='op'>*</span><span class='self'>self</span>.<span class='ident'>scopes</span>.<span class='ident'>get</span>(<span class='self'>self</span>.<span class='ident'>scopes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>)
 	}
 }
-<span class='kw'>impl</span> <span class='ident'>Executor</span> <span class='kw'>for</span> <span class='ident'>Interpreter</span> {
+<span class='kw'>impl</span> <span class='ident'>Executor</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Interpreter</span> {
 	<span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Interpreter</span> {
 		<span class='kw'>let</span> <span class='ident'>global</span> <span class='op'>=</span> <span class='ident'>ValueData</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>None</span>);
 		<span class='ident'>object</span>::<span class='ident'>init</span>(<span class='ident'>global</span>);
@@ -527,6 +534,9 @@
 	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
 	<span class='kw'>fn</span> <span class='ident'>destroy_scope</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Scope</span> {
 		<span class='self'>self</span>.<span class='ident'>scopes</span>.<span class='ident'>pop</span>().<span class='ident'>unwrap</span>()
+	}
+	<span class='kw'>fn</span> <span class='ident'>compile</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Expr</span> {
+		<span class='ident'>expr</span>
 	}
 	<span class='kw'>fn</span> <span class='ident'>run</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 		<span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>def</span> {
