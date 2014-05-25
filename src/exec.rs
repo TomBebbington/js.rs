@@ -7,7 +7,7 @@ use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use ast::{LogAnd, LogOr};
 use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
 use stdlib::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value};
-use stdlib::object::{INSTANCE_PROTOTYPE, PROTOTYPE, ObjectData};
+use stdlib::object::{INSTANCE_PROTOTYPE, PROTOTYPE};
 use stdlib::function::{RegularFunc, RegularFunction};
 use stdlib::{console, math, object, array, function, json, number, error, uri, string};
 use collections::treemap::TreeMap;
@@ -23,9 +23,9 @@ pub trait Executor {
 	/// Resolve the global variable `name`
 	fn get_global(&self, name:StrBuf) -> Value;
 	/// Create a new scope and return it
-	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>>;
+	fn make_scope(&mut self) -> Value;
 	/// Destroy the current scope
-	fn destroy_scope(&mut self) -> ();
+	fn destroy_scope(&mut self) -> Value;
 	/// Run an expression
 	fn run(&mut self, expr:&Expr) -> ResultValue;
 }
@@ -34,8 +34,8 @@ pub trait Executor {
 pub struct Interpreter {
 	/// An object representing the global object
 	global: Value,
-	/// The variable scopes
-	scopes: Vec<Gc<RefCell<ObjectData>>>,
+	/// The variable scope
+	scope: Value
 }
 impl Executor for Interpreter {
 	fn new() -> Interpreter {
@@ -50,7 +50,7 @@ impl Executor for Interpreter {
 		error::init(global);
 		string::init(global);
 		uri::init(global);
-		Interpreter {global: global, scopes: Vec::new()}
+		Interpreter {global: global, scope: global}
 	}
 	fn set_global(&mut self, name:StrBuf, val:Value) -> Value {
 		self.global.borrow().set_field(name, val)
@@ -58,13 +58,24 @@ impl Executor for Interpreter {
 	fn get_global(&self, name:StrBuf) -> Value {
 		self.global.borrow().get_field(name)
 	}
-	fn make_scope(&mut self) -> Gc<RefCell<ObjectData>> {
-		let value = Gc::new(RefCell::new(TreeMap::new()));
-		self.scopes.push(value.clone());
-		value
+	fn make_scope(&mut self) -> Value {
+		let scope = ValueData::new_obj(None);
+		scope.borrow().set_field_slice(INSTANCE_PROTOTYPE, self.scope);
+		self.scope = scope;
+		scope
 	}
-	fn destroy_scope(&mut self) -> () {
-		self.scopes.pop();
+	fn destroy_scope(&mut self) -> Value {
+		let scope = self.scope;
+		let scope_ptr = scope.borrow();
+		self.scope = scope_ptr.get_field_slice(INSTANCE_PROTOTYPE);
+		match *scope_ptr {
+			VObject(ref obj) => {
+				obj.borrow_mut().remove(&INSTANCE_PROTOTYPE.into_strbuf());
+				obj.borrow_mut().remove(&"this".into_strbuf());
+			},
+			_ => unreachable!()
+		}
+		scope
 	}
 	fn run(&mut self, expr:&Expr) -> ResultValue {
 		match expr.def {
@@ -86,21 +97,7 @@ impl Executor for Interpreter {
 				Ok(obj)
 			},
 			LocalExpr(ref name) => {
-				let mut value = Gc::new(VUndefined);
-				for scope in self.scopes.iter().rev() {
-					match scope.borrow().borrow().find(name) {
-						Some(v) => {
-							value = v.value.clone();
-							break;
-						}
-						None => ()
-					}
-				}
-				Ok(if value.borrow().is_undefined() {
-					self.global.borrow().get_field(name.clone())
-				} else {
-					value
-				})
+				Ok(self.scope.borrow().get_field(name.clone()))
 			},
 			GetConstFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
@@ -304,7 +301,7 @@ impl Executor for Interpreter {
 				let val = try!(self.run(*val_e));
 				match ref_e.def {
 					LocalExpr(ref name) => {
-						self.global.borrow().set_field(name.clone(), val);
+						self.scope.borrow().set_field(name.clone(), val);
 					},
 					GetConstFieldExpr(ref obj, ref field) => {
 						let val_obj = try!(self.run(*obj));

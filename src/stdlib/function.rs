@@ -22,11 +22,12 @@ impl Function {
 				func(this, callee, args)
 			}, RegularFunc(ref data) => {
 				let scope = exe.make_scope();
-				scope.borrow().borrow_mut().insert("this".into_strbuf(), Property::new(this));
+				let scope_ptr = scope.borrow();
+				scope_ptr.set_field_slice("this", this);
 				for i in range(0, data.args.len()) {
 					let name = data.args.get(i);
 					let expr = args.get(i);
-					scope.borrow().borrow_mut().insert(name.to_strbuf(), Property::new(*expr));
+					scope_ptr.set_field(name.clone(), *expr);
 				}
 				let result = exe.run(&data.expr);
 				exe.destroy_scope();
