@@ -14,6 +14,13 @@ use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::gc::Gc;
 use std::cell::RefCell;
+/// A variable scope
+pub struct Scope {
+	/// The value of `this` in the scope
+	pub this: Value,
+	/// The variables declared in the scope
+	pub vars: Value
+}
 /// An execution engine
 pub trait Executor {
 	/// Make a new execution engine
@@ -23,19 +30,24 @@ pub trait Executor {
 	/// Resolve the global variable `name`
 	fn get_global(&self, name:StrBuf) -> Value;
 	/// Create a new scope and return it
-	fn make_scope(&mut self) -> Value;
+	fn make_scope(&mut self, this:Value) -> Scope;
 	/// Destroy the current scope
-	fn destroy_scope(&mut self) -> Value;
+	fn destroy_scope(&mut self) -> Scope;
 	/// Run an expression
 	fn run(&mut self, expr:&Expr) -> ResultValue;
 }
-#[deriving(Clone)]
 /// A Javascript intepreter
 pub struct Interpreter {
 	/// An object representing the global object
 	global: Value,
-	/// The variable scope
-	scope: Value
+	/// The scopes
+	scopes: Vec<Scope>
+}
+impl Interpreter {
+	#[inline(always)]
+	fn scope(&self) -> Scope {
+		*self.scopes.get(self.scopes.len() - 1)
+	}
 }
 impl Executor for Interpreter {
 	fn new() -> Interpreter {
@@ -50,7 +62,10 @@ impl Executor for Interpreter {
 		error::init(global);
 		string::init(global);
 		uri::init(global);
-		Interpreter {global: global, scope: global}
+		Interpreter {global: global, scopes: vec!(Scope {
+			this: global,
+			vars: global
+		})}
 	}
 	fn set_global(&mut self, name:StrBuf, val:Value) -> Value {
 		self.global.borrow().set_field(name, val)
@@ -58,24 +73,16 @@ impl Executor for Interpreter {
 	fn get_global(&self, name:StrBuf) -> Value {
 		self.global.borrow().get_field(name)
 	}
-	fn make_scope(&mut self) -> Value {
-		let scope = ValueData::new_obj(None);
-		scope.borrow().set_field_slice(INSTANCE_PROTOTYPE, self.scope);
-		self.scope = scope;
+	fn make_scope(&mut self, this:Value) -> Scope {
+		let scope = Scope {
+			this: this,
+			vars: ValueData::new_obj(None)
+		};
+		self.scopes.push(scope);
 		scope
 	}
-	fn destroy_scope(&mut self) -> Value {
-		let scope = self.scope;
-		let scope_ptr = scope.borrow();
-		self.scope = scope_ptr.get_field_slice(INSTANCE_PROTOTYPE);
-		match *scope_ptr {
-			VObject(ref obj) => {
-				obj.borrow_mut().remove(&INSTANCE_PROTOTYPE.into_strbuf());
-				obj.borrow_mut().remove(&"this".into_strbuf());
-			},
-			_ => unreachable!()
-		}
-		scope
+	fn destroy_scope(&mut self) -> Scope {
+		self.scopes.pop().unwrap()
 	}
 	fn run(&mut self, expr:&Expr) -> ResultValue {
 		match expr.def {
@@ -97,7 +104,24 @@ impl Executor for Interpreter {
 				Ok(obj)
 			},
 			LocalExpr(ref name) => {
-				Ok(self.scope.borrow().get_field(name.clone()))
+				let mut val = Gc::new(VUndefined);
+				for scope in self.scopes.iter().rev() {
+					let vars = scope.vars;
+					let vars_ptr = vars.borrow();
+					match *vars_ptr {
+						VObject(ref obj) => {
+							match obj.borrow().find(name) {
+								Some(v) => {
+									val = v.value;
+									break;
+								},
+								None => ()
+							}
+						},
+						_ => unreachable!()
+					}
+				}
+				Ok(val)
 			},
 			GetConstFieldExpr(ref obj, ref field) => {
 				let val_obj = try!(self.run(*obj));
@@ -301,7 +325,7 @@ impl Executor for Interpreter {
 				let val = try!(self.run(*val_e));
 				match ref_e.def {
 					LocalExpr(ref name) => {
-						self.scope.borrow().set_field(name.clone(), val);
+						self.scope().vars.borrow().set_field(name.clone(), val);
 					},
 					GetConstFieldExpr(ref obj, ref field) => {
 						let val_obj = try!(self.run(*obj));
@@ -312,13 +336,15 @@ impl Executor for Interpreter {
 				Ok(val)
 			},
 			VarDeclExpr(ref vars) => {
+				let scope_vars = self.scope().vars;
+				let scope_vars_ptr = scope_vars.borrow();
 				for var in vars.iter() {
 					let (name, value) = var.clone();
 					let val = match value {
 						Some(v) => try!(self.run(&v)),
 						None => Gc::new(VNull)
 					};
-					self.scope.borrow().set_field(name.clone(), val);
+					scope_vars_ptr.set_field(name.clone(), val);
 				}
 				Ok(Gc::new(VUndefined))
 			},

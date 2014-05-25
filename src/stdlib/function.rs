@@ -21,13 +21,12 @@ impl Function {
 				let func = ntv.data;
 				func(this, callee, args)
 			}, RegularFunc(ref data) => {
-				let scope = exe.make_scope();
-				let scope_ptr = scope.borrow();
-				scope_ptr.set_field_slice("this", this);
+				let scope = exe.make_scope(this);
+				let scope_vars_ptr = scope.vars.borrow();
 				for i in range(0, data.args.len()) {
 					let name = data.args.get(i);
 					let expr = args.get(i);
-					scope_ptr.set_field(name.clone(), *expr);
+					scope_vars_ptr.set_field(name.clone(), *expr);
 				}
 				let result = exe.run(&data.expr);
 				exe.destroy_scope();
