@@ -1,14 +1,14 @@
-use ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, VarDeclExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
-use ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
-use ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
-use ast::{UnaryMinus, UnaryPlus, UnaryNot};
-use ast::{BinNum, BinBit, BinLog, BinComp};
-use ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use ast::{LogAnd, LogOr};
-use ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
+use syntax::ast::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, VarDeclExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
+use syntax::ast::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
+use syntax::ast::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
+use syntax::ast::{UnaryMinus, UnaryPlus, UnaryNot};
+use syntax::ast::{BinNum, BinBit, BinLog, BinComp};
+use syntax::ast::{BitAnd, BitOr, BitXor, BitShl, BitShr};
+use syntax::ast::{LogAnd, LogOr};
+use syntax::ast::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
 use stdlib::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value};
 use stdlib::object::{INSTANCE_PROTOTYPE, PROTOTYPE};
-use stdlib::function::{RegularFunc, RegularFunction};
+use stdlib::function::{NativeFunc, RegularFunc, RegularFunction};
 use stdlib::{console, math, object, array, function, json, number, error, uri, string};
 use collections::treemap::TreeMap;
 use std::vec::Vec;
@@ -155,7 +155,23 @@ impl Executor for Interpreter {
 				}
 				match *func.borrow() {
 					VFunction(ref func) => {
-						func.borrow().call(self, this, Gc::new(VNull), v_args)
+						match *func.borrow() {
+							NativeFunc(ref ntv) => {
+								let func = ntv.data;
+								func(this, try!(self.run(*callee)), v_args)
+							}, RegularFunc(ref data) => {
+								let scope = self.make_scope(this);
+								let scope_vars_ptr = scope.vars.borrow();
+								for i in range(0, data.args.len()) {
+									let name = data.args.get(i);
+									let expr = v_args.get(i);
+									scope_vars_ptr.set_field(name.clone(), *expr);
+								}
+								let result = self.run(&data.expr);
+								self.destroy_scope();
+								result
+							}
+						}
 					},
 					_ => Err(Gc::new(VUndefined))
 				}
@@ -309,13 +325,28 @@ impl Executor for Interpreter {
 				}
 				let this = Gc::new(VObject(RefCell::new(TreeMap::new())));
 				this.borrow().set_field_slice(INSTANCE_PROTOTYPE, func.borrow().get_field_slice(PROTOTYPE));
-				Ok(match *func.borrow() {
+				match *func.borrow() {
 					VFunction(ref func) => {
-						try!(func.borrow().call(self, this, Gc::new(VNull), v_args));
-						this
+						match *func.borrow() {
+							NativeFunc(ref ntv) => {
+								let func = ntv.data;
+								func(this, try!(self.run(*callee)), v_args)
+							}, RegularFunc(ref data) => {
+								let scope = self.make_scope(this);
+								let scope_vars_ptr = scope.vars.borrow();
+								for i in range(0, data.args.len()) {
+									let name = data.args.get(i);
+									let expr = v_args.get(i);
+									scope_vars_ptr.set_field(name.clone(), *expr);
+								}
+								let result = self.run(&data.expr);
+								self.destroy_scope();
+								result
+							}
+						}
 					},
-					_ => Gc::new(VUndefined)
-				})
+					_ => Ok(Gc::new(VUndefined))
+				}
 			},
 			ReturnExpr(ref ret) => {
 				match *ret {

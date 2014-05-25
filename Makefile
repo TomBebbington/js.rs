@@ -1,14 +1,18 @@
-.PHONY: all build doc update-doc interactive tests clean
-all: build interactive tests doc
+.PHONY: all build doc libs libjs libjs_syntax update-doc clean
+all: libs build doc
+libjs:
+	mkdir -p target
+	cd target && rustc ../src/libjs/lib.rs -L .
+libjs_syntax:
+	mkdir -p target
+	cd target && rustc ../src/libjs_syntax/lib.rs -L .
+libs: libjs_syntax libjs
 build:
 	mkdir -p target
-	cd target && rustc ../src/lib.rs -L .
-tests:
-	rustc src/bin/tests.rs -L target -o target/tests
-interactive:
-	rustc src/bin/interactive.rs -L target -o target/interactive
+	cd target && rustc ../src/front/front.rs -L .
 doc:
-	rustdoc src/lib.rs -o doc
+	rustdoc src/libjs/lib.rs -o doc -L target
+	rustdoc src/libjs_syntax/lib.rs -o doc -L target
 update-doc: doc
 	rm -rf /tmp/doc
 	mv doc /tmp/doc

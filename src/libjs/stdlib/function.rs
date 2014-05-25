@@ -1,9 +1,8 @@
 use stdlib::object::{ObjectData, Property};
 use stdlib::value::{Value, VInteger, ResultValue, to_value};
-use ast::Expr;
+use syntax::ast::Expr;
 use collections::treemap::TreeMap;
 use std::gc::Gc;
-use exec::Executor;
 pub type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
 #[deriving(Clone)]
 /// A Javascript function
@@ -12,28 +11,6 @@ pub enum Function {
 	NativeFunc(NativeFunction),
 	/// A regular javascript function
 	RegularFunc(RegularFunction)
-}
-impl Function {
-	/// Call a function with some arguments
-	pub fn call(&self, exe:&mut Executor, this:Value, callee:Value, args:Vec<Value>) -> ResultValue {
-		match *self {
-			NativeFunc(ref ntv) => {
-				let func = ntv.data;
-				func(this, callee, args)
-			}, RegularFunc(ref data) => {
-				let scope = exe.make_scope(this);
-				let scope_vars_ptr = scope.vars.borrow();
-				for i in range(0, data.args.len()) {
-					let name = data.args.get(i);
-					let expr = args.get(i);
-					scope_vars_ptr.set_field(name.clone(), *expr);
-				}
-				let result = exe.run(&data.expr);
-				exe.destroy_scope();
-				result
-			}
-		}
-	}
 }
 #[deriving(Clone)]
 /// Represents a regular javascript function in memory

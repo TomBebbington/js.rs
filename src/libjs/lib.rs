@@ -1,7 +1,9 @@
 #![crate_id = "js"]
-#![crate_type = "lib"]
-#![comment = "Rust Javascript parsing and interpretation library"]
+#![comment = "Javascript execution"]
 #![license = "MIT"]
+#![crate_type = "dylib"]
+#![crate_type = "rlib"]
+
 #![deny(non_uppercase_statics)]
 #![deny(missing_doc)]
 #![deny(unnecessary_parens)]
@@ -13,23 +15,17 @@
 #![deny(uppercase_variables)]
 #![deny(non_camel_case_types)]
 #![deny(unused_must_use)]
-#![feature(macro_rules)]
 
-//! A Javascript lexing, parsing and execution library
+//! A Javascript execution library
 extern crate collections;
-extern crate time;
-extern crate serialize;
+extern crate syntax = "js_syntax";
 extern crate rand;
+extern crate serialize;
+extern crate time;
 extern crate url;
-/// Abstract syntax tree for lexing and parsing
-pub mod ast;
-/// A lexer which transforms a stream into a seqeunce of tokens
-pub mod lexer;
-/// A parser which transforms a sequence of tokens into Javascript expressions
-pub mod parser;
-/// An interpreter which runs Javascript expressions
+/// The interpreter
 pub mod exec;
-/// An implementation of the core Javascript library in Rust
+/// The standard Javascript library
 pub mod stdlib {
 	/// Javascript values, utility methods and conversion between Javascript values and Rust values
 	pub mod value;
