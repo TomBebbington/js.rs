@@ -27,14 +27,18 @@ Supported APIs
 
 Contributing
 ------------
-If you want to contribute just file a pull request with your changes. If it passes travis and is reasonably clean and justifiable, it will be merged. Look at the lints specified in src/lib.rs for coding guidelines.
+If you want to contribute just file a pull request with your changes. If it passes travis and is reasonably clean and justifiable, it will be merged. Look at the lints specified in `src/libjs/lib.rs` for coding guidelines.
 
 Building
 --------
-To build this project, clone it then run `make libs all` in the root
+To build this project, clone it then run `make libs all` in the project root
+
+Installing
+----------
+To install this project, run `make install` in the project root
 
 Running
 -------
-+ To run the test suite, run `target/js.rs test` from the project root.
-+ To run the interactive (REPL) interpreter, run `target/js.rs interactive` from the project root
-+ To run a specific script, run `target/js.rs [script path]` from the project root
++ To run the test suite, run `js.rs test`
++ To run the interactive (REPL) interpreter, run `js.rs interactive`
++ To run a specific script, run `js.rs *[script path]*`
