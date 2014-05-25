@@ -1,5 +1,5 @@
-use js::object::PROTOTYPE;
-use js::value::{Value, ValueData, ResultValue, VUndefined, to_value};
+use stdlib::object::PROTOTYPE;
+use stdlib::value::{Value, ValueData, ResultValue, VUndefined, to_value};
 use std::gc::Gc;
 
 /// Create a new error

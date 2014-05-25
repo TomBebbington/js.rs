@@ -1,4 +1,4 @@
-use js::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from_value};
+use stdlib::value::{Value, ValueData, ResultValue, VNumber, VInteger, to_value, from_value};
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
 /// Parse a float into a value
 pub fn parse_float(_:Value, _:Value, args:Vec<Value>) -> ResultValue {

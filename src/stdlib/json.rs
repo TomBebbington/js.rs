@@ -1,4 +1,4 @@
-use js::value::{Value, ValueData, VString, ResultValue, to_value};
+use stdlib::value::{Value, ValueData, VString, ResultValue, to_value};
 use serialize::json::{ToJson, from_str};
 use std::gc::Gc;
 /// Parse a JSON string into a Javascript object

@@ -1,4 +1,4 @@
-use js::value::{Value, ValueData, ResultValue, to_value, from_value};
+use stdlib::value::{Value, ValueData, ResultValue, to_value, from_value};
 use rand::random;
 use std::f64;
 

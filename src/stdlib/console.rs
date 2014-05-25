@@ -1,4 +1,4 @@
-use js::value::{Value, ValueData, ResultValue, VUndefined, to_value, from_value};
+use stdlib::value::{Value, ValueData, ResultValue, VUndefined, to_value, from_value};
 use std::gc::Gc;
 use std::iter::FromIterator;
 use std::io::stdio::stderr;

@@ -1,5 +1,5 @@
-use js::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
-use js::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
+use stdlib::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
+use stdlib::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
 use std::fmt;

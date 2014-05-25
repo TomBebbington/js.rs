@@ -1,5 +1,5 @@
-use js::object::{ObjectData, Property};
-use js::value::{Value, VInteger, ResultValue, to_value};
+use stdlib::object::{ObjectData, Property};
+use stdlib::value::{Value, VInteger, ResultValue, to_value};
 use ast::Expr;
 use collections::treemap::TreeMap;
 use std::gc::Gc;

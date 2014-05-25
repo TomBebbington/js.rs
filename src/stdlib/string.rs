@@ -1,5 +1,5 @@
-use js::value::{Value, ValueData, VUndefined, ResultValue, to_value, from_value};
-use js::object::{PROTOTYPE, Property};
+use stdlib::value::{Value, ValueData, VUndefined, ResultValue, to_value, from_value};
+use stdlib::object::{PROTOTYPE, Property};
 use std::gc::Gc;
 
 /// Create new string

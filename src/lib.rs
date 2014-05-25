@@ -30,7 +30,7 @@ pub mod parser;
 /// An interpreter which runs Javascript expressions
 pub mod exec;
 /// An implementation of the core Javascript library in Rust
-pub mod js {
+pub mod stdlib {
 	/// Javascript values, utility methods and conversion between Javascript values and Rust values
 	pub mod value;
 	/// The global `Function` object and function value representations

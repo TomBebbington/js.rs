@@ -1,4 +1,4 @@
-use js::value::{Value, ResultValue, VString, VUndefined, to_value};
+use stdlib::value::{Value, ResultValue, VString, VUndefined, to_value};
 use url::{encode, decode, encode_component, decode_component};
 use std::gc::Gc;
 

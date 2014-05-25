@@ -1,4 +1,4 @@
-use js::value::{Value, VUndefined, ResultValue, to_value};
+use stdlib::value::{Value, VUndefined, ResultValue, to_value};
 use std::gc::Gc;
 
 /// Create a new array

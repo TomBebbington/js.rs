@@ -5,7 +5,7 @@ use js::lexer::Lexer;
 use js::parser::Parser;
 use js::exec::{Executor, Interpreter};
 use js::ast::{Token, TComment};
-use js::js::value::{Value, ResultValue, to_value, from_value};
+use js::stdlib::value::{Value, ResultValue, to_value, from_value};
 use collections::treemap::TreeMap;
 use std::path::posix::Path;
 use std::io::fs::{File, walk_dir};
