@@ -216,7 +216,7 @@ impl Expr {
 }
 impl fmt::Show for Expr {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "{}:{}: {}", self.start.line_number, self.start.column_number, self.def)
+		write!(f, "{}", self.def)
 	}
 }
 #[deriving(Clone, Eq)]
@@ -385,7 +385,7 @@ impl Token {
 }
 impl fmt::Show for Token {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		write!(f, "{}:{}: {}", self.pos.line_number, self.pos.column_number, self.data)
+		write!(f, "{}", self.data)
 	}
 }
 #[deriving(Clone)]
