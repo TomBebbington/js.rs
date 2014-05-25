@@ -52,14 +52,15 @@ pub struct Lexer<B> {
 impl<B:Buffer> Lexer<B> {
 	/// Creates a new lexer with empty buffers
 	pub fn new(buffer: B) -> Lexer<B> {
-		return Lexer {
+		Lexer {
 			tokens: Vec::new(),
 			line_number: 1,
 			column_number: 0,
 			buffer: buffer,
 			peek_buffer: StrBuf::new()
-		};
+		}
 	}
+	#[inline(always)]
 	fn push_token(&mut self, tk:TokenData) {
 		self.tokens.push(Token::new(tk, self.line_number, self.column_number))
 	}

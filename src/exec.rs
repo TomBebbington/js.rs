@@ -68,9 +68,11 @@ impl Executor for Interpreter {
 			vars: global
 		})}
 	}
+	#[inline(always)]
 	fn set_global(&mut self, name:StrBuf, val:Value) -> Value {
 		self.global.borrow().set_field(name, val)
 	}
+	#[inline(always)]
 	fn get_global(&self, name:StrBuf) -> Value {
 		self.global.borrow().get_field(name)
 	}
@@ -82,6 +84,7 @@ impl Executor for Interpreter {
 		self.scopes.push(scope);
 		scope
 	}
+	#[inline(always)]
 	fn destroy_scope(&mut self) -> Scope {
 		self.scopes.pop().unwrap()
 	}

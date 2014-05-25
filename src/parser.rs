@@ -59,6 +59,7 @@ pub struct Parser {
 	pos: uint
 }
 impl Parser {
+	#[inline(always)]
 	/// Creates a new parser, using `tokens` as input
 	pub fn new(tokens: Vec<Token>) -> Parser {
 		Parser {tokens: tokens, pos: 0}
