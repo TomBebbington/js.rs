@@ -10,6 +10,10 @@ libs: libjs_syntax libjs
 build:
 	mkdir -p target
 	cd target && rustc ../src/front/front.rs -L .
+install:
+	sudo cp -f target/js.rs /usr/local/bin/
+	sudo cp -f target/libjs*.so /usr/local/lib
+	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
 doc:
 	rustdoc src/libjs/lib.rs -o doc -L target
 	rustdoc src/libjs_syntax/lib.rs -o doc -L target
