@@ -39,13 +39,14 @@ pub trait Executor {
 /// A Javascript intepreter
 pub struct Interpreter {
 	/// An object representing the global object
-	global: Value,
+	pub global: Value,
 	/// The scopes
-	scopes: Vec<Scope>
+	pub scopes: Vec<Scope>
 }
 impl Interpreter {
 	#[inline(always)]
-	fn scope(&self) -> Scope {
+	/// Get the current scope
+	pub fn scope(&self) -> Scope {
 		*self.scopes.get(self.scopes.len() - 1)
 	}
 }
