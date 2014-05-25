@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The js library documentation.">
+
+    <title>js::exec::Interpreter - Rust</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+          rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+</head>
+<body>
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <section class="sidebar">
+        
+
+        <p class='location'><a href='../index.html'>js</a>&#8203;::<a href='index.html'>exec</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Interpreter.html'>Interpreter</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Executor.html'>Executor</a><br/></div>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Search documentation..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'>Struct <a href='../index.html'>js</a>::<a href='index.html'>exec</a>::<a class='struct' href=''>Interpreter</a><a class='source' href='../../src/js/src/exec.rs.html#34-39'>[src]</a></h1>
+<pre class='rust struct'>pub struct Interpreter {
+    // some fields omitted
+}</pre><div class='docblock'><p>A Javascript intepreter</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../js/exec/trait.Executor.html' title='js::exec::Executor'>Executor</a> for <a class='struct' href='../../js/exec/struct.Interpreter.html' title='js::exec::Interpreter'>Interpreter</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../../js/exec/struct.Interpreter.html' title='js::exec::Interpreter'>Interpreter</a></code></h4>
+<h4 id='method.set_global' class='method'><code>fn <a href='#method.set_global' class='fnname'>set_global</a>(&amp;mut self, name: <a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>, val: <a class='type' href='../../js/js/value/type.Value.html' title='js::js::value::Value'>Value</a>) -&gt; <a class='type' href='../../js/js/value/type.Value.html' title='js::js::value::Value'>Value</a></code></h4>
+<h4 id='method.get_global' class='method'><code>fn <a href='#method.get_global' class='fnname'>get_global</a>(&amp;self, name: <a class='struct' href='http://doc.rust-lang.org/std/strbuf/struct.StrBuf.html' title='std::strbuf::StrBuf'>StrBuf</a>) -&gt; <a class='type' href='../../js/js/value/type.Value.html' title='js::js::value::Value'>Value</a></code></h4>
+<h4 id='method.make_scope' class='method'><code>fn <a href='#method.make_scope' class='fnname'>make_scope</a>(&amp;mut self) -&gt; <a class='struct' href='http://doc.rust-lang.org/std/gc/struct.Gc.html' title='std::gc::Gc'>Gc</a>&lt;<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='type' href='../../js/js/object/type.ObjectData.html' title='js::js::object::ObjectData'>ObjectData</a>&gt;&gt;</code></h4>
+<h4 id='method.destroy_scope' class='method'><code>fn <a href='#method.destroy_scope' class='fnname'>destroy_scope</a>(&amp;mut self)</code></h4>
+<h4 id='method.run' class='method'><code>fn <a href='#method.run' class='fnname'>run</a>(&amp;mut self, expr: &amp;<a class='struct' href='../../js/ast/struct.Expr.html' title='js::ast::Expr'>Expr</a>) -&gt; <a class='type' href='../../js/js/value/type.ResultValue.html' title='js::js::value::ResultValue'>ResultValue</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../js/exec/struct.Interpreter.html' title='js::exec::Interpreter'>Interpreter</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../js/exec/struct.Interpreter.html' title='js::exec::Interpreter'>Interpreter</a></code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, &amp;Self)</code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&uarr;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&darr;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    <script>
+        var rootPath = "../../";
+        var currentCrate = "js";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script async src="../../search-index.js"></script>
+</body>
+</html>
