@@ -2,7 +2,7 @@ use js::exec::{Executor, Interpreter};
 use js::stdlib::value::{ResultValue, Value, to_value, from_value};
 use syntax::Lexer;
 use syntax::Parser;
-use syntax::ast::{Token, TComment};
+use syntax::ast::token::{Token, TComment};
 use getopts::Matches;
 use collections::treemap::TreeMap;
 use std::io::{BufferedReader, File};

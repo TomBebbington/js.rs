@@ -24,7 +24,18 @@ extern crate collections;
 pub use lexer::Lexer;
 pub use parser::Parser;
 /// The Abstract Syntax Trees for Javascript tokens and expressions
-pub mod ast;
+pub mod ast {
+	/// Constant AST
+	pub mod constant;
+	/// Expression AST
+	pub mod expr;
+	/// Operation AST
+	pub mod op;
+	/// Position AST
+	pub mod pos;
+	/// Token AST
+	pub mod token;
+}
 /// The lexer, which transforms a string stream into a sequence of tokens
 pub mod lexer;
 /// The parser, which transforms a sequence of tokens into expressions

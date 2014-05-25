@@ -1,6 +1,6 @@
 use stdlib::object::{ObjectData, Property};
 use stdlib::value::{Value, VInteger, ResultValue, to_value};
-use syntax::ast::Expr;
+use syntax::ast::expr::Expr;
 use collections::treemap::TreeMap;
 use std::gc::Gc;
 pub type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;

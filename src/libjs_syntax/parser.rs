@@ -1,9 +1,11 @@
-use ast::{Token, TokenData, Expr};
-use ast::{VarDeclExpr, BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
-use ast::{CBool, CNull, CUndefined, CString, CNum};
-use ast::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
-use ast::{OpSub, OpAdd, UnaryMinus, UnaryPlus, UnaryNot};
-use ast::{BinNum, Operator};
+use ast::token::{Token, TokenData};
+use ast::expr::Expr;
+use ast::expr::{VarDeclExpr, BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
+use ast::constant::{CBool, CNull, CUndefined, CString, CNum};
+use ast::token::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
+use ast::op::{OpSub, OpAdd};
+use ast::op::{UnaryMinus, UnaryPlus, UnaryNot};
+use ast::op::{BinNum, Operator};
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
