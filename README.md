@@ -3,7 +3,7 @@ This is a Javascript lexer, parser and interpreter written in Rust. Currently, i
 
 Documentation
 -------------
-[View here](http://tombebbington.github.io/js.rs/script/index.html)
+[View here](http://tombebbington.github.io/js.rs/js/index.html)
 
 Supported language features
 ---------------------------
