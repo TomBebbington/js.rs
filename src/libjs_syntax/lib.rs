@@ -19,7 +19,7 @@
 //! off the Kaleidocope OCaml tutorial, then it evolved off there.
 //! 
 //! The parser is based on my work on the [`hscript` project from 
-//! Haxe](https://github.com/TomBebbington/hscript), but it's still
+//! Haxe](https://github.com/TomBebbington/hscript/blob/master/hscript/Parser.hx), but it's still
 //! very premature and some important things are missing for now.
 
 extern crate collections;
