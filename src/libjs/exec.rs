@@ -147,6 +147,27 @@ impl Executor<Function> for JITCompiler {
 						let create_number_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_float64()]);
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
+					UnaryOpExpr(op, ref a) => {
+						let i_a = compile_value(func, *a);
+						let unop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);
+						let (name, op_func) = match op {
+							UnaryPlus => return i_a,
+							UnaryMinus => {
+								fn neg_value(a:Value) -> Value {
+									Gc::new(-a.borrow())
+								}
+								("neg", neg_value)
+							}
+							UnaryNot => {
+								fn not_value(a: Value) -> Value {
+									Gc::new(!a.borrow())
+								}
+								("not", not_value)
+							},
+							_ => fail!("Unimplemented {}", op)
+						};
+						func.insn_call_native1(name, op_func, unop_sig, &[&*i_a])
+					},
 					BinOpExpr(op, ref a, ref b) => {
 						let i_a = compile_value(func, *a);
 						let i_b = compile_value(func, *b);
