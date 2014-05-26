@@ -6,6 +6,13 @@ before_install:
   - tar -xzvf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
 install:
   - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
+  - git clone git://git.savannah.gnu.org/libjit.git
+  - cd libjit
+  - ./auto_gen.sh
+  - ./configure 
+  - make
+  - sudo make install
+  - cd ..
 script:
   - make libs build doc
 notifications:
