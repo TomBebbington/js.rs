@@ -4,10 +4,10 @@ env:
 before_install:
   - wget http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
   - tar -xzvf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - git clone git://git.savannah.gnu.org/libjit.git
 install:
   - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
   - sudo apt-get install texinfo
-  - git clone git://git.savannah.gnu.org/libjit.git
   - cd libjit
   - ./auto_gen.sh
   - ./configure 
