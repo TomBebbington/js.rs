@@ -351,6 +351,11 @@ impl Not<ValueData> for ValueData {
 		VBoolean(!self.is_true())
 	}
 }
+impl Neg<ValueData> for ValueData {
+	fn neg(&self) -> ValueData {
+		VNumber(-self.to_num())
+	}
+}
 impl Ord for ValueData {
 	fn lt(&self, other: &ValueData) -> bool {
 		self.to_num() < other.to_num()
