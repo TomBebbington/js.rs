@@ -20,6 +20,7 @@ extern crate rand;
 extern crate serialize;
 extern crate time;
 extern crate url;
+extern crate jit;
 /// The interpreter
 pub mod exec;
 /// The standard Javascript library
