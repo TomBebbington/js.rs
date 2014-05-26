@@ -106,9 +106,6 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn compile(&self, expr: &Expr) -> Box<Function> {
 		self.with_builder(|| {
-			fn create_value_from_data(arg: ValueData) -> Value {
-				Gc::new(arg)
-			}
 			let valuedata_t = Types::get_int();
 			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
@@ -117,25 +114,24 @@ impl Executor<Function> for JITCompiler {
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-				let create_val_sig = Type::create_signature(CDECL, &*value_t, &[&*valuedata_t]);
 				match expr.def {
 					ConstExpr(CNull) => {
-						let vnull = func.insn_alloca(func.constant_int32(valuedata_t.get_size() as i32));
-						func.insn_store_relative(&*vnull, 0, func.constant_int32(0));
-						let t = func.create_value(&*valuedata_t);
-						func.insn_store(t, vnull);
-						func.insn_call_native1("create_value_from_data", create_value_from_data, &*create_val_sig, &[&*t])
+						fn create_null_value() -> Value {
+							Gc::new(VNull)
+						}
+						let create_null_sig = Type::create_signature(CDECL, &*value_t, &[]);
+						func.insn_call_native0("create_null_value", create_null_value, &*create_null_sig, &[])
 					},
 					ConstExpr(CUndefined) => {
-						let vundef = func.insn_alloca(func.constant_int32(valuedata_t.get_size() as i32));
-						func.insn_store_relative(&*vundef, 0, func.constant_int32(1));
-						let t = func.create_value(&*valuedata_t);
-						func.insn_store(t, vundef);
-						func.insn_call_native1("create_value_from_data", create_value_from_data, &*create_val_sig, &[&*t])
+						fn create_undef_value() -> Value {
+							Gc::new(VUndefined)
+						}
+						let create_undef_sig = Type::create_signature(CDECL, &*value_t, &[]);
+						func.insn_call_native0("create_undef_value", create_undef_value, &*create_undef_sig, &[])
 					},
 					ConstExpr(CBool(v)) => {
 						let create_bool_value = to_value::<bool>;
-						let val = func.constant_int32_as_type(v as i32, *Types::get_bool());
+						let val = func.constant_int32_as_type(v as i32, &*Types::get_bool());
 						let create_bool_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_bool()]);
 						func.insn_call_native1("create_bool_value", create_bool_value, &*create_bool_sig, &[&*val])
 					},

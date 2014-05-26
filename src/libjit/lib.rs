@@ -492,7 +492,7 @@ impl Function {
 		}
 	}
 	/// Create a 32-bit integer constant in this context
-	pub fn constant_int32_as_type(&self, constant: i32, ty:Type) -> Box<Value> {
+	pub fn constant_int32_as_type(&self, constant: i32, ty:&Type) -> Box<Value> {
 		unsafe {
 			let value = jit_value_create_nint_constant(self._function, ty._type, constant);
 			box Value { _value: value }
