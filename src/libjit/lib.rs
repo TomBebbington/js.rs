@@ -114,10 +114,10 @@ pub struct Context {
 
 impl Context {
     /// Create a new JIT Context
-    pub fn new() -> Context {
+    pub fn new() -> Box<Context> {
         unsafe {
             let context = jit_context_create();
-            Context { _context: context }
+            box Context { _context: context }
         }
     }
     /// Lock down the context to prevent multiple threads from using the builder at a time
@@ -133,10 +133,10 @@ impl Context {
         }
     }
     /// Create a function in the context with the type signature given
-    pub fn create_function(&self, signature: &Type) -> Function {
+    pub fn create_function(&self, signature: &Type) -> Box<Function> {
         unsafe {
             let function = jit_function_create(self._context, signature._type);
-            Function { _context: self, _function: function }
+            box Function { _context: self, _function: function }
         }
     }
 }
@@ -155,7 +155,7 @@ pub struct Type {
 
 impl Type {
     /// Create a function signature, with the given ABI, return type and parameters
-    pub fn create_signature(abi: ABI, return_type: &Type, params: &[&Type]) -> Type {
+    pub fn create_signature(abi: ABI, return_type: &Type, params: &[&Type]) -> Box<Type> {
         unsafe {
             let mut ps: Vec<*c_void> = vec!();
 
@@ -166,11 +166,11 @@ impl Type {
             let params = if ps.len() > 0 { ps.as_ptr() } else { 0 as **c_void };
 
             let signature = jit_type_create_signature(abi as c_int, return_type._type, params, ps.len() as c_uint, 1);
-            Type { _type: signature }
+            box Type { _type: signature }
         }
     }
 
-    fn create_complex(fields: &[&Type], union: bool) -> Type {
+    fn create_complex(fields: &[&Type], union: bool) -> Box<Type> {
         unsafe {
             let mut fs: Vec<*c_void> = vec!();
 
@@ -181,23 +181,23 @@ impl Type {
             let fields = if fs.len() > 0 { fs.as_ptr() } else { 0 as **c_void };
             let f = if union { jit_type_create_union } else { jit_type_create_struct };
             let ty = f(fields, fs.len() as c_uint, 1);
-            Type { _type: ty }
+            box Type { _type: ty }
         }
     }
     /// Create a struct type with the given field types
-    pub fn create_struct(fields: &[&Type]) -> Type {
+    pub fn create_struct(fields: &[&Type]) -> Box<Type> {
         Type::create_complex(fields, false)
     }
     /// Create a union type with the given field types
-    pub fn create_union(fields: &[&Type]) -> Type {
+    pub fn create_union(fields: &[&Type]) -> Box<Type> {
         let inner = Type::create_complex(fields, true);
-        Type::create_struct(&[&Types::get_int(), &inner])
+        Type::create_struct(&[&*Types::get_int(), &*inner])
     }
     /// Create a pointer type with the given pointee type
-    pub fn create_pointer(pointee: &Type) -> Type {
+    pub fn create_pointer(pointee: &Type) -> Box<Type> {
         unsafe {
             let ptr = jit_type_create_pointer(pointee._type, 1);
-            Type { _type: ptr }
+            box Type { _type: ptr }
         }
     }
     /// Work out the size of this type
@@ -214,17 +214,17 @@ pub struct Function {
 }
 
 impl Function {
-    fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void) -> Value {
+    fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void) -> Box<Value> {
         unsafe {
             let value = f(self._function, v1._value, v2._value);
-            Value { _value: value }
+            box Value { _value: value }
         }
     }
 
-    fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: *c_void, value: *c_void) -> *c_void) -> Value {
+    fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: *c_void, value: *c_void) -> *c_void) -> Box<Value> {
         unsafe {
             let value = f(self._function, value._value);
-            Value { _value: value }
+            box Value { _value: value }
         }
     }
     /// Dump the function onto stdout
@@ -256,70 +256,70 @@ impl Function {
         }
     }
     /// Make an instruction that multiplies the values
-    pub fn insn_mul(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_mul(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_mul)
     }
     /// Make an instruction that adds the values
-    pub fn insn_add(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_add(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_add)
     }
     /// Make an instruction that subtracts the second value from the first
-    pub fn insn_sub(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_sub(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_sub)
     }
     /// Make an instruction that divides the first number by the second
-    pub fn insn_div(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_div(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_div)
     }
     /// Make an instruction that checks if the first value is lower than or equal to the second
-    pub fn insn_leq(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_leq(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_le)
     }
     /// Make an instruction that checks if the first value is greater than or equal to the second
-    pub fn insn_geq(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_geq(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_ge)
     }
     /// Make an instruction that checks if the first value is lower than the second
-    pub fn insn_lt(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_lt(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_lt)
     }
     /// Make an instruction that checks if the first value is greater than the second
-    pub fn insn_gt(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_gt(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_gt)
     }
     /// Make an instruction that checks if the values are equal
-    pub fn insn_eq(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_eq(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_eq)
     }
     /// Make an instruction that checks if the values are not equal
-    pub fn insn_neq(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_neq(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_ne)
     }
     /// Make an instruction that performs a bitwise and on the two values
-    pub fn insn_and(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_and(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_and)
     }
     /// Make an instruction that performs a bitwise or on the two values
-    pub fn insn_or(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_or(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_or)
     }
     /// Make an instruction that performs a bitwise xor on the two values
-    pub fn insn_xor(&self, v1: &Value, v2: &Value) -> Value {
+    pub fn insn_xor(&self, v1: &Value, v2: &Value) -> Box<Value> {
         self.insn_binop(v1, v2, jit_insn_xor)
     }
     /// Make an instruction that performs a bitwise not on the two values
-    pub fn insn_not(&self, value: &Value) -> Value {
+    pub fn insn_not(&self, value: &Value) -> Box<Value> {
         self.insn_unop(value, jit_insn_not)
     }
     /// Make an instruction that performs a bitwise negate on the value
-    pub fn insn_neg(&self, value: &Value) -> Value {
+    pub fn insn_neg(&self, value: &Value) -> Box<Value> {
         self.insn_unop(value, jit_insn_neg)
     }
     /// Make an instruction that duplicates the value given
-    pub fn insn_dup(&self, value: &Value) -> Value {
+    pub fn insn_dup(&self, value: &Value) -> Box<Value> {
         unsafe {
             let dup_value = jit_insn_load(self._function, value._value);
-            Value { _value: dup_value }
+            box Value { _value: dup_value }
         }
     }
     /// Make an instruction that stores a value at a destination value
@@ -365,7 +365,7 @@ impl Function {
     }
     /// Make an instruction that calls a native function that has the signature given with some arguments
     fn insn_call_native(&self, name: &'static str, native_func: *u8,
-                        signature: &Type, args: &[&Value]) -> Value {
+                        signature: &Type, args: &[&Value]) -> Box<Value> {
         unsafe {
             let mut as_: Vec<*c_void> = vec!();
 
@@ -375,7 +375,7 @@ impl Function {
 
             let args = if as_.len() > 0 { as_.as_ptr() } else { 0 as **c_void };
             name.with_c_str(|name| {
-                Value {
+                box Value {
                     _value: jit_insn_call_native(self._function, name, native_func,
                                                  signature._type, args, as_.len() as c_uint,
                                                  JitCallNothrow as c_int)
@@ -386,19 +386,19 @@ impl Function {
     /// Make an instruction that calls a Rust function that has the signature given with no arguments and expects a return value
     pub fn insn_call_native0<R>(&self, name: &'static str,
                                 native_func: fn() -> R,
-                                signature: &Type, args: &[&Value]) -> Value {
+                                signature: &Type, args: &[&Value]) -> Box<Value> {
         self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
     }
     /// Make an instruction that calls a Rust function that has the signature given with a single argument and expects a return value
     pub fn insn_call_native1<A,R>(&self, name: &'static str,
                                   native_func: fn(A) -> R,
-                                  signature: &Type, args: &[&Value]) -> Value {
+                                  signature: &Type, args: &[&Value]) -> Box<Value> {
         self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
     }
     /// Make an instruction that allocates some space
-    pub fn insn_alloca(&self, size: &Value) -> Value {
+    pub fn insn_alloca(&self, size: &Value) -> Box<Value> {
         unsafe {
-            Value { _value: jit_insn_alloca(self._function, size._value) }
+            box Value { _value: jit_insn_alloca(self._function, size._value) }
         }
     }
     /// Apply a function to some arguments and set the retval to the return value
@@ -422,24 +422,24 @@ impl Function {
         }
     }
     /// Create a 32-bit float constant in this context
-    pub fn constant_float32(&self, constant: f32) -> Value {
+    pub fn constant_float32(&self, constant: f32) -> Box<Value> {
         unsafe {
             let value = jit_value_create_float32_constant(self._function, jit_type_float32, constant);
-            Value { _value: value }
+            box Value { _value: value }
         }
     }
     /// Create a 32-bit integer constant in this context
-    pub fn constant_int32(&self, constant: i32) -> Value {
+    pub fn constant_int32(&self, constant: i32) -> Box<Value> {
         unsafe {
             let value = jit_value_create_nint_constant(self._function, jit_type_int, constant);
-            Value { _value: value }
+            box Value { _value: value }
         }
     }
     /// Create a new value with the given type
-    pub fn create_value(&self, value_type: &Type) -> Value {
+    pub fn create_value(&self, value_type: &Type) -> Box<Value> {
         unsafe {
             let value = jit_value_create(self._function, value_type._type);
-            Value { _value: value }
+            box Value { _value: value }
         }
     }
 }
@@ -460,31 +460,31 @@ impl Label {
         !0u32 as *c_void
     }
     /// Create a new label
-    pub fn new() -> Label {
-        Label { _label: Label::undefined() }
+    pub fn new() -> Box<Label> {
+        box Label { _label: Label::undefined() }
     }
 }
 /// Quick retrieval of common types
 pub struct Types;
 impl Types {
     /// Void type
-    pub fn get_void() -> Type {
-        Type { _type: jit_type_void }
+    pub fn get_void() -> Box<Type> {
+        box Type { _type: jit_type_void }
     }
     /// Integer type
-    pub fn get_int() -> Type {
-        Type { _type: jit_type_int }
+    pub fn get_int() -> Box<Type> {
+        box Type { _type: jit_type_int }
     }
     /// 32-bit floating point type
-    pub fn get_float32() -> Type {
-        Type { _type: jit_type_float32 }
+    pub fn get_float32() -> Box<Type> {
+        box Type { _type: jit_type_float32 }
     }
     /// 64-bit floating point type
-    pub fn get_float64() -> Type {
-        Type { _type: jit_type_float64 }
+    pub fn get_float64() -> Box<Type> {
+        box Type { _type: jit_type_float64 }
     }
     /// A void pointer, which can represent any kind of pointer
-    pub fn get_void_ptr() -> Type {
-        Type { _type: jit_type_void_ptr }
+    pub fn get_void_ptr() -> Box<Type> {
+        box Type { _type: jit_type_void_ptr }
     }
 }
