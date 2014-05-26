@@ -71,6 +71,7 @@ extern {
 	fn jit_value_get_param(function: *c_void, param: c_uint) -> *c_void;
 	fn jit_value_get_type(val: *c_void) -> *c_void;
 	fn jit_insn_return(function: *c_void, value: *c_void);
+	fn jit_insn_default_return(function: *c_void);
 	fn jit_function_apply(function: *c_void, args: **c_void, return_area: *mut c_void);
 	fn jit_insn_add(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
 	fn jit_insn_mul(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
@@ -296,6 +297,12 @@ impl Function {
 	pub fn insn_return(&self, retval: &Value) {
 		unsafe {
 			jit_insn_return(self._function, retval._value);
+		}
+	}
+	/// Return from the function
+	pub fn insn_default_return(&self) {
+		unsafe {
+			jit_insn_default_return(self._function);
 		}
 	}
 	/// Make an instruction that multiplies the values
