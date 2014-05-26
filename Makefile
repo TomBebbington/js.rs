@@ -18,6 +18,7 @@ build:
 install:
 	sudo cp -f target/js.rs /usr/local/bin/
 	sudo cp -f target/libjs*.so /usr/local/lib
+	sudo cp -f target/libjit*.so /usr/local/lib
 	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
 doc:
 	$(RUSTDOC) src/libjit/lib.rs -o doc -L target
