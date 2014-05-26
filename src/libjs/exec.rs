@@ -112,13 +112,11 @@ impl Executor<Function> for JITCompiler {
 			let valuedata_t = Types::get_int();
 			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-			let create_val_sig = Type::create_signature(CDECL, &*value_t, &[&*valuedata_t]);
 			let default_sig_t = Type::create_signature(CDECL, Types::get_void(), &[&*valuedata_ptr_t]);
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-				let value_ptr_t = Type::create_pointer(&*value_t);
 				let create_val_sig = Type::create_signature(CDECL, &*value_t, &[&*valuedata_t]);
 				match expr.def {
 					ConstExpr(CNull) => {
