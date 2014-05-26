@@ -8,7 +8,10 @@ libjs:
 libjs_syntax:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjs_syntax/lib.rs -L .
-libs: libjs_syntax libjs
+libjit:
+	mkdir -p target
+	cd target && $(RUSTC) ../src/libjit/lib.rs -L .
+libs: libjit libjs_syntax libjs
 build:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/front/front.rs -L .
