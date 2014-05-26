@@ -16,7 +16,7 @@ impl Runner {
 		}
 	}
 	/// Run the script
-	pub fn run(&self, script: StrBuf) {
+	pub fn run(&self, script: String) {
 		let verbose = self.m.opt_present("v");
 		let path = Path::new(script.as_slice());
 		if path.exists() {

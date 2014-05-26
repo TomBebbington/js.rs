@@ -4,7 +4,7 @@ use std::gc::Gc;
 pub static PROTOTYPE: &'static str = "prototype";
 pub static INSTANCE_PROTOTYPE: &'static str = "__proto__";
 #[deriving(Clone)]
-pub type ObjectData = TreeMap<StrBuf, Property>;
+pub type ObjectData = TreeMap<String, Property>;
 
 #[deriving(Clone)]
 /// A Javascript property
@@ -81,7 +81,7 @@ pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Define a property in an object
 pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let obj = args.get(0);
-	let prop = from_value::<StrBuf>(*args.get(1)).unwrap();
+	let prop = from_value::<String>(*args.get(1)).unwrap();
 	let desc = from_value::<Property>(*args.get(2)).unwrap();
 	obj.borrow().set_prop(prop, desc);
 	Ok(Gc::new(VUndefined))
@@ -95,7 +95,7 @@ pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let prop = if args.len() == 0 {
 		None
 	} else {
-		from_value::<StrBuf>(*args.get(0)).ok()
+		from_value::<String>(*args.get(0)).ok()
 	};
 	Ok(to_value::<bool>(prop.is_some() && match *this.borrow() {
 		VObject(ref obj) => obj.borrow().find(&prop.unwrap()).is_some(),

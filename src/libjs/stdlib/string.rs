@@ -9,7 +9,7 @@ pub fn make_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
 }
 /// Get a string's length
 pub fn get_string_length(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	let this_str: StrBuf = from_value(this).unwrap();
+	let this_str: String = from_value(this).unwrap();
 	Ok(to_value::<i32>(this_str.len() as i32))
 }
 /// Create a new `String` object

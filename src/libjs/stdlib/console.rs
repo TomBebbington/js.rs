@@ -5,13 +5,13 @@ use std::io::stdio::stderr;
 use time::{now, strftime};
 /// Print a javascript value to the standard output stream
 pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let args : Vec<StrBuf> = FromIterator::from_iter(args.iter().map(|x|from_value::<StrBuf>(*x).unwrap()));
+	let args : Vec<String> = FromIterator::from_iter(args.iter().map(|x|from_value::<String>(*x).unwrap()));
 	println!("{}: {}", strftime("%X", &now()), args.connect(" "));
 	Ok(Gc::new(VUndefined))
 }
 /// Print a javascript value to the standard error stream
 pub fn error(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
-	let args : Vec<StrBuf> = FromIterator::from_iter(args.iter().map(|x|from_value::<StrBuf>(*x).unwrap()));
+	let args : Vec<String> = FromIterator::from_iter(args.iter().map(|x|from_value::<String>(*x).unwrap()));
 	match writeln!(&mut stderr().unwrap(), "{}: {}", strftime("%X", &now()), args.connect(" ")) {
 		Ok(_) => Ok(Gc::new(VUndefined)),
 		Err(io_error) => Err(to_value(io_error.to_str().into_strbuf()))

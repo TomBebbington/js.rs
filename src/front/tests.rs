@@ -7,7 +7,7 @@ use getopts::Matches;
 use collections::treemap::TreeMap;
 use std::io::{BufferedReader, File};
 use std::io::fs::walk_dir;
-fn find_attrs(tokens: Vec<Token>) -> TreeMap<StrBuf, StrBuf> {
+fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
 	let mut map = TreeMap::new();
 	for tk in tokens.iter() {
 		match tk.data {

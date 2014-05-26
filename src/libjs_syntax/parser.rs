@@ -203,7 +203,7 @@ impl Parser {
 					_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk.clone(), "function name"))
 				};
 				try!(self.expect(TOpenParen, "function"));
-				let mut args:Vec<StrBuf> = Vec::new();
+				let mut args:Vec<String> = Vec::new();
 				let mut tk = try!(self.get_token(self.pos));
 				while tk.data != TCloseParen {
 					match tk.data {

@@ -37,9 +37,9 @@ pub enum ExprDef {
 	/// Run several expressions from top-to-bottom
 	BlockExpr(Vec<Expr>),
 	/// Load a reference to a value
-	LocalExpr(StrBuf),
+	LocalExpr(String),
 	/// Gets the constant field of a value
-	GetConstFieldExpr(Box<Expr>, StrBuf),
+	GetConstFieldExpr(Box<Expr>, String),
 	/// Gets the field of a value
 	GetFieldExpr(Box<Expr>, Box<Expr>),
 	/// Call a function with some values
@@ -51,13 +51,13 @@ pub enum ExprDef {
 	/// Run blocks whose cases match the expression
 	SwitchExpr(Box<Expr>, Vec<(Expr, Vec<Expr>)>, Option<Box<Expr>>),
 	/// Create an object out of the binary tree given
-	ObjectDeclExpr(Box<TreeMap<StrBuf, Expr>>),
+	ObjectDeclExpr(Box<TreeMap<String, Expr>>),
 	/// Create an array with items inside
 	ArrayDeclExpr(Vec<Expr>),
 	/// Create a function with the given name, arguments, and expression
-	FunctionDeclExpr(Option<StrBuf>, Vec<StrBuf>, Box<Expr>),
+	FunctionDeclExpr(Option<String>, Vec<String>, Box<Expr>),
 	/// Create an arrow function with the given arguments and expression
-	ArrowFunctionDeclExpr(Vec<StrBuf>, Box<Expr>),
+	ArrowFunctionDeclExpr(Vec<String>, Box<Expr>),
 	/// Construct an object from the function and arguments given
 	ConstructExpr(Box<Expr>, Vec<Expr>),
 	/// Return the expression from a function
@@ -67,7 +67,7 @@ pub enum ExprDef {
 	/// Assign an expression to a value
 	AssignExpr(Box<Expr>, Box<Expr>),
 	/// A variable declaration
-	VarDeclExpr(Vec<(StrBuf, Option<Expr>)>),
+	VarDeclExpr(Vec<(String, Option<Expr>)>),
 	/// Return a string representing the type of the given expression
 	TypeOfExpr(Box<Expr>)
 }
@@ -139,7 +139,7 @@ impl Show for ExprDef {
 	}
 }
 
-impl Show for TreeMap<StrBuf, Expr> {
+impl Show for TreeMap<String, Expr> {
 	fn fmt(&self, f: &mut Formatter) -> Result {
 		try!(write!(f, "{}", "{ "));
 		match self.iter().last() {

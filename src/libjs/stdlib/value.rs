@@ -24,7 +24,7 @@ pub enum ValueData {
 	/// `boolean` - A `true` / `false` value, for if a certain criteria is met
 	VBoolean(bool),
 	/// `String` - A UTF-8 string, such as `"Hello, world"`
-	VString(StrBuf),
+	VString(String),
 	/// `Number` - A 64-bit floating point number, such as `3.1415`
 	VNumber(f64),
 	/// `Number` - A 32-bit integer, such as `42`
@@ -118,7 +118,7 @@ impl ValueData {
 		}
 	}
 	/// Resolve the property in the object
-	pub fn get_prop(&self, field:StrBuf) -> Option<Property> {
+	pub fn get_prop(&self, field:String) -> Option<Property> {
 		let obj : ObjectData = match *self {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) => {
@@ -140,7 +140,7 @@ impl ValueData {
 		}
 	}
 	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
-	pub fn get_field(&self, field:StrBuf) -> Value {
+	pub fn get_field(&self, field:String) -> Value {
 		match self.get_prop(field) {
 			Some(prop) => prop.value,
 			None => Gc::new(VUndefined)
@@ -151,7 +151,7 @@ impl ValueData {
 		self.get_field(field.into_strbuf())
 	}
 	/// Set the field in the value
-	pub fn set_field(&self, field:StrBuf, val:Value) -> Value {
+	pub fn set_field(&self, field:String, val:Value) -> Value {
 		match *self {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), Property::new(val));
@@ -171,7 +171,7 @@ impl ValueData {
 		self.set_field(field.into_strbuf(), val)
 	}
 	/// Set the property in the value
-	pub fn set_prop(&self, field:StrBuf, prop:Property) -> Property {
+	pub fn set_prop(&self, field:String, prop:Property) -> Property {
 		match *self {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), prop);
@@ -380,24 +380,24 @@ pub trait FromValue {
 	/// Convert this value to a Javascript value
 	fn from_value(value:Value) -> Result<Self, &'static str>;
 }
-impl ToValue for StrBuf {
+impl ToValue for String {
 	fn to_value(&self) -> Value {
 		Gc::new(VString(self.clone()))
 	}
 }
-impl FromValue for StrBuf {
-	fn from_value(v:Value) -> Result<StrBuf, &'static str> {
+impl FromValue for String {
+	fn from_value(v:Value) -> Result<String, &'static str> {
 		Ok(v.borrow().to_str())
 	}
 }
 impl<'s> ToValue for &'s str {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(StrBuf::from_str(*self)))
+		Gc::new(VString(String::from_str(*self)))
 	}
 }
 impl ToValue for char {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(StrBuf::from_char(1, *self)))
+		Gc::new(VString(String::from_char(1, *self)))
 	}
 }
 impl FromValue for char {

@@ -20,11 +20,11 @@ pub struct RegularFunction {
 	/// This function's expression
 	pub expr : Expr,
 	/// The argument names of the function
-	pub args : Vec<StrBuf>
+	pub args : Vec<String>
 }
 impl RegularFunction {
 	/// Make a new regular function
-	pub fn new(expr : Expr, args: Vec<StrBuf>) -> RegularFunction {
+	pub fn new(expr : Expr, args: Vec<String>) -> RegularFunction {
 		let mut obj = TreeMap::new();
 		obj.insert("arguments".into_strbuf(), Property::new(Gc::new(VInteger(args.len() as i32))));
 		RegularFunction {object: obj, expr: expr, args: args}
