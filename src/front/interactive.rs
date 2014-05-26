@@ -1,4 +1,4 @@
-use js::exec::{Executor, Interpreter};
+use js::exec::{Executor, JITCompiler};
 use syntax::Lexer;
 use syntax::Parser;
 use getopts::Matches;
@@ -18,7 +18,7 @@ impl Interactive {
 	/// Run the interactive mode
 	pub fn run(&self) {
 		print!("> ");
-		let mut engine : Interpreter = Executor::new();
+		let mut engine : JITCompiler = Executor::new();
 		let verbose = self.m.opt_present("v");
 		let mut input = stdin();
 		loop {
@@ -34,11 +34,12 @@ impl Interactive {
 				println!("Tokens: {}", tokens);
 				println!("Parsing");
 			}
-			let expr = Parser::new(tokens).parse_all().unwrap();
+			let expr = Parser::new(tokens).parse().unwrap();
 			if verbose {
 				println!("Expression: {}", expr);
 			}
-			let result = engine.run(&expr);
+			let comp = engine.compile(&expr);
+			let result = engine.run(comp);
 			match result {
 				Ok(v) =>
 					println!("{}", v.borrow()),

@@ -1,4 +1,4 @@
-use js::exec::{Executor, Interpreter};
+use js::exec::{Executor, JITCompiler};
 use syntax::Lexer;
 use syntax::Parser;
 use getopts::Matches;
@@ -33,8 +33,9 @@ impl Runner {
 				println!("Parsed as {}", expr);
 				println!("Now running");
 			}
-			let mut engine:Interpreter = Executor::new();
-			let result = engine.run(&expr);
+			let mut engine:JITCompiler = Executor::new();
+			let comp = engine.compile(&expr);
+			let result = engine.run(comp);
 			match result {
 				Ok(v) =>
 					println!("{}", v.borrow()),

@@ -1,4 +1,4 @@
-use js::exec::{Executor, Interpreter};
+use js::exec::{Executor, JITCompiler};
 use js::stdlib::value::{ResultValue, Value, to_value, from_value};
 use syntax::Lexer;
 use syntax::Parser;
@@ -72,9 +72,10 @@ impl Tests {
 			println!("Parsed as {}", expr);
 			println!("Now running");
 		}
-		let mut engine:Interpreter = Executor::new();
+		let mut engine:JITCompiler = Executor::new();
 		engine.set_global("assert".into_strbuf(), to_value(assert));
-		let result = engine.run(&expr);
+		let comp = engine.compile(&expr);
+		let result = engine.run(comp);
 		match result {
 			Ok(_) =>
 				println!("{}: {}: All tests passed successfully", file, desc),
