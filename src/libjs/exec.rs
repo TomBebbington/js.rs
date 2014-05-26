@@ -16,7 +16,6 @@ use std::gc::Gc;
 use std::cell::RefCell;
 use jit::{Context, Function, Type, Types, CDECL};
 use jit;
-
 /// A variable scope
 pub struct Scope {
 	/// The value of `this` in the scope
@@ -107,53 +106,171 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn compile(&self, expr: &Expr) -> Box<Function> {
 		self.with_builder(|| {
-			let void_t = Types::get_void();
-			let void_ptr_t = Type::create_pointer(void_t);
-			let valuedata_t =Types::get_int();
-			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
-			let value_t = Type::create_struct(&[&*valuedata_ptr_t]); // Gc<ValueData>
-			let value_ptr_t = Type::create_pointer(&*value_t);
-			let string_t = Type::create_pointer(Types::get_char());
-			// fn(&mut &ValueData) -> ()
-			let sig = Type::create_signature(CDECL, void_t, &[&*valuedata_ptr_t]);
-			let func = self.context.create_function(sig);
-			let result = func.get_param(0);
 			fn create_value_from_data(arg: ValueData) -> Value {
 				Gc::new(arg)
 			}
-			let create_val_sig = Type::create_signature(CDECL, value_t, &[&*valuedata_t]);
-			let value = {
+			let valuedata_t = Types::get_int();
+			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
+			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
+			let create_val_sig = Type::create_signature(CDECL, &*value_t, &[&*valuedata_t]);
+			let default_sig_t = Type::create_signature(CDECL, Types::get_void(), &[&*valuedata_ptr_t]);
+			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
+				let valuedata_t = Types::get_int();
+				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
+				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
+				let value_ptr_t = Type::create_pointer(&*value_t);
+				let create_val_sig = Type::create_signature(CDECL, &*value_t, &[&*valuedata_t]);
 				match expr.def {
 					ConstExpr(CNull) => {
 						let vnull = func.insn_alloca(func.constant_int32(valuedata_t.get_size() as i32));
 						func.insn_store_relative(&*vnull, 0, func.constant_int32(0));
-						let t = func.create_value(valuedata_t);
+						let t = func.create_value(&*valuedata_t);
 						func.insn_store(t, vnull);
-						func.insn_call_native1("create_value_from_data", create_value_from_data, create_val_sig, &[&*t])
+						func.insn_call_native1("create_value_from_data", create_value_from_data, &*create_val_sig, &[&*t])
 					},
 					ConstExpr(CUndefined) => {
 						let vundef = func.insn_alloca(func.constant_int32(valuedata_t.get_size() as i32));
 						func.insn_store_relative(&*vundef, 0, func.constant_int32(1));
-						let t = func.create_value(valuedata_t);
+						let t = func.create_value(&*valuedata_t);
 						func.insn_store(t, vundef);
-						func.insn_call_native1("create_value_from_data", create_value_from_data, create_val_sig, &[&*t])
+						func.insn_call_native1("create_value_from_data", create_value_from_data, &*create_val_sig, &[&*t])
 					},
 					ConstExpr(CBool(v)) => {
 						let create_bool_value = to_value::<bool>;
 						let val = func.constant_int32_as_type(v as i32, *Types::get_bool());
-						let create_bool_sig = Type::create_signature(CDECL, value_t, &[&*Types::get_bool()]);
-						func.insn_call_native1("create_bool_value", create_bool_value, create_bool_sig, &[&*val])
+						let create_bool_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_bool()]);
+						func.insn_call_native1("create_bool_value", create_bool_value, &*create_bool_sig, &[&*val])
 					},
 					ConstExpr(CNum(n)) => {
 						let create_number_value = to_value::<f64>;
 						let val = func.constant_float64(n);
-						let create_number_sig = Type::create_signature(CDECL, value_t, &[&*Types::get_float64()]);
-						func.insn_call_native1("create_number_value", create_number_value, create_number_sig, &[&*val])
+						let create_number_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_float64()]);
+						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
+					},
+					BinOpExpr(op, ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						let binop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t]);
+						
+						let (name, op_func) = match op {
+							BinNum(OpAdd) => {
+								fn add_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() + *b.borrow())
+								}
+								("add", add_values)
+							},
+							BinNum(OpSub) => {
+								fn sub_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() - *b.borrow())
+								}
+								("sub", sub_values)
+							},
+							BinNum(OpMul) => {
+								fn mul_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() * *b.borrow())
+								}
+								("mul", mul_values)
+							},
+							BinNum(OpDiv) => {
+								fn div_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() / *b.borrow())
+								}
+								("div", div_values)
+							},
+							BinNum(OpMod) => {
+								fn mod_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() % *b.borrow())
+								}
+								("mod", mod_values)
+							},
+							BinBit(BitAnd) => {
+								fn and_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() & *b.borrow())
+								}
+								("and", and_values)
+							},
+							BinBit(BitOr) => {
+								fn or_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() | *b.borrow())
+								}
+								("or", or_values)
+							},
+							BinBit(BitXor) => {
+								fn xor_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() ^ *b.borrow())
+								}
+								("xor", xor_values)
+							},
+							BinBit(BitShl) => {
+								fn shl_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() << *b.borrow())
+								}
+								("shl", shl_values)
+							},
+							BinBit(BitShr) => {
+								fn shr_values(a: Value, b:Value) -> Value {
+									Gc::new(a.borrow() >> *b.borrow())
+								}
+								("shr", shr_values)
+							},
+							BinLog(LogOr) => {
+								fn or_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow().is_true() || b.borrow().is_true())
+								}
+								("or", or_values)
+							},
+							BinLog(LogAnd) => {
+								fn and_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow().is_true() && b.borrow().is_true())
+								}
+								("and", and_values)
+							},
+							BinComp(CompEqual) | BinComp(CompStrictEqual) => {
+								fn eq_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow() == b.borrow())
+								}
+								("eq", eq_values)
+							},
+							BinComp(CompNotEqual) | BinComp(CompStrictNotEqual) => {
+								fn neq_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow() != b.borrow())
+								}
+								("neq", neq_values)
+							},
+							BinComp(CompLessThan) => {
+								fn lt_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow() < b.borrow())
+								}
+								("lt", lt_values)
+							},
+							BinComp(CompLessThanOrEqual) => {
+								fn lte_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow() <= b.borrow())
+								}
+								("lte", lte_values)
+							},
+							BinComp(CompGreaterThan) => {
+								fn gt_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow() > b.borrow())
+								}
+								("gt", gt_values)
+							},
+							BinComp(CompGreaterThanOrEqual) => {
+								fn gte_values(a: Value, b:Value) -> Value {
+									to_value(a.borrow() >= b.borrow())
+								}
+								("gte", gte_values)
+							}
+						};
+						func.insn_call_native2(name, op_func, binop_sig, &[&*i_a, &*i_b])
 					},
 					_ => fail!("Unimplemented {}", expr)
 				}
-			};
-			func.insn_store_relative(&result, 0, value);
+			}
+			let func = self.context.create_function(&*default_sig_t);
+			let result = func.get_param(0);
+			let value = compile_value(func, expr);
+			func.insn_store_relative(&result, 0, &*value);
 			func.compile();
 			func
 		})

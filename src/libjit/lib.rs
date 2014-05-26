@@ -438,6 +438,12 @@ impl Function {
 								  signature: &Type, args: &[&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
+	/// Make an instruction that calls a Rust function that has the signature given with two arguments and expects a return value
+	pub fn insn_call_native2<A,B,R>(&self, name: &'static str,
+								  native_func: fn(A, B) -> R,
+								  signature: &Type, args: &[&Value]) -> Box<Value> {
+		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
+	}
 	/// Make an instruction that allocates some space
 	pub fn insn_alloca(&self, size: &Value) -> Box<Value> {
 		unsafe {

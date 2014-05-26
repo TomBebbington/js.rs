@@ -8,6 +8,7 @@ use std::f64;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::iter::FromIterator;
+use std::cmp::Ord;
 #[must_use]
 /// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;
@@ -348,6 +349,20 @@ impl Shr<ValueData, ValueData> for ValueData {
 impl Not<ValueData> for ValueData {
 	fn not(&self) -> ValueData {
 		VBoolean(!self.is_true())
+	}
+}
+impl Ord for ValueData {
+	fn lt(&self, other: &ValueData) -> bool {
+		self.to_num() < other.to_num()
+	}
+	fn le(&self, other: &ValueData) -> bool {
+		self.to_num() <= other.to_num()
+	}
+	fn gt(&self, other: &ValueData) -> bool {
+		self.to_num() > other.to_num()
+	}
+	fn ge(&self, other: &ValueData) -> bool {
+		self.to_num() >= other.to_num()
 	}
 }
 /// Conversion to Javascript values from Rust values
