@@ -282,6 +282,17 @@ impl Executor<Function> for JITCompiler {
 						func.insn_throw(i_val);
 						i_val
 					},
+					LocalExpr(ref name) => {
+						fn find_field(obj:Value, s: *i8) -> Value {
+							unsafe {
+								let cstr = CString::new(s, false);
+								obj.get_field_slice(cstr.as_str().unwrap())
+							}
+						}
+						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
+						let bufptr = wrap_str(name.as_slice());
+						func.insn_call_native2("get_local", find_field, &*find_field_sig, &[&scope, &*bufptr])
+					},
 					TypeOfExpr(ref ex) => {
 						fn get_val_type(v:Value) -> Value {
 							to_value(v.get_type())
