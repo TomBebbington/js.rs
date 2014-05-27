@@ -118,7 +118,20 @@ impl Executor<Function> for JITCompiler {
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
+				let cstring_t = Type::create_pointer(&*Types::get_char());
 				let create_value_sig = Type::create_signature(CDECL, &*value_t, &[]);
+				let wrap_str = |text:String| -> Box<jit::Value> {
+					let strlen_i = func.constant_int32_as_type(text.len() as i32, &*Types::get_char());
+					let bufptr = func.create_value(cstring_t);
+					func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
+					for i in range(0, text.len()) {
+						let char_i = func.constant_int32_as_type(text.as_slice().char_at(i) as i32, &*Types::get_char());
+						func.insn_store_relative(bufptr, i as i32, char_i);
+					}
+					let null_term = func.constant_int32_as_type(0i32, &*Types::get_char());
+					func.insn_store_relative(bufptr, text.len() as i32, null_term);
+					bufptr
+				};
 				match expr.def {
 					ConstExpr(CNull) => {
 						fn create_null_value() -> Value {
@@ -142,27 +155,27 @@ impl Executor<Function> for JITCompiler {
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
 					ConstExpr(CString(ref s)) => {
-						let cstring_t = Type::create_pointer(&*Types::get_char());
 						fn create_string_value(s: *i8) -> Value {
 							unsafe {
 								let cstr = CString::new(s, false);
-								match cstr.as_str() {
-									Some(v) => Gc::new(VString(String::from_str(v))),
-									None => Gc::new(VUndefined)
-								}
+								Gc::new(VString(String::from_str(cstr.as_str().unwrap())))
 							}
 						}
 						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
-						let strlen_i = func.constant_int32_as_type(s.len() as i32, &*Types::get_char());
-						let bufptr = func.create_value(cstring_t);
-						func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
-						for i in range(0, s.len()) {
-							let char_i = func.constant_int32_as_type(s.as_slice().char_at(i) as i32, &*Types::get_char());
-							func.insn_store_relative(bufptr, i as i32, char_i);
-						}
-						let null_term = func.constant_int32_as_type(0i32, &*Types::get_char());
-						func.insn_store_relative(bufptr, s.len() as i32, null_term);
+						let bufptr = wrap_str(s.clone());
 						func.insn_call_native1("create_string_value", create_string_value, &* create_string_sig, &[&*bufptr])
+					},
+					GetConstFieldExpr(ref obj, ref field) => {
+						fn find_field(obj:Value, s: *i8) -> Value {
+							unsafe {
+								let cstr = CString::new(s, false);
+								obj.borrow().get_field_slice(cstr.as_str().unwrap())
+							}
+						}
+						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
+						let obj_i = compile_value(func, *obj);
+						let bufptr = wrap_str(field.clone());
+						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*bufptr])
 					},
 					BlockExpr(ref block) => {
 						let last = block.last();
