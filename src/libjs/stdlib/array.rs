@@ -1,5 +1,4 @@
-use stdlib::value::{Value, VUndefined, ResultValue, to_value};
-use std::gc::Gc;
+use stdlib::value::{Value, ResultValue, to_value};
 
 /// Create a new array
 pub fn make_array(this:Value, _:Value, _:Vec<Value>) -> ResultValue {

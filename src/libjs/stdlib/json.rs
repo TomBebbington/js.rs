@@ -1,6 +1,5 @@
-use stdlib::value::{Value, ValueData, VString, ResultValue, to_value};
+use stdlib::value::{Value, ResultValue, to_value};
 use serialize::json::{ToJson, from_str};
-use std::gc::Gc;
 /// Parse a JSON string into a Javascript object
 pub fn parse(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	match from_str(args.get(0).to_str().as_slice()) {

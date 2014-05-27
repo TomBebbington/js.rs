@@ -1,6 +1,5 @@
 use stdlib::object::PROTOTYPE;
-use stdlib::value::{Value, ValueData, ResultValue, VUndefined, to_value};
-use std::gc::Gc;
+use stdlib::value::{Value, ResultValue, to_value};
 
 /// Create a new error
 pub fn make_error(this:Value, _:Value, args:Vec<Value>) -> ResultValue {

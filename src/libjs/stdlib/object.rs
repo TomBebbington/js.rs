@@ -1,6 +1,5 @@
-use stdlib::value::{Value, ValueData, VUndefined, VObject, ResultValue, ToValue, FromValue, to_value, from_value};
+use stdlib::value::{Value, ResultValue, ToValue, FromValue, to_value, from_value};
 use collections::treemap::TreeMap;
-use std::gc::Gc;
 pub static PROTOTYPE: &'static str = "prototype";
 pub static INSTANCE_PROTOTYPE: &'static str = "__proto__";
 #[deriving(Clone)]

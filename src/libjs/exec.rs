@@ -10,10 +10,8 @@ use stdlib::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInte
 use stdlib::object::{INSTANCE_PROTOTYPE, PROTOTYPE};
 use stdlib::function::{NativeFunc, RegularFunc, RegularFunction};
 use stdlib::{console, math, object, array, function, json, number, error, uri, string};
-use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::gc::Gc;
-use std::cell::RefCell;
 use std::c_str::CString;
 use std::mem::size_of;
 use jit::{Context, Function, Type, Types, CDECL};
@@ -197,7 +195,7 @@ impl Executor<Function> for JITCompiler {
 					ObjectDeclExpr(ref fields) => {
 						fn create_object_with_fields(mut c_fields: **i8, mut vals: *Value, num_fields: i32) -> Value {
 							let object = Value::new_obj(None);
-							for i in range(0, num_fields) {
+							for _ in range(0, num_fields) {
 								unsafe {
 									let cstr = CString::new(*c_fields, false);
 									let field = cstr.as_str().unwrap();

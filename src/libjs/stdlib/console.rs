@@ -1,5 +1,4 @@
-use stdlib::value::{Value, ValueData, ResultValue, VUndefined, to_value, from_value};
-use std::gc::Gc;
+use stdlib::value::{Value, ResultValue, to_value, from_value};
 use std::iter::FromIterator;
 use std::io::stdio::stderr;
 use time::{now, strftime};

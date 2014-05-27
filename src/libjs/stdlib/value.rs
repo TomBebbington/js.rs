@@ -283,11 +283,11 @@ impl Eq for Value {
 		match (self.ptr.borrow().clone(), other.ptr.borrow().clone()) {
 			_ if self.ptr.ptr_eq(&other.ptr) => true,
 			_ if self.is_null_or_undefined() && other.is_null_or_undefined() => true,
-			(VString(ref a), ref b) | (ref b, VString(ref a)) => self.to_str() == other.to_str(),
+			(VString(_), _) | (_, VString(_)) => self.to_str() == other.to_str(),
 			(VBoolean(a), VBoolean(b)) if a == b => true,
 			(VNumber(a), VNumber(b)) if a == b && !a.is_nan() && !b.is_nan() => true,
-			(VNumber(a), ref b) if a == other.to_num() => true,
-			(ref b, VNumber(a)) if a == self.to_num() => true,
+			(VNumber(a), _) if a == other.to_num() => true,
+			(_, VNumber(a)) if a == self.to_num() => true,
 			(VInteger(a), VInteger(b)) if a == b => true,
 			_ => false
 		}

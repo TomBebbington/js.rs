@@ -509,6 +509,18 @@ impl Function {
 								  signature: &Type, args: &[&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
+	/// Make an instruction that calls a Rust function that has the signature given with three arguments and expects a return value
+	pub fn insn_call_native3<A,B,C,R>(&self, name: &'static str,
+								  native_func: fn(A, B, C) -> R,
+								  signature: &Type, args: &[&Value]) -> Box<Value> {
+		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
+	}
+	/// Make an instruction that calls a Rust function that has the signature given with four arguments and expects a return value
+	pub fn insn_call_native4<A,B,C,D,R>(&self, name: &'static str,
+								  native_func: fn(A, B, C, D) -> R,
+								  signature: &Type, args: &[&Value]) -> Box<Value> {
+		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
+	}
 	/// Make an instruction that allocates some space
 	pub fn insn_alloca(&self, size: &Value) -> Box<Value> {
 		unsafe {

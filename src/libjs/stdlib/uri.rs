@@ -1,6 +1,5 @@
-use stdlib::value::{Value, ResultValue, VString, VUndefined, to_value};
+use stdlib::value::{Value, ResultValue, to_value};
 use url::{encode, decode, encode_component, decode_component};
-use std::gc::Gc;
 
 /// Encode a URI
 pub fn encode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {

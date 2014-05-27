@@ -1,6 +1,5 @@
-use stdlib::value::{Value, ValueData, VUndefined, ResultValue, to_value, from_value};
+use stdlib::value::{Value, ResultValue, to_value, from_value};
 use stdlib::object::{PROTOTYPE, Property};
-use std::gc::Gc;
 
 /// Create new string
 pub fn make_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
