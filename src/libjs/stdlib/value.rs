@@ -12,8 +12,12 @@ use std::cmp::Ord;
 #[must_use]
 /// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;
+#[deriving(Clone)]
 /// A Garbage-collected Javascript value as represented in the interpreter
-pub type Value = Gc<ValueData>;
+pub struct Value {
+	/// The garbage-collected pointer
+	pub ptr: Gc<ValueData>
+}
 #[deriving(Clone)]
 /// A Javascript value
 pub enum ValueData {
@@ -34,54 +38,63 @@ pub enum ValueData {
 	/// `Function` - A runnable block of code, such as `Math.sqrt`, which can take some variables and return a useful value or act upon an object
 	VFunction(RefCell<Function>)
 }
-impl ValueData {
+impl Value {
 	/// Returns a new empty object
 	pub fn new_obj(global: Option<Value>) -> Value {
 		let mut obj : ObjectData = TreeMap::new();
 		if global.is_some() {
-			let obj_proto = global.unwrap().borrow().get_field_slice("Object").borrow().get_field_slice(PROTOTYPE);
+			let obj_proto = global.unwrap().get_field_slice("Object").get_field_slice(PROTOTYPE);
 			obj.insert(INSTANCE_PROTOTYPE.into_strbuf(), Property::new(obj_proto));
 		}
-		Gc::new(VObject(RefCell::new(obj)))
+		Value {
+			ptr: Gc::new(VObject(RefCell::new(obj)))
+		}
 	}
 	/// Returns true if the value is an object
 	pub fn is_object(&self) -> bool {
-		match *self {
+		match *self.ptr.borrow() {
 			VObject(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {
-		match *self {
+		match *self.ptr.borrow() {
 			VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null
 	pub fn is_null(&self) -> bool {
-		match *self {
+		match *self.ptr.borrow() {
 			VNull => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null or undefined
 	pub fn is_null_or_undefined(&self) -> bool {
-		match *self {
+		match *self.ptr.borrow() {
 			VNull | VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is a 64-bit floating-point number
 	pub fn is_double(&self) -> bool {
-		match *self {
+		match *self.ptr.borrow() {
 			VNumber(_) => true,
+			_ => false
+		}
+	}
+	/// Returns true if the value is a string
+	pub fn is_string(&self) -> bool {
+		match *self.ptr.borrow() {
+			VString(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is true
 	pub fn is_true(&self) -> bool {
-		match *self {
+		match *self.ptr.borrow() {
 			VObject(_) => true,
 			VString(ref s) if s.as_slice() == "1" => true,
 			VNumber(n) if n >= 1.0 && n % 1.0 == 0.0 => true,
@@ -92,7 +105,7 @@ impl ValueData {
 	}
 	/// Converts the value into a 64-bit floating point number
 	pub fn to_num(&self) -> f64 {
-		match *self {
+		match *self.ptr.borrow() {
 			VObject(_) | VUndefined | VFunction(_) => f64::NAN,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -106,7 +119,7 @@ impl ValueData {
 	}
 	/// Converts the value into a 32-bit integer
 	pub fn to_int(&self) -> i32 {
-		match *self {
+		match *self.ptr.borrow() {
 			VObject(_) | VUndefined | VNull | VBoolean(false) | VFunction(_) => 0,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -119,7 +132,7 @@ impl ValueData {
 	}
 	/// Resolve the property in the object
 	pub fn get_prop(&self, field:String) -> Option<Property> {
-		let obj : ObjectData = match *self {
+		let obj : ObjectData = match *self.ptr.borrow() {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) => {
 				let func = func.borrow().clone();
@@ -134,7 +147,7 @@ impl ValueData {
 			Some(val) => Some(*val),
 			None => match obj.find(&PROTOTYPE.into_strbuf()) {
 				Some(prop) => 
-					prop.value.borrow().get_prop(field),
+					prop.value.get_prop(field),
 				None => None
 			}
 		}
@@ -143,7 +156,9 @@ impl ValueData {
 	pub fn get_field(&self, field:String) -> Value {
 		match self.get_prop(field) {
 			Some(prop) => prop.value,
-			None => Gc::new(VUndefined)
+			None => Value{
+				ptr: Gc::new(VUndefined)
+			}
 		}
 	}
 	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
@@ -152,7 +167,7 @@ impl ValueData {
 	}
 	/// Set the field in the value
 	pub fn set_field(&self, field:String, val:Value) -> Value {
-		match *self {
+		match *self.ptr.borrow() {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), Property::new(val));
 			},
@@ -172,7 +187,7 @@ impl ValueData {
 	}
 	/// Set the property in the value
 	pub fn set_prop(&self, field:String, prop:Property) -> Property {
-		match *self {
+		match *self.ptr.borrow() {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), prop);
 			},
@@ -214,10 +229,16 @@ impl ValueData {
 			Null => VNull
 		}
 	}
+	/// Get the value for undefined
+	pub fn undefined() -> Value {
+		Value {
+			ptr: Gc::new(VUndefined)
+		}
+	}
 }
-impl fmt::Show for ValueData {
+impl fmt::Show for Value {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		match *self {
+		match *self.ptr.borrow() {
 			VNull => write!(f, "null"),
 			VUndefined => write!(f, "undefined"),
 			VBoolean(v) => write!(f, "{}", v),
@@ -233,7 +254,7 @@ impl fmt::Show for ValueData {
 				match v.borrow().iter().last() {
 					Some((last_key, _)) => {
 						for (key, val) in v.borrow().iter() {
-							try!(write!(f, "{}: {}", key, val.value.borrow()));
+							try!(write!(f, "{}: {}", key, val.value));
 							if key != last_key {
 								try!(write!(f, "{}", ", "));
 							}
@@ -257,30 +278,31 @@ impl fmt::Show for ValueData {
 		}
 	}
 }
-impl Eq for ValueData {
-	fn eq(&self, other:&ValueData) -> bool {
-		match (self.clone(), other.clone()) {
-			(ref a, ref b) if a.is_null_or_undefined() && b.is_null_or_undefined() => true,
-			(VString(ref a), VString(ref b)) if a == b => true,
-			(VString(ref a), ref b) | (ref b, VString(ref a)) if *a == b.to_str() => true,
+impl Eq for Value {
+	fn eq(&self, other:&Value) -> bool {
+		match (self.ptr.borrow().clone(), other.ptr.borrow().clone()) {
+			_ if self.ptr.ptr_eq(&other.ptr) => true,
+			_ if self.is_null_or_undefined() && other.is_null_or_undefined() => true,
+			(VString(ref a), ref b) | (ref b, VString(ref a)) => self.to_str() == other.to_str(),
 			(VBoolean(a), VBoolean(b)) if a == b => true,
 			(VNumber(a), VNumber(b)) if a == b && !a.is_nan() && !b.is_nan() => true,
-			(VNumber(a), ref b) | (ref b, VNumber(a)) if a == b.to_num() => true,
+			(VNumber(a), ref b) if a == other.to_num() => true,
+			(ref b, VNumber(a)) if a == self.to_num() => true,
 			(VInteger(a), VInteger(b)) if a == b => true,
 			_ => false
 		}
 	}
 }
-impl ToJson for ValueData {
+impl ToJson for Value {
 	fn to_json( &self ) -> Json {
-		match *self {
+		match *self.ptr.borrow() {
 			VNull | VUndefined => Null,
 			VBoolean(b) => Boolean(b),
 			VObject(ref obj) => {
 				let mut nobj = TreeMap::new();
 				for (k, v) in obj.borrow().iter() {
 					if k.as_slice() != INSTANCE_PROTOTYPE.as_slice() {
-						nobj.insert(k.clone(), v.value.borrow().to_json());
+						nobj.insert(k.clone(), v.value.to_json());
 					}
 				}
 				Object(box nobj)
@@ -292,81 +314,86 @@ impl ToJson for ValueData {
 		}
 	}
 }
-impl Add<ValueData, ValueData> for ValueData {
-	fn add(&self, other:&ValueData) -> ValueData {
-		return match (self.clone(), other.clone()) {
-			(VString(s), other) | (other, VString(s)) =>
-				VString(s.clone().append(other.to_str().as_slice())),
-			(_, _) => VNumber(self.to_num() + other.to_num())
+impl Add<Value, Value> for Value {
+	fn add(&self, other:&Value) -> Value {
+		if self.is_string() || other.is_string() {
+			let self_str = self.to_str();
+			let other_str = other.to_str();
+			let mut text = String::with_capacity(self_str.len() + other_str.len());
+			text.push_str(self_str.as_slice());
+			text.push_str(other_str.as_slice());
+			to_value(text)
+		} else {
+			to_value(self.to_num() + other.to_num())
 		}
 	}
 }
-impl Sub<ValueData, ValueData> for ValueData {
-	fn sub(&self, other:&ValueData) -> ValueData {
-		VNumber(self.to_num() - other.to_num())
+impl Sub<Value, Value> for Value {
+	fn sub(&self, other:&Value) -> Value {
+		to_value(self.to_num() - other.to_num())
 	}
 }
-impl Mul<ValueData, ValueData> for ValueData {
-	fn mul(&self, other:&ValueData) -> ValueData {
-		VNumber(self.to_num() * other.to_num())
+impl Mul<Value, Value> for Value {
+	fn mul(&self, other:&Value) -> Value {
+		to_value(self.to_num() * other.to_num())
 	}
 }
-impl Div<ValueData, ValueData> for ValueData {
-	fn div(&self, other:&ValueData) -> ValueData {
-		VNumber(self.to_num() / other.to_num())
+impl Div<Value, Value> for Value {
+	fn div(&self, other:&Value) -> Value {
+		to_value(self.to_num() / other.to_num())
 	}
 }
-impl Rem<ValueData, ValueData> for ValueData {
-	fn rem(&self, other:&ValueData) -> ValueData {
-		VNumber(self.to_num() % other.to_num())
+impl Rem<Value, Value> for Value {
+	fn rem(&self, other:&Value) -> Value {
+		to_value(self.to_num() % other.to_num())
 	}
 }
-impl BitAnd<ValueData, ValueData> for ValueData {
-	fn bitand(&self, other:&ValueData) -> ValueData {
-		VInteger(self.to_int() & other.to_int())
+impl BitAnd<Value, Value> for Value {
+	fn bitand(&self, other:&Value) -> Value {
+		to_value(self.to_int() & other.to_int())
 	}
 }
-impl BitOr<ValueData, ValueData> for ValueData {
-	fn bitor(&self, other:&ValueData) -> ValueData {
-		VInteger(self.to_int() | other.to_int())
+impl BitOr<Value, Value> for Value {
+	fn bitor(&self, other:&Value) -> Value {
+		to_value(self.to_int() | other.to_int())
 	}
 }
-impl BitXor<ValueData, ValueData> for ValueData {
-	fn bitxor(&self, other:&ValueData) -> ValueData {
-		VInteger(self.to_int() ^ other.to_int())
+impl BitXor<Value, Value> for Value {
+	fn bitxor(&self, other:&Value) -> Value {
+		to_value(self.to_int() ^ other.to_int())
 	}
 }
-impl Shl<ValueData, ValueData> for ValueData {
-	fn shl(&self, other:&ValueData) -> ValueData {
-		VInteger(self.to_int() << other.to_int())
+impl Shl<Value, Value> for Value {
+	fn shl(&self, other:&Value) -> Value {
+		to_value(self.to_int() << other.to_int())
 	}
 }
-impl Shr<ValueData, ValueData> for ValueData {
-	fn shr(&self, other:&ValueData) -> ValueData {
-		VInteger(self.to_int() >> other.to_int())
+impl Shr<Value, Value> for Value {
+	fn shr(&self, other:&Value) -> Value {
+		to_value(self.to_int() >> other.to_int())
 	}
 }
-impl Not<ValueData> for ValueData {
-	fn not(&self) -> ValueData {
-		VBoolean(!self.is_true())
+impl Not<Value> for Value {
+	fn not(&self) -> Value {
+		to_value(!self.is_true())
 	}
 }
-impl Neg<ValueData> for ValueData {
-	fn neg(&self) -> ValueData {
-		VNumber(-self.to_num())
+impl Neg<Value> for Value {
+	fn neg(&self) -> Value {
+		to_value(-self.to_num())
 	}
 }
-impl Ord for ValueData {
-	fn lt(&self, other: &ValueData) -> bool {
+impl Ord for Value {
+	fn lt(&self, other: &Value) -> bool {
 		self.to_num() < other.to_num()
 	}
-	fn le(&self, other: &ValueData) -> bool {
+	fn le(&self, other: &Value) -> bool {
 		self.to_num() <= other.to_num()
 	}
-	fn gt(&self, other: &ValueData) -> bool {
+	fn gt(&self, other: &Value) -> bool {
 		self.to_num() > other.to_num()
 	}
-	fn ge(&self, other: &ValueData) -> bool {
+	fn ge(&self, other: &Value) -> bool {
 		self.to_num() >= other.to_num()
 	}
 }
@@ -382,57 +409,69 @@ pub trait FromValue {
 }
 impl ToValue for String {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(self.clone()))
+		Value {
+			ptr: Gc::new(VString(self.clone()))
+		}
 	}
 }
 impl FromValue for String {
 	fn from_value(v:Value) -> Result<String, &'static str> {
-		Ok(v.borrow().to_str())
+		Ok(v.to_str())
 	}
 }
 impl<'s> ToValue for &'s str {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(String::from_str(*self)))
+		Value {
+			ptr: Gc::new(VString(String::from_str(*self)))
+		}
 	}
 }
 impl ToValue for char {
 	fn to_value(&self) -> Value {
-		Gc::new(VString(String::from_char(1, *self)))
+		Value {
+			ptr: Gc::new(VString(String::from_char(1, *self)))
+		}
 	}
 }
 impl FromValue for char {
 	fn from_value(v:Value) -> Result<char, &'static str> {
-		Ok(v.borrow().to_str().as_slice().char_at(0))
+		Ok(v.to_str().as_slice().char_at(0))
 	}
 }
 impl ToValue for f64 {
 	fn to_value(&self) -> Value {
-		Gc::new(VNumber(self.clone()))
+		Value {
+			ptr: Gc::new(VNumber(*self))
+		}
 	}
 }
 impl FromValue for f64 {
 	fn from_value(v:Value) -> Result<f64, &'static str> {
-		Ok(v.borrow().to_num())
+		Ok(v.to_num())
 	}
 }
 impl ToValue for i32 {
 	fn to_value(&self) -> Value {
-		Gc::new(VInteger(self.clone()))
+		Value {
+			ptr: Gc::new(VInteger(*self))
+		}
 	}
 }
 impl FromValue for i32 {
 	fn from_value(v:Value) -> Result<i32, &'static str> {
-		Ok(v.borrow().to_int())
+		Ok(v.to_int())
 	}
 }
 impl ToValue for bool {
 	fn to_value(&self) -> Value {
-		Gc::new(VBoolean(self.clone()))
+		Value {
+			ptr: Gc::new(VBoolean(*self))
+		}
 	}
 }
 impl FromValue for bool {
 	fn from_value(v:Value) -> Result<bool, &'static str> {
-		Ok(v.borrow().is_true())
+		Ok(v.is_true())
 	}
 }
 impl<'s, T:ToValue> ToValue for &'s [T] {
@@ -459,22 +498,24 @@ impl<T:ToValue> ToValue for Vec<T> {
 }
 impl<T:FromValue> FromValue for Vec<T> {
 	fn from_value(v:Value) -> Result<Vec<T>, &'static str> {
-		let len = v.borrow().get_field_slice("length").borrow().to_int();
+		let len = v.get_field_slice("length").to_int();
 		let mut vec = Vec::with_capacity(len as uint);
 		for i in range(0, len) {
-			vec.push(try!(from_value(v.borrow().get_field(i.to_str()))))
+			vec.push(try!(from_value(v.get_field(i.to_str()))))
 		}
 		Ok(vec)
 	}
 }
 impl ToValue for NativeFunctionData {
 	fn to_value(&self) -> Value {
-		Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self)))))
+		Value {
+			ptr: Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self)))))
+		}
 	}
 }
 impl FromValue for NativeFunctionData {
 	fn from_value(v:Value) -> Result<NativeFunctionData, &'static str> {
-		match *v.borrow() {
+		match *v.ptr.borrow() {
 			VFunction(ref func) => {
 				match *func.borrow() {
 					NativeFunc(ref data) => Ok(data.data),
@@ -487,12 +528,14 @@ impl FromValue for NativeFunctionData {
 }
 impl ToValue for ObjectData {
 	fn to_value(&self) -> Value {
-		Gc::new(VObject(RefCell::new(self.clone())))
+		Value {
+			ptr: Gc::new(VObject(RefCell::new(self.clone())))
+		}
 	}
 }
 impl FromValue for ObjectData {
 	fn from_value(v:Value) -> Result<ObjectData, &'static str> {
-		match *v.borrow() {
+		match *v.ptr.borrow() {
 			VObject(ref obj) => Ok(obj.clone().borrow().deref().clone()),
 			VFunction(ref func) => {
 				Ok(match *func.borrow().deref() {
@@ -506,22 +549,45 @@ impl FromValue for ObjectData {
 }
 impl ToValue for Json {
 	fn to_value(&self) -> Value {
-		Gc::new(ValueData::from_json(self.clone()))
+		Value {
+			ptr: Gc::new(Value::from_json(self.clone()))
+		}
 	}
 }
 impl FromValue for Json {
 	fn from_value(v:Value) -> Result<Json, &'static str> {
-		Ok(v.borrow().to_json())
+		Ok(v.to_json())
 	}
 }
 impl ToValue for () {
 	fn to_value(&self) -> Value {
-		Gc::new(VNull)
+		Value {
+			ptr: Gc::new(VNull)
+		}
 	}
 }
 impl FromValue for () {
 	fn from_value(_:Value) -> Result<(), &'static str> {
 		Ok(())
+	}
+}
+impl<T:ToValue> ToValue for Option<T> {
+	fn to_value(&self) -> Value {
+		match *self {
+			Some(ref v) => v.to_value(),
+			None => Value {
+				ptr: Gc::new(VNull)
+			}
+		}
+	}
+}
+impl<T:FromValue> FromValue for Option<T> {
+	fn from_value(value:Value) -> Result<Option<T>, &'static str> {
+		Ok(if value.is_null_or_undefined() {
+			None
+		} else {
+			Some(try!(FromValue::from_value(value)))
+		})
 	}
 }
 /// A utility function that just calls FromValue::from_value

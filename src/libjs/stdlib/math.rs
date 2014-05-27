@@ -37,7 +37,7 @@ pub fn atan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 /// Get the arctangent of a numbers
 pub fn atan2(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	Ok(to_value(if args.len() >= 1 {
-		from_value::<f64>(*args.get(0)).unwrap().atan2(args.get(1).borrow().to_num())
+		from_value::<f64>(*args.get(0)).unwrap().atan2(args.get(1).to_num())
 	} else {
 		f64::NAN
 	}))
@@ -94,7 +94,7 @@ pub fn log(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 pub fn max(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let mut max = f64::NEG_INFINITY;
 	for arg in args.iter() {
-		let num = arg.borrow().to_num();
+		let num = arg.to_num();
 		max = max.max(num);
 	}
 	Ok(to_value(max))
@@ -103,7 +103,7 @@ pub fn max(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 pub fn min(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	let mut max = f64::INFINITY;
 	for arg in args.iter() {
-		let num = arg.borrow().to_num();
+		let num = arg.to_num();
 		max = max.min(num);
 	}
 	Ok(to_value(max))
@@ -156,38 +156,37 @@ pub fn tan(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Create a new `Math` object
 pub fn _create(global : Value) -> Value {
-	let math = ValueData::new_obj(Some(global));
-	let math_ptr = math.borrow();
-	math_ptr.set_field_slice("E", to_value(f64::consts::E));
-	math_ptr.set_field_slice("LN2", to_value(f64::consts::LN_2));
-	math_ptr.set_field_slice("LN10", to_value(f64::consts::LN_10));
-	math_ptr.set_field_slice("LOG2E", to_value(f64::consts::LOG2_E));
-	math_ptr.set_field_slice("LOG10E", to_value(f64::consts::LOG10_E));
-	math_ptr.set_field_slice("SQRT1_2", to_value(0.5f64.sqrt()));
-	math_ptr.set_field_slice("SQRT2", to_value(f64::consts::SQRT2));
-	math_ptr.set_field_slice("PI", to_value(f64::consts::PI));
-	math_ptr.set_field_slice("abs", to_value(abs));
-	math_ptr.set_field_slice("acos", to_value(acos));
-	math_ptr.set_field_slice("asin", to_value(asin));
-	math_ptr.set_field_slice("atan", to_value(atan));
-	math_ptr.set_field_slice("atan2", to_value(atan2));
-	math_ptr.set_field_slice("cbrt", to_value(cbrt));
-	math_ptr.set_field_slice("ceil", to_value(ceil));
-	math_ptr.set_field_slice("cos", to_value(cos));
-	math_ptr.set_field_slice("exp", to_value(exp));
-	math_ptr.set_field_slice("floor", to_value(floor));
-	math_ptr.set_field_slice("log", to_value(log));
-	math_ptr.set_field_slice("max", to_value(max));
-	math_ptr.set_field_slice("min", to_value(min));
-	math_ptr.set_field_slice("pow", to_value(pow));
-	math_ptr.set_field_slice("random", to_value(_random));
-	math_ptr.set_field_slice("round", to_value(round));
-	math_ptr.set_field_slice("sin", to_value(sin));
-	math_ptr.set_field_slice("sqrt", to_value(sqrt));
-	math_ptr.set_field_slice("tan", to_value(tan));
+	let math = Value::new_obj(Some(global));
+	math.set_field_slice("E", to_value(f64::consts::E));
+	math.set_field_slice("LN2", to_value(f64::consts::LN_2));
+	math.set_field_slice("LN10", to_value(f64::consts::LN_10));
+	math.set_field_slice("LOG2E", to_value(f64::consts::LOG2_E));
+	math.set_field_slice("LOG10E", to_value(f64::consts::LOG10_E));
+	math.set_field_slice("SQRT1_2", to_value(0.5f64.sqrt()));
+	math.set_field_slice("SQRT2", to_value(f64::consts::SQRT2));
+	math.set_field_slice("PI", to_value(f64::consts::PI));
+	math.set_field_slice("abs", to_value(abs));
+	math.set_field_slice("acos", to_value(acos));
+	math.set_field_slice("asin", to_value(asin));
+	math.set_field_slice("atan", to_value(atan));
+	math.set_field_slice("atan2", to_value(atan2));
+	math.set_field_slice("cbrt", to_value(cbrt));
+	math.set_field_slice("ceil", to_value(ceil));
+	math.set_field_slice("cos", to_value(cos));
+	math.set_field_slice("exp", to_value(exp));
+	math.set_field_slice("floor", to_value(floor));
+	math.set_field_slice("log", to_value(log));
+	math.set_field_slice("max", to_value(max));
+	math.set_field_slice("min", to_value(min));
+	math.set_field_slice("pow", to_value(pow));
+	math.set_field_slice("random", to_value(_random));
+	math.set_field_slice("round", to_value(round));
+	math.set_field_slice("sin", to_value(sin));
+	math.set_field_slice("sqrt", to_value(sqrt));
+	math.set_field_slice("tan", to_value(tan));
 	math
 }
 /// Initialise the `Math` object on the global object
 pub fn init(global:Value) {
-	global.borrow().set_field_slice("Math", _create(global));
+	global.set_field_slice("Math", _create(global));
 }

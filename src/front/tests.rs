@@ -80,7 +80,7 @@ impl Tests {
 			Ok(_) =>
 				println!("{}: {}: All tests passed successfully", file, desc),
 			Err(v) =>
-				println!("{}: {}: Failed with {}", file, desc, v.borrow())
+				println!("{}: {}: Failed with {}", file, desc, v)
 		}
 	}
 	/// Run all the tests in `path`

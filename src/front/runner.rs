@@ -38,9 +38,9 @@ impl Runner {
 			let result = engine.run(comp);
 			match result {
 				Ok(v) =>
-					println!("{}", v.borrow()),
+					println!("{}", v),
 				Err(v) =>
-					println!("Failed with {}", v.borrow())
+					println!("Failed with {}", v)
 			}
 		} else {
 			fail!("{} does not exist", script);

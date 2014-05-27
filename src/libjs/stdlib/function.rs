@@ -27,7 +27,7 @@ impl RegularFunction {
 	/// Make a new regular function
 	pub fn new(jit : jit::Function, args: Vec<String>) -> RegularFunction {
 		let mut obj = TreeMap::new();
-		obj.insert("arguments".into_strbuf(), Property::new(Gc::new(VInteger(args.len() as i32))));
+		obj.insert("arguments".into_strbuf(), Property::new(to_value(args.len() as i32)));
 		RegularFunction {object: obj, jit: jit, args: args}
 	}
 }
@@ -53,6 +53,5 @@ pub fn _create(_ : Value) -> Value {
 }
 /// Initialise the global object with the `Function` object
 pub fn init(global:Value) {
-	let global_ptr = global.borrow();
-	global_ptr.set_field_slice("Function", _create(global));
+	global.set_field_slice("Function", _create(global));
 }

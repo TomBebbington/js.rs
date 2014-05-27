@@ -42,9 +42,9 @@ impl Interactive {
 			let result = engine.run(comp);
 			match result {
 				Ok(v) =>
-					println!("{}", v.borrow()),
+					println!("{}", v),
 				Err(v) =>
-					println!("Failed with {}", v.borrow())
+					println!("Failed with {}", v)
 			}
 			print!("> ");
 		}

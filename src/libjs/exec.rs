@@ -65,7 +65,7 @@ impl JITCompiler {
 }
 impl Executor<Function> for JITCompiler {
 	fn new() -> JITCompiler {
-		let global = ValueData::new_obj(None);
+		let global = Value::new_obj(None);
 		object::init(global);
 		console::init(global);
 		math::init(global);
@@ -87,16 +87,16 @@ impl Executor<Function> for JITCompiler {
 	}
 	#[inline(always)]
 	fn set_global(&mut self, name:String, val:Value) -> Value {
-		self.global.borrow().set_field(name, val)
+		self.global.set_field(name, val)
 	}
 	#[inline(always)]
 	fn get_global(&self, name:String) -> Value {
-		self.global.borrow().get_field(name)
+		self.global.get_field(name)
 	}
 	fn make_scope(&mut self, this:Value) -> Scope {
 		let scope = Scope {
 			this: this,
-			vars: ValueData::new_obj(None)
+			vars: Value::new_obj(None)
 		};
 		self.scopes.push(scope);
 		scope
@@ -113,7 +113,9 @@ impl Executor<Function> for JITCompiler {
 			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[]);
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
 				fn create_undef_value() -> Value {
-					Gc::new(VUndefined)
+					Value {
+						ptr: Gc::new(VUndefined)
+					}
 				}
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
@@ -136,7 +138,9 @@ impl Executor<Function> for JITCompiler {
 				match expr.def {
 					ConstExpr(CNull) => {
 						fn create_null_value() -> Value {
-							Gc::new(VNull)
+							Value {
+								ptr: Gc::new(VNull)
+							}
 						}
 						func.insn_call_native0("create_null_value", create_null_value, &*create_value_sig, &[])
 					},
@@ -159,7 +163,9 @@ impl Executor<Function> for JITCompiler {
 						fn create_string_value(s: *i8) -> Value {
 							unsafe {
 								let cstr = CString::new(s, false);
-								Gc::new(VString(String::from_str(cstr.as_str().unwrap())))
+								Value{
+									ptr: Gc::new(VString(String::from_str(cstr.as_str().unwrap())))
+								}
 							}
 						}
 						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
@@ -170,7 +176,7 @@ impl Executor<Function> for JITCompiler {
 						fn find_field(obj:Value, s: *i8) -> Value {
 							unsafe {
 								let cstr = CString::new(s, false);
-								obj.borrow().get_field_slice(cstr.as_str().unwrap())
+								obj.get_field_slice(cstr.as_str().unwrap())
 							}
 						}
 						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
@@ -180,7 +186,7 @@ impl Executor<Function> for JITCompiler {
 					},
 					GetFieldExpr(ref obj, ref field) => {
 						fn find_field(obj:Value, field:Value) -> Value {
-							obj.borrow().get_field(field.borrow().to_str())
+							obj.get_field(field.to_str())
 						}
 						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t]);
 						let obj_i = compile_value(func, *obj);
@@ -232,13 +238,13 @@ impl Executor<Function> for JITCompiler {
 							UnaryPlus => return i_a,
 							UnaryMinus => {
 								fn neg_value(a:Value) -> Value {
-									Gc::new(-a.borrow())
+									-a
 								}
 								("neg", neg_value)
 							}
 							UnaryNot => {
 								fn not_value(a: Value) -> Value {
-									Gc::new(!a.borrow())
+									!a
 								}
 								("not", not_value)
 							},
@@ -254,109 +260,109 @@ impl Executor<Function> for JITCompiler {
 						let (name, op_func) = match op {
 							BinNum(OpAdd) => {
 								fn add_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() + *b.borrow())
+									a + b
 								}
 								("add", add_values)
 							},
 							BinNum(OpSub) => {
 								fn sub_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() - *b.borrow())
+									a - b
 								}
 								("sub", sub_values)
 							},
 							BinNum(OpMul) => {
 								fn mul_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() * *b.borrow())
+									a * b
 								}
 								("mul", mul_values)
 							},
 							BinNum(OpDiv) => {
 								fn div_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() / *b.borrow())
+									a / b
 								}
 								("div", div_values)
 							},
 							BinNum(OpMod) => {
 								fn mod_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() % *b.borrow())
+									a % b
 								}
 								("mod", mod_values)
 							},
 							BinBit(BitAnd) => {
 								fn and_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() & *b.borrow())
+									a & b
 								}
 								("and", and_values)
 							},
 							BinBit(BitOr) => {
 								fn or_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() | *b.borrow())
+									a | b
 								}
 								("or", or_values)
 							},
 							BinBit(BitXor) => {
 								fn xor_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() ^ *b.borrow())
+									a ^ b
 								}
 								("xor", xor_values)
 							},
 							BinBit(BitShl) => {
 								fn shl_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() << *b.borrow())
+									a << b
 								}
 								("shl", shl_values)
 							},
 							BinBit(BitShr) => {
 								fn shr_values(a: Value, b:Value) -> Value {
-									Gc::new(a.borrow() >> *b.borrow())
+									a >> b
 								}
 								("shr", shr_values)
 							},
 							BinLog(LogOr) => {
 								fn or_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow().is_true() || b.borrow().is_true())
+									to_value(a.is_true() || b.is_true())
 								}
 								("or", or_values)
 							},
 							BinLog(LogAnd) => {
 								fn and_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow().is_true() && b.borrow().is_true())
+									to_value(a.is_true() && b.is_true())
 								}
 								("and", and_values)
 							},
 							BinComp(CompEqual) | BinComp(CompStrictEqual) => {
 								fn eq_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow() == b.borrow())
+									to_value(a == b)
 								}
 								("eq", eq_values)
 							},
 							BinComp(CompNotEqual) | BinComp(CompStrictNotEqual) => {
 								fn neq_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow() != b.borrow())
+									to_value(a != b)
 								}
 								("neq", neq_values)
 							},
 							BinComp(CompLessThan) => {
 								fn lt_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow() < b.borrow())
+									to_value(a < b)
 								}
 								("lt", lt_values)
 							},
 							BinComp(CompLessThanOrEqual) => {
 								fn lte_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow() <= b.borrow())
+									to_value(a <= b)
 								}
 								("lte", lte_values)
 							},
 							BinComp(CompGreaterThan) => {
 								fn gt_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow() > b.borrow())
+									to_value(a > b)
 								}
 								("gt", gt_values)
 							},
 							BinComp(CompGreaterThanOrEqual) => {
 								fn gte_values(a: Value, b:Value) -> Value {
-									to_value(a.borrow() >= b.borrow())
+									to_value(a >= b)
 								}
 								("gte", gte_values)
 							}
@@ -365,7 +371,7 @@ impl Executor<Function> for JITCompiler {
 					},
 					IfExpr(ref cond, ref expr, None) => {
 						fn from_bool_value(v:Value) -> bool {
-							v.borrow().is_true()
+							v.is_true()
 						}
 						let from_bool_sig = Type::create_signature(CDECL, &*Types::get_bool(), &[&*value_t]);
 						let i_cond = compile_value(func, *cond);
