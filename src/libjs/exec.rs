@@ -293,6 +293,25 @@ impl Executor<Function> for JITCompiler {
 						let bufptr = wrap_str(name.as_slice());
 						func.insn_call_native2("get_local", find_field, &*find_field_sig, &[&scope, &*bufptr])
 					},
+					VarDeclExpr(ref vars) => {
+						fn set_field(obj:Value, s: *i8, val:Value) -> () {
+							unsafe {
+								let cstr = CString::new(s, false);
+								obj.set_field_slice(cstr.as_str().unwrap(), val);
+							}
+						}
+						let set_field_sig = Type::create_signature(CDECL, &*Types::get_void(), &[&*value_t, &*cstring_t, &*value_t]);
+						for tup in vars.iter() {
+							let (name, expr) = tup.clone();
+							let bufptr = wrap_str(name.as_slice());
+							let value = match expr {
+								Some(ex) => compile_value(func, &ex),
+								None => undefined()
+							};
+							func.insn_call_native3("set_local", set_field, &*set_field_sig, &[&scope, &*bufptr, &*value]);
+						}
+						undefined()
+					},
 					TypeOfExpr(ref ex) => {
 						fn get_val_type(v:Value) -> Value {
 							to_value(v.get_type())
