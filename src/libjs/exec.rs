@@ -15,6 +15,7 @@ use std::vec::Vec;
 use std::gc::Gc;
 use std::cell::RefCell;
 use std::c_str::CString;
+use std::mem::size_of;
 use jit::{Context, Function, Type, Types, CDECL};
 use jit;
 /// A variable scope
@@ -122,12 +123,12 @@ impl Executor<Function> for JITCompiler {
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
 				let cstring_t = Type::create_pointer(&*Types::get_char());
 				let create_value_sig = Type::create_signature(CDECL, &*value_t, &[]);
-				let wrap_str = |text:String| -> Box<jit::Value> {
+				let wrap_str = |text:&str| -> Box<jit::Value> {
 					let strlen_i = func.constant_int32_as_type(text.len() as i32, &*Types::get_char());
 					let bufptr = func.create_value(cstring_t);
 					func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
 					for i in range(0, text.len()) {
-						let char_i = func.constant_int32_as_type(text.as_slice().char_at(i) as i32, &*Types::get_char());
+						let char_i = func.constant_int32_as_type(text.char_at(i) as i32, &*Types::get_char());
 						func.insn_store_relative(bufptr, i as i32, char_i);
 					}
 					let null_term = func.constant_int32_as_type(0i32, &*Types::get_char());
@@ -169,7 +170,7 @@ impl Executor<Function> for JITCompiler {
 							}
 						}
 						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
-						let bufptr = wrap_str(s.clone());
+						let bufptr = wrap_str(s.as_slice());
 						func.insn_call_native1("create_string_value", create_string_value, &* create_string_sig, &[&*bufptr])
 					},
 					GetConstFieldExpr(ref obj, ref field) => {
@@ -181,7 +182,7 @@ impl Executor<Function> for JITCompiler {
 						}
 						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
 						let obj_i = compile_value(func, *obj);
-						let bufptr = wrap_str(field.clone());
+						let bufptr = wrap_str(field.as_slice());
 						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*bufptr])
 					},
 					GetFieldExpr(ref obj, ref field) => {
@@ -193,6 +194,38 @@ impl Executor<Function> for JITCompiler {
 						let field_i = compile_value(func, *field);
 						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*field_i])
 					},
+					ObjectDeclExpr(ref fields) => {
+						fn create_object_with_fields(mut c_fields: **i8, mut vals: *Value, num_fields: i32) -> Value {
+							let object = Value::new_obj(None);
+							for i in range(0, num_fields) {
+								unsafe {
+									let cstr = CString::new(*c_fields, false);
+									let field = cstr.as_str().unwrap();
+									object.set_field_slice(field, *vals);
+									c_fields = ((c_fields as uint) + size_of::<*i8>()) as **i8;
+									vals = ((vals as uint) + size_of::<Value>()) as *Value;
+								}
+							}
+							object
+						}
+						let value_ptr_t = Type::create_pointer(&*value_t);
+						let cstring_ptr_t = Type::create_pointer(&*cstring_t);
+						let create_object_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_ptr_t, &*value_ptr_t, &*Types::get_int()]);
+						let num_fields_i = func.constant_int32(fields.len() as i32);
+						let fields_i = func.create_value(cstring_ptr_t);
+						let fields_size = func.constant_int32((fields.len() as u32 * cstring_t.get_size()) as i32);
+						func.insn_store(fields_i, func.insn_alloca(fields_size));
+						let values_i = func.create_value(value_ptr_t);
+						let values_size = func.constant_int32((fields.len() as u32 * value_t.get_size()) as i32);
+						func.insn_store(values_i, func.insn_alloca(values_size));
+						let mut i = 0i32;
+						for (key, value) in fields.iter() {
+							func.insn_store_relative(fields_i, i * cstring_t.get_size() as i32, wrap_str(key.as_slice()));
+							func.insn_store_relative(values_i, i * value_t.get_size() as i32, compile_value(func, value));
+							i += 1i32;
+						}
+						func.insn_call_native3("create_object_with_fields", create_object_with_fields, &*create_object_sig, &[&*fields_i, &*values_i, &*num_fields_i])
+					}
 					/*
 					FunctionDeclExpr(ref name, ref args, ref expr) => {
 						let mut args_i = Vec::with_capacity(args.len());
