@@ -161,7 +161,6 @@ impl Drop for Context {
 }
 /// The types that a value can be
 bitflags!(
-	#[deriving(Show)]
 	flags TypeKind: i32 {
 		static Invalid		= -1,
 		static Void			= 0,
