@@ -141,6 +141,19 @@ impl Executor<Function> for JITCompiler {
 						let create_number_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_float64()]);
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
+					ReturnExpr(None) => {
+						fn create_undef_value() -> Value {
+							Gc::new(VUndefined)
+						}
+						func.insn_default_return();
+						let create_undef_sig = Type::create_signature(CDECL, &*value_t, &[]);
+						func.insn_call_native0("create_undef_value", create_undef_value, &*create_undef_sig, &[])
+					},
+					ReturnExpr(Some(ref ret)) => {
+						let i_ret = compile_value(func, *ret);
+						func.insn_return(i_ret);
+						i_ret
+					},
 					UnaryOpExpr(op, ref a) => {
 						let i_a = compile_value(func, *a);
 						let unop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);
