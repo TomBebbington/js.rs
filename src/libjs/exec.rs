@@ -132,6 +132,7 @@ impl Executor<Function> for JITCompiler {
 					func.insn_store_relative(bufptr, text.len() as i32, null_term);
 					bufptr
 				};
+				let undefined = || func.insn_call_native0("undefined", create_undef_value, &*create_value_sig, &[]);
 				match expr.def {
 					ConstExpr(CNull) => {
 						fn create_null_value() -> Value {
@@ -140,7 +141,7 @@ impl Executor<Function> for JITCompiler {
 						func.insn_call_native0("create_null_value", create_null_value, &*create_value_sig, &[])
 					},
 					ConstExpr(CUndefined) => {
-						func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[])
+						undefined()
 					},
 					ConstExpr(CBool(v)) => {
 						let create_bool_value = to_value::<bool>;
@@ -175,7 +176,16 @@ impl Executor<Function> for JITCompiler {
 						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
 						let obj_i = compile_value(func, *obj);
 						let bufptr = wrap_str(field.clone());
-						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*bufptr])
+						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*bufptr])
+					},
+					GetFieldExpr(ref obj, ref field) => {
+						fn find_field(obj:Value, field:Value) -> Value {
+							obj.borrow().get_field(field.borrow().to_str())
+						}
+						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t]);
+						let obj_i = compile_value(func, *obj);
+						let field_i = compile_value(func, *field);
+						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*field_i])
 					},
 					BlockExpr(ref block) => {
 						let last = block.last();
@@ -185,11 +195,11 @@ impl Executor<Function> for JITCompiler {
 								return comp
 							}
 						}
-						func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[])
+						undefined()
 					},
 					ReturnExpr(None) => {
 						func.insn_default_return();
-						func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[])
+						undefined()
 					},
 					ReturnExpr(Some(ref ret)) => {
 						let i_ret = compile_value(func, *ret);
