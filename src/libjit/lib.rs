@@ -104,6 +104,7 @@ extern {
 	fn jit_insn_call_native(function: *c_void, name: *c_char, native_func: *u8, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
 	fn jit_insn_call_indirect(function: *c_void, value: *c_void, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
 	fn jit_insn_alloca(function: *c_void, size: *c_void) -> *c_void;
+	fn jit_insn_uses_catcher(function: *c_void) -> c_void;
 	fn jit_dump_function (stream: *FILE, funcion: *c_void, name: *c_char);
 	fn jit_value_create_float32_constant(function: *c_void, value_type: *c_void, value: c_float) -> *c_void;
 	fn jit_value_create_float64_constant(function: *c_void, value_type: *c_void, value: f64) -> *c_void;
@@ -316,6 +317,12 @@ impl Function {
 		unsafe {
 			let value = jit_value_get_param(self._function, param as c_uint);
 			Value { _value: value }
+		}
+	}
+	/// Notify libjit that this function has a catch block in it so it can prepare
+	pub fn insn_uses_catcher(&self) {
+		unsafe {
+			jit_insn_uses_catcher(self._function);
 		}
 	}
 	/// Throw an exception from the function with the value given
