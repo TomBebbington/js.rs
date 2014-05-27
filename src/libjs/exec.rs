@@ -287,6 +287,14 @@ impl Executor<Function> for JITCompiler {
 						func.insn_throw(i_val);
 						i_val
 					},
+					TypeOfExpr(ref ex) => {
+						fn get_val_type(v:Value) -> Value {
+							to_value(v.get_type())
+						}
+						let get_val_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);
+						let i_ex = compile_value(func, *ex);
+						func.insn_call_native1("get_value_type", get_val_type, &*get_val_sig, &[&*i_ex])
+					},
 					UnaryOpExpr(op, ref a) => {
 						let i_a = compile_value(func, *a);
 						let unop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);

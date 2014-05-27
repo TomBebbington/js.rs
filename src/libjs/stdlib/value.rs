@@ -229,6 +229,17 @@ impl Value {
 			Null => VNull
 		}
 	}
+	/// Get the type of the value
+	pub fn get_type(&self) -> &'static str {
+		match *self.ptr.borrow() {
+			VNumber(_) | VInteger(_) => "number",
+			VString(_) => "string",
+			VBoolean(_) => "boolean",
+			VNull => "null",
+			VUndefined => "undefined",
+			_ => "object"
+		}
+	}
 	/// Get the value for undefined
 	pub fn undefined() -> Value {
 		Value {
