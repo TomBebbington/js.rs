@@ -223,7 +223,32 @@ impl Executor<Function> for JITCompiler {
 							i += 1i32;
 						}
 						func.insn_call_native3("create_object_with_fields", create_object_with_fields, &*create_object_sig, &[&*fields_i, &*values_i, &*num_fields_i])
-					}
+					},
+					ArrayDeclExpr(ref values) => {
+						fn create_array(mut vals: *Value, num_vals: i32) -> Value {
+							let array = Value::new_obj(None);
+							array.set_field_slice("length", to_value(num_vals));
+							for i in range(0, num_vals) {
+								unsafe {
+									array.set_field(i.to_str(), *vals);
+									vals = ((vals as uint) + size_of::<Value>()) as *Value;
+								}
+							}
+							array
+						}
+						let value_ptr_t = Type::create_pointer(&*value_t);
+						let create_array_sig = Type::create_signature(CDECL, &*value_t, &[&*value_ptr_t, &*Types::get_int()]);
+						let values_i = func.create_value(value_ptr_t);
+						let values_size = func.constant_int32((values.len() as u32 * value_t.get_size()) as i32);
+						func.insn_store(values_i, func.insn_alloca(values_size));
+						let mut i = 0i32;
+						for val in values.iter() {
+							func.insn_store_relative(values_i, i * value_t.get_size() as i32, compile_value(func, val));
+							i += 1i32;
+						}
+						let num_values = func.constant_int32(values.len() as i32);
+						func.insn_call_native2("create_array", create_array, &*create_array_sig, &[&*values_i, &*num_values])
+					},
 					/*
 					FunctionDeclExpr(ref name, ref args, ref expr) => {
 						let mut args_i = Vec::with_capacity(args.len());
