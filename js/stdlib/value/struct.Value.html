@@ -39,7 +39,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='struct' href=''>Value</a><a class='source' id='src-2358' href='../../../src/js/src/libjs/stdlib/value.rs.html#17-20'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='struct' href=''>Value</a><a class='source' id='src-2863' href='../../../src/js/src/libjs/stdlib/value.rs.html#17-20'>[src]</a></h1>
 <pre class='rust struct'>pub struct Value {
     pub ptr: <a class='struct' href='../../../std/gc/struct.Gc.html' title='std::gc::Gc'>Gc</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt;,
 }</pre><div class='docblock'><p>A Garbage-collected Javascript value as represented in the interpreter</p>
@@ -81,6 +81,8 @@
 <div class='docblock'><p>Set the property in the value</p>
 </div><h4 id='method.from_json' class='method'><code>fn <a href='#method.from_json' class='fnname'>from_json</a>(json: <a class='type' href='../../../serialize/json/type.Json.html' title='serialize::json::Json'>Json</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
 <div class='docblock'><p>Convert from a JSON value to a JS value</p>
+</div><h4 id='method.get_type' class='method'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; &amp;'static str</code></h4>
+<div class='docblock'><p>Get the type of the value</p>
 </div><h4 id='method.undefined' class='method'><code>fn <a href='#method.undefined' class='fnname'>undefined</a>() -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Get the value for undefined</p>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../../core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='../../../core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='../../../core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
