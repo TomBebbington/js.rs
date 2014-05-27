@@ -106,10 +106,6 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn compile(&self, expr: &Expr) -> Box<Function> {
 		self.with_builder(|| {
-			let valuedata_t = Types::get_int();
-			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
-			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[]);
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
 				let create_undef_value = Value::undefined;
 				let valuedata_t = Types::get_int();
@@ -130,6 +126,9 @@ impl Executor<Function> for JITCompiler {
 					bufptr
 				};
 				let undefined = || func.insn_call_native0("undefined", create_undef_value, &*create_value_sig, &[]);
+				let global = func.get_param(0);
+				let scope = func.get_param(1);
+				let this = func.get_param(2);
 				match expr.def {
 					ConstExpr(CNull) => {
 						fn create_null_value() -> Value {
@@ -446,6 +445,10 @@ impl Executor<Function> for JITCompiler {
 					_ => fail!("Unimplemented {}", expr)
 				}
 			}
+			let valuedata_t = Types::get_int();
+			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
+			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
+			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t, &*value_t]);
 			let func = self.context.create_function(&*default_sig_t);
 			let value = compile_value(func, expr);
 			func.insn_return(&*value);
@@ -457,7 +460,8 @@ impl Executor<Function> for JITCompiler {
 		})
 	}
 	fn run(&mut self, comp:Box<Function>) -> ResultValue {
-		let func: fn() -> Value = comp.closure();
-		return Ok(func());
+		// global fn(global, scope, this)
+		let func: fn(Value, Value, Value) -> Value = comp.closure();
+		return Ok(func(self.global, self.global, self.global));
 	}
 }
