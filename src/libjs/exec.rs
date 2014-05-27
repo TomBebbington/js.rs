@@ -109,7 +109,7 @@ impl Executor<Function> for JITCompiler {
 			let valuedata_t = Types::get_int();
 			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-			let default_sig_t = Type::create_signature(CDECL, Types::get_void(), &[&*valuedata_ptr_t]);
+			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[]);
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
@@ -283,17 +283,14 @@ impl Executor<Function> for JITCompiler {
 				}
 			}
 			let func = self.context.create_function(&*default_sig_t);
-			let result = func.get_param(0);
 			let value = compile_value(func, expr);
-			func.insn_store_relative(&result, 0, &*value);
+			func.insn_return(&*value);
 			func.compile();
 			func
 		})
 	}
 	fn run(&mut self, comp:Box<Function>) -> ResultValue {
-		let func: fn(&mut Value) = comp.closure();
-		let mut rv: Value = Gc::new(VUndefined);
-		func(&mut rv);
-		return Ok(rv);
+		let func: fn() -> Value = comp.closure();
+		return Ok(func());
 	}
 }
