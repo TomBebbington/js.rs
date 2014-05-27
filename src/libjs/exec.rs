@@ -154,6 +154,11 @@ impl Executor<Function> for JITCompiler {
 						func.insn_return(i_ret);
 						i_ret
 					},
+					ThrowExpr(ref val) => {
+						let i_val = compile_value(func, *val);
+						func.insn_throw(i_val);
+						i_val
+					}
 					UnaryOpExpr(op, ref a) => {
 						let i_a = compile_value(func, *a);
 						let unop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);

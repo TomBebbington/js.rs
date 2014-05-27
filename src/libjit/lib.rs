@@ -71,6 +71,7 @@ extern {
 	fn jit_value_get_param(function: *c_void, param: c_uint) -> *c_void;
 	fn jit_value_get_type(val: *c_void) -> *c_void;
 	fn jit_insn_return(function: *c_void, value: *c_void);
+	fn jit_insn_throw(function: *c_void, value: *c_void);
 	fn jit_insn_default_return(function: *c_void);
 	fn jit_function_apply(function: *c_void, args: **c_void, return_area: *mut c_void);
 	fn jit_insn_add(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
@@ -291,6 +292,12 @@ impl Function {
 		unsafe {
 			let value = jit_value_get_param(self._function, param as c_uint);
 			Value { _value: value }
+		}
+	}
+	/// Throw an exception from the function with the value given
+	pub fn insn_throw(&self, retval: &Value) {
+		unsafe {
+			jit_insn_throw(self._function, retval._value);
 		}
 	}
 	/// Return from the function with the value given
