@@ -14,6 +14,7 @@ use collections::treemap::TreeMap;
 use std::vec::Vec;
 use std::gc::Gc;
 use std::cell::RefCell;
+use std::c_str::CString;
 use jit::{Context, Function, Type, Types, CDECL};
 use jit;
 /// A variable scope
@@ -140,6 +141,29 @@ impl Executor<Function> for JITCompiler {
 						let create_number_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_float64()]);
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
+					ConstExpr(CString(ref s)) => {
+						let cstring_t = Type::create_pointer(&*Types::get_char());
+						fn create_string_value(s: *i8) -> Value {
+							unsafe {
+								let cstr = CString::new(s, false);
+								match cstr.as_str() {
+									Some(v) => Gc::new(VString(String::from_str(v))),
+									None => Gc::new(VUndefined)
+								}
+							}
+						}
+						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
+						let strlen_i = func.constant_int32_as_type(s.len() as i32, &*Types::get_char());
+						let bufptr = func.create_value(cstring_t);
+						func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
+						for i in range(0, s.len()) {
+							let char_i = func.constant_int32_as_type(s.as_slice().char_at(i) as i32, &*Types::get_char());
+							func.insn_store_relative(bufptr, i as i32, char_i);
+						}
+						let null_term = func.constant_int32_as_type(0i32, &*Types::get_char());
+						func.insn_store_relative(bufptr, s.len() as i32, null_term);
+						func.insn_call_native1("create_string_value", create_string_value, &* create_string_sig, &[&*bufptr])
+					},
 					BlockExpr(ref block) => {
 						let last = block.last();
 						for expr in block.iter() {
@@ -163,7 +187,7 @@ impl Executor<Function> for JITCompiler {
 						let i_val = compile_value(func, *val);
 						func.insn_throw(i_val);
 						i_val
-					}
+					},
 					UnaryOpExpr(op, ref a) => {
 						let i_a = compile_value(func, *a);
 						let unop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);
@@ -322,6 +346,9 @@ impl Executor<Function> for JITCompiler {
 			let func = self.context.create_function(&*default_sig_t);
 			let value = compile_value(func, expr);
 			func.insn_return(&*value);
+			func.dump("js.rs");
+			func.set_optimization_level(5);
+			func.set_recompilable();
 			func.compile();
 			func
 		})
