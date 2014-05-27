@@ -282,6 +282,7 @@ impl Executor<Function> for JITCompiler {
 						func.insn_throw(i_val);
 						i_val
 					},
+					LocalExpr(ref name) if name.as_slice() == "this" => box this,
 					LocalExpr(ref name) => {
 						fn find_field(obj:Value, s: *i8) -> Value {
 							unsafe {
