@@ -63,6 +63,7 @@ extern {
 	fn jit_function_compile(function: *c_void);
 	fn jit_function_set_optimization_level(function: *c_void, level: c_uint);
 	fn jit_function_set_recompilable(function: *c_void);
+	fn jit_function_get_context(function: *c_void) -> *c_void;
 	fn jit_type_create_signature(abi: c_int, return_type: *c_void, params: **c_void, num_params: c_uint, incref: c_int) -> *c_void;
 	fn jit_type_create_struct(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
 	fn jit_type_create_union(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
@@ -101,6 +102,7 @@ extern {
 	fn jit_insn_store(function: *c_void, dest: *c_void, src: *c_void);
 	fn jit_insn_store_relative(function: *c_void, dest: *c_void, offset: c_int, src: *c_void);
 	fn jit_insn_call_native(function: *c_void, name: *c_char, native_func: *u8, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
+	fn jit_insn_call_indirect(function: *c_void, value: *c_void, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
 	fn jit_insn_alloca(function: *c_void, size: *c_void) -> *c_void;
 	fn jit_dump_function (stream: *FILE, funcion: *c_void, name: *c_char);
 	fn jit_value_create_float32_constant(function: *c_void, value_type: *c_void, value: c_float) -> *c_void;
@@ -255,6 +257,7 @@ impl Type {
 		}
 	}
 }
+#[deriving(Clone)]
 /// A Function to JIT
 pub struct Function {
 	_context: *Context,
@@ -273,6 +276,13 @@ impl Function {
 		unsafe {
 			let value = f(self._function, value._value);
 			box Value { _value: value }
+		}
+	}
+	/// Get the context this function was made i
+	pub fn get_context(&self) -> Box<Context> {
+		unsafe {
+			let context = jit_function_get_context(self._function);
+			box Context {_context: context }
 		}
 	}
 	/// Set the optimization level of the function, where the bigger the level, the more effort should be spent optimising
@@ -444,6 +454,21 @@ impl Function {
 		unsafe {
 			let labels_ptr: *c_void = transmute(conv_labels.as_slice().unsafe_ref(0));
 			jit_insn_jump_table(self._function, value._value, labels_ptr, labels.len() as u32);
+		}
+	}
+	/// Make an instruction that calls a function that has the signature given with some arguments
+	pub fn insn_call_indirect(&self, func:&Function, signature: &Type, args: &[&Value]) -> Box<Value> {
+		unsafe {
+			let mut as_: Vec<*c_void> = vec!();
+
+			for arg in args.iter() {
+				as_.push(arg._value);
+			}
+
+			let args = if as_.len() > 0 { as_.as_ptr() } else { 0 as **c_void };
+			box Value {
+				_value: jit_insn_call_indirect(self._function, func._function, signature._type, args, as_.len() as c_uint, JitCallNothrow as c_int)
+			}
 		}
 	}
 	/// Make an instruction that calls a native function that has the signature given with some arguments

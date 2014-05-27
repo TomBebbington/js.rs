@@ -187,6 +187,20 @@ impl Executor<Function> for JITCompiler {
 						let field_i = compile_value(func, *field);
 						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*field_i])
 					},
+					/*
+					FunctionDeclExpr(ref name, ref args, ref expr) => {
+						let mut args_i = Vec::with_capacity(args.len());
+						let mut arg_types = Vec::with_capacity(args.len());
+						for _ in range(0, args.len()) {
+							arg_types.push(&*value_t);
+						}
+						let sig_t = Type::create_signature(CDECL, &*value_t, arg_types.as_slice());
+						let new_func = func.get_context().create_function(&*sig_t);
+						let value = compile_value(new_func, &**expr);
+						new_func.insn_return(&*value);
+						let make_func_sig_t = Type::create_signature(CDECL, &*value_t, &[&*sig_t])
+					},
+					*/
 					BlockExpr(ref block) => {
 						let last = block.last();
 						for expr in block.iter() {

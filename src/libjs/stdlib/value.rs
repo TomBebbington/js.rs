@@ -250,7 +250,7 @@ impl fmt::Show for ValueData {
 						write!(f, "{}", "function() { [native code] }")
 					},
 					RegularFunc(rf) => {
-						write!(f, "function({}){}", rf.args.connect(", "), rf.expr)
+						write!(f, "function({})\\{...\\}", rf.args.connect(", "))
 					}
 				}
 			}

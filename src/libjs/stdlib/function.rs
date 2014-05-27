@@ -3,6 +3,7 @@ use stdlib::value::{Value, VInteger, ResultValue, to_value};
 use syntax::ast::expr::Expr;
 use collections::treemap::TreeMap;
 use std::gc::Gc;
+use jit;
 pub type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
 #[deriving(Clone)]
 /// A Javascript function
@@ -17,17 +18,17 @@ pub enum Function {
 pub struct RegularFunction {
 	/// The fields associated with the function
 	pub object : ObjectData,
-	/// This function's expression
-	pub expr : Expr,
+	/// This function's JIT representation
+	pub jit : jit::Function,
 	/// The argument names of the function
 	pub args : Vec<String>
 }
 impl RegularFunction {
 	/// Make a new regular function
-	pub fn new(expr : Expr, args: Vec<String>) -> RegularFunction {
+	pub fn new(jit : jit::Function, args: Vec<String>) -> RegularFunction {
 		let mut obj = TreeMap::new();
 		obj.insert("arguments".into_strbuf(), Property::new(Gc::new(VInteger(args.len() as i32))));
-		RegularFunction {object: obj, expr: expr, args: args}
+		RegularFunction {object: obj, jit: jit, args: args}
 	}
 }
 #[deriving(Clone)]
