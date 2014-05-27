@@ -111,11 +111,7 @@ impl Executor<Function> for JITCompiler {
 			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
 			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[]);
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
-				fn create_undef_value() -> Value {
-					Value {
-						ptr: Gc::new(VUndefined)
-					}
-				}
+				let create_undef_value = Value::undefined;
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
