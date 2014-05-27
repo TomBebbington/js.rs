@@ -61,6 +61,8 @@ extern {
 	fn jit_context_build_end(context: *c_void);
 	fn jit_function_create(context: *c_void, signature: *c_void) -> *c_void;
 	fn jit_function_compile(function: *c_void);
+	fn jit_function_set_optimization_level(function: *c_void, level: c_uint);
+	fn jit_function_set_recompilable(function: *c_void);
 	fn jit_type_create_signature(abi: c_int, return_type: *c_void, params: **c_void, num_params: c_uint, incref: c_int) -> *c_void;
 	fn jit_type_create_struct(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
 	fn jit_type_create_union(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
@@ -271,6 +273,18 @@ impl Function {
 		unsafe {
 			let value = f(self._function, value._value);
 			box Value { _value: value }
+		}
+	}
+	/// Set the optimization level of the function, where the bigger the level, the more effort should be spent optimising
+	pub fn set_optimization_level(&self, level: c_uint) {
+		unsafe {
+			jit_function_set_optimization_level(self._function, level);
+		}
+	}
+	/// Make this funcition a candidate for recompilation
+	pub fn set_recompilable(&self) {
+		unsafe {
+			jit_function_set_recompilable(self._function);
 		}
 	}
 	/// Dump the function onto stdout
