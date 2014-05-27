@@ -95,6 +95,7 @@ extern {
 	fn jit_insn_ne(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
 	fn jit_insn_branch_if(function: *c_void, value: *c_void, label: *mut c_void);
 	fn jit_insn_branch_if_not(function: *c_void, value: *c_void, label: *mut c_void);
+	fn jit_insn_jump_table(function: *c_void, value: *c_void, labels: *c_void, num_labels: c_uint);
 	fn jit_insn_store(function: *c_void, dest: *c_void, src: *c_void);
 	fn jit_insn_store_relative(function: *c_void, dest: *c_void, offset: c_int, src: *c_void);
 	fn jit_insn_call_native(function: *c_void, name: *c_char, native_func: *u8, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
@@ -418,6 +419,17 @@ impl Function {
 		unsafe {
 			let label_ptr: *mut c_void = transmute(&label._label);
 			jit_insn_branch_if_not(self._function, value._value, label_ptr);
+		}
+	}
+	/// Make an instruction that branches to a label in the table
+	pub fn insn_jump_table(&self, value: &Value, labels: &[Label]) {
+		let mut conv_labels = Vec::with_capacity(labels.len());
+		for label in labels.iter() {
+			conv_labels.push(label._label);
+		}
+		unsafe {
+			let labels_ptr: *c_void = transmute(conv_labels.as_slice().unsafe_ref(0));
+			jit_insn_jump_table(self._function, value._value, labels_ptr, labels.len() as u32);
 		}
 	}
 	/// Make an instruction that calls a native function that has the signature given with some arguments

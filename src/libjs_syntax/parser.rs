@@ -131,8 +131,8 @@ impl Parser {
 				let cond = try!(self.parse());
 				try!(self.expect(TCloseParen, "if block"));
 				let expr = try!(self.parse());
-				let next = try!(self.get_token(self.pos + 1));
-				Ok(Some(mk!(IfExpr(box cond, box expr, if next.data == TIdent("else".to_strbuf()) {
+				let next = self.get_token(self.pos + 1);
+				Ok(Some(mk!(IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TIdent("else".to_strbuf()) {
 					self.pos += 2;
 					Some(box try!(self.parse()))
 				} else {

@@ -111,23 +111,22 @@ impl Executor<Function> for JITCompiler {
 			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
 			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[]);
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
+				fn create_undef_value() -> Value {
+					Gc::new(VUndefined)
+				}
 				let valuedata_t = Types::get_int();
 				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
+				let create_value_sig = Type::create_signature(CDECL, &*value_t, &[]);
 				match expr.def {
 					ConstExpr(CNull) => {
 						fn create_null_value() -> Value {
 							Gc::new(VNull)
 						}
-						let create_null_sig = Type::create_signature(CDECL, &*value_t, &[]);
-						func.insn_call_native0("create_null_value", create_null_value, &*create_null_sig, &[])
+						func.insn_call_native0("create_null_value", create_null_value, &*create_value_sig, &[])
 					},
 					ConstExpr(CUndefined) => {
-						fn create_undef_value() -> Value {
-							Gc::new(VUndefined)
-						}
-						let create_undef_sig = Type::create_signature(CDECL, &*value_t, &[]);
-						func.insn_call_native0("create_undef_value", create_undef_value, &*create_undef_sig, &[])
+						func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[])
 					},
 					ConstExpr(CBool(v)) => {
 						let create_bool_value = to_value::<bool>;
@@ -142,9 +141,6 @@ impl Executor<Function> for JITCompiler {
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
 					BlockExpr(ref block) => {
-						fn create_undef_value() -> Value {
-							Gc::new(VUndefined)
-						}
 						let last = block.last();
 						for expr in block.iter() {
 							let comp = compile_value(func, expr);
@@ -152,16 +148,11 @@ impl Executor<Function> for JITCompiler {
 								return comp
 							}
 						}
-						let create_undef_sig = Type::create_signature(CDECL, &*value_t, &[]);
-						func.insn_call_native0("create_undef_value", create_undef_value, &*create_undef_sig, &[])
+						func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[])
 					},
 					ReturnExpr(None) => {
-						fn create_undef_value() -> Value {
-							Gc::new(VUndefined)
-						}
 						func.insn_default_return();
-						let create_undef_sig = Type::create_signature(CDECL, &*value_t, &[]);
-						func.insn_call_native0("create_undef_value", create_undef_value, &*create_undef_sig, &[])
+						func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[])
 					},
 					ReturnExpr(Some(ref ret)) => {
 						let i_ret = compile_value(func, *ret);
@@ -310,6 +301,20 @@ impl Executor<Function> for JITCompiler {
 							}
 						};
 						func.insn_call_native2(name, op_func, binop_sig, &[&*i_a, &*i_b])
+					},
+					IfExpr(ref cond, ref expr, None) => {
+						fn from_bool_value(v:Value) -> bool {
+							v.borrow().is_true()
+						}
+						let from_bool_sig = Type::create_signature(CDECL, &*Types::get_bool(), &[&*value_t]);
+						let i_cond = compile_value(func, *cond);
+						let i_cond_bool = func.insn_call_native1("to_bool", from_bool_value, from_bool_sig, &[&*i_cond]);
+						let value = func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[]);
+						let mut done_label = jit::Label::new();
+						func.insn_branch_if_not(i_cond_bool, done_label);
+						func.insn_store(value, compile_value(func, *expr));
+						func.insn_set_label(done_label);
+						value
 					},
 					_ => fail!("Unimplemented {}", expr)
 				}
