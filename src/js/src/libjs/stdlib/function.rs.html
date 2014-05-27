@@ -93,14 +93,11 @@
 <span id='53'>53</span>
 <span id='54'>54</span>
 <span id='55'>55</span>
-<span id='56'>56</span>
-<span id='57'>57</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>ObjectData</span>, <span class='ident'>Property</span>};
-<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>VInteger</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
-<span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>expr</span>::<span class='ident'>Expr</span>;
+<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>treemap</span>::<span class='ident'>TreeMap</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>Gc</span>;
+<span class='kw'>use</span> <span class='ident'>jit</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>NativeFunctionData</span> <span class='op'>=</span> <span class='kw'>fn</span>(<span class='ident'>Value</span>, <span class='ident'>Value</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span>;
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='doccomment'>/// A Javascript function
@@ -115,17 +112,17 @@
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RegularFunction</span> {
 	<span class='doccomment'>/// The fields associated with the function
 </span>	<span class='kw'>pub</span> <span class='ident'>object</span> : <span class='ident'>ObjectData</span>,
-	<span class='doccomment'>/// This function&#39;s expression
-</span>	<span class='kw'>pub</span> <span class='ident'>expr</span> : <span class='ident'>Expr</span>,
+	<span class='doccomment'>/// This function&#39;s JIT representation
+</span>	<span class='kw'>pub</span> <span class='ident'>jit</span> : <span class='ident'>jit</span>::<span class='ident'>Function</span>,
 	<span class='doccomment'>/// The argument names of the function
-</span>	<span class='kw'>pub</span> <span class='ident'>args</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>
+</span>	<span class='kw'>pub</span> <span class='ident'>args</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>
 }
 <span class='kw'>impl</span> <span class='ident'>RegularFunction</span> {
 	<span class='doccomment'>/// Make a new regular function
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>expr</span> : <span class='ident'>Expr</span>, <span class='ident'>args</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>RegularFunction</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>jit</span> : <span class='ident'>jit</span>::<span class='ident'>Function</span>, <span class='ident'>args</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>RegularFunction</span> {
 		<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>TreeMap</span>::<span class='ident'>new</span>();
-		<span class='ident'>obj</span>.<span class='ident'>insert</span>(<span class='string'>&quot;arguments&quot;</span>.<span class='ident'>into_strbuf</span>(), <span class='ident'>Property</span>::<span class='ident'>new</span>(<span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VInteger</span>(<span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>))));
-		<span class='ident'>RegularFunction</span> {<span class='ident'>object</span>: <span class='ident'>obj</span>, <span class='ident'>expr</span>: <span class='ident'>expr</span>, <span class='ident'>args</span>: <span class='ident'>args</span>}
+		<span class='ident'>obj</span>.<span class='ident'>insert</span>(<span class='string'>&quot;arguments&quot;</span>.<span class='ident'>into_strbuf</span>(), <span class='ident'>Property</span>::<span class='ident'>new</span>(<span class='ident'>to_value</span>(<span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>)));
+		<span class='ident'>RegularFunction</span> {<span class='ident'>object</span>: <span class='ident'>obj</span>, <span class='ident'>jit</span>: <span class='ident'>jit</span>, <span class='ident'>args</span>: <span class='ident'>args</span>}
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
@@ -150,8 +147,7 @@
 }
 <span class='doccomment'>/// Initialise the global object with the `Function` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
-	<span class='kw'>let</span> <span class='ident'>global_ptr</span> <span class='op'>=</span> <span class='ident'>global</span>.<span class='ident'>borrow</span>();
-	<span class='ident'>global_ptr</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Function&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
+	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Function&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
 }
 </pre>
 </section>

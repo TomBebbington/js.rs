@@ -167,7 +167,7 @@
 <span class='doccomment'>/// A single token of Javacript code - a single word, symbol or constant
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>TokenData</span> {
 	<span class='doccomment'>/// A string literal
-</span>	<span class='ident'>TString</span>(<span class='ident'>StrBuf</span>),
+</span>	<span class='ident'>TString</span>(<span class='ident'>String</span>),
 	<span class='doccomment'>/// A semicolon (;)
 </span>	<span class='ident'>TSemicolon</span>,
 	<span class='doccomment'>/// A colon
@@ -179,7 +179,7 @@
 	<span class='doccomment'>/// A comma
 </span>	<span class='ident'>TComma</span>,
 	<span class='doccomment'>/// An identity literal
-</span>	<span class='ident'>TIdent</span>(<span class='ident'>StrBuf</span>),
+</span>	<span class='ident'>TIdent</span>(<span class='ident'>String</span>),
 	<span class='doccomment'>/// An opening bracket
 </span>	<span class='ident'>TOpenParen</span>,
 	<span class='doccomment'>/// A closing bracket
@@ -205,7 +205,7 @@
 	<span class='doccomment'>/// An assign operation combined with something else
 </span>	<span class='ident'>TAssignOp</span>(<span class='ident'>BinOp</span>),
 	<span class='doccomment'>/// A comment
-</span>	<span class='ident'>TComment</span>(<span class='ident'>StrBuf</span>)
+</span>	<span class='ident'>TComment</span>(<span class='ident'>String</span>)
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>TokenData</span> {
 	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {

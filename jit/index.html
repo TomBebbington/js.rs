@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The jit library documentation.">
+
+    <title>jit - Rust</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+          rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+</head>
+<body>
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <section class="sidebar">
+        
+
+        <p class='location'></p>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Search documentation..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'>Crate <a class='mod' href=''>jit</a><a class='stability Stable' title=''>Stable</a><a class='source' id='src-0' href='../src/jit/src/libjit/lib.rs.html#26-647'>[src]</a></h1>
+<div class='docblock'><p>This crate wraps LibJIT</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr>
+                        <td><a class='struct' href='struct.Context.html'
+                               title='jit::Context'>Context</a></td>
+                        <td class='docblock short'><p>Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.Function.html'
+                               title='jit::Function'>Function</a></td>
+                        <td class='docblock short'><p>A Function to JIT</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.Label.html'
+                               title='jit::Label'>Label</a></td>
+                        <td class='docblock short'><p>A label in the code that can be branched to in instructions</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.Type.html'
+                               title='jit::Type'>Type</a></td>
+                        <td class='docblock short'><p>A Type of a value to JIT</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.TypeKind.html'
+                               title='jit::TypeKind'>TypeKind</a></td>
+                        <td class='docblock short'></td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.Types.html'
+                               title='jit::Types'>Types</a></td>
+                        <td class='docblock short'><p>Quick retrieval of common types</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.Value.html'
+                               title='jit::Value'>Value</a></td>
+                        <td class='docblock short'><p>A Value that is being JITed</p>
+</td>
+                    </tr>
+                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                    <tr>
+                        <td><a class='type' href='type.ABI.html'
+                               title='jit::ABI'>ABI</a></td>
+                        <td class='docblock short'><p>A platform&#39;s application binary interface</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='type' href='type.CallFlags.html'
+                               title='jit::CallFlags'>CallFlags</a></td>
+                        <td class='docblock short'><p>Call flags to a function</p>
+</td>
+                    </tr>
+                </table><h2 id='statics' class='section-header'><a href="#statics">Statics</a></h2>
+<table>
+                    <tr>
+                        <td><code>pub static FirstTagged: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Float32: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Float64: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Int: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Invalid: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Long: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static MaxPrimitive: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static NFloat: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static NInt: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static NUInt: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Pointer: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static SByte: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Short: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Signature: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Struct: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static UByte: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static UInt: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static ULong: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static UShort: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Union: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                
+                    <tr>
+                        <td><code>pub static Void: <a class='struct' href='../jit/struct.TypeKind.html' title='jit::TypeKind'>TypeKind</a></code><code> = </code><code>BitFlags { bits: $value }</code></td>
+                        <td class='docblock'>&nbsp;</td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&uarr;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&darr;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    <script>
+        var rootPath = "../";
+        var currentCrate = "jit";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    <script async src="../search-index.js"></script>
+</body>
+</html>

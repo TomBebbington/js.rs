@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The jit library documentation.">
+
+    <title>jit::Types - Rust</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+          rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+</head>
+<body>
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <section class="sidebar">
+        
+
+        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct current' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Search documentation..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Types</a><a class='source' id='src-3821' href='../src/jit/src/libjit/lib.rs.html#617'>[src]</a></h1>
+<pre class='rust struct'>pub struct Types;</pre><div class='docblock'><p>Quick retrieval of common types</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Types.html' title='jit::Types'>Types</a></code></h3><div class='methods'><h4 id='method.get_void' class='method'><code>fn <a href='#method.get_void' class='fnname'>get_void</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>Void type</p>
+</div><h4 id='method.get_int' class='method'><code>fn <a href='#method.get_int' class='fnname'>get_int</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>Integer type</p>
+</div><h4 id='method.get_bool' class='method'><code>fn <a href='#method.get_bool' class='fnname'>get_bool</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>Bool type</p>
+</div><h4 id='method.get_char' class='method'><code>fn <a href='#method.get_char' class='fnname'>get_char</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>Character type</p>
+</div><h4 id='method.get_float32' class='method'><code>fn <a href='#method.get_float32' class='fnname'>get_float32</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>32-bit floating point type</p>
+</div><h4 id='method.get_float64' class='method'><code>fn <a href='#method.get_float64' class='fnname'>get_float64</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>64-bit floating point type</p>
+</div><h4 id='method.get_void_ptr' class='method'><code>fn <a href='#method.get_void_ptr' class='fnname'>get_void_ptr</a>() -&gt; <a class='struct' href='../alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
+<div class='docblock'><p>A void pointer, which can represent any kind of pointer</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&uarr;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&darr;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    <script>
+        var rootPath = "../";
+        var currentCrate = "jit";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    <script async src="../search-index.js"></script>
+</body>
+</html>

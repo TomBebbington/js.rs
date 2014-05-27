@@ -237,9 +237,9 @@
 	<span class='doccomment'>/// Run several expressions from top-to-bottom
 </span>	<span class='ident'>BlockExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Load a reference to a value
-</span>	<span class='ident'>LocalExpr</span>(<span class='ident'>StrBuf</span>),
+</span>	<span class='ident'>LocalExpr</span>(<span class='ident'>String</span>),
 	<span class='doccomment'>/// Gets the constant field of a value
-</span>	<span class='ident'>GetConstFieldExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>StrBuf</span>),
+</span>	<span class='ident'>GetConstFieldExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>String</span>),
 	<span class='doccomment'>/// Gets the field of a value
 </span>	<span class='ident'>GetFieldExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Call a function with some values
@@ -251,13 +251,13 @@
 	<span class='doccomment'>/// Run blocks whose cases match the expression
 </span>	<span class='ident'>SwitchExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
 	<span class='doccomment'>/// Create an object out of the binary tree given
-</span>	<span class='ident'>ObjectDeclExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span>, <span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
+</span>	<span class='ident'>ObjectDeclExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>),
 	<span class='doccomment'>/// Create an array with items inside
 </span>	<span class='ident'>ArrayDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Create a function with the given name, arguments, and expression
-</span>	<span class='ident'>FunctionDeclExpr</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
+</span>	<span class='ident'>FunctionDeclExpr</span>(<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Create an arrow function with the given arguments and expression
-</span>	<span class='ident'>ArrowFunctionDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
+</span>	<span class='ident'>ArrowFunctionDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Construct an object from the function and arguments given
 </span>	<span class='ident'>ConstructExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Return the expression from a function
@@ -267,7 +267,7 @@
 	<span class='doccomment'>/// Assign an expression to a value
 </span>	<span class='ident'>AssignExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>, <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>),
 	<span class='doccomment'>/// A variable declaration
-</span>	<span class='ident'>VarDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>StrBuf</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>),
+</span>	<span class='ident'>VarDeclExpr</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>String</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>),
 	<span class='doccomment'>/// Return a string representing the type of the given expression
 </span>	<span class='ident'>TypeOfExpr</span>(<span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)
 }
@@ -339,7 +339,7 @@
 	}
 }
 
-<span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>StrBuf</span>, <span class='ident'>Expr</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Expr</span><span class='op'>&gt;</span> {
 	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
 		<span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;{ &quot;</span>));
 		<span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>last</span>() {

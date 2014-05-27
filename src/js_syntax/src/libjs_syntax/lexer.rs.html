@@ -460,7 +460,6 @@
 <span id='420'>420</span>
 <span id='421'>421</span>
 <span id='422'>422</span>
-<span id='423'>423</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>token</span>::{<span class='ident'>TIdent</span>, <span class='ident'>TNumber</span>, <span class='ident'>TString</span>, <span class='ident'>TSemicolon</span>, <span class='ident'>TComment</span>, <span class='ident'>TColon</span>, <span class='ident'>TDot</span>, <span class='ident'>TEqual</span>, <span class='ident'>TOpenParen</span>, <span class='ident'>TCloseParen</span>, <span class='ident'>TComma</span>, <span class='ident'>TOpenBlock</span>, <span class='ident'>TCloseBlock</span>, <span class='ident'>TOpenArray</span>, <span class='ident'>TCloseArray</span>, <span class='ident'>TQuestion</span>, <span class='ident'>TBinOp</span>, <span class='ident'>TAssignOp</span>, <span class='ident'>TUnaryOp</span>, <span class='ident'>TArrow</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>token</span>::{<span class='ident'>Token</span>, <span class='ident'>TokenData</span>};
@@ -471,7 +470,6 @@
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>op</span>::{<span class='ident'>UnaryNot</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>op</span>::{<span class='ident'>BinNum</span>, <span class='ident'>BinBit</span>, <span class='ident'>BinComp</span>, <span class='ident'>BinLog</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>io</span>::{<span class='ident'>BufReader</span>, <span class='ident'>BufferedReader</span>, <span class='ident'>Buffer</span>, <span class='ident'>IoResult</span>, <span class='ident'>EndOfFile</span>};
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>strbuf</span>::<span class='ident'>StrBuf</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>char</span>::<span class='ident'>from_u32</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>from_str_radix</span>;
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
@@ -511,7 +509,7 @@
 	<span class='doccomment'>/// The reader
 </span>	<span class='ident'>buffer</span>: <span class='ident'>B</span>,
 	<span class='doccomment'>/// The peeked character buffer
-</span>	<span class='ident'>peek_buffer</span>: <span class='ident'>StrBuf</span>
+</span>	<span class='ident'>peek_buffer</span>: <span class='ident'>String</span>
 }
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>B</span>:<span class='ident'>Buffer</span><span class='op'>&gt;</span> <span class='ident'>Lexer</span><span class='op'>&lt;</span><span class='ident'>B</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// Creates a new lexer with empty buffers
@@ -521,7 +519,7 @@
 			<span class='ident'>line_number</span>: <span class='number'>1</span>,
 			<span class='ident'>column_number</span>: <span class='number'>0</span>,
 			<span class='ident'>buffer</span>: <span class='ident'>buffer</span>,
-			<span class='ident'>peek_buffer</span>: <span class='ident'>StrBuf</span>::<span class='ident'>new</span>()
+			<span class='ident'>peek_buffer</span>: <span class='ident'>String</span>::<span class='ident'>new</span>()
 		}
 	}
 	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
@@ -579,7 +577,7 @@
 			<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>1</span>;
 			<span class='kw'>match</span> <span class='ident'>ch</span> {
 				<span class='string'>&#39;&quot;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='kw'>loop</span> {
 						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
 							<span class='string'>&#39;\&#39;&#39;</span> <span class='kw'>if</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> {
@@ -599,7 +597,7 @@
 										<span class='string'>&#39;f&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\x0c&#39;</span>,
 										<span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> <span class='string'>&#39;\0&#39;</span>,
 										<span class='string'>&#39;x&#39;</span> <span class='op'>=&gt;</span> {
-											<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>);
+											<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>with_capacity</span>(<span class='number'>2</span>);
 											<span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>2</span>) {
 												<span class='ident'>nums</span>.<span class='ident'>push_char</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()));
 											}
@@ -614,7 +612,7 @@
 											}
 										},
 										<span class='string'>&#39;u&#39;</span> <span class='op'>=&gt;</span> {
-											<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+											<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>nums</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 											<span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='number'>4</span>) {
 												<span class='ident'>nums</span>.<span class='ident'>push_char</span>(<span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()));
 											}
@@ -640,7 +638,7 @@
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TString</span>(<span class='ident'>buf</span>))
 				},
 				<span class='string'>&#39;0&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;x&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='kw'>loop</span> {
 						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
 							<span class='ident'>ch</span> <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_digit_radix</span>(<span class='number'>16</span>) <span class='op'>=&gt;</span> <span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>),
@@ -653,7 +651,7 @@
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TNumber</span>(<span class='ident'>from_str_radix</span>(<span class='ident'>buf</span>.<span class='ident'>as_slice</span>(), <span class='number'>16</span>).<span class='ident'>unwrap</span>()));
 				},
 				<span class='string'>&#39;0&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gone_decimal</span> <span class='op'>=</span> <span class='boolval'>false</span>;
 					<span class='kw'>loop</span> {
 						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
@@ -676,7 +674,7 @@
 					}.<span class='ident'>unwrap</span>()));
 				},
 				_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_digit</span>() <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
 					<span class='kw'>loop</span> {
 						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
@@ -692,7 +690,7 @@
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TNumber</span>(<span class='ident'>from_str</span>(<span class='ident'>buf</span>.<span class='ident'>as_slice</span>()).<span class='ident'>unwrap</span>()));
 				},
 				_ <span class='kw'>if</span> <span class='ident'>ch</span>.<span class='ident'>is_alphabetic</span>() <span class='op'>||</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;$&#39;</span> <span class='op'>||</span> <span class='ident'>ch</span> <span class='op'>==</span> <span class='string'>&#39;_&#39;</span> <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='ident'>buf</span>.<span class='ident'>push_char</span>(<span class='ident'>ch</span>);
 					<span class='kw'>loop</span> {
 						<span class='kw'>let</span> <span class='ident'>ch</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>());
@@ -740,7 +738,7 @@
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TQuestion</span>);
 				},
 				<span class='string'>&#39;/&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;/&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='kw'>loop</span> {
 						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
 							<span class='string'>&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='kw'>break</span>,
@@ -750,7 +748,7 @@
 					<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TComment</span>(<span class='ident'>buf</span>));
 				},
 				<span class='string'>&#39;/&#39;</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>peek_for</span>(<span class='string'>&#39;*&#39;</span>) <span class='op'>=&gt;</span> {
-					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>StrBuf</span>::<span class='ident'>new</span>();
+					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
 					<span class='kw'>loop</span> {
 						<span class='kw'>match</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>next</span>()) {
 							<span class='string'>&#39;\n&#39;</span> <span class='op'>=&gt;</span> <span class='kw'>break</span>,
