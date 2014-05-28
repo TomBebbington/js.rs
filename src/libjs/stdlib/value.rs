@@ -6,6 +6,7 @@ use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
 use std::gc::Gc;
+use std::c_str::CString;
 use std::cell::RefCell;
 use std::iter::FromIterator;
 use std::cmp::Ord;
@@ -415,6 +416,14 @@ impl<'s> ToValue for &'s str {
 	fn to_value(&self) -> Value {
 		Value {
 			ptr: Gc::new(VString(String::from_str(*self)))
+		}
+	}
+}
+impl ToValue for *i8 {
+	fn to_value(&self) -> Value {
+		unsafe {
+			let cstr = CString::new(*self, false);
+			to_value(cstr.as_str().unwrap())
 		}
 	}
 }
