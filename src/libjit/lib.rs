@@ -33,11 +33,10 @@
 //! This crate wraps LibJIT
 
 extern crate libc;
-extern crate core;
 
 use std::ptr;
-use core::mem::transmute;
-use libc::{FILE, STDOUT_FILENO, c_int, fdopen, c_void, c_uint, c_char, c_float};
+use std::mem::transmute;
+use libc::{FILE, STDOUT_FILENO, c_int, fdopen, c_void, c_uint, c_char, c_float, c_long};
 /// A platform's application binary interface
 pub enum ABI {
 	/// The C application binary interface
@@ -110,12 +109,24 @@ extern {
 	fn jit_value_create_float32_constant(function: *c_void, value_type: *c_void, value: c_float) -> *c_void;
 	fn jit_value_create_float64_constant(function: *c_void, value_type: *c_void, value: f64) -> *c_void;
 	fn jit_value_create_nint_constant(function: *c_void, value_type: *c_void, value: c_int) -> *c_void;
+	fn jit_value_create_long_constant(function: *c_void, value_type: *c_void, value: c_long) -> *c_void;
+	fn jit_value_create_constant(function: *c_void, constant: *c_void) -> *c_void;
 	fn jit_function_to_closure(function: *c_void) -> *c_void;
 
 	static jit_type_void: *c_void;
+	static jit_type_sbyte: *c_void;
+	static jit_type_ubyte: *c_void;
+	static jit_type_short: *c_void;
+	static jit_type_ushort: *c_void;
 	static jit_type_int: *c_void;
+	static jit_type_uint: *c_void;
+	static jit_type_nint: *c_void;
+	static jit_type_nuint: *c_void;
+	static jit_type_long: *c_void;
+	static jit_type_ulong: *c_void;
 	static jit_type_float32: *c_void;
 	static jit_type_float64: *c_void;
+	static jit_type_nfloat: *c_void;
 	static jit_type_void_ptr: *c_void;
 	static jit_type_sys_bool: *c_void;
 	static jit_type_sys_char: *c_void;
@@ -560,34 +571,6 @@ impl Function {
 			transmute(jit_function_to_closure(self._function))
 		}
 	}
-	/// Create a 32-bit float constant in this context
-	pub fn constant_float32(&self, constant: f32) -> Box<Value> {
-		unsafe {
-			let value = jit_value_create_float32_constant(self._function, jit_type_float32, constant);
-			box Value { _value: value }
-		}
-	}
-	/// Create a 64-bit float constant in this context
-	pub fn constant_float64(&self, constant: f64) -> Box<Value> {
-		unsafe {
-			let value = jit_value_create_float64_constant(self._function, jit_type_float64, constant);
-			box Value { _value: value }
-		}
-	}
-	/// Create a 32-bit integer constant in this context
-	pub fn constant_int32(&self, constant: i32) -> Box<Value> {
-		unsafe {
-			let value = jit_value_create_nint_constant(self._function, jit_type_int, constant);
-			box Value { _value: value }
-		}
-	}
-	/// Create a 32-bit integer constant in this context
-	pub fn constant_int32_as_type(&self, constant: i32, ty:&Type) -> Box<Value> {
-		unsafe {
-			let value = jit_value_create_nint_constant(self._function, ty._type, constant);
-			box Value { _value: value }
-		}
-	}
 	/// Create a new value with the given type
 	pub fn create_value(&self, value_type: &Type) -> Box<Value> {
 		unsafe {
@@ -626,7 +609,7 @@ impl Label {
 		box Label { _label: Label::undefined() }
 	}
 }
-/// Quick retrieval of common types
+/// Holds type constructors
 pub struct Types;
 impl Types {
 	/// Void type
@@ -637,13 +620,17 @@ impl Types {
 	pub fn get_int() -> Box<Type> {
 		box Type { _type: jit_type_int }
 	}
-	/// Bool type
-	pub fn get_bool() -> Box<Type> {
-		box Type { _type: jit_type_sys_bool }
+	/// Unsigned integer type
+	pub fn get_uint() -> Box<Type> {
+		box Type { _type: jit_type_uint }
 	}
-	/// Character type
-	pub fn get_char() -> Box<Type> {
-		box Type { _type: jit_type_sys_char }
+	/// Long integer type
+	pub fn get_long() -> Box<Type> {
+		box Type { _type: jit_type_long }
+	}
+	/// Unsigned long integer type
+	pub fn get_ulong() -> Box<Type> {
+		box Type { _type: jit_type_ulong }
 	}
 	/// 32-bit floating point type
 	pub fn get_float32() -> Box<Type> {
@@ -653,8 +640,182 @@ impl Types {
 	pub fn get_float64() -> Box<Type> {
 		box Type { _type: jit_type_float64 }
 	}
+	/// Default floating point type
+	pub fn get_float() -> Box<Type> {
+		box Type { _type: jit_type_nfloat }
+	}
 	/// A void pointer, which can represent any kind of pointer
 	pub fn get_void_ptr() -> Box<Type> {
 		box Type { _type: jit_type_void_ptr }
+	}
+	/// Character type
+	pub fn get_char() -> Box<Type> {
+		box Type { _type: jit_type_sys_char }
+	}
+	/// C String type
+	pub fn get_cstring() -> Box<Type> {
+		Type::create_pointer(&*Types::get_char())
+	}
+	/// Boolean type
+	pub fn get_bool() -> Box<Type> {
+		box Type { _type: jit_type_sys_bool }
+	}
+}
+struct PointerConstant {
+	_type: *c_void,
+	_ptr: *c_void
+}
+/// A type that can be compiled into a LibJIT representation
+pub trait Compilable {
+	/// Get a JIT representation of this value
+	fn compile(&self, func:&Function) -> Box<Value>;
+}
+impl Compilable for () {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_void_ptr, 0)
+			}
+		}
+	}
+}
+impl Compilable for f64 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_float64_constant(func._function, jit_type_float64, *self) 
+			}
+		}
+	}
+}
+impl Compilable for f32 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_float32_constant(func._function, jit_type_float32, *self) 
+			}
+		}
+	}
+}
+impl Compilable for int {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_long_constant(func._function, jit_type_nint, *self as i64) 
+			}
+		}
+	}
+}
+impl Compilable for uint {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_nuint, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for i32 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_int, *self) 
+			}
+		}
+	}
+}
+impl Compilable for u32 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_uint, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for i16 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_short, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for u16 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_ushort, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for i8 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_sbyte, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for u8 {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for bool {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_sys_bool, *self as i32) 
+			}
+		}
+	}
+}
+impl Compilable for char {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as i32) 
+			}
+		}
+	}
+}
+impl<'t> Compilable for &'t str {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		let cstring_t = Types::get_cstring();
+		let strlen_i = (self.len() as i32).compile(func);
+		let bufptr = func.create_value(cstring_t);
+		func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
+		for i in range(0, self.len()) {
+			let char_i = self.char_at(i).compile(func);
+			func.insn_store_relative(bufptr, i as i32, char_i);
+		}
+		let null_term = '\0'.compile(func);
+		func.insn_store_relative(bufptr, self.len() as i32, null_term);
+		bufptr
+	}
+}
+impl Compilable for String {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		self.as_slice().compile(func)
+	}
+}
+impl<'t, T> Compilable for &'t T {
+	fn compile(&self, func:&Function) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_value_create_constant(func._function, transmute(&PointerConstant {
+					_type: jit_type_void_ptr,
+					_ptr: transmute(*self)
+				}))
+			}
+		}
 	}
 }

@@ -16,7 +16,7 @@ use std::vec::Vec;
 use std::gc::Gc;
 use std::c_str::CString;
 use std::mem::size_of;
-use jit::{Context, Function, Type, Types, CDECL};
+use jit::{Context, Function, Type, Types, Compilable, CDECL};
 use jit;
 /// A variable scope
 pub struct Scope {
@@ -115,18 +115,6 @@ impl Executor<Function> for JITCompiler {
 				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
 				let cstring_t = Type::create_pointer(&*Types::get_char());
 				let create_value_sig = Type::create_signature(CDECL, &*value_t, &[]);
-				let wrap_str = |text:&str| -> Box<jit::Value> {
-					let strlen_i = func.constant_int32_as_type(text.len() as i32, &*Types::get_char());
-					let bufptr = func.create_value(cstring_t);
-					func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
-					for i in range(0, text.len()) {
-						let char_i = func.constant_int32_as_type(text.char_at(i) as i32, &*Types::get_char());
-						func.insn_store_relative(bufptr, i as i32, char_i);
-					}
-					let null_term = func.constant_int32_as_type(0i32, &*Types::get_char());
-					func.insn_store_relative(bufptr, text.len() as i32, null_term);
-					bufptr
-				};
 				let undefined = || func.insn_call_native0("undefined", create_undef_value, &*create_value_sig, &[]);
 				let global = func.get_param(0);
 				let scope = func.get_param(1);
@@ -145,13 +133,13 @@ impl Executor<Function> for JITCompiler {
 					},
 					ConstExpr(CBool(v)) => {
 						let create_bool_value = to_value::<bool>;
-						let val = func.constant_int32_as_type(v as i32, &*Types::get_bool());
+						let val = v.compile(func);
 						let create_bool_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_bool()]);
 						func.insn_call_native1("create_bool_value", create_bool_value, &*create_bool_sig, &[&*val])
 					},
 					ConstExpr(CNum(n)) => {
 						let create_number_value = to_value::<f64>;
-						let val = func.constant_float64(n);
+						let val = n.compile(func);
 						let create_number_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_float64()]);
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
@@ -165,7 +153,7 @@ impl Executor<Function> for JITCompiler {
 							}
 						}
 						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
-						let bufptr = wrap_str(s.as_slice());
+						let bufptr = s.compile(func);
 						func.insn_call_native1("create_string_value", create_string_value, &* create_string_sig, &[&*bufptr])
 					},
 					GetConstFieldExpr(ref obj, ref field) => {
@@ -177,7 +165,7 @@ impl Executor<Function> for JITCompiler {
 						}
 						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
 						let obj_i = compile_value(func, *obj);
-						let bufptr = wrap_str(field.as_slice());
+						let bufptr = field.compile(func);
 						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*bufptr])
 					},
 					GetFieldExpr(ref obj, ref field) => {
@@ -206,16 +194,16 @@ impl Executor<Function> for JITCompiler {
 						let value_ptr_t = Type::create_pointer(&*value_t);
 						let cstring_ptr_t = Type::create_pointer(&*cstring_t);
 						let create_object_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_ptr_t, &*value_ptr_t, &*Types::get_int()]);
-						let num_fields_i = func.constant_int32(fields.len() as i32);
+						let num_fields_i = (fields.len() as i32).compile(func);
 						let fields_i = func.create_value(cstring_ptr_t);
-						let fields_size = func.constant_int32((fields.len() as u32 * cstring_t.get_size()) as i32);
+						let fields_size = (fields.len() as u32 * cstring_t.get_size()).compile(func);
 						func.insn_store(fields_i, func.insn_alloca(fields_size));
 						let values_i = func.create_value(value_ptr_t);
-						let values_size = func.constant_int32((fields.len() as u32 * value_t.get_size()) as i32);
+						let values_size = (fields.len() as u32 * value_t.get_size()).compile(func);
 						func.insn_store(values_i, func.insn_alloca(values_size));
 						let mut i = 0i32;
 						for (key, value) in fields.iter() {
-							func.insn_store_relative(fields_i, i * cstring_t.get_size() as i32, wrap_str(key.as_slice()));
+							func.insn_store_relative(fields_i, i * cstring_t.get_size() as i32, key.compile(func));
 							func.insn_store_relative(values_i, i * value_t.get_size() as i32, compile_value(func, value));
 							i += 1i32;
 						}
@@ -236,14 +224,14 @@ impl Executor<Function> for JITCompiler {
 						let value_ptr_t = Type::create_pointer(&*value_t);
 						let create_array_sig = Type::create_signature(CDECL, &*value_t, &[&*value_ptr_t, &*Types::get_int()]);
 						let values_i = func.create_value(value_ptr_t);
-						let values_size = func.constant_int32((values.len() as u32 * value_t.get_size()) as i32);
+						let values_size = ((values.len() as u32 * value_t.get_size()) as i32).compile(func);
 						func.insn_store(values_i, func.insn_alloca(values_size));
 						let mut i = 0i32;
 						for val in values.iter() {
 							func.insn_store_relative(values_i, i * value_t.get_size() as i32, compile_value(func, val));
 							i += 1i32;
 						}
-						let num_values = func.constant_int32(values.len() as i32);
+						let num_values = (values.len() as i32).compile(func);
 						func.insn_call_native2("create_array", create_array, &*create_array_sig, &[&*values_i, &*num_values])
 					},
 					/*
@@ -306,7 +294,7 @@ impl Executor<Function> for JITCompiler {
 							}
 						}
 						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
-						let bufptr = wrap_str(name.as_slice());
+						let bufptr = name.compile(func);
 						func.insn_call_native2("get_local", find_field, &*find_field_sig, &[&scope, &*bufptr])
 					},
 					VarDeclExpr(ref vars) => {
@@ -319,7 +307,7 @@ impl Executor<Function> for JITCompiler {
 						let set_field_sig = Type::create_signature(CDECL, &*Types::get_void(), &[&*value_t, &*cstring_t, &*value_t]);
 						for tup in vars.iter() {
 							let (name, expr) = tup.clone();
-							let bufptr = wrap_str(name.as_slice());
+							let bufptr = name.compile(func);
 							let value = match expr {
 								Some(ex) => compile_value(func, &ex),
 								None => undefined()
@@ -339,7 +327,7 @@ impl Executor<Function> for JITCompiler {
 						let value_i = compile_value(func, &**value);
 						match assignee.def {
 							LocalExpr(ref name) => {
-								let bufptr = wrap_str(name.as_slice());
+								let bufptr = name.compile(func);
 								func.insn_call_native3("set_local", set_field, &*set_field_sig, &[&scope, &*bufptr, &*value_i]);
 							},
 							_ => fail!("Unimplemented assigning to {}", *assignee)
