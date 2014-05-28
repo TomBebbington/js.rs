@@ -122,11 +122,13 @@
 <span id='82'>82</span>
 <span id='83'>83</span>
 <span id='84'>84</span>
+<span id='85'>85</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>ResultValue</span>, <span class='ident'>VNumber</span>, <span class='ident'>VInteger</span>, <span class='ident'>to_value</span>, <span class='ident'>from_value</span>};
+<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::<span class='ident'>Function</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>::{<span class='ident'>NAN</span>, <span class='ident'>MAX_VALUE</span>, <span class='ident'>MIN_VALUE</span>, <span class='ident'>INFINITY</span>, <span class='ident'>NEG_INFINITY</span>, <span class='ident'>EPSILON</span>};
 <span class='doccomment'>/// Parse a float into a value
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse_float</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse_float</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='kw'>let</span> <span class='ident'>parsed</span> <span class='op'>=</span> <span class='ident'>from_str</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>());
 	<span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>match</span> <span class='ident'>parsed</span> {
 		<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,
@@ -134,7 +136,7 @@
 	}));
 }
 <span class='doccomment'>/// Parse an int into a value
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse_int</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse_int</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='kw'>let</span> <span class='ident'>parsed</span> <span class='op'>=</span> <span class='ident'>from_str</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>(<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>());
 	<span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='kw'>match</span> <span class='ident'>parsed</span> {
 		<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>to_value</span>(<span class='ident'>v</span>),
@@ -142,7 +144,7 @@
 	});
 }
 <span class='doccomment'>/// Check if a value when converted to a number is finite
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_finite</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_finite</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 		<span class='boolval'>false</span>
 	} <span class='kw'>else</span> {
@@ -150,7 +152,7 @@
 	}))
 }
 <span class='doccomment'>/// Check if a number is finite
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>strict_is_finite</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>strict_is_finite</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 		<span class='boolval'>false</span>
 	} <span class='kw'>else</span> {
@@ -163,7 +165,7 @@
 	}))
 }
 <span class='doccomment'>/// Check if a value when converted to a number is equal to NaN
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_nan</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>is_nan</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 		<span class='boolval'>false</span>
 	} <span class='kw'>else</span> {
@@ -171,7 +173,7 @@
 	}))
 }
 <span class='doccomment'>/// Check if a number is equal to NaN
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>strict_is_nan</span>(_:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>strict_is_nan</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
 	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 		<span class='boolval'>false</span>
 	} <span class='kw'>else</span> {
@@ -191,20 +193,20 @@
 	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;POSITIVE_INFINITY&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>INFINITY</span>));
 	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;NEGATIVE_INFINITY&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>NEG_INFINITY</span>));
 	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;EPSILON&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>EPSILON</span>));
-	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseFloat&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>parse_float</span>));
-	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseInt&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>parse_int</span>));
-	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isFinite&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>strict_is_finite</span>));
-	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isNaN&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>strict_is_nan</span>));
+	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseFloat&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>parse_float</span>, [<span class='string'>&quot;string&quot;</span>]));
+	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseInt&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>parse_int</span>, [<span class='string'>&quot;string&quot;</span>]));
+	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isFinite&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>strict_is_finite</span>, [<span class='string'>&quot;num&quot;</span>]));
+	<span class='ident'>number</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isNaN&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>strict_is_nan</span>, [<span class='string'>&quot;num&quot;</span>]));
 	<span class='ident'>number</span>
 }
 <span class='doccomment'>/// Initialise the parse functions and `Number` on the global object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
 	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;NaN&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>NAN</span>));
 	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Infinity&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>INFINITY</span>));
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseFloat&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>parse_float</span>));
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseInt&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>parse_int</span>));
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isFinite&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>is_finite</span>));
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isNaN&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>is_nan</span>));
+	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseFloat&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>parse_float</span>, [<span class='string'>&quot;string&quot;</span>]));
+	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parseInt&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>parse_int</span>, [<span class='string'>&quot;string&quot;</span>]));
+	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isFinite&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>is_finite</span>, [<span class='string'>&quot;number&quot;</span>]));
+	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;isNaN&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>is_nan</span>, [<span class='string'>&quot;num&quot;</span>]));
 	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Number&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
 }
 </pre>

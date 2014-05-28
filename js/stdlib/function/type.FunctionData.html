@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="The js library documentation.">
 
-    <title>js::stdlib::object::get_proto_of - Rust</title>
+    <title>js::stdlib::function::FunctionData - Rust</title>
 
     <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
           rel='stylesheet' type='text/css'>
@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>object</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Property.html'>Property</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn._create.html'>_create</a><br/><a class='fn ' href='fn.define_prop.html'>define_prop</a><br/><a class='fn current' href='fn.get_proto_of.html'>get_proto_of</a><br/><a class='fn ' href='fn.has_own_prop.html'>has_own_prop</a><br/><a class='fn ' href='fn.init.html'>init</a><br/><a class='fn ' href='fn.make_object.html'>make_object</a><br/><a class='fn ' href='fn.set_proto_of.html'>set_proto_of</a><br/><a class='fn ' href='fn.to_string.html'>to_string</a><br/></div>
+        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>function</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Function.html'>Function</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn._create.html'>_create</a><br/><a class='fn ' href='fn.init.html'>init</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -38,10 +38,9 @@
         </form>
     </nav>
 
-    <section id='main' class="content fn">
-<h1 class='fqn'>Function <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>object</a>::<a class='fn' href=''>get_proto_of</a><a class='source' id='src-6342' href='../../../src/js/src/libjs/stdlib/object.rs.html#68-71'>[src]</a></h1>
-<pre class='rust fn'>pub fn get_proto_of(args: <a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>&gt;, _: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, _: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, _: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a></pre><div class='docblock'><p>Get the prototype of an object</p>
-</div></section>
+    <section id='main' class="content type">
+<h1 class='fqn'><a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>function</a>::<a class='type' href=''>FunctionData</a><a class='source' id='src-5882' href='../../../src/js/src/libjs/stdlib/function.rs.html#7'>[src]</a></h1>
+<pre class='rust typedef'>type FunctionData = fn(<a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>&gt;, <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a>;</pre></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
