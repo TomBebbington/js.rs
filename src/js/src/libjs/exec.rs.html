@@ -548,15 +548,6 @@
 <span id='508'>508</span>
 <span id='509'>509</span>
 <span id='510'>510</span>
-<span id='511'>511</span>
-<span id='512'>512</span>
-<span id='513'>513</span>
-<span id='514'>514</span>
-<span id='515'>515</span>
-<span id='516'>516</span>
-<span id='517'>517</span>
-<span id='518'>518</span>
-<span id='519'>519</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>expr</span>::{<span class='ident'>Expr</span>, <span class='ident'>ConstExpr</span>, <span class='ident'>BlockExpr</span>, <span class='ident'>TypeOfExpr</span>, <span class='ident'>LocalExpr</span>, <span class='ident'>VarDeclExpr</span>, <span class='ident'>GetConstFieldExpr</span>, <span class='ident'>GetFieldExpr</span>, <span class='ident'>CallExpr</span>, <span class='ident'>WhileLoopExpr</span>, <span class='ident'>IfExpr</span>, <span class='ident'>SwitchExpr</span>, <span class='ident'>ObjectDeclExpr</span>, <span class='ident'>ArrayDeclExpr</span>, <span class='ident'>FunctionDeclExpr</span>, <span class='ident'>ArrowFunctionDeclExpr</span>, <span class='ident'>UnaryOpExpr</span>, <span class='ident'>BinOpExpr</span>, <span class='ident'>ConstructExpr</span>, <span class='ident'>ReturnExpr</span>, <span class='ident'>ThrowExpr</span>, <span class='ident'>AssignExpr</span>};
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>constant</span>::{<span class='ident'>CNum</span>, <span class='ident'>CInt</span>, <span class='ident'>CString</span>, <span class='ident'>CBool</span>, <span class='ident'>CRegExp</span>, <span class='ident'>CNull</span>, <span class='ident'>CUndefined</span>};
@@ -704,14 +695,7 @@
 						<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;create_number_value&quot;</span>, <span class='ident'>create_number_value</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span> <span class='ident'>create_number_sig</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>val</span>])
 					},
 					<span class='ident'>ConstExpr</span>(<span class='ident'>CString</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>)) <span class='op'>=&gt;</span> {
-						<span class='kw'>fn</span> <span class='ident'>create_string_value</span>(<span class='ident'>s</span>: <span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-							<span class='kw'>unsafe</span> {
-								<span class='kw'>let</span> <span class='ident'>cstr</span> <span class='op'>=</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>s</span>, <span class='boolval'>false</span>);
-								<span class='ident'>Value</span>{
-									<span class='ident'>ptr</span>: <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VString</span>(<span class='ident'>String</span>::<span class='ident'>from_str</span>(<span class='ident'>cstr</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>())))
-								}
-							}
-						}
+						<span class='kw'>let</span> <span class='ident'>create_string_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='op'>*</span><span class='ident'>i8</span><span class='op'>&gt;</span>;
 						<span class='kw'>let</span> <span class='ident'>create_string_sig</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>cstring_t</span>]);
 						<span class='kw'>let</span> <span class='ident'>bufptr</span> <span class='op'>=</span> <span class='ident'>s</span>.<span class='ident'>compile</span>(<span class='ident'>func</span>);
 						<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;create_string_value&quot;</span>, <span class='ident'>create_string_value</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span> <span class='ident'>create_string_sig</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>bufptr</span>])
@@ -1041,9 +1025,7 @@
 						<span class='ident'>func</span>.<span class='ident'>insn_call_native2</span>(<span class='ident'>name</span>, <span class='ident'>op_func</span>, <span class='ident'>binop_sig</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>i_a</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>i_b</span>])
 					},
 					<span class='ident'>IfExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>cond</span>, <span class='kw-2'>ref</span> <span class='ident'>expr</span>, <span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> {
-						<span class='kw'>fn</span> <span class='ident'>from_bool_value</span>(<span class='ident'>v</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-							<span class='ident'>v</span>.<span class='ident'>is_true</span>()
-						}
+						<span class='kw'>let</span> <span class='ident'>from_bool_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>;
 						<span class='kw'>let</span> <span class='ident'>from_bool_sig</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>Types</span>::<span class='ident'>get_bool</span>(), <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>]);
 						<span class='kw'>let</span> <span class='ident'>i_cond</span> <span class='op'>=</span> <span class='ident'>compile_value</span>(<span class='ident'>func</span>, <span class='op'>*</span><span class='ident'>cond</span>);
 						<span class='kw'>let</span> <span class='ident'>i_cond_bool</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;to_bool&quot;</span>, <span class='ident'>from_bool_value</span>, <span class='ident'>from_bool_sig</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>i_cond</span>]);

@@ -608,6 +608,15 @@
 <span id='568'>568</span>
 <span id='569'>569</span>
 <span id='570'>570</span>
+<span id='571'>571</span>
+<span id='572'>572</span>
+<span id='573'>573</span>
+<span id='574'>574</span>
+<span id='575'>575</span>
+<span id='576'>576</span>
+<span id='577'>577</span>
+<span id='578'>578</span>
+<span id='579'>579</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>PROTOTYPE</span>, <span class='ident'>INSTANCE_PROTOTYPE</span>, <span class='ident'>ObjectData</span>, <span class='ident'>Property</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::{<span class='ident'>Function</span>, <span class='ident'>FunctionData</span>};
@@ -617,6 +626,7 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Add</span>, <span class='ident'>Sub</span>, <span class='ident'>Mul</span>, <span class='ident'>Div</span>, <span class='ident'>Rem</span>, <span class='ident'>BitAnd</span>, <span class='ident'>BitOr</span>, <span class='ident'>BitXor</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>Gc</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>c_str</span>::<span class='ident'>CString</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>RefCell</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>FromIterator</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>::<span class='ident'>Ord</span>;
@@ -1026,6 +1036,14 @@
 	<span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='ident'>Value</span> {
 			<span class='ident'>ptr</span>: <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VString</span>(<span class='ident'>String</span>::<span class='ident'>from_str</span>(<span class='op'>*</span><span class='self'>self</span>)))
+		}
+	}
+}
+<span class='kw'>impl</span> <span class='ident'>ToValue</span> <span class='kw'>for</span> <span class='op'>*</span><span class='ident'>i8</span> {
+	<span class='kw'>fn</span> <span class='ident'>to_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+		<span class='kw'>unsafe</span> {
+			<span class='kw'>let</span> <span class='ident'>cstr</span> <span class='op'>=</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='op'>*</span><span class='self'>self</span>, <span class='boolval'>false</span>);
+			<span class='ident'>to_value</span>(<span class='ident'>cstr</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>())
 		}
 	}
 }
