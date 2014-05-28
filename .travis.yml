@@ -13,9 +13,10 @@ install:
   - ./configure 
   - make
   - sudo make install
+  - sudo cp /usr/local/lib/libjit* /usr/lib/
   - cd ..
 script:
-  - make libs build doc
+  - make clean libjit libs doc
 notifications:
   email:
     - tophattedcoder@gmail.com

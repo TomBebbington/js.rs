@@ -1,6 +1,6 @@
 RUSTC ?= rustc
 RUSTDOC ?= rustdoc
-.PHONY: all build doc libs libjs libjs_syntax update-doc clean
+.PHONY: all build doc libs libjit libjs libjs_syntax update-doc clean
 all: libs build doc
 libjs:
 	mkdir -p target
