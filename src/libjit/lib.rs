@@ -64,6 +64,7 @@ extern {
 	fn jit_function_set_optimization_level(function: *c_void, level: c_uint);
 	fn jit_function_set_recompilable(function: *c_void);
 	fn jit_function_get_context(function: *c_void) -> *c_void;
+	fn jit_function_abandon(function: *c_void) -> *c_void;
 	fn jit_type_create_signature(abi: c_int, return_type: *c_void, params: **c_void, num_params: c_uint, incref: c_int) -> *c_void;
 	fn jit_type_create_struct(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
 	fn jit_type_create_union(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
@@ -263,7 +264,13 @@ pub struct Function {
 	_context: *Context,
 	_function: *c_void
 }
-
+impl Drop for Function {
+	fn drop(&mut self) {
+		unsafe {
+			jit_function_abandon(self._function);
+		}
+	}
+}
 impl Function {
 	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void) -> Box<Value> {
 		unsafe {

@@ -85,7 +85,7 @@ pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// To string
 pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	Ok(to_value(this.to_str().into_strbuf()))
+	Ok(to_value(this.to_str().into_string()))
 }
 /// Check if it has a property
 pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {

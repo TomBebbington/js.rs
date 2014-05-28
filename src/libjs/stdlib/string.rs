@@ -23,7 +23,7 @@ pub fn _create(global: Value) -> Value {
 		get: to_value(get_string_length),
 		set: Value::undefined()
 	};
-	proto.set_prop("length".into_strbuf(), prop);
+	proto.set_prop("length".into_string(), prop);
 	string.set_field_slice(PROTOTYPE, proto);
 	string
 }

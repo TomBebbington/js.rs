@@ -44,7 +44,7 @@ impl Value {
 		let mut obj : ObjectData = TreeMap::new();
 		if global.is_some() {
 			let obj_proto = global.unwrap().get_field_slice("Object").get_field_slice(PROTOTYPE);
-			obj.insert(INSTANCE_PROTOTYPE.into_strbuf(), Property::new(obj_proto));
+			obj.insert(INSTANCE_PROTOTYPE.into_string(), Property::new(obj_proto));
 		}
 		Value {
 			ptr: Gc::new(VObject(RefCell::new(obj)))
@@ -145,7 +145,7 @@ impl Value {
 		};
 		match obj.find(&field) {
 			Some(val) => Some(*val),
-			None => match obj.find(&PROTOTYPE.into_strbuf()) {
+			None => match obj.find(&PROTOTYPE.into_string()) {
 				Some(prop) => 
 					prop.value.get_prop(field),
 				None => None
@@ -163,7 +163,7 @@ impl Value {
 	}
 	/// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
 	pub fn get_field_slice<'t>(&self, field:&'t str) -> Value {
-		self.get_field(field.into_strbuf())
+		self.get_field(field.into_string())
 	}
 	/// Set the field in the value
 	pub fn set_field(&self, field:String, val:Value) -> Value {
@@ -183,7 +183,7 @@ impl Value {
 	}
 	/// Set the field in the value
 	pub fn set_field_slice<'t>(&self, field:&'t str, val:Value) -> Value {
-		self.set_field(field.into_strbuf(), val)
+		self.set_field(field.into_string(), val)
 	}
 	/// Set the property in the value
 	pub fn set_prop(&self, field:String, prop:Property) -> Property {
@@ -203,7 +203,7 @@ impl Value {
 	}
 	/// Set the property in the value
 	pub fn set_prop_slice<'t>(&self, field:&'t str, prop:Property) -> Property {
-		self.set_prop(field.into_strbuf(), prop)
+		self.set_prop(field.into_string(), prop)
 	}
 	/// Convert from a JSON value to a JS value
 	pub fn from_json(json:Json) -> ValueData {
@@ -215,9 +215,9 @@ impl Value {
 				let mut i = 0;
 				let mut data : ObjectData = FromIterator::from_iter(vs.iter().map(|json| {
 					i += 1;
-					((i - 1).to_str().into_strbuf(), Property::new(to_value(json.clone())))
+					((i - 1).to_str().into_string(), Property::new(to_value(json.clone())))
 				}));
-				data.insert("length".into_strbuf(), Property::new(to_value(vs.len() as i32)));
+				data.insert("length".into_string(), Property::new(to_value(vs.len() as i32)));
 				VObject(RefCell::new(data))
 			},
 			Object(obj) => {
@@ -255,9 +255,9 @@ impl fmt::Show for Value {
 			VBoolean(v) => write!(f, "{}", v),
 			VString(ref v) => write!(f, "{}", v),
 			VNumber(v) => write!(f, "{}", match v {
-				_ if v.is_nan() => "NaN".into_strbuf(),
-				f64::INFINITY => "Infinity".into_strbuf(),
-				f64::NEG_INFINITY => "-Infinity".into_strbuf(),
+				_ if v.is_nan() => "NaN".into_string(),
+				f64::INFINITY => "Infinity".into_string(),
+				f64::NEG_INFINITY => "-Infinity".into_string(),
 				_ => f64::to_str_digits(v, 15)
 			}),
 			VObject(ref v) => {
@@ -490,7 +490,7 @@ impl<'s, T:ToValue> ToValue for &'s [T] {
 		let mut arr = TreeMap::new();
 		let mut i = 0;
 		for item in self.iter() {
-			arr.insert(i.to_str().into_strbuf(), Property::new(item.to_value()));
+			arr.insert(i.to_str().into_string(), Property::new(item.to_value()));
 			i += 1;
 		}
 		to_value(arr)
@@ -501,7 +501,7 @@ impl<T:ToValue> ToValue for Vec<T> {
 		let mut arr = TreeMap::new();
 		let mut i = 0;
 		for item in self.iter() {
-			arr.insert(i.to_str().into_strbuf(), Property::new(item.to_value()));
+			arr.insert(i.to_str().into_string(), Property::new(item.to_value()));
 			i += 1;
 		}
 		to_value(arr)

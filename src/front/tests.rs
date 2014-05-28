@@ -17,7 +17,7 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
 					let space_ind = current.slice_from(1).find(' ').unwrap() + 1;
 					let key = current.slice_chars(2, space_ind);
 					let value = current.slice_from(space_ind + 1);
-					map.insert(key.into_strbuf(), value.into_strbuf());
+					map.insert(key.into_string(), value.into_string());
 				}
 			},
 			_ => ()
@@ -62,7 +62,7 @@ impl Tests {
 		lexer.lex().unwrap();
 		let tokens = lexer.tokens;
 		let attrs = find_attrs(tokens.clone());
-		let desc = attrs.find(&"description".into_strbuf()).unwrap();
+		let desc = attrs.find(&"description".into_string()).unwrap();
 		if verbose {
 			println!("Lexed into: {}", tokens);
 			println!("Parsing");
@@ -73,7 +73,7 @@ impl Tests {
 			println!("Now running");
 		}
 		let mut engine:JITCompiler = Executor::new();
-		engine.set_global("assert".into_strbuf(), to_value(assert));
+		engine.set_global("assert".into_string(), to_value(assert));
 		let comp = engine.compile(&expr);
 		let result = engine.run(comp);
 		match result {

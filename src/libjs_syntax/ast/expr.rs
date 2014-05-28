@@ -138,22 +138,3 @@ impl Show for ExprDef {
 		}
 	}
 }
-
-impl Show for TreeMap<String, Expr> {
-	fn fmt(&self, f: &mut Formatter) -> Result {
-		try!(write!(f, "{}", "{ "));
-		match self.iter().last() {
-			Some((last_key, _)) => {
-				for (k, v) in self.iter() {
-					try!(write!(f, "{}: {}", k, v));
-					if k == last_key {
-						try!(write!(f, "{}", ","));
-					}
-					try!(write!(f, "{}", "\n"));
-				}
-			},
-			None => ()
-		}
-		write!(f, "{}", "}")
-	}
-}

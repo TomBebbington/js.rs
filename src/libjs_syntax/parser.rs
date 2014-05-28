@@ -90,7 +90,7 @@ impl Parser {
 				loop {
 					let name = match self.get_token(self.pos) {
 						Ok(Token{data: TIdent(ref name), ..}) => name.clone(),
-						Ok(tok) => return Err(Expected(vec!(TIdent("identifier".into_strbuf())), tok, "var statement")),
+						Ok(tok) => return Err(Expected(vec!(TIdent("identifier".into_string())), tok, "var statement")),
 						Err(AbruptEnd) => break,
 						Err(e) => return Err(e)
 					};
@@ -132,7 +132,7 @@ impl Parser {
 				try!(self.expect(TCloseParen, "if block"));
 				let expr = try!(self.parse());
 				let next = self.get_token(self.pos + 1);
-				Ok(Some(mk!(IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TIdent("else".to_strbuf()) {
+				Ok(Some(mk!(IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TIdent("else".into_string()) {
 					self.pos += 2;
 					Some(box try!(self.parse()))
 				} else {
@@ -183,7 +183,7 @@ impl Parser {
 							default = Some(mk!(BlockExpr(block)));
 						},
 						TCloseBlock => break,
-						_ => return Err(Expected(vec!(TIdent("case".to_strbuf()), TIdent("default".to_strbuf()), TCloseBlock), tok, "switch block"))
+						_ => return Err(Expected(vec!(TIdent("case".into_string()), TIdent("default".into_string()), TCloseBlock), tok, "switch block"))
 					}
 				}
 				try!(self.expect(TCloseBlock, "switch block"));
@@ -200,7 +200,7 @@ impl Parser {
 						Some(name.clone())
 					},
 					TOpenParen => None,
-					_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk.clone(), "function name"))
+					_ => return Err(Expected(vec!(TIdent("identifier".into_string())), tk.clone(), "function name"))
 				};
 				try!(self.expect(TOpenParen, "function"));
 				let mut args:Vec<String> = Vec::new();
@@ -208,7 +208,7 @@ impl Parser {
 				while tk.data != TCloseParen {
 					match tk.data {
 						TIdent(ref id) => args.push(id.clone()),
-						_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk.clone(), "function arguments"))
+						_ => return Err(Expected(vec!(TIdent("identifier".into_string())), tk.clone(), "function arguments"))
 					}
 					self.pos += 1;
 					if try!(self.get_token(self.pos)).data == TComma {
@@ -257,10 +257,10 @@ impl Parser {
 							TComma => { // at this point it's probably gonna be an arrow function
 								let mut args = vec!(match next.def {
 									LocalExpr(name) => name,
-									_ => "".to_strbuf()
+									_ => "".into_string()
 								}, match try!(self.get_token(self.pos)).data {
 									TIdent(ref id) => id.clone(),
-									_ => "".to_strbuf()
+									_ => "".into_string()
 								});
 								let mut expect_ident = true;
 								loop {
@@ -278,7 +278,7 @@ impl Parser {
 											self.pos += 1;
 											break;
 										},
-										_ if expect_ident => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), curr_tk, "arrow function")),
+										_ if expect_ident => return Err(Expected(vec!(TIdent("identifier".into_string())), curr_tk, "arrow function")),
 										_ => return Err(Expected(vec!(TComma, TCloseParen), curr_tk, "arrow function"))
 									}
 								}
@@ -327,7 +327,7 @@ impl Parser {
 					let name = match tk.data {
 						TIdent(ref id) => id.clone(),
 						TString(ref str) => str.clone(),
-						_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf()), TString("string".to_strbuf())), tk, "object declaration"))
+						_ => return Err(Expected(vec!(TIdent("identifier".into_string()), TString("string".into_string())), tk, "object declaration"))
 					};
 					self.pos += 1;
 					try!(self.expect(TColon, "object declaration"));
@@ -381,8 +381,8 @@ impl Parser {
 				self.pos += 1;
 				let tk = try!(self.get_token(self.pos));
 				match tk.data {
-					TIdent(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_strbuf())),
-					_ => return Err(Expected(vec!(TIdent("identifier".to_strbuf())), tk, "field access"))
+					TIdent(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_string())),
+					_ => return Err(Expected(vec!(TIdent("identifier".into_string())), tk, "field access"))
 				}
 				self.pos += 1;
 			},
