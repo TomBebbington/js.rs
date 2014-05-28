@@ -144,14 +144,7 @@ impl Executor<Function> for JITCompiler {
 						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
 					},
 					ConstExpr(CString(ref s)) => {
-						fn create_string_value(s: *i8) -> Value {
-							unsafe {
-								let cstr = CString::new(s, false);
-								Value{
-									ptr: Gc::new(VString(String::from_str(cstr.as_str().unwrap())))
-								}
-							}
-						}
+						let create_string_value = to_value::<*i8>;
 						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
 						let bufptr = s.compile(func);
 						func.insn_call_native1("create_string_value", create_string_value, &* create_string_sig, &[&*bufptr])
@@ -481,9 +474,7 @@ impl Executor<Function> for JITCompiler {
 						func.insn_call_native2(name, op_func, binop_sig, &[&*i_a, &*i_b])
 					},
 					IfExpr(ref cond, ref expr, None) => {
-						fn from_bool_value(v:Value) -> bool {
-							v.is_true()
-						}
+						let from_bool_value = to_value::<bool>;
 						let from_bool_sig = Type::create_signature(CDECL, &*Types::get_bool(), &[&*value_t]);
 						let i_cond = compile_value(func, *cond);
 						let i_cond_bool = func.insn_call_native1("to_bool", from_bool_value, from_bool_sig, &[&*i_cond]);
