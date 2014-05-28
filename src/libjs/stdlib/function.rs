@@ -1,47 +1,36 @@
 use stdlib::object::{ObjectData, Property};
-use stdlib::value::{Value, ResultValue, to_value};
+use stdlib::value::{Value, VFunction, ResultValue, to_value};
 use collections::treemap::TreeMap;
-use jit;
-pub type NativeFunctionData = fn(Value, Value, Vec<Value>) -> ResultValue;
+use std::iter::FromIterator;
+use std::gc::Gc;
+use std::cell::RefCell;
+pub type FunctionData = fn(Vec<Value>, Value, Value, Value) -> ResultValue;
 #[deriving(Clone)]
 /// A Javascript function
-pub enum Function {
-	/// A native javascript function
-	NativeFunc(NativeFunction),
-	/// A regular javascript function
-	RegularFunc(RegularFunction)
-}
-#[deriving(Clone)]
-/// Represents a regular javascript function in memory
-pub struct RegularFunction {
+pub struct Function {
 	/// The fields associated with the function
 	pub object : ObjectData,
 	/// This function's JIT representation
-	pub jit : jit::Function,
+	pub repr : FunctionData,
 	/// The argument names of the function
 	pub args : Vec<String>
 }
-impl RegularFunction {
-	/// Make a new regular function
-	pub fn new(jit : jit::Function, args: Vec<String>) -> RegularFunction {
+impl Function {
+	/// Make a new function
+	pub fn new(repr : FunctionData, args: Vec<String>) -> Function {
 		let mut obj = TreeMap::new();
 		obj.insert("arguments".into_string(), Property::new(to_value(args.len() as i32)));
-		RegularFunction {object: obj, jit: jit, args: args}
+		Function {object: obj, repr: repr, args: args}
 	}
-}
-#[deriving(Clone)]
-/// Represents a native javascript function in memory
-pub struct NativeFunction {
-	/// The fields associated with the function
-	pub object : ObjectData,
-	/// The callable function data
-	pub data: NativeFunctionData
-}
-impl NativeFunction {
-	/// Make a new native function with the given function data
-	pub fn new(data : NativeFunctionData) -> NativeFunction {
-		let obj = TreeMap::new();
-		NativeFunction {object: obj, data: data}
+	/// Create a function from function data and arguments
+	pub fn make(repr: FunctionData, args:&[&'static str]) -> Value {
+		Value {
+			ptr: Gc::new(VFunction(RefCell::new(Function::new(repr, FromIterator::from_iter(args.iter().map(|arg|arg.to_string()))))))
+		}
+	}
+	/// Call with some args
+	pub fn call(&self, args: Vec<Value>, global:Value, scope:Value, this:Value) -> ResultValue {
+		(self.repr)(args, global, scope, this)
 	}
 }
 /// Create a new `Function` object

@@ -1,8 +1,9 @@
 use stdlib::value::{Value, ResultValue, to_value};
+use stdlib::function::Function;
 use url::{encode, decode, encode_component, decode_component};
 
 /// Encode a URI
-pub fn encode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn encode_uri(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	Ok(if args.len() == 0 {
 		Value::undefined()
 	} else {
@@ -11,7 +12,7 @@ pub fn encode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Encode a URI component
 /// Rust uses RFC 3986, but standard Javascript doesn't, this will need a fix
-pub fn encode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn encode_uri_component(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	Ok(if args.len() == 0 {
 		Value::undefined()
 	} else {
@@ -19,7 +20,7 @@ pub fn encode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 	})
 }
 /// Decode a URI
-pub fn decode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn decode_uri(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	Ok(if args.len() == 0 {
 		Value::undefined()
 	} else {
@@ -28,7 +29,7 @@ pub fn decode_uri(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Decode a URI component
 /// Rust uses RFC 3986, but standard Javascript doesn't, this will need a fix
-pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn decode_uri_component(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	Ok(if args.len() == 0 {
 		Value::undefined()
 	} else {
@@ -37,8 +38,8 @@ pub fn decode_uri_component(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
 }
 /// Initialise the URI functions on the global object
 pub fn init(global:Value) {
-	global.set_field_slice("encodeURI", to_value(encode_uri));
-	global.set_field_slice("encodeURIComponent", to_value(encode_uri_component));
-	global.set_field_slice("decodeURI", to_value(decode_uri));
-	global.set_field_slice("decodeURIComponent", to_value(decode_uri_component));
+	global.set_field_slice("encodeURI", Function::make(encode_uri, ["uri"]));
+	global.set_field_slice("encodeURIComponent", Function::make(encode_uri_component, ["uri_comp"]));
+	global.set_field_slice("decodeURI", Function::make(decode_uri, ["uri"]));
+	global.set_field_slice("decodeURIComponent", Function::make(decode_uri_component, ["uri_comp"]));
 }

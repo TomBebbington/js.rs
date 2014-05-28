@@ -2,7 +2,7 @@ use stdlib::value::{Value, VUndefined, ResultValue, to_value};
 use std::gc::Gc;
 
 /// Create a new boolean
-pub fn make_boolean(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
+pub fn make_boolean(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
 	Ok(Gc::new(VUndefined))
 }
 /// Create a new `Boolean` object

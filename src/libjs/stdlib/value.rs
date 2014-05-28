@@ -1,5 +1,5 @@
 use stdlib::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
-use stdlib::function::{Function, NativeFunc, RegularFunc, NativeFunction, NativeFunctionData};
+use stdlib::function::{Function, FunctionData};
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
 use std::fmt;
@@ -134,13 +134,7 @@ impl Value {
 	pub fn get_prop(&self, field:String) -> Option<Property> {
 		let obj : ObjectData = match *self.ptr.borrow() {
 			VObject(ref obj) => obj.borrow().clone(),
-			VFunction(ref func) => {
-				let func = func.borrow().clone();
-				match func {
-					NativeFunc(f) => f.object.clone(),
-					RegularFunc(f) => f.object.clone()
-				}
-			},
+			VFunction(ref func) =>func.borrow().object.clone(),
 			_ => return None
 		};
 		match obj.find(&field) {
@@ -172,10 +166,7 @@ impl Value {
 				obj.borrow_mut().insert(field.clone(), Property::new(val));
 			},
 			VFunction(ref func) => {
-				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field.clone(), Property::new(val)),
-					RegularFunc(ref mut f) => f.object.insert(field.clone(), Property::new(val))
-				};
+				func.borrow_mut().object.insert(field.clone(), Property::new(val));
 			},
 			_ => ()
 		}
@@ -192,10 +183,7 @@ impl Value {
 				obj.borrow_mut().insert(field.clone(), prop);
 			},
 			VFunction(ref func) => {
-				match *func.borrow_mut().deref_mut() {
-					NativeFunc(ref mut f) => f.object.insert(field.clone(), prop),
-					RegularFunc(ref mut f) => f.object.insert(field.clone(), prop)
-				};
+				func.borrow_mut().object.insert(field.clone(), prop);
 			},
 			_ => ()
 		}
@@ -277,14 +265,7 @@ impl fmt::Show for Value {
 			},
 			VInteger(v) => write!(f, "{}", v),
 			VFunction(ref v) => {
-				match v.borrow().clone() {
-					NativeFunc(_) => {
-						write!(f, "{}", "function() { [native code] }")
-					},
-					RegularFunc(rf) => {
-						write!(f, "function({})\\{...\\}", rf.args.connect(", "))
-					}
-				}
+				write!(f, "function({})\\{...\\}", v.borrow().args.connect(", "))
 			}
 		}
 	}
@@ -517,26 +498,6 @@ impl<T:FromValue> FromValue for Vec<T> {
 		Ok(vec)
 	}
 }
-impl ToValue for NativeFunctionData {
-	fn to_value(&self) -> Value {
-		Value {
-			ptr: Gc::new(VFunction(RefCell::new(NativeFunc(NativeFunction::new(*self)))))
-		}
-	}
-}
-impl FromValue for NativeFunctionData {
-	fn from_value(v:Value) -> Result<NativeFunctionData, &'static str> {
-		match *v.ptr.borrow() {
-			VFunction(ref func) => {
-				match *func.borrow() {
-					NativeFunc(ref data) => Ok(data.data),
-					_ => Err("Value is not a native function")
-				}
-			},
-			_ => Err("Value is not a function")
-		}
-	}
-}
 impl ToValue for ObjectData {
 	fn to_value(&self) -> Value {
 		Value {
@@ -549,10 +510,7 @@ impl FromValue for ObjectData {
 		match *v.ptr.borrow() {
 			VObject(ref obj) => Ok(obj.clone().borrow().deref().clone()),
 			VFunction(ref func) => {
-				Ok(match *func.borrow().deref() {
-					NativeFunc(ref data) => data.object.clone(),
-					RegularFunc(ref data) => data.object.clone()
-				})
+				Ok(func.borrow().object.clone())
 			},
 			_ => Err("Value is not a valid object")
 		}

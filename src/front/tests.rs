@@ -1,5 +1,6 @@
 use js::exec::{Executor, JITCompiler};
 use js::stdlib::value::{ResultValue, Value, to_value, from_value};
+use js::stdlib::function::Function;
 use syntax::Lexer;
 use syntax::Parser;
 use syntax::ast::token::{Token, TComment};
@@ -38,7 +39,7 @@ impl Tests {
 	}
 	/// Run a test
 	pub fn run_test(&self, path: Path) {
-		fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+		fn assert(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 			if args.len() < 2 {
 				return Err(to_value("'assert' function expects assertion and description arguments"));
 			}
@@ -73,7 +74,7 @@ impl Tests {
 			println!("Now running");
 		}
 		let mut engine:JITCompiler = Executor::new();
-		engine.set_global("assert".into_string(), to_value(assert));
+		engine.set_global("assert".into_string(), Function::make(assert, ["string"]));
 		let comp = engine.compile(&expr);
 		let result = engine.run(comp);
 		match result {

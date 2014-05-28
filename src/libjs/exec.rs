@@ -8,8 +8,10 @@ use syntax::ast::op::{LogAnd, LogOr};
 use syntax::ast::op::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
 use stdlib::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value, ToValue};
 use stdlib::object::{INSTANCE_PROTOTYPE, PROTOTYPE};
-use stdlib::function::{NativeFunc, RegularFunc, RegularFunction};
+use stdlib::function;
+use stdlib::function::FunctionData;
 use stdlib::{console, math, object, array, function, json, number, error, uri, string};
+use std::vec::raw::from_buf;
 use std::vec::Vec;
 use std::gc::Gc;
 use std::c_str::CString;
@@ -246,16 +248,29 @@ impl Executor<Function> for JITCompiler {
 					},
 					/*
 					FunctionDeclExpr(ref name, ref args, ref expr) => {
-						let mut args_i = Vec::with_capacity(args.len());
-						let mut arg_types = Vec::with_capacity(args.len());
-						for _ in range(0, args.len()) {
-							arg_types.push(&*value_t);
+						fn create_func_value(data: FunctionData, args: *Value, nargs: uint) -> Value {
+							Value {
+								ptr: Gc::new(function::Function::new(data, from_buf(args, nargs)))
+							}
 						}
-						let sig_t = Type::create_signature(CDECL, &*value_t, arg_types.as_slice());
+						let value_ptr_t = Type::create_pointer(&*value_t);
+						let vec_t = value_ptr_t;
+						let args_i = func.create_value(&*value_ptr_t);
+						let nargs_i = func.constant_int32(args.len() as i32);
+						let args_size = func.constant_int32((args.len() as u32 * value_t.get_size()) as i32);
+						func.insn_store(args_i, func.insn_alloca(args_size));
+						let mut arg_types = Vec::with_capacity(args.len());
+						for i in range(0i32, args.len() as i32) {
+							arg_types.push(&*value_t);
+							func.insn_store_relative(args_i, i * value_t.get_size() as i32, compile_value(func, args.get(i)))
+						}
+						// fn(args, global, scope, this)
+						let sig_t = Type::create_signature(CDECL, &*value_t, &[&*vec_t, &*]);
 						let new_func = func.get_context().create_function(&*sig_t);
 						let value = compile_value(new_func, &**expr);
 						new_func.insn_return(&*value);
-						let make_func_sig_t = Type::create_signature(CDECL, &*value_t, &[&*sig_t])
+						let make_func_sig_t = Type::create_signature(CDECL, &*value_t, &[&*sig_t, &*args_i.get_type(), &*nargs_i.get_type()]);
+						func.insn_call_native3("create_func", create_func_value, &*make_func_sig_t, &[&*new_func, &*args_i, &*nargs_i])
 					},
 					*/
 					BlockExpr(ref block) => {
