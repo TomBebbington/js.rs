@@ -105,6 +105,33 @@ extern {
 	fn jit_insn_call_indirect(function: *c_void, value: *c_void, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
 	fn jit_insn_alloca(function: *c_void, size: *c_void) -> *c_void;
 	fn jit_insn_uses_catcher(function: *c_void) -> c_void;
+	fn jit_insn_acos(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_asin(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_atan(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_atan2(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
+	fn jit_insn_ceil(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_cos(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_cosh(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_exp(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_floor(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_log(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_log10(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_pow(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
+	fn jit_insn_rint(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_round(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_sin(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_sinh(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_sqrt(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_tan(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_tanh(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_trunc(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_is_nan(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_is_finite(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_is_inf(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_abs(function: *c_void, value: *c_void) -> *c_void;
+	fn jit_insn_min(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
+	fn jit_insn_max(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
+	fn jit_insn_sign(function: *c_void, value: *c_void) -> *c_void;
 	fn jit_dump_function (stream: *FILE, funcion: *c_void, name: *c_char);
 	fn jit_value_create_float32_constant(function: *c_void, value_type: *c_void, value: c_float) -> *c_void;
 	fn jit_value_create_float64_constant(function: *c_void, value_type: *c_void, value: f64) -> *c_void;
@@ -577,6 +604,114 @@ impl Function {
 			let value = jit_value_create(self._function, value_type._type);
 			box Value { _value: value }
 		}
+	}
+	/// Make an instruction that gets the inverse cosine of the number given
+	pub fn insn_acos(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_acos)
+	}
+	/// Make an instruction that gets the inverse sine of the number given
+	pub fn insn_asin(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_asin)
+	}
+	/// Make an instruction that gets the inverse tangent of the number given
+	pub fn insn_atan(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_atan)
+	}
+	/// Make an instruction that gets the inverse tangent of the numbers given
+	pub fn insn_atan2(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_atan2)
+	}
+	/// Make an instruction that finds the nearest integer above a number
+	pub fn insn_ceil(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_ceil)
+	}
+	/// Make an instruction that gets the consine of the number given
+	pub fn insn_cos(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_cos)
+	}
+	/// Make an instruction that gets the hyperbolic consine of the number given
+	pub fn insn_cosh(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_cosh)
+	}
+	/// Make an instruction that gets the natural logarithm rased to the power of the number
+	pub fn insn_exp(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_exp)
+	}
+	/// Make an instruction that finds the nearest integer below a number
+	pub fn insn_floor(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_floor)
+	}
+	/// Make an instruction that gets the natural logarithm of the number
+	pub fn insn_log(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_log)
+	}
+	/// Make an instruction that gets the base 10 logarithm of the number
+	pub fn insn_log10(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_log10)
+	}
+	/// Make an instruction the gets the result of raising the first value to the power of the second value
+	pub fn insn_pow(&self, v1: &Value, v2:&Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_pow)
+	}
+	/// Make an instruction the gets the result of rounding the value to the nearest integer
+	pub fn insn_rint(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_rint)
+	}
+	/// Make an instruction the gets the result of rounding the value to the nearest integer
+	pub fn insn_round(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_round)
+	}
+	/// Make an instruction the gets the sine of the number
+	pub fn insn_sin(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_sin)
+	}
+	/// Make an instruction the gets the hyperbolic sine of the number
+	pub fn insn_sinh(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_sinh)
+	}
+	/// Make an instruction the gets the square root of a number
+	pub fn insn_sqrt(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_sqrt)
+	}
+	/// Make an instruction the gets the tangent of a number
+	pub fn insn_tan(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_tan)
+	}
+	/// Make an instruction the gets the hyperbolic tangent of a number
+	pub fn insn_tanh(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_tanh)
+	}
+	/// Make an instruction that truncates the value
+	pub fn insn_trunc(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_trunc)
+	}
+	/// Make an instruction that checks if the number is NaN
+	pub fn insn_is_nan(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_is_nan)
+	}
+	/// Make an instruction that checks if the number is finite
+	pub fn insn_is_finite(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_is_finite)
+	}
+	/// Make an instruction that checks if the number is  infinite
+	pub fn insn_is_inf(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_is_inf)
+	}
+	/// Make an instruction that gets the absolute value of a number
+	pub fn insn_abs(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_abs)
+	}
+	/// Make an instruction that gets the smallest of two numbers
+	pub fn insn_min(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_min)
+	}
+	/// Make an instruction that gets the biggest of two numbers
+	pub fn insn_max(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_max)
+	}
+	/// Make an instruction that gets the sign of a number
+	pub fn insn_sign(&self, v: &Value) -> Box<Value> {
+		self.insn_unop(v, jit_insn_sign)
 	}
 }
 #[deriving(Clone)]
