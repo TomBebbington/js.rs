@@ -1,62 +1,31 @@
 use syntax::ast::expr::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, VarDeclExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
-use syntax::ast::constant::{CNum, CInt, CString, CBool, CRegExp, CNull, CUndefined};
+use syntax::ast::constant::{CNum, CInt, CString, CBool, CNull, CUndefined};
 use syntax::ast::op::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
 use syntax::ast::op::{UnaryMinus, UnaryPlus, UnaryNot};
 use syntax::ast::op::{BinNum, BinBit, BinLog, BinComp};
 use syntax::ast::op::{BitAnd, BitOr, BitXor, BitShl, BitShr};
 use syntax::ast::op::{LogAnd, LogOr};
 use syntax::ast::op::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
-use stdlib::value::{Value, ValueData, VNull, VUndefined, VString, VNumber, VInteger, VObject, VBoolean, VFunction, ResultValue, to_value, from_value, ToValue};
-use stdlib::object::{INSTANCE_PROTOTYPE, PROTOTYPE};
-use stdlib::function;
+use stdlib::value::{Value, VNull, VFunction, ResultValue, to_value};
 use stdlib::function::FunctionData;
 use stdlib::{console, math, object, array, function, json, number, error, uri, string};
-use std::vec::raw::from_buf;
-use std::vec::Vec;
+use run::exec::Executor;
 use std::gc::Gc;
 use std::c_str::CString;
+use std::str::raw::from_c_str;
 use std::mem::size_of;
+use std::cell::RefCell;
 use jit::{Context, Function, Type, Types, Compilable, CDECL};
 use jit;
-/// A variable scope
-pub struct Scope {
-	/// The value of `this` in the scope
-	pub this: Value,
-	/// The variables declared in the scope
-	pub vars: Value
-}
-/// An execution engine
-pub trait Executor<T> {
-	/// Make a new execution engine
-	fn new() -> Self;
-	/// Set a global variable called `name` with the value `val`
-	fn set_global(&mut self, name:String, val:Value) -> Value;
-	/// Resolve the global variable `name`
-	fn get_global(&self, name:String) -> Value;
-	/// Create a new scope and return it
-	fn make_scope(&mut self, this:Value) -> Scope;
-	/// Destroy the current scope
-	fn destroy_scope(&mut self) -> Scope;
-	/// Compile the expression
-	fn compile(&self, expr:&Expr) -> Box<T>;
-	/// Run an expression
-	fn run(&mut self, comp:Box<T>) -> ResultValue;
-}
+
 /// A Javascript JIT compiler
 pub struct JITCompiler {
 	/// The JIT Context
 	context: Box<Context>,
 	/// An object representing the global object
-	pub global: Value,
-	/// The scopes
-	pub scopes: Vec<Scope>
+	pub global: Value
 }
 impl JITCompiler {
-	#[inline(always)]
-	/// Get the current scope
-	pub fn scope(&self) -> Scope {
-		*self.scopes.get(self.scopes.len() - 1)
-	}
 	fn with_builder<R>(&self, cb: || -> R) -> R {
 		self.context.build_start();
 		let rv = cb();
@@ -79,11 +48,7 @@ impl Executor<Function> for JITCompiler {
 		uri::init(global);
 		JITCompiler {
 			context: Context::new(),
-			global: global,
-			scopes: vec!(Scope {
-				this: global,
-				vars: global
-			})
+			global: global
 		}
 	}
 	#[inline(always)]
@@ -93,18 +58,6 @@ impl Executor<Function> for JITCompiler {
 	#[inline(always)]
 	fn get_global(&self, name:String) -> Value {
 		self.global.get_field(name)
-	}
-	fn make_scope(&mut self, this:Value) -> Scope {
-		let scope = Scope {
-			this: this,
-			vars: Value::new_obj(None)
-		};
-		self.scopes.push(scope);
-		scope
-	}
-	#[inline(always)]
-	fn destroy_scope(&mut self) -> Scope {
-		self.scopes.pop().unwrap()
 	}
 	fn compile(&self, expr: &Expr) -> Box<Function> {
 		self.with_builder(|| {
@@ -116,9 +69,10 @@ impl Executor<Function> for JITCompiler {
 				let cstring_t = Type::create_pointer(&*Types::get_char());
 				let create_value_sig = Type::create_signature(CDECL, &*value_t, &[]);
 				let undefined = || func.insn_call_native0("undefined", create_undef_value, &*create_value_sig, &[]);
-				let global = func.get_param(0);
-				let scope = func.get_param(1);
-				let this = func.get_param(2);
+				let args = func.get_param(0);
+				let global = func.get_param(1);
+				let scope = func.get_param(2);
+				let this = func.get_param(3);
 				match expr.def {
 					ConstExpr(CNull) => {
 						fn create_null_value() -> Value {
@@ -229,29 +183,38 @@ impl Executor<Function> for JITCompiler {
 					},
 					/*
 					FunctionDeclExpr(ref name, ref args, ref expr) => {
-						fn create_func_value(data: FunctionData, args: *Value, nargs: uint) -> Value {
+						fn create_func_value(data: FunctionData, args: **i8, nargs: uint) -> Value {
+							let mut s_args = Vec::with_capacity(nargs);
+							for i in range(0, nargs) {
+								unsafe {
+									println!("{}", nargs);
+									let c_str = from_c_str(((args as uint) + i * size_of::<*i8>()) as *i8);
+									println!("{}", c_str);
+									s_args.push(c_str);
+								}
+							}
 							Value {
-								ptr: Gc::new(function::Function::new(data, from_buf(args, nargs)))
+								ptr: Gc::new(VFunction(RefCell::new(function::Function::new(data, s_args))))
 							}
 						}
-						let value_ptr_t = Type::create_pointer(&*value_t);
-						let vec_t = value_ptr_t;
-						let args_i = func.create_value(&*value_ptr_t);
-						let nargs_i = func.constant_int32(args.len() as i32);
-						let args_size = func.constant_int32((args.len() as u32 * value_t.get_size()) as i32);
+						let cstring_ptr_t = Type::create_pointer(&*value_t);
+						let args_i = func.create_value(&*cstring_ptr_t);
+						let nargs_i = args.len().compile(func);
+						let args_size = (args.len() * cstring_t.get_size() as uint).compile(func);
 						func.insn_store(args_i, func.insn_alloca(args_size));
-						let mut arg_types = Vec::with_capacity(args.len());
 						for i in range(0i32, args.len() as i32) {
-							arg_types.push(&*value_t);
-							func.insn_store_relative(args_i, i * value_t.get_size() as i32, compile_value(func, args.get(i)))
+							func.insn_store_relative(args_i, i * cstring_t.get_size() as i32, args.get(i as uint).compile(func))
 						}
 						// fn(args, global, scope, this)
-						let sig_t = Type::create_signature(CDECL, &*value_t, &[&*vec_t, &*]);
+						let vec_t = Types::get_vec();
+						let sig_t = Type::create_signature(CDECL, &*value_t, &[&*vec_t, &*value_t, &*value_t, &*value_t]);
 						let new_func = func.get_context().create_function(&*sig_t);
 						let value = compile_value(new_func, &**expr);
 						new_func.insn_return(&*value);
+						new_func.dump(name.clone().unwrap().as_slice());
 						let make_func_sig_t = Type::create_signature(CDECL, &*value_t, &[&*sig_t, &*args_i.get_type(), &*nargs_i.get_type()]);
-						func.insn_call_native3("create_func", create_func_value, &*make_func_sig_t, &[&*new_func, &*args_i, &*nargs_i])
+						println!("{}", new_func.as_value().get_type().get_size());
+						func.insn_call_native3("create_func", create_func_value, &*make_func_sig_t, &[&*new_func.as_value(), &*args_i, &*nargs_i])
 					},
 					*/
 					BlockExpr(ref block) => {
@@ -491,7 +454,7 @@ impl Executor<Function> for JITCompiler {
 			let valuedata_t = Types::get_int();
 			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
 			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t, &*value_t]);
+			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[&*Types::get_vec(), &*value_t, &*value_t, &*value_t]);
 			let func = self.context.create_function(&*default_sig_t);
 			let value = compile_value(func, expr);
 			func.insn_return(&*value);

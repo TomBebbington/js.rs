@@ -21,8 +21,13 @@ extern crate serialize;
 extern crate time;
 extern crate url;
 extern crate jit;
-/// The interpreter
-pub mod exec;
+/// The execution engines
+pub mod run {
+	/// Defines the base executor trait which the execution engines derive from
+	pub mod exec;
+	/// Just-In-Time Compilation using libJIT
+	pub mod jit;
+}
 /// The standard Javascript library
 pub mod stdlib {
 	/// Javascript values, utility methods and conversion between Javascript values and Rust values

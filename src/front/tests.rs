@@ -1,4 +1,4 @@
-use js::exec::{Executor, JITCompiler};
+use js::run::exec::execute_env;
 use js::stdlib::value::{ResultValue, Value, to_value, from_value};
 use js::stdlib::function::Function;
 use syntax::Lexer;
@@ -73,11 +73,9 @@ impl Tests {
 			println!("Parsed as {}", expr);
 			println!("Now running");
 		}
-		let mut engine:JITCompiler = Executor::new();
-		engine.set_global("assert".into_string(), Function::make(assert, ["string"]));
-		let comp = engine.compile(&expr);
-		let result = engine.run(comp);
-		match result {
+		let env = Value::new_obj(None);
+		env.set_field_slice("assert", Function::make(assert, ["condition"]));
+		match execute_env(&expr, env) {
 			Ok(_) =>
 				println!("{}: {}: All tests passed successfully", file, desc),
 			Err(v) =>

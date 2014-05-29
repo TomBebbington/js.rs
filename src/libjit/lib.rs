@@ -713,6 +713,12 @@ impl Function {
 	pub fn insn_sign(&self, v: &Value) -> Box<Value> {
 		self.insn_unop(v, jit_insn_sign)
 	}
+	/// Convert it into a value
+	pub fn as_value(&self) -> Box<Value> {
+		box Value {
+			_value: self._function
+		}
+	}
 }
 #[deriving(Clone)]
 /// A Value that is being JITed
@@ -794,6 +800,12 @@ impl Types {
 	/// Boolean type
 	pub fn get_bool() -> Box<Type> {
 		box Type { _type: jit_type_sys_bool }
+	}
+	/// Vec<?> type
+	pub fn get_vec() -> Box<Type> {
+		let uint_t = Types::get_uint();
+		let void_ptr_t = Types::get_void_ptr();
+		Type::create_struct(&[&*uint_t, &*uint_t, &*void_ptr_t])
 	}
 }
 struct PointerConstant {

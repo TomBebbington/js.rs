@@ -1,4 +1,5 @@
-use js::exec::{Executor, JITCompiler};
+use js::run::exec::Executor;
+use js::run::jit::JITCompiler;
 use syntax::Lexer;
 use syntax::Parser;
 use getopts::Matches;
@@ -34,13 +35,12 @@ impl Interactive {
 				println!("Tokens: {}", tokens);
 				println!("Parsing");
 			}
-			let expr = Parser::new(tokens).parse().unwrap();
+			let expr = Parser::new(tokens).parse_all().unwrap();
 			if verbose {
 				println!("Expression: {}", expr);
 			}
-			let comp = engine.compile(&expr);
-			let result = engine.run(comp);
-			match result {
+			let compiled = engine.compile(&expr);
+			match engine.run(compiled) {
 				Ok(v) =>
 					println!("{}", v),
 				Err(v) =>
