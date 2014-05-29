@@ -1,4 +1,4 @@
-use js::exec::{Executor, Interpreter};
+use js::run::exec::execute;
 use syntax::Lexer;
 use syntax::Parser;
 use getopts::Matches;
@@ -16,7 +16,7 @@ impl Runner {
 		}
 	}
 	/// Run the script
-	pub fn run(&self, script: StrBuf) {
+	pub fn run(&self, script: String) {
 		let verbose = self.m.opt_present("v");
 		let path = Path::new(script.as_slice());
 		if path.exists() {
@@ -33,13 +33,11 @@ impl Runner {
 				println!("Parsed as {}", expr);
 				println!("Now running");
 			}
-			let mut engine:Interpreter = Executor::new();
-			let result = engine.run(&expr);
-			match result {
+			match execute(&expr) {
 				Ok(v) =>
-					println!("{}", v.borrow()),
+					println!("{}", v),
 				Err(v) =>
-					println!("Failed with {}", v.borrow())
+					println!("Failed with {}", v)
 			}
 		} else {
 			fail!("{} does not exist", script);

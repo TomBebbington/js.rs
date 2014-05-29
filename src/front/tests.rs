@@ -1,5 +1,6 @@
-use js::exec::{Executor, Interpreter};
+use js::run::exec::execute_env;
 use js::stdlib::value::{ResultValue, Value, to_value, from_value};
+use js::stdlib::function::Function;
 use syntax::Lexer;
 use syntax::Parser;
 use syntax::ast::token::{Token, TComment};
@@ -7,7 +8,7 @@ use getopts::Matches;
 use collections::treemap::TreeMap;
 use std::io::{BufferedReader, File};
 use std::io::fs::walk_dir;
-fn find_attrs(tokens: Vec<Token>) -> TreeMap<StrBuf, StrBuf> {
+fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
 	let mut map = TreeMap::new();
 	for tk in tokens.iter() {
 		match tk.data {
@@ -17,7 +18,7 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<StrBuf, StrBuf> {
 					let space_ind = current.slice_from(1).find(' ').unwrap() + 1;
 					let key = current.slice_chars(2, space_ind);
 					let value = current.slice_from(space_ind + 1);
-					map.insert(key.into_strbuf(), value.into_strbuf());
+					map.insert(key.into_string(), value.into_string());
 				}
 			},
 			_ => ()
@@ -38,7 +39,7 @@ impl Tests {
 	}
 	/// Run a test
 	pub fn run_test(&self, path: Path) {
-		fn assert(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+		fn assert(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 			if args.len() < 2 {
 				return Err(to_value("'assert' function expects assertion and description arguments"));
 			}
@@ -62,7 +63,7 @@ impl Tests {
 		lexer.lex().unwrap();
 		let tokens = lexer.tokens;
 		let attrs = find_attrs(tokens.clone());
-		let desc = attrs.find(&"description".into_strbuf()).unwrap();
+		let desc = attrs.find(&"description".into_string()).unwrap();
 		if verbose {
 			println!("Lexed into: {}", tokens);
 			println!("Parsing");
@@ -72,14 +73,13 @@ impl Tests {
 			println!("Parsed as {}", expr);
 			println!("Now running");
 		}
-		let mut engine:Interpreter = Executor::new();
-		engine.set_global("assert".into_strbuf(), to_value(assert));
-		let result = engine.run(&expr);
-		match result {
+		let env = Value::new_obj(None);
+		env.set_field_slice("assert", Function::make(assert, ["condition"]));
+		match execute_env(&expr, env) {
 			Ok(_) =>
 				println!("{}: {}: All tests passed successfully", file, desc),
 			Err(v) =>
-				println!("{}: {}: Failed with {}", file, desc, v.borrow())
+				println!("{}: {}: Failed with {}", file, desc, v)
 		}
 	}
 	/// Run all the tests in `path`

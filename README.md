@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/TomBebbington/js.rs.svg?branch=master)](https://travis-ci.org/TomBebbington/js.rs)
-This is a Javascript lexer, parser and interpreter written in Rust. Currently, it has support for some of the language.
+This is a Javascript lexer, parser and Just-in-Time written in Rust. Currently, it has support for some of the language.
 
 Documentation
 -------------
@@ -7,7 +7,7 @@ Documentation
 
 Supported language features
 ---------------------------
-+ Functions(partial, return last expression)
++ Functions
 + Switch blocks (partial, ignore breaks)
 + If blocks
 + While blocks
@@ -35,7 +35,7 @@ To build this project, clone it then run `make libs all` in the project root
 
 Installing
 ----------
-To install this project, run `make install` in the project root
+To install this project, run `[sudo ]make install` in the project root
 
 Running
 -------

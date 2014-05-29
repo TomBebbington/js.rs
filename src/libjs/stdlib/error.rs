@@ -1,35 +1,31 @@
 use stdlib::object::PROTOTYPE;
-use stdlib::value::{Value, ValueData, ResultValue, VUndefined, to_value};
-use std::gc::Gc;
+use stdlib::value::{Value, ResultValue, to_value};
+use stdlib::function::Function;
 
 /// Create a new error
-pub fn make_error(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn make_error(args:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
 	if args.len() >= 1 {
-		this.borrow().set_field_slice("message", to_value(args.get(0).borrow().to_str().into_strbuf()));
+		this.set_field_slice("message", to_value(args.get(0).to_str().into_string()));
 	}
-	Ok(Gc::new(VUndefined))
+	Ok(Value::undefined())
 }
 /// Get the string representation of the error
-pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	let this_ptr = this.borrow();
-	let name = this_ptr.get_field_slice("name");
-	let message = this_ptr.get_field_slice("message");
-	Ok(to_value(format!("{}: {}", name.borrow(), message.borrow()).into_strbuf()))
+pub fn to_string(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
+	let name = this.get_field_slice("name");
+	let message = this.get_field_slice("message");
+	Ok(to_value(format!("{}: {}", name, message).into_string()))
 }
 /// Create a new `Error` object
 pub fn _create(global: Value) -> Value {
-	let prototype = ValueData::new_obj(Some(global));
-	let prototype_ptr = prototype.borrow();
-	prototype_ptr.set_field_slice("message", to_value(""));
-	prototype_ptr.set_field_slice("name", to_value("Error"));
-	prototype_ptr.set_field_slice("toString", to_value(to_string));
-	let error = to_value(make_error);
-	let error_ptr = error.borrow();
-	error_ptr.set_field_slice(PROTOTYPE, prototype);
+	let prototype = Value::new_obj(Some(global));
+	prototype.set_field_slice("message", to_value(""));
+	prototype.set_field_slice("name", to_value("Error"));
+	prototype.set_field_slice("toString", Function::make(to_string, []));
+	let error = Function::make(make_error, ["message"]);
+	error.set_field_slice(PROTOTYPE, prototype);
 	error
 }
 /// Initialise the global object with the `Error` object
 pub fn init(global:Value) {
-	let global_ptr = global.borrow();
-	global_ptr.set_field_slice("Error", _create(global));
+	global.set_field_slice("Error", _create(global));
 }

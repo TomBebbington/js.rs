@@ -1,10 +1,10 @@
-use stdlib::value::{Value, ValueData, VUndefined, VObject, ResultValue, ToValue, FromValue, to_value, from_value};
+use stdlib::value::{Value, ResultValue, ToValue, FromValue, to_value, from_value};
+use stdlib::function::Function;
 use collections::treemap::TreeMap;
-use std::gc::Gc;
 pub static PROTOTYPE: &'static str = "prototype";
 pub static INSTANCE_PROTOTYPE: &'static str = "__proto__";
 #[deriving(Clone)]
-pub type ObjectData = TreeMap<StrBuf, Property>;
+pub type ObjectData = TreeMap<String, Property>;
 
 #[deriving(Clone)]
 /// A Javascript property
@@ -30,94 +30,87 @@ impl Property {
 			enumerable: false,
 			writable: false,
 			value: value,
-			get: Gc::new(VUndefined),
-			set: Gc::new(VUndefined)
+			get: Value::undefined(),
+			set: Value::undefined()
 		}
 	}
 }
 
 impl ToValue for Property {
 	fn to_value(&self) -> Value {
-		let prop = ValueData::new_obj(None);
-		let prop_ref = prop.borrow();
-		prop_ref.set_field_slice("configurable", to_value(self.configurable));
-		prop_ref.set_field_slice("enumerable", to_value(self.enumerable));
-		prop_ref.set_field_slice("writable", to_value(self.writable));
-		prop_ref.set_field_slice("value", self.value);
-		prop_ref.set_field_slice("get", self.get);
-		prop_ref.set_field_slice("set", self.set);
+		let prop = Value::new_obj(None);
+		prop.set_field_slice("configurable", to_value(self.configurable));
+		prop.set_field_slice("enumerable", to_value(self.enumerable));
+		prop.set_field_slice("writable", to_value(self.writable));
+		prop.set_field_slice("value", self.value);
+		prop.set_field_slice("get", self.get);
+		prop.set_field_slice("set", self.set);
 		prop
 	}
 }
 impl FromValue for Property {
 	fn from_value(v:Value) -> Result<Property, &'static str> {
-		let vb = v.borrow();
 		Ok(Property {
-			configurable: from_value(vb.get_field_slice("configurable")).unwrap(),
-			enumerable: from_value(vb.get_field_slice("enumerable")).unwrap(),
-			writable: from_value(vb.get_field_slice("writable")).unwrap(),
-			value: vb.get_field_slice("value"),
-			get: vb.get_field_slice("get"),
-			set: vb.get_field_slice("set")
+			configurable: from_value(v.get_field_slice("configurable")).unwrap(),
+			enumerable: from_value(v.get_field_slice("enumerable")).unwrap(),
+			writable: from_value(v.get_field_slice("writable")).unwrap(),
+			value: v.get_field_slice("value"),
+			get: v.get_field_slice("get"),
+			set: v.get_field_slice("set")
 		})
 	}
 }
 /// Create a new object
-pub fn make_object(_:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	Ok(Gc::new(VUndefined))
+pub fn make_object(_:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
+	Ok(Value::undefined())
 }
 /// Get the prototype of an object
-pub fn get_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn get_proto_of(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	let obj = args.get(0);
-	Ok(obj.borrow().get_field_slice(INSTANCE_PROTOTYPE))
+	Ok(obj.get_field_slice(INSTANCE_PROTOTYPE))
 }
 /// Set the prototype of an object
-pub fn set_proto_of(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn set_proto_of(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	let obj = *args.get(0);
 	let proto = *args.get(1);
-	obj.borrow().set_field_slice(INSTANCE_PROTOTYPE, proto);
+	obj.set_field_slice(INSTANCE_PROTOTYPE, proto);
 	Ok(obj)
 }
 /// Define a property in an object
-pub fn define_prop(_:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn define_prop(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 	let obj = args.get(0);
-	let prop = from_value::<StrBuf>(*args.get(1)).unwrap();
+	let prop = from_value::<String>(*args.get(1)).unwrap();
 	let desc = from_value::<Property>(*args.get(2)).unwrap();
-	obj.borrow().set_prop(prop, desc);
-	Ok(Gc::new(VUndefined))
+	obj.set_prop(prop, desc);
+	Ok(Value::undefined())
 }
 /// To string
-pub fn to_string(this:Value, _:Value, _:Vec<Value>) -> ResultValue {
-	Ok(to_value(this.borrow().to_str().into_strbuf()))
+pub fn to_string(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
+	Ok(to_value(this.to_str().into_string()))
 }
 /// Check if it has a property
-pub fn has_own_prop(this:Value, _:Value, args:Vec<Value>) -> ResultValue {
+pub fn has_own_prop(args:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
 	let prop = if args.len() == 0 {
 		None
 	} else {
-		from_value::<StrBuf>(*args.get(0)).ok()
+		from_value::<String>(*args.get(0)).ok()
 	};
-	Ok(to_value::<bool>(prop.is_some() && match *this.borrow() {
-		VObject(ref obj) => obj.borrow().find(&prop.unwrap()).is_some(),
-		_ => false
-	}))
+	Ok(to_value(prop.is_some() && this.get_prop(prop.unwrap()).is_some()))
 }
 /// Create a new `Object` object
 pub fn _create(global:Value) -> Value {
-	let object = to_value(make_object);
-	let object_ptr = object.borrow();
-	let prototype = ValueData::new_obj(Some(global));
-	prototype.borrow().set_field_slice("hasOwnProperty", to_value(has_own_prop));
-	prototype.borrow().set_field_slice("toString", to_value(to_string));
-	object_ptr.set_field_slice("length", to_value(1i32));
-	object_ptr.set_field_slice(PROTOTYPE, prototype);
-	object_ptr.set_field_slice("setPrototypeOf", to_value(set_proto_of));
-	object_ptr.set_field_slice("getPrototypeOf", to_value(get_proto_of));
-	object_ptr.set_field_slice("defineProperty", to_value(define_prop));
+	let object = Function::make(make_object, []);
+	let prototype = Value::new_obj(Some(global));
+	prototype.set_field_slice("hasOwnProperty", Function::make(has_own_prop, ["property"]));
+	prototype.set_field_slice("toString", Function::make(to_string, []));
+	object.set_field_slice("length", to_value(1i32));
+	object.set_field_slice(PROTOTYPE, prototype);
+	object.set_field_slice("setPrototypeOf", Function::make(get_proto_of, ["object", "prototype"]));
+	object.set_field_slice("getPrototypeOf", Function::make(get_proto_of, ["object"]));
+	object.set_field_slice("defineProperty", Function::make(define_prop, ["object", "property"]));
 	object
 }
 /// Initialise the `Object` object on the global object
 pub fn init(global:Value) {
-	let global_ptr = global.borrow();
-	global_ptr.set_field_slice("Object", _create(global));
+	global.set_field_slice("Object", _create(global));
 }

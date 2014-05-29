@@ -4,9 +4,9 @@ use std::fmt::{Formatter, Result, Show};
 /// A Javascript constant
 pub enum Const {
 	/// A UTF-8 string, such as `"Hello, world"`
-	CString(StrBuf),
+	CString(String),
 	/// A regular expression, such as `/where('s| is) [wW]ally/`
-	CRegExp(StrBuf, bool, bool),
+	CRegExp(String, bool, bool),
 	/// A 64-bit floating-point number, such as `3.1415`
 	CNum(f64),
 	/// A 32-bit integer, such as `42`

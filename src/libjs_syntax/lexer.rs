@@ -6,8 +6,7 @@ use ast::op::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, Comp
 use ast::op::{LogAnd, LogOr};
 use ast::op::{UnaryNot};
 use ast::op::{BinNum, BinBit, BinComp, BinLog};
-use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
-use std::strbuf::StrBuf;
+use std::io::{BufReader, BufferedReader, Buffer, IoError, IoResult, EndOfFile};
 use std::char::from_u32;
 use std::num::from_str_radix;
 #[deriving(Clone, Eq)]
@@ -47,7 +46,7 @@ pub struct Lexer<B> {
 	/// The reader
 	buffer: B,
 	/// The peeked character buffer
-	peek_buffer: StrBuf
+	peek_buffer: String
 }
 impl<B:Buffer> Lexer<B> {
 	/// Creates a new lexer with empty buffers
@@ -57,7 +56,7 @@ impl<B:Buffer> Lexer<B> {
 			line_number: 1,
 			column_number: 0,
 			buffer: buffer,
-			peek_buffer: StrBuf::new()
+			peek_buffer: String::new()
 		}
 	}
 	#[inline(always)]
@@ -115,7 +114,7 @@ impl<B:Buffer> Lexer<B> {
 			self.column_number += 1;
 			match ch {
 				'"' | '\'' => {
-					let mut buf = StrBuf::new();
+					let mut buf = String::new();
 					loop {
 						match try!(self.next()) {
 							'\'' if ch == '\'' => {
@@ -135,7 +134,7 @@ impl<B:Buffer> Lexer<B> {
 										'f' => '\x0c',
 										'0' => '\0',
 										'x' => {
-											let mut nums = StrBuf::with_capacity(2);
+											let mut nums = String::with_capacity(2);
 											for _ in range(0, 2) {
 												nums.push_char(try!(self.next()));
 											}
@@ -150,7 +149,7 @@ impl<B:Buffer> Lexer<B> {
 											}
 										},
 										'u' => {
-											let mut nums = StrBuf::new();
+											let mut nums = String::new();
 											for _ in range(0, 4) {
 												nums.push_char(try!(self.next()));
 											}
@@ -176,7 +175,7 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TString(buf))
 				},
 				'0' if self.peek_for('x') => {
-					let mut buf = StrBuf::new();
+					let mut buf = String::new();
 					loop {
 						match try!(self.next()) {
 							ch if ch.is_digit_radix(16) => buf.push_char(ch),
@@ -189,20 +188,25 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TNumber(from_str_radix(buf.as_slice(), 16).unwrap()));
 				},
 				'0' => {
-					let mut buf = StrBuf::new();
+					let mut buf = "0".into_string();
 					let mut gone_decimal = false;
 					loop {
-						let ch = try!(self.next());
+						let ch = self.next();
 						match ch {
-							_ if ch.is_digit_radix(8) => buf.push_char(ch),
-							'8' | '9' | '.' => {
+							Ok(ch) if ch.is_digit_radix(8) =>
+								buf.push_char(ch),
+							Ok('8') | Ok('9') | Ok('.') => {
 								gone_decimal = true;
-								buf.push_char(ch);
+								buf.push_char(ch.unwrap());
 							},
-							ch => {
+							Ok(ch) => {
 								self.peek_buffer.push_char(ch);
 								break;
-							}
+							},
+							Err(IoError {kind: EndOfFile, ..}) =>
+								break,
+							Err(err) =>
+								return Err(err)
 						}
 					}
 					self.push_token(TNumber(if gone_decimal {
@@ -212,7 +216,7 @@ impl<B:Buffer> Lexer<B> {
 					}.unwrap()));
 				},
 				_ if ch.is_digit() => {
-					let mut buf = StrBuf::new();
+					let mut buf = String::new();
 					buf.push_char(ch);
 					loop {
 						let ch = try!(self.next());
@@ -228,7 +232,7 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TNumber(from_str(buf.as_slice()).unwrap()));
 				},
 				_ if ch.is_alphabetic() || ch == '$' || ch == '_' => {
-					let mut buf = StrBuf::new();
+					let mut buf = String::new();
 					buf.push_char(ch);
 					loop {
 						let ch = try!(self.next());
@@ -276,7 +280,7 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TQuestion);
 				},
 				'/' if self.peek_for('/') => {
-					let mut buf = StrBuf::new();
+					let mut buf = String::new();
 					loop {
 						match try!(self.next()) {
 							'\n' => break,
@@ -286,7 +290,7 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TComment(buf));
 				},
 				'/' if self.peek_for('*') => {
-					let mut buf = StrBuf::new();
+					let mut buf = String::new();
 					loop {
 						match try!(self.next()) {
 							'\n' => break,

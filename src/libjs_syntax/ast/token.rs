@@ -29,7 +29,7 @@ impl Show for Token {
 /// A single token of Javacript code - a single word, symbol or constant
 pub enum TokenData {
 	/// A string literal
-	TString(StrBuf),
+	TString(String),
 	/// A semicolon (;)
 	TSemicolon,
 	/// A colon
@@ -41,7 +41,7 @@ pub enum TokenData {
 	/// A comma
 	TComma,
 	/// An identity literal
-	TIdent(StrBuf),
+	TIdent(String),
 	/// An opening bracket
 	TOpenParen,
 	/// A closing bracket
@@ -67,7 +67,7 @@ pub enum TokenData {
 	/// An assign operation combined with something else
 	TAssignOp(BinOp),
 	/// A comment
-	TComment(StrBuf)
+	TComment(String)
 }
 impl Show for TokenData {
 	fn fmt(&self, f: &mut Formatter) -> Result {
