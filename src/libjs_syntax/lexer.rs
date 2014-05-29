@@ -6,7 +6,7 @@ use ast::op::{CompEqual, CompStrictEqual, CompNotEqual, CompStrictNotEqual, Comp
 use ast::op::{LogAnd, LogOr};
 use ast::op::{UnaryNot};
 use ast::op::{BinNum, BinBit, BinComp, BinLog};
-use std::io::{BufReader, BufferedReader, Buffer, IoResult, EndOfFile};
+use std::io::{BufReader, BufferedReader, Buffer, IoError, IoResult, EndOfFile};
 use std::char::from_u32;
 use std::num::from_str_radix;
 #[deriving(Clone, Eq)]
@@ -188,20 +188,25 @@ impl<B:Buffer> Lexer<B> {
 					self.push_token(TNumber(from_str_radix(buf.as_slice(), 16).unwrap()));
 				},
 				'0' => {
-					let mut buf = String::new();
+					let mut buf = "0".into_string();
 					let mut gone_decimal = false;
 					loop {
-						let ch = try!(self.next());
+						let ch = self.next();
 						match ch {
-							_ if ch.is_digit_radix(8) => buf.push_char(ch),
-							'8' | '9' | '.' => {
+							Ok(ch) if ch.is_digit_radix(8) =>
+								buf.push_char(ch),
+							Ok('8') | Ok('9') | Ok('.') => {
 								gone_decimal = true;
-								buf.push_char(ch);
+								buf.push_char(ch.unwrap());
 							},
-							ch => {
+							Ok(ch) => {
 								self.peek_buffer.push_char(ch);
 								break;
-							}
+							},
+							Err(IoError {kind: EndOfFile, ..}) =>
+								break,
+							Err(err) =>
+								return Err(err)
 						}
 					}
 					self.push_token(TNumber(if gone_decimal {
