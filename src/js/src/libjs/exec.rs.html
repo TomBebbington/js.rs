@@ -548,6 +548,16 @@
 <span id='508'>508</span>
 <span id='509'>509</span>
 <span id='510'>510</span>
+<span id='511'>511</span>
+<span id='512'>512</span>
+<span id='513'>513</span>
+<span id='514'>514</span>
+<span id='515'>515</span>
+<span id='516'>516</span>
+<span id='517'>517</span>
+<span id='518'>518</span>
+<span id='519'>519</span>
+<span id='520'>520</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>expr</span>::{<span class='ident'>Expr</span>, <span class='ident'>ConstExpr</span>, <span class='ident'>BlockExpr</span>, <span class='ident'>TypeOfExpr</span>, <span class='ident'>LocalExpr</span>, <span class='ident'>VarDeclExpr</span>, <span class='ident'>GetConstFieldExpr</span>, <span class='ident'>GetFieldExpr</span>, <span class='ident'>CallExpr</span>, <span class='ident'>WhileLoopExpr</span>, <span class='ident'>IfExpr</span>, <span class='ident'>SwitchExpr</span>, <span class='ident'>ObjectDeclExpr</span>, <span class='ident'>ArrayDeclExpr</span>, <span class='ident'>FunctionDeclExpr</span>, <span class='ident'>ArrowFunctionDeclExpr</span>, <span class='ident'>UnaryOpExpr</span>, <span class='ident'>BinOpExpr</span>, <span class='ident'>ConstructExpr</span>, <span class='ident'>ReturnExpr</span>, <span class='ident'>ThrowExpr</span>, <span class='ident'>AssignExpr</span>};
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ast</span>::<span class='ident'>constant</span>::{<span class='ident'>CNum</span>, <span class='ident'>CInt</span>, <span class='ident'>CString</span>, <span class='ident'>CBool</span>, <span class='ident'>CRegExp</span>, <span class='ident'>CNull</span>, <span class='ident'>CUndefined</span>};
@@ -566,7 +576,9 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>vec</span>::<span class='ident'>Vec</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>Gc</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>c_str</span>::<span class='ident'>CString</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>str</span>::<span class='ident'>raw</span>::<span class='ident'>from_c_str</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>::<span class='ident'>size_of</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>RefCell</span>;
 <span class='kw'>use</span> <span class='ident'>jit</span>::{<span class='ident'>Context</span>, <span class='ident'>Function</span>, <span class='ident'>Type</span>, <span class='ident'>Types</span>, <span class='ident'>Compilable</span>, <span class='ident'>CDECL</span>};
 <span class='kw'>use</span> <span class='ident'>jit</span>;
 <span class='doccomment'>/// A variable scope
@@ -667,9 +679,10 @@
 				<span class='kw'>let</span> <span class='ident'>cstring_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_pointer</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>Types</span>::<span class='ident'>get_char</span>());
 				<span class='kw'>let</span> <span class='ident'>create_value_sig</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span>[]);
 				<span class='kw'>let</span> <span class='ident'>undefined</span> <span class='op'>=</span> <span class='op'>||</span> <span class='ident'>func</span>.<span class='ident'>insn_call_native0</span>(<span class='string'>&quot;undefined&quot;</span>, <span class='ident'>create_undef_value</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>create_value_sig</span>, <span class='kw-2'>&amp;</span>[]);
-				<span class='kw'>let</span> <span class='ident'>global</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>0</span>);
-				<span class='kw'>let</span> <span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>1</span>);
-				<span class='kw'>let</span> <span class='ident'>this</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>2</span>);
+				<span class='kw'>let</span> <span class='ident'>args</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>0</span>);
+				<span class='kw'>let</span> <span class='ident'>global</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>1</span>);
+				<span class='kw'>let</span> <span class='ident'>scope</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>2</span>);
+				<span class='kw'>let</span> <span class='ident'>this</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_param</span>(<span class='number'>3</span>);
 				<span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>def</span> {
 					<span class='ident'>ConstExpr</span>(<span class='ident'>CNull</span>) <span class='op'>=&gt;</span> {
 						<span class='kw'>fn</span> <span class='ident'>create_null_value</span>() <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
@@ -777,35 +790,42 @@
 						}
 						<span class='kw'>let</span> <span class='ident'>num_values</span> <span class='op'>=</span> (<span class='ident'>values</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>).<span class='ident'>compile</span>(<span class='ident'>func</span>);
 						<span class='ident'>func</span>.<span class='ident'>insn_call_native2</span>(<span class='string'>&quot;create_array&quot;</span>, <span class='ident'>create_array</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>create_array_sig</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>values_i</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>num_values</span>])
-					},<span class='comment'>
-					/*
-					FunctionDeclExpr(ref name, ref args, ref expr) =&gt; {
-						fn create_func_value(data: FunctionData, args: *Value, nargs: uint) -&gt; Value {
-							Value {
-								ptr: Gc::new(function::Function::new(data, from_buf(args, nargs)))
+					},
+					<span class='ident'>FunctionDeclExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>name</span>, <span class='kw-2'>ref</span> <span class='ident'>args</span>, <span class='kw-2'>ref</span> <span class='ident'>expr</span>) <span class='op'>=&gt;</span> {
+						<span class='kw'>fn</span> <span class='ident'>create_func_value</span>(<span class='ident'>data</span>: <span class='ident'>FunctionData</span>, <span class='ident'>args</span>: <span class='op'>*</span><span class='op'>*</span><span class='ident'>i8</span>, <span class='ident'>nargs</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+							<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>s_args</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>nargs</span>);
+							<span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='ident'>nargs</span>) {
+								<span class='kw'>unsafe</span> {
+									<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>nargs</span>);
+									<span class='kw'>let</span> <span class='ident'>c_str</span> <span class='op'>=</span> <span class='ident'>from_c_str</span>(((<span class='ident'>args</span> <span class='kw'>as</span> <span class='ident'>uint</span>) <span class='op'>+</span> <span class='ident'>i</span> <span class='op'>*</span> <span class='ident'>size_of</span>::<span class='op'>&lt;</span><span class='op'>*</span><span class='ident'>i8</span><span class='op'>&gt;</span>()) <span class='kw'>as</span> <span class='op'>*</span><span class='ident'>i8</span>);
+									<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>c_str</span>);
+									<span class='ident'>s_args</span>.<span class='ident'>push</span>(<span class='ident'>c_str</span>);
+								}
+							}
+							<span class='ident'>Value</span> {
+								<span class='ident'>ptr</span>: <span class='ident'>Gc</span>::<span class='ident'>new</span>(<span class='ident'>VFunction</span>(<span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>function</span>::<span class='ident'>Function</span>::<span class='ident'>new</span>(<span class='ident'>data</span>, <span class='ident'>s_args</span>))))
 							}
 						}
-						let value_ptr_t = Type::create_pointer(&amp;*value_t);
-						let vec_t = value_ptr_t;
-						let args_i = func.create_value(&amp;*value_ptr_t);
-						let nargs_i = func.constant_int32(args.len() as i32);
-						let args_size = func.constant_int32((args.len() as u32 * value_t.get_size()) as i32);
-						func.insn_store(args_i, func.insn_alloca(args_size));
-						let mut arg_types = Vec::with_capacity(args.len());
-						for i in range(0i32, args.len() as i32) {
-							arg_types.push(&amp;*value_t);
-							func.insn_store_relative(args_i, i * value_t.get_size() as i32, compile_value(func, args.get(i)))
-						}
+						<span class='kw'>let</span> <span class='ident'>cstring_ptr_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_pointer</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>);
+						<span class='kw'>let</span> <span class='ident'>args_i</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>create_value</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>cstring_ptr_t</span>);
+						<span class='kw'>let</span> <span class='ident'>nargs_i</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>len</span>().<span class='ident'>compile</span>(<span class='ident'>func</span>);
+						<span class='kw'>let</span> <span class='ident'>args_size</span> <span class='op'>=</span> (<span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>*</span> <span class='ident'>cstring_t</span>.<span class='ident'>get_size</span>() <span class='kw'>as</span> <span class='ident'>uint</span>).<span class='ident'>compile</span>(<span class='ident'>func</span>);
+						<span class='ident'>func</span>.<span class='ident'>insn_store</span>(<span class='ident'>args_i</span>, <span class='ident'>func</span>.<span class='ident'>insn_alloca</span>(<span class='ident'>args_size</span>));
+						<span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0i32</span>, <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>) {
+							<span class='ident'>func</span>.<span class='ident'>insn_store_relative</span>(<span class='ident'>args_i</span>, <span class='ident'>i</span> <span class='op'>*</span> <span class='ident'>cstring_t</span>.<span class='ident'>get_size</span>() <span class='kw'>as</span> <span class='ident'>i32</span>, <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>uint</span>).<span class='ident'>compile</span>(<span class='ident'>func</span>))
+						}<span class='comment'>
 						// fn(args, global, scope, this)
-						let sig_t = Type::create_signature(CDECL, &amp;*value_t, &amp;[&amp;*vec_t, &amp;*]);
-						let new_func = func.get_context().create_function(&amp;*sig_t);
-						let value = compile_value(new_func, &amp;**expr);
-						new_func.insn_return(&amp;*value);
-						let make_func_sig_t = Type::create_signature(CDECL, &amp;*value_t, &amp;[&amp;*sig_t, &amp;*args_i.get_type(), &amp;*nargs_i.get_type()]);
-						func.insn_call_native3(&quot;create_func&quot;, create_func_value, &amp;*make_func_sig_t, &amp;[&amp;*new_func, &amp;*args_i, &amp;*nargs_i])
+						</span><span class='kw'>let</span> <span class='ident'>vec_t</span> <span class='op'>=</span> <span class='ident'>Types</span>::<span class='ident'>get_vec</span>();
+						<span class='kw'>let</span> <span class='ident'>sig_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>vec_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>]);
+						<span class='kw'>let</span> <span class='ident'>new_func</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>get_context</span>().<span class='ident'>create_function</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>sig_t</span>);
+						<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>compile_value</span>(<span class='ident'>new_func</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='op'>*</span><span class='ident'>expr</span>);
+						<span class='ident'>new_func</span>.<span class='ident'>insn_return</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value</span>);
+						<span class='ident'>new_func</span>.<span class='ident'>dump</span>(<span class='ident'>name</span>.<span class='ident'>clone</span>().<span class='ident'>unwrap</span>().<span class='ident'>as_slice</span>());
+						<span class='kw'>let</span> <span class='ident'>make_func_sig_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>sig_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>args_i</span>.<span class='ident'>get_type</span>(), <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>nargs_i</span>.<span class='ident'>get_type</span>()]);
+						<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>new_func</span>.<span class='ident'>as_value</span>().<span class='ident'>get_type</span>().<span class='ident'>get_size</span>());
+						<span class='ident'>func</span>.<span class='ident'>insn_call_native3</span>(<span class='string'>&quot;create_func&quot;</span>, <span class='ident'>create_func_value</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>make_func_sig_t</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>new_func</span>.<span class='ident'>as_value</span>(), <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>args_i</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>nargs_i</span>])
 					},
-					*/
-					</span><span class='ident'>BlockExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>block</span>) <span class='op'>=&gt;</span> {
+					<span class='ident'>BlockExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>block</span>) <span class='op'>=&gt;</span> {
 						<span class='kw'>let</span> <span class='ident'>last</span> <span class='op'>=</span> <span class='ident'>block</span>.<span class='ident'>last</span>();
 						<span class='kw'>for</span> <span class='ident'>expr</span> <span class='kw'>in</span> <span class='ident'>block</span>.<span class='ident'>iter</span>() {
 							<span class='kw'>let</span> <span class='ident'>comp</span> <span class='op'>=</span> <span class='ident'>compile_value</span>(<span class='ident'>func</span>, <span class='ident'>expr</span>);
@@ -1042,7 +1062,7 @@
 			<span class='kw'>let</span> <span class='ident'>valuedata_t</span> <span class='op'>=</span> <span class='ident'>Types</span>::<span class='ident'>get_int</span>();
 			<span class='kw'>let</span> <span class='ident'>valuedata_ptr_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_pointer</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>valuedata_t</span>);
 			<span class='kw'>let</span> <span class='ident'>value_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_struct</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>valuedata_ptr_t</span>]);
-			<span class='kw'>let</span> <span class='ident'>default_sig_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>]);
+			<span class='kw'>let</span> <span class='ident'>default_sig_t</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_signature</span>(<span class='ident'>CDECL</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>Types</span>::<span class='ident'>get_vec</span>(), <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value_t</span>]);
 			<span class='kw'>let</span> <span class='ident'>func</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>context</span>.<span class='ident'>create_function</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>default_sig_t</span>);
 			<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>compile_value</span>(<span class='ident'>func</span>, <span class='ident'>expr</span>);
 			<span class='ident'>func</span>.<span class='ident'>insn_return</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>value</span>);

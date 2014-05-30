@@ -106,39 +106,11 @@
 <span id='66'>66</span>
 <span id='67'>67</span>
 <span id='68'>68</span>
-<span id='69'>69</span>
-<span id='70'>70</span>
-<span id='71'>71</span>
-<span id='72'>72</span>
-<span id='73'>73</span>
-<span id='74'>74</span>
-<span id='75'>75</span>
-<span id='76'>76</span>
-<span id='77'>77</span>
-<span id='78'>78</span>
-<span id='79'>79</span>
-<span id='80'>80</span>
-<span id='81'>81</span>
-<span id='82'>82</span>
-<span id='83'>83</span>
-<span id='84'>84</span>
-<span id='85'>85</span>
-<span id='86'>86</span>
-<span id='87'>87</span>
-<span id='88'>88</span>
-<span id='89'>89</span>
-<span id='90'>90</span>
-<span id='91'>91</span>
-<span id='92'>92</span>
-<span id='93'>93</span>
-<span id='94'>94</span>
-<span id='95'>95</span>
-<span id='96'>96</span>
-<span id='97'>97</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>pos</span>::<span class='ident'>Position</span>;
-<span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>op</span>::{<span class='ident'>BinOp</span>, <span class='ident'>UnaryOp</span>};
+<span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>punc</span>::<span class='ident'>Punctuator</span>;
+<span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>keyword</span>::<span class='ident'>Keyword</span>;
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// A single of token of Javascript code including its position
@@ -166,70 +138,40 @@
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// A single token of Javacript code - a single word, symbol or constant
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>TokenData</span> {
+	<span class='doccomment'>/// A boolean literal, which is either `true` or `false`
+</span>	<span class='ident'>TBooleanLiteral</span>(<span class='ident'>bool</span>),
+	<span class='doccomment'>/// The end of the file
+</span>	<span class='ident'>TEOF</span>,
+	<span class='doccomment'>/// An identifier
+</span>	<span class='ident'>TIdentifier</span>(<span class='ident'>String</span>),
+	<span class='doccomment'>/// A keyword
+</span>	<span class='ident'>TKeyword</span>(<span class='ident'>Keyword</span>),
+	<span class='doccomment'>/// A `null` literal
+</span>	<span class='ident'>TNullLiteral</span>,
+	<span class='doccomment'>/// A numeric literal
+</span>	<span class='ident'>TNumericLiteral</span>(<span class='ident'>f64</span>),
+	<span class='doccomment'>/// A piece of punctuation
+</span>	<span class='ident'>TPunctuator</span>(<span class='ident'>Punctuator</span>),
 	<span class='doccomment'>/// A string literal
-</span>	<span class='ident'>TString</span>(<span class='ident'>String</span>),
-	<span class='doccomment'>/// A semicolon (;)
-</span>	<span class='ident'>TSemicolon</span>,
-	<span class='doccomment'>/// A colon
-</span>	<span class='ident'>TColon</span>,
-	<span class='doccomment'>/// A dot / full stop
-</span>	<span class='ident'>TDot</span>,
-	<span class='doccomment'>/// An equal sign
-</span>	<span class='ident'>TEqual</span>,
-	<span class='doccomment'>/// A comma
-</span>	<span class='ident'>TComma</span>,
-	<span class='doccomment'>/// An identity literal
-</span>	<span class='ident'>TIdent</span>(<span class='ident'>String</span>),
-	<span class='doccomment'>/// An opening bracket
-</span>	<span class='ident'>TOpenParen</span>,
-	<span class='doccomment'>/// A closing bracket
-</span>	<span class='ident'>TCloseParen</span>,
-	<span class='doccomment'>/// An opening curly bracket
-</span>	<span class='ident'>TOpenBlock</span>,
-	<span class='doccomment'>/// An closing curly bracket
-</span>	<span class='ident'>TCloseBlock</span>,
-	<span class='doccomment'>/// An opening square bracket
-</span>	<span class='ident'>TOpenArray</span>,
-	<span class='doccomment'>/// A closing square bracket
-</span>	<span class='ident'>TCloseArray</span>,
-	<span class='doccomment'>/// A 64-bit floating-point number
-</span>	<span class='ident'>TNumber</span>(<span class='ident'>f64</span>),
-	<span class='doccomment'>/// A question mark
-</span>	<span class='ident'>TQuestion</span>,
-	<span class='doccomment'>/// An arrow
-</span>	<span class='ident'>TArrow</span>,
-	<span class='doccomment'>/// An operation between 2 values
-</span>	<span class='ident'>TBinOp</span>(<span class='ident'>BinOp</span>),
-	<span class='doccomment'>/// A unary operation
-</span>	<span class='ident'>TUnaryOp</span>(<span class='ident'>UnaryOp</span>),
-	<span class='doccomment'>/// An assign operation combined with something else
-</span>	<span class='ident'>TAssignOp</span>(<span class='ident'>BinOp</span>),
+</span>	<span class='ident'>TStringLiteral</span>(<span class='ident'>String</span>),
+	<span class='doccomment'>/// A regular expression
+</span>	<span class='ident'>TRegularExpression</span>(<span class='ident'>String</span>),
 	<span class='doccomment'>/// A comment
 </span>	<span class='ident'>TComment</span>(<span class='ident'>String</span>)
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>TokenData</span> {
 	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
 		<span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>clone</span>() {
-			<span class='ident'>TString</span>(<span class='kw-2'>ref</span> <span class='ident'>s</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;\&quot;{}\&quot;&quot;</span>, <span class='ident'>s</span>),
-			<span class='ident'>TSemicolon</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;;&quot;</span>),
-			<span class='ident'>TColon</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;:&quot;</span>),
-			<span class='ident'>TDot</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;.&quot;</span>),
-			<span class='ident'>TEqual</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;=&quot;</span>),
-			<span class='ident'>TComma</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;,&quot;</span>),
-			<span class='ident'>TIdent</span>(<span class='kw-2'>ref</span> <span class='ident'>ident</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='op'>*</span><span class='ident'>ident</span>),
-			<span class='ident'>TOpenParen</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;(&quot;</span>),
-			<span class='ident'>TCloseParen</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;)&quot;</span>),
-			<span class='ident'>TOpenBlock</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;{&quot;</span>),
-			<span class='ident'>TCloseBlock</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;}&quot;</span>),
-			<span class='ident'>TOpenArray</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;[&quot;</span>),
-			<span class='ident'>TCloseArray</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;]&quot;</span>),
-			<span class='ident'>TNumber</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>num</span>),
-			<span class='ident'>TQuestion</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;?&quot;</span>),
-			<span class='ident'>TArrow</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;=&gt;&quot;</span>),
-			<span class='ident'>TBinOp</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>op</span>),
-			<span class='ident'>TUnaryOp</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>op</span>),
-			<span class='ident'>TAssignOp</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}=&quot;</span>, <span class='ident'>op</span>),
-			<span class='ident'>TComment</span>(<span class='kw-2'>ref</span> <span class='ident'>com</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;// {}&quot;</span>, <span class='ident'>com</span>)
+			<span class='ident'>TBooleanLiteral</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>val</span>),
+			<span class='ident'>TEOF</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;end of file&quot;</span>),
+			<span class='ident'>TIdentifier</span>(<span class='ident'>ident</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>ident</span>),
+			<span class='ident'>TKeyword</span>(<span class='ident'>word</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>word</span>),
+			<span class='ident'>TNullLiteral</span> <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;null&quot;</span>),
+			<span class='ident'>TNumericLiteral</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>num</span>),
+			<span class='ident'>TPunctuator</span>(<span class='ident'>punc</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>punc</span>),
+			<span class='ident'>TStringLiteral</span>(<span class='ident'>lit</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>lit</span>),
+			<span class='ident'>TRegularExpression</span>(<span class='ident'>reg</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>reg</span>),
+			<span class='ident'>TComment</span>(<span class='ident'>comm</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;/*{}*/&quot;</span>, <span class='ident'>comm</span>)
 		}
 	}
 }

@@ -39,15 +39,17 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../index.html'>js_syntax</a>::<a href='index.html'>parser</a>::<a class='type' href=''>ParseError</a><a class='source' id='src-11128' href='../../src/js_syntax/src/libjs_syntax/parser.rs.html#23-30'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../index.html'>js_syntax</a>::<a href='index.html'>parser</a>::<a class='type' href=''>ParseError</a><a class='source' id='src-12144' href='../../src/js_syntax/src/libjs_syntax/parser.rs.html#21-30'>[src]</a></h1>
 <pre class='rust enum'>pub enum ParseError {
     Expected(<a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;<a class='type' href='../../js_syntax/ast/token/type.TokenData.html' title='js_syntax::ast::token::TokenData'>TokenData</a>&gt;, <a class='struct' href='../../js_syntax/ast/token/struct.Token.html' title='js_syntax::ast::token::Token'>Token</a>, &amp;'static str),
     ExpectedExpr(&amp;'static str, <a class='struct' href='../../js_syntax/ast/expr/struct.Expr.html' title='js_syntax::ast::expr::Expr'>Expr</a>),
+    UnexpectedKeyword(<a class='type' href='../../js_syntax/ast/keyword/type.Keyword.html' title='js_syntax::ast::keyword::Keyword'>Keyword</a>),
     AbruptEnd,
 }</pre><div class='docblock'><p>An error encountered during parsing an expression</p>
 </div><h2 class='variants'>Variants</h2>
 <table><tr><td id='variant.Expected'><code>Expected</code></td><td><div class='docblock'><p>When it expected a certain kind of token, but got another as part of something</p>
 </div></td></tr><tr><td id='variant.ExpectedExpr'><code>ExpectedExpr</code></td><td><div class='docblock'><p>When it expected a certain expression, but got another</p>
+</div></td></tr><tr><td id='variant.UnexpectedKeyword'><code>UnexpectedKeyword</code></td><td><div class='docblock'><p>When it didn&#39;t expect this keyword</p>
 </div></td></tr><tr><td id='variant.AbruptEnd'><code>AbruptEnd</code></td><td><div class='docblock'><p>When there is an abrupt end to the parsing</p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../js_syntax/parser/type.ParseError.html' title='js_syntax::parser::ParseError'>ParseError</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='type' href='../../js_syntax/parser/type.ParseError.html' title='js_syntax::parser::ParseError'>ParseError</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='type' href='../../js_syntax/parser/type.ParseError.html' title='js_syntax::parser::ParseError'>ParseError</a></code></h4>

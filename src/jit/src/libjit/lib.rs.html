@@ -994,6 +994,18 @@
 <span id='954'>954</span>
 <span id='955'>955</span>
 <span id='956'>956</span>
+<span id='957'>957</span>
+<span id='958'>958</span>
+<span id='959'>959</span>
+<span id='960'>960</span>
+<span id='961'>961</span>
+<span id='962'>962</span>
+<span id='963'>963</span>
+<span id='964'>964</span>
+<span id='965'>965</span>
+<span id='966'>966</span>
+<span id='967'>967</span>
+<span id='968'>968</span>
 </pre><pre class='rust '>
 <span class='comment'>/* Copyright (c) 2014, Peter Nelson
  * All rights reserved.
@@ -1710,6 +1722,12 @@
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sign</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_sign</span>)
 	}
+	<span class='doccomment'>/// Convert it into a value
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+		<span class='kw'>box</span> <span class='ident'>Value</span> {
+			<span class='ident'>_value</span>: <span class='self'>self</span>.<span class='ident'>_function</span>
+		}
+	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='doccomment'>/// A Value that is being JITed
@@ -1791,6 +1809,12 @@
 	<span class='doccomment'>/// Boolean type
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_bool</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
 		<span class='kw'>box</span> <span class='ident'>Type</span> { <span class='ident'>_type</span>: <span class='ident'>jit_type_sys_bool</span> }
+	}
+	<span class='doccomment'>/// Vec&lt;?&gt; type
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_vec</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+		<span class='kw'>let</span> <span class='ident'>uint_t</span> <span class='op'>=</span> <span class='ident'>Types</span>::<span class='ident'>get_uint</span>();
+		<span class='kw'>let</span> <span class='ident'>void_ptr_t</span> <span class='op'>=</span> <span class='ident'>Types</span>::<span class='ident'>get_void_ptr</span>();
+		<span class='ident'>Type</span>::<span class='ident'>create_struct</span>(<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>uint_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>uint_t</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>void_ptr_t</span>])
 	}
 }
 <span class='kw'>struct</span> <span class='ident'>PointerConstant</span> {

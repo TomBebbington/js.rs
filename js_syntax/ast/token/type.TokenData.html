@@ -39,49 +39,29 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../../index.html'>js_syntax</a>::<a href='../index.html'>ast</a>::<a href='index.html'>token</a>::<a class='type' href=''>TokenData</a><a class='source' id='src-6983' href='../../../src/js_syntax/src/libjs_syntax/ast/token.rs.html#30-71'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../../index.html'>js_syntax</a>::<a href='../index.html'>ast</a>::<a href='index.html'>token</a>::<a class='type' href=''>TokenData</a><a class='source' id='src-9118' href='../../../src/js_syntax/src/libjs_syntax/ast/token.rs.html#31-52'>[src]</a></h1>
 <pre class='rust enum'>pub enum TokenData {
-    TString(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
-    TSemicolon,
-    TColon,
-    TDot,
-    TEqual,
-    TComma,
-    TIdent(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
-    TOpenParen,
-    TCloseParen,
-    TOpenBlock,
-    TCloseBlock,
-    TOpenArray,
-    TCloseArray,
-    TNumber(f64),
-    TQuestion,
-    TArrow,
-    TBinOp(<a class='type' href='../../../js_syntax/ast/op/type.BinOp.html' title='js_syntax::ast::op::BinOp'>BinOp</a>),
-    TUnaryOp(<a class='type' href='../../../js_syntax/ast/op/type.UnaryOp.html' title='js_syntax::ast::op::UnaryOp'>UnaryOp</a>),
-    TAssignOp(<a class='type' href='../../../js_syntax/ast/op/type.BinOp.html' title='js_syntax::ast::op::BinOp'>BinOp</a>),
+    TBooleanLiteral(bool),
+    TEOF,
+    TIdentifier(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
+    TKeyword(<a class='type' href='../../../js_syntax/ast/keyword/type.Keyword.html' title='js_syntax::ast::keyword::Keyword'>Keyword</a>),
+    TNullLiteral,
+    TNumericLiteral(f64),
+    TPunctuator(<a class='type' href='../../../js_syntax/ast/punc/type.Punctuator.html' title='js_syntax::ast::punc::Punctuator'>Punctuator</a>),
+    TStringLiteral(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
+    TRegularExpression(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
     TComment(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
 }</pre><div class='docblock'><p>A single token of Javacript code - a single word, symbol or constant</p>
 </div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.TString'><code>TString</code></td><td><div class='docblock'><p>A string literal</p>
-</div></td></tr><tr><td id='variant.TSemicolon'><code>TSemicolon</code></td><td><div class='docblock'><p>A semicolon (;)</p>
-</div></td></tr><tr><td id='variant.TColon'><code>TColon</code></td><td><div class='docblock'><p>A colon</p>
-</div></td></tr><tr><td id='variant.TDot'><code>TDot</code></td><td><div class='docblock'><p>A dot / full stop</p>
-</div></td></tr><tr><td id='variant.TEqual'><code>TEqual</code></td><td><div class='docblock'><p>An equal sign</p>
-</div></td></tr><tr><td id='variant.TComma'><code>TComma</code></td><td><div class='docblock'><p>A comma</p>
-</div></td></tr><tr><td id='variant.TIdent'><code>TIdent</code></td><td><div class='docblock'><p>An identity literal</p>
-</div></td></tr><tr><td id='variant.TOpenParen'><code>TOpenParen</code></td><td><div class='docblock'><p>An opening bracket</p>
-</div></td></tr><tr><td id='variant.TCloseParen'><code>TCloseParen</code></td><td><div class='docblock'><p>A closing bracket</p>
-</div></td></tr><tr><td id='variant.TOpenBlock'><code>TOpenBlock</code></td><td><div class='docblock'><p>An opening curly bracket</p>
-</div></td></tr><tr><td id='variant.TCloseBlock'><code>TCloseBlock</code></td><td><div class='docblock'><p>An closing curly bracket</p>
-</div></td></tr><tr><td id='variant.TOpenArray'><code>TOpenArray</code></td><td><div class='docblock'><p>An opening square bracket</p>
-</div></td></tr><tr><td id='variant.TCloseArray'><code>TCloseArray</code></td><td><div class='docblock'><p>A closing square bracket</p>
-</div></td></tr><tr><td id='variant.TNumber'><code>TNumber</code></td><td><div class='docblock'><p>A 64-bit floating-point number</p>
-</div></td></tr><tr><td id='variant.TQuestion'><code>TQuestion</code></td><td><div class='docblock'><p>A question mark</p>
-</div></td></tr><tr><td id='variant.TArrow'><code>TArrow</code></td><td><div class='docblock'><p>An arrow</p>
-</div></td></tr><tr><td id='variant.TBinOp'><code>TBinOp</code></td><td><div class='docblock'><p>An operation between 2 values</p>
-</div></td></tr><tr><td id='variant.TUnaryOp'><code>TUnaryOp</code></td><td><div class='docblock'><p>A unary operation</p>
-</div></td></tr><tr><td id='variant.TAssignOp'><code>TAssignOp</code></td><td><div class='docblock'><p>An assign operation combined with something else</p>
+<table><tr><td id='variant.TBooleanLiteral'><code>TBooleanLiteral</code></td><td><div class='docblock'><p>A boolean literal, which is either <code>true</code> or <code>false</code></p>
+</div></td></tr><tr><td id='variant.TEOF'><code>TEOF</code></td><td><div class='docblock'><p>The end of the file</p>
+</div></td></tr><tr><td id='variant.TIdentifier'><code>TIdentifier</code></td><td><div class='docblock'><p>An identifier</p>
+</div></td></tr><tr><td id='variant.TKeyword'><code>TKeyword</code></td><td><div class='docblock'><p>A keyword</p>
+</div></td></tr><tr><td id='variant.TNullLiteral'><code>TNullLiteral</code></td><td><div class='docblock'><p>A <code>null</code> literal</p>
+</div></td></tr><tr><td id='variant.TNumericLiteral'><code>TNumericLiteral</code></td><td><div class='docblock'><p>A numeric literal</p>
+</div></td></tr><tr><td id='variant.TPunctuator'><code>TPunctuator</code></td><td><div class='docblock'><p>A piece of punctuation</p>
+</div></td></tr><tr><td id='variant.TStringLiteral'><code>TStringLiteral</code></td><td><div class='docblock'><p>A string literal</p>
+</div></td></tr><tr><td id='variant.TRegularExpression'><code>TRegularExpression</code></td><td><div class='docblock'><p>A regular expression</p>
 </div></td></tr><tr><td id='variant.TComment'><code>TComment</code></td><td><div class='docblock'><p>A comment</p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../../js_syntax/ast/token/type.TokenData.html' title='js_syntax::ast::token::TokenData'>TokenData</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='type' href='../../../js_syntax/ast/token/type.TokenData.html' title='js_syntax::ast::token::TokenData'>TokenData</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='type' href='../../../js_syntax/ast/token/type.TokenData.html' title='js_syntax::ast::token::TokenData'>TokenData</a></code></h4>

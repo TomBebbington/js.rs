@@ -208,12 +208,33 @@
 <span id='168'>168</span>
 <span id='169'>169</span>
 <span id='170'>170</span>
+<span id='171'>171</span>
+<span id='172'>172</span>
+<span id='173'>173</span>
+<span id='174'>174</span>
+<span id='175'>175</span>
+<span id='176'>176</span>
+<span id='177'>177</span>
+<span id='178'>178</span>
+<span id='179'>179</span>
+<span id='180'>180</span>
+<span id='181'>181</span>
+<span id='182'>182</span>
+<span id='183'>183</span>
+<span id='184'>184</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
 <span class='doccomment'>/// Represents an operator
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Operator</span> {
-	<span class='doccomment'>/// Get the precedence as an unsignes integer, where the lower it is, the more precedence/priority it has
+	<span class='doccomment'>/// Get the associativity as a boolean that is true if it goes rightwards
+</span>	<span class='kw'>fn</span> <span class='ident'>get_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
+	<span class='doccomment'>/// Get the precedence as an unsigned integer, where the lower it is, the more precedence/priority it has
 </span>	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
+	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
+	<span class='doccomment'>/// Get the precedence and associativity of this operator
+</span>	<span class='kw'>fn</span> <span class='ident'>get_precedence_and_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='ident'>bool</span>) {
+		(<span class='self'>self</span>.<span class='ident'>get_precedence</span>(), <span class='self'>self</span>.<span class='ident'>get_assoc</span>())
+	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
 <span class='doccomment'>/// A numeric operation between 2 values
@@ -244,9 +265,13 @@
 <span class='doccomment'>/// A unary operation on a single value
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>UnaryOp</span> {
 	<span class='doccomment'>/// `a++` - increment the value
-</span>	<span class='ident'>UnaryIncrement</span>(<span class='ident'>bool</span>),
+</span>	<span class='ident'>UnaryIncrementPost</span>,
+	<span class='doccomment'>/// `++a` - increment the value
+</span>	<span class='ident'>UnaryIncrementPre</span>,
 	<span class='doccomment'>/// `a--` - decrement the value
-</span>	<span class='ident'>UnaryDecrement</span>(<span class='ident'>bool</span>),
+</span>	<span class='ident'>UnaryDecrementPost</span>,
+	<span class='doccomment'>/// `--a` - decrement the value
+</span>	<span class='ident'>UnaryDecrementPre</span>,
 	<span class='doccomment'>/// `-a` - negate the value
 </span>	<span class='ident'>UnaryMinus</span>,
 	<span class='doccomment'>/// `+a` - convert to a number
@@ -257,8 +282,8 @@
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>UnaryOp</span> {
 	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
 		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>UnaryIncrement</span>(_) <span class='op'>=&gt;</span> <span class='string'>&quot;++&quot;</span>,
-			<span class='ident'>UnaryDecrement</span>(_) <span class='op'>=&gt;</span> <span class='string'>&quot;--&quot;</span>,
+			<span class='ident'>UnaryIncrementPost</span> <span class='op'>|</span> <span class='ident'>UnaryIncrementPre</span> <span class='op'>=&gt;</span> <span class='string'>&quot;++&quot;</span>,
+			<span class='ident'>UnaryDecrementPost</span> <span class='op'>|</span> <span class='ident'>UnaryDecrementPre</span> <span class='op'>=&gt;</span> <span class='string'>&quot;--&quot;</span>,
 			<span class='ident'>UnaryPlus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;+&quot;</span>,
 			<span class='ident'>UnaryMinus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;-&quot;</span>,
 			<span class='ident'>UnaryNot</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!&quot;</span>
@@ -353,6 +378,9 @@
 </span>	<span class='ident'>BinLog</span>(<span class='ident'>LogOp</span>)
 }
 <span class='kw'>impl</span> <span class='ident'>Operator</span> <span class='kw'>for</span> <span class='ident'>BinOp</span> {
+	<span class='kw'>fn</span> <span class='ident'>get_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+		<span class='boolval'>true</span>
+	}
 	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
 		<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
 			<span class='ident'>BinNum</span>(<span class='ident'>OpMul</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpDiv</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpMod</span>) <span class='op'>=&gt;</span> <span class='number'>5</span>,

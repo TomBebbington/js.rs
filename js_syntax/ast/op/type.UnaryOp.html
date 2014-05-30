@@ -39,17 +39,21 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../../index.html'>js_syntax</a>::<a href='../index.html'>ast</a>::<a href='index.html'>op</a>::<a class='type' href=''>UnaryOp</a><a class='source' id='src-5248' href='../../../src/js_syntax/src/libjs_syntax/ast/op.rs.html#34-45'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../../index.html'>js_syntax</a>::<a href='../index.html'>ast</a>::<a href='index.html'>op</a>::<a class='type' href=''>UnaryOp</a><a class='source' id='src-5293' href='../../../src/js_syntax/src/libjs_syntax/ast/op.rs.html#41-56'>[src]</a></h1>
 <pre class='rust enum'>pub enum UnaryOp {
-    UnaryIncrement(bool),
-    UnaryDecrement(bool),
+    UnaryIncrementPost,
+    UnaryIncrementPre,
+    UnaryDecrementPost,
+    UnaryDecrementPre,
     UnaryMinus,
     UnaryPlus,
     UnaryNot,
 }</pre><div class='docblock'><p>A unary operation on a single value</p>
 </div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.UnaryIncrement'><code>UnaryIncrement</code></td><td><div class='docblock'><p><code>a++</code> - increment the value</p>
-</div></td></tr><tr><td id='variant.UnaryDecrement'><code>UnaryDecrement</code></td><td><div class='docblock'><p><code>a--</code> - decrement the value</p>
+<table><tr><td id='variant.UnaryIncrementPost'><code>UnaryIncrementPost</code></td><td><div class='docblock'><p><code>a++</code> - increment the value</p>
+</div></td></tr><tr><td id='variant.UnaryIncrementPre'><code>UnaryIncrementPre</code></td><td><div class='docblock'><p><code>++a</code> - increment the value</p>
+</div></td></tr><tr><td id='variant.UnaryDecrementPost'><code>UnaryDecrementPost</code></td><td><div class='docblock'><p><code>a--</code> - decrement the value</p>
+</div></td></tr><tr><td id='variant.UnaryDecrementPre'><code>UnaryDecrementPre</code></td><td><div class='docblock'><p><code>--a</code> - decrement the value</p>
 </div></td></tr><tr><td id='variant.UnaryMinus'><code>UnaryMinus</code></td><td><div class='docblock'><p><code>-a</code> - negate the value</p>
 </div></td></tr><tr><td id='variant.UnaryPlus'><code>UnaryPlus</code></td><td><div class='docblock'><p><code>+a</code> - convert to a number</p>
 </div></td></tr><tr><td id='variant.UnaryNot'><code>UnaryNot</code></td><td><div class='docblock'><p><code>!a</code> - get the opposite of the boolean value</p>
