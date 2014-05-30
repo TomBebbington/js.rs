@@ -1,4 +1,4 @@
-RUSTC ?= rustc
+RUSTC ?= rustc -O
 RUSTDOC ?= rustdoc
 .PHONY: all build doc libs libjit libjs libjs_syntax update-doc clean
 all: libs build doc
