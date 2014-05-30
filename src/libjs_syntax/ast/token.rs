@@ -1,6 +1,7 @@
 use std::fmt::{Formatter, Result, Show};
 use ast::pos::Position;
-use ast::op::{BinOp, UnaryOp};
+use ast::punc::Punctuator;
+use ast::keyword::Keyword;
 #[deriving(Clone)]
 #[deriving(Eq)]
 /// A single of token of Javascript code including its position
@@ -28,70 +29,40 @@ impl Show for Token {
 #[deriving(Eq)]
 /// A single token of Javacript code - a single word, symbol or constant
 pub enum TokenData {
+	/// A boolean literal, which is either `true` or `false`
+	TBooleanLiteral(bool),
+	/// The end of the file
+	TEOF,
+	/// An identifier
+	TIdentifier(String),
+	/// A keyword
+	TKeyword(Keyword),
+	/// A `null` literal
+	TNullLiteral,
+	/// A numeric literal
+	TNumericLiteral(f64),
+	/// A piece of punctuation
+	TPunctuator(Punctuator),
 	/// A string literal
-	TString(String),
-	/// A semicolon (;)
-	TSemicolon,
-	/// A colon
-	TColon,
-	/// A dot / full stop
-	TDot,
-	/// An equal sign
-	TEqual,
-	/// A comma
-	TComma,
-	/// An identity literal
-	TIdent(String),
-	/// An opening bracket
-	TOpenParen,
-	/// A closing bracket
-	TCloseParen,
-	/// An opening curly bracket
-	TOpenBlock,
-	/// An closing curly bracket
-	TCloseBlock,
-	/// An opening square bracket
-	TOpenArray,
-	/// A closing square bracket
-	TCloseArray,
-	/// A 64-bit floating-point number
-	TNumber(f64),
-	/// A question mark
-	TQuestion,
-	/// An arrow
-	TArrow,
-	/// An operation between 2 values
-	TBinOp(BinOp),
-	/// A unary operation
-	TUnaryOp(UnaryOp),
-	/// An assign operation combined with something else
-	TAssignOp(BinOp),
+	TStringLiteral(String),
+	/// A regular expression
+	TRegularExpression(String),
 	/// A comment
 	TComment(String)
 }
 impl Show for TokenData {
 	fn fmt(&self, f: &mut Formatter) -> Result {
 		match self.clone() {
-			TString(ref s) => write!(f, "\"{}\"", s),
-			TSemicolon => write!(f, "{}", ";"),
-			TColon => write!(f, "{}", ":"),
-			TDot => write!(f, "{}", "."),
-			TEqual => write!(f, "{}", "="),
-			TComma => write!(f, "{}", ","),
-			TIdent(ref ident) => write!(f, "{}", *ident),
-			TOpenParen => write!(f, "{}", "("),
-			TCloseParen => write!(f, "{}", ")"),
-			TOpenBlock => write!(f, "{}", "{"),
-			TCloseBlock => write!(f, "{}", "}"),
-			TOpenArray => write!(f, "{}", "["),
-			TCloseArray => write!(f, "{}", "]"),
-			TNumber(num) => write!(f, "{}", num),
-			TQuestion => write!(f, "{}", "?"),
-			TArrow => write!(f, "{}", "=>"),
-			TBinOp(op) => write!(f, "{}", op),
-			TUnaryOp(op) => write!(f, "{}", op),
-			TAssignOp(op) => write!(f, "{}=", op),
-			TComment(ref com) => write!(f, "// {}", com)
+			TBooleanLiteral(val) => write!(f, "{}", val),
+			TEOF => write!(f, "end of file"),
+			TIdentifier(ident) => write!(f, "{}", ident),
+			TKeyword(word) => write!(f, "{}", word),
+			TNullLiteral => write!(f, "null"),
+			TNumericLiteral(num) => write!(f, "{}", num),
+			TPunctuator(punc) => write!(f, "{}", punc),
+			TStringLiteral(lit) => write!(f, "{}", lit),
+			TRegularExpression(reg) => write!(f, "{}", reg),
+			TComment(comm) => write!(f, "/*{}*/", comm)
 		}
 	}
 }

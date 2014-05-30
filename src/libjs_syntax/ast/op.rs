@@ -1,8 +1,15 @@
 use std::fmt::{Formatter, Result, Show};
 /// Represents an operator
 pub trait Operator {
-	/// Get the precedence as an unsignes integer, where the lower it is, the more precedence/priority it has
+	/// Get the associativity as a boolean that is true if it goes rightwards
+	fn get_assoc(&self) -> bool;
+	/// Get the precedence as an unsigned integer, where the lower it is, the more precedence/priority it has
 	fn get_precedence(&self) -> uint;
+	#[inline(always)]
+	/// Get the precedence and associativity of this operator
+	fn get_precedence_and_assoc(&self) -> (uint, bool) {
+		(self.get_precedence(), self.get_assoc())
+	}
 }
 #[deriving(Clone, Eq)]
 /// A numeric operation between 2 values
@@ -33,9 +40,13 @@ impl Show for NumOp {
 /// A unary operation on a single value
 pub enum UnaryOp {
 	/// `a++` - increment the value
-	UnaryIncrement(bool),
+	UnaryIncrementPost,
+	/// `++a` - increment the value
+	UnaryIncrementPre,
 	/// `a--` - decrement the value
-	UnaryDecrement(bool),
+	UnaryDecrementPost,
+	/// `--a` - decrement the value
+	UnaryDecrementPre,
 	/// `-a` - negate the value
 	UnaryMinus,
 	/// `+a` - convert to a number
@@ -46,8 +57,8 @@ pub enum UnaryOp {
 impl Show for UnaryOp {
 	fn fmt(&self, f: &mut Formatter) -> Result {
 		write!(f, "{}", match *self {
-			UnaryIncrement(_) => "++",
-			UnaryDecrement(_) => "--",
+			UnaryIncrementPost | UnaryIncrementPre => "++",
+			UnaryDecrementPost | UnaryDecrementPre => "--",
 			UnaryPlus => "+",
 			UnaryMinus => "-",
 			UnaryNot => "!"
@@ -142,6 +153,9 @@ pub enum BinOp {
 	BinLog(LogOp)
 }
 impl Operator for BinOp {
+	fn get_assoc(&self) -> bool {
+		true
+	}
 	fn get_precedence(&self) -> uint {
 		match *self {
 			BinNum(OpMul) | BinNum(OpDiv) | BinNum(OpMod) => 5,

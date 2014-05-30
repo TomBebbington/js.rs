@@ -12,7 +12,7 @@
 
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 
-#![feature(macro_rules)]
+#![feature(macro_rules, globs)]
 
 //! This crate provides a Javascript parsing library with a parser, 
 //! a lexer, and Abstract Syntax Tree. The lexer started off based
@@ -31,8 +31,12 @@ pub mod ast {
 	pub mod constant;
 	/// Expression AST
 	pub mod expr;
-	/// Operation AST
+	/// Operations AST
 	pub mod op;
+	/// Keywords AST
+	pub mod keyword;
+	/// Punctation AST
+	pub mod punc;
 	/// Position AST
 	pub mod pos;
 	/// Token AST

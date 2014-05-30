@@ -1,11 +1,9 @@
-use ast::token::{Token, TokenData};
-use ast::expr::Expr;
-use ast::expr::{VarDeclExpr, BlockExpr, ThrowExpr, ReturnExpr, CallExpr, ConstructExpr, IfExpr, WhileLoopExpr, SwitchExpr, TypeOfExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, LocalExpr, ArrayDeclExpr, ObjectDeclExpr, GetConstFieldExpr, GetFieldExpr, BinOpExpr, UnaryOpExpr, ConstExpr, AssignExpr};
-use ast::constant::{CBool, CNull, CUndefined, CString, CNum};
-use ast::token::{TIdent, TNumber, TString, TSemicolon, TColon, TComment, TDot, TOpenParen, TCloseParen, TComma, TOpenBlock, TCloseBlock, TOpenArray, TCloseArray, TQuestion, TUnaryOp, TEqual, TArrow, TAssignOp, TBinOp};
-use ast::op::{OpSub, OpAdd};
-use ast::op::{UnaryMinus, UnaryPlus, UnaryNot};
-use ast::op::{BinNum, Operator};
+use ast::token::*;
+use ast::expr::*;
+use ast::constant::*;
+use ast::op::*;
+use ast::punc::*;
+use ast::keyword::*;
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
@@ -25,12 +23,14 @@ pub enum ParseError {
 	Expected(Vec<TokenData>, Token, &'static str),
 	/// When it expected a certain expression, but got another
 	ExpectedExpr(&'static str, Expr),
+	/// When it didn't expect this keyword
+	UnexpectedKeyword(Keyword),
 	/// When there is an abrupt end to the parsing
 	AbruptEnd
 }
 impl fmt::Show for ParseError {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		return match *self {
+		match *self {
 			Expected(ref wanted, ref got, ref routine) if wanted.len() == 0 => write!(f, "{}:{}: Expected expression for {}, got {}", got.pos.line_number, got.pos.column_number, routine, got.data),
 			Expected(ref wanted, ref got, ref routine) => {
 				try!(write!(f, "{}:{}: ", got.pos.line_number, got.pos.column_number));
@@ -42,6 +42,9 @@ impl fmt::Show for ParseError {
 				try!(write!(f, " for {}", routine));
 				write!(f, " but got {}", got.data)
 			},
+			UnexpectedKeyword(ref key) => {
+				write!(f, "Unexpected {}", key)
+			}
 			ExpectedExpr(ref wanted, ref got) => {
 				write!(f, "Expected {}, but got {}", wanted, got)
 			},
@@ -52,7 +55,6 @@ impl fmt::Show for ParseError {
 	}
 }
 pub type ParseResult = Result<Expr, ParseError>;
-pub type ParseStructResult = Result<Option<Expr>, ParseError>;
 /// A Javascript parser
 pub struct Parser {
 	/// The tokens being input
@@ -75,37 +77,33 @@ impl Parser {
 		}
 		Ok(mk!(BlockExpr(exprs)))
 	}
-	fn parse_struct(&mut self, name:&str) -> ParseStructResult {
-		match name {
-			"true" => Ok(Some(mk!(ConstExpr(CBool(true))))),
-			"false" => Ok(Some(mk!(ConstExpr(CBool(false))))),
-			"null" => Ok(Some(mk!(ConstExpr(CNull)))),
-			"undefined" => Ok(Some(mk!(ConstExpr(CUndefined)))),
-			"throw" => {
+	fn parse_struct(&mut self, keyword:Keyword) -> ParseResult {
+		match keyword {
+			KThrow => {
 				let thrown = try!(self.parse());
-				Ok(Some(mk!(ThrowExpr(box thrown))))
+				Ok(mk!(ThrowExpr(box thrown)))
 			},
-			"var" => {
+			KVar => {
 				let mut vars = Vec::new();
 				loop {
 					let name = match self.get_token(self.pos) {
-						Ok(Token{data: TIdent(ref name), ..}) => name.clone(),
-						Ok(tok) => return Err(Expected(vec!(TIdent("identifier".into_string())), tok, "var statement")),
+						Ok(Token { data: TIdentifier(ref name), ..}) => name.clone(),
+						Ok(tok) => return Err(Expected(vec!(TIdentifier("identifier".into_string())), tok, "var statement")),
 						Err(AbruptEnd) => break,
 						Err(e) => return Err(e)
 					};
 					self.pos += 1;
 					match self.get_token(self.pos) {
-						Ok(Token {data: TEqual, ..}) => {
+						Ok(Token {data: TPunctuator(PAssign), ..}) => {
 							self.pos += 1;
 							let val = try!(self.parse());
 							vars.push((name, Some(val)));
 							match self.get_token(self.pos) {
-								Ok(Token {data: TComma, ..}) => self.pos += 1,
+								Ok(Token {data: TPunctuator(PComma), ..}) => self.pos += 1,
 								_ => break
 							}
 						},
-						Ok(Token {data: TComma, ..}) => {
+						Ok(Token {data: TPunctuator(PComma), ..}) => {
 							self.pos += 1;
 							vars.push((name, None));
 						},
@@ -115,112 +113,112 @@ impl Parser {
 						}
 					}
 				}
-				Ok(Some(mk!(VarDeclExpr(vars))))
+				Ok(mk!(VarDeclExpr(vars)))
 			},
-			"return" => Ok(Some(mk!(ReturnExpr(Some(box try!(self.parse()).clone()))))),
-			"new" => {
+			KReturn => Ok(mk!(ReturnExpr(Some(box try!(self.parse()).clone())))),
+			KNew => {
 				let call = try!(self.parse());
 				match call.def {
-					CallExpr(ref func, ref args) => Ok(Some(mk!(ConstructExpr(func.clone(), args.clone())))),
+					CallExpr(ref func, ref args) => Ok(mk!(ConstructExpr(func.clone(), args.clone()))),
 					_ => Err(ExpectedExpr("constructor", call))
 				}
 			},
-			"typeof" => Ok(Some(mk!(TypeOfExpr(box try!(self.parse()))))),
-			"if" => {
-				try!(self.expect(TOpenParen, "if block"));
+			KTypeOf => Ok(mk!(TypeOfExpr(box try!(self.parse())))),
+			KIf => {
+				try!(self.expect_punc(POpenParen, "if block"));
 				let cond = try!(self.parse());
-				try!(self.expect(TCloseParen, "if block"));
+				try!(self.expect_punc(PCloseParen, "if block"));
 				let expr = try!(self.parse());
 				let next = self.get_token(self.pos + 1);
-				Ok(Some(mk!(IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TIdent("else".into_string()) {
+				Ok(mk!(IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TKeyword(KElse) {
 					self.pos += 2;
 					Some(box try!(self.parse()))
 				} else {
 					None
-				}))))
+				})))
 			},
-			"while" => {
-				try!(self.expect(TOpenParen, "while condition"));
+			KWhile => {
+				try!(self.expect_punc(POpenParen, "while condition"));
 				let cond = try!(self.parse());
-				try!(self.expect(TCloseParen, "while condition"));
+				try!(self.expect_punc(PCloseParen, "while condition"));
 				let expr = try!(self.parse());
-				Ok(Some(mk!(WhileLoopExpr(box cond, box expr))))
+				Ok(mk!(WhileLoopExpr(box cond, box expr)))
 			},
-			"switch" => {
-				try!(self.expect(TOpenParen, "switch value"));
+			KSwitch => {
+				try!(self.expect_punc(POpenParen, "switch value"));
 				let value = self.parse();
-				try!(self.expect(TCloseParen, "switch value"));
-				try!(self.expect(TOpenBlock, "switch block"));
+				try!(self.expect_punc(PCloseParen, "switch value"));
+				try!(self.expect_punc(POpenBlock, "switch block"));
 				let mut cases = Vec::new();
 				let mut default = None;
 				while self.pos + 1 < self.tokens.len() {
 					let tok = try!(self.get_token(self.pos));
 					self.pos += 1;
 					match tok.data {
-						TIdent(ref id) if id.as_slice() == "case" => {
+						TKeyword(KCase) => {
 							let cond = self.parse();
 							let mut block = Vec::new();
-							try!(self.expect(TColon, "switch case"));
+							try!(self.expect_punc(PColon, "switch case"));
 							loop {
 								match try!(self.get_token(self.pos)).data {
-									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
-									TCloseBlock => break,
+									TKeyword(KCase) | TKeyword(KDefault) => break,
+									TPunctuator(PCloseBlock) => break,
 									_ => block.push(try!(self.parse()))
 								}
 							}
 							cases.push((cond.unwrap(), block));
 						},
-						TIdent(ref id) if id.as_slice() == "default" => {
+						TKeyword(KDefault) => {
 							let mut block = Vec::new();
-							try!(self.expect(TColon, "default switch case"));
+							try!(self.expect_punc(PColon, "default switch case"));
 							loop {
 								match try!(self.get_token(self.pos)).data {
-									TIdent(ref id) if id.as_slice() == "case" || id.as_slice() == "default" => break,
-									TCloseBlock => break,
+									TKeyword(KCase) | TKeyword(KDefault) => break,
+									TPunctuator(PCloseBlock) => break,
 									_ => block.push(try!(self.parse()))
 								}
 							}
 							default = Some(mk!(BlockExpr(block)));
 						},
-						TCloseBlock => break,
-						_ => return Err(Expected(vec!(TIdent("case".into_string()), TIdent("default".into_string()), TCloseBlock), tok, "switch block"))
+						TPunctuator(PCloseBlock) => break,
+						_ => return Err(Expected(vec!(TKeyword(KCase), TKeyword(KDefault), TPunctuator(PCloseBlock)), tok, "switch block"))
 					}
 				}
-				try!(self.expect(TCloseBlock, "switch block"));
-				Ok(Some(mk!(SwitchExpr(box value.unwrap(), cases, match default {
+				try!(self.expect_punc(PCloseBlock, "switch block"));
+				Ok(mk!(SwitchExpr(box value.unwrap(), cases, match default {
 					Some(v) => Some(box v),
 					None => None
-				}))))
+				})))
 			},
-			"function" => {
+			KFunction => {
 				let tk = try!(self.get_token(self.pos));
 				let name = match tk.data {
-					TIdent(ref name) => {
+					TIdentifier(ref name) => {
 						self.pos += 1;
 						Some(name.clone())
 					},
-					TOpenParen => None,
-					_ => return Err(Expected(vec!(TIdent("identifier".into_string())), tk.clone(), "function name"))
+					TPunctuator(POpenParen) => None,
+					_ => return Err(Expected(vec!(TIdentifier("identifier".into_string())), tk.clone(), "function name"))
 				};
-				try!(self.expect(TOpenParen, "function"));
+				try!(self.expect_punc(POpenParen, "function"));
 				let mut args:Vec<String> = Vec::new();
 				let mut tk = try!(self.get_token(self.pos));
-				while tk.data != TCloseParen {
+				while tk.data != TPunctuator(PCloseParen) {
 					match tk.data {
-						TIdent(ref id) => args.push(id.clone()),
-						_ => return Err(Expected(vec!(TIdent("identifier".into_string())), tk.clone(), "function arguments"))
+						TIdentifier(ref id) => args.push(id.clone()),
+						_ => return Err(Expected(vec!(TIdentifier("identifier".into_string())), tk.clone(), "function arguments"))
 					}
 					self.pos += 1;
-					if try!(self.get_token(self.pos)).data == TComma {
+					if try!(self.get_token(self.pos)).data == TPunctuator(PComma) {
 						self.pos += 1;
 					}
 					tk = try!(self.get_token(self.pos));
 				}
 				self.pos += 1;
 				let block = try!(self.parse());
-				Ok(Some(mk!(FunctionDeclExpr(name, args, box block))))
+				Ok(mk!(FunctionDeclExpr(name, args, box block)))
 			},
-			_ => Ok(None)
+			_ => Err(UnexpectedKeyword(keyword))
 		}
 	}
 	/// Parse a single expression
@@ -231,19 +229,25 @@ impl Parser {
 		let token = try!(self.get_token(self.pos));
 		self.pos += 1;
 		let expr : Expr = match token.data {
-			TSemicolon | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
-			TSemicolon | TComment(_) => mk!(ConstExpr(CUndefined)),
-			TIdent(ref s) => {
-				let structure = try!(self.parse_struct(s.as_slice()));
-				match structure {
-					Some(v) => v,
-					None => mk!(LocalExpr(s.clone()))
-				}
-			},
-			TString(ref s) => mk!(ConstExpr(CString(s.clone()))),
-			TOpenParen => {
+			TPunctuator(PSemicolon) | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
+			TPunctuator(PSemicolon) | TComment(_) => mk!(ConstExpr(CUndefined)),
+			TNumericLiteral(num) =>
+				mk!(ConstExpr(CNum(num))),
+			TNullLiteral =>
+				mk!(ConstExpr(CNull)),
+			TStringLiteral(text) =>
+				mk!(ConstExpr(CString(text))),
+			TBooleanLiteral(val) =>
+				mk!(ConstExpr(CBool(val))),
+			TIdentifier(ref s) if s.as_slice() == "undefined" =>
+				mk!(ConstExpr(CUndefined)),
+			TIdentifier(s) =>
+				mk!(LocalExpr(s)),
+			TKeyword(keyword) =>
+				try!(self.parse_struct(keyword)),
+			TPunctuator(POpenParen) => {
 				match try!(self.get_token(self.pos)).data {
-					TCloseParen if try!(self.get_token(self.pos + 1)).data == TArrow => {
+					TPunctuator(PCloseParen) if try!(self.get_token(self.pos + 1)).data == TPunctuator(PArrow) => {
 						self.pos += 2;
 						let expr = try!(self.parse());
 						mk!(ArrowFunctionDeclExpr(Vec::new(), box expr), token)
@@ -253,13 +257,13 @@ impl Parser {
 						let next_tok = try!(self.get_token(self.pos));
 						self.pos += 1;
 						match next_tok.data {
-							TCloseParen => next,
-							TComma => { // at this point it's probably gonna be an arrow function
+							TPunctuator(PCloseParen) => next,
+							TPunctuator(PComma) => { // at this point it's probably gonna be an arrow function
 								let mut args = vec!(match next.def {
 									LocalExpr(name) => name,
 									_ => "".into_string()
 								}, match try!(self.get_token(self.pos)).data {
-									TIdent(ref id) => id.clone(),
+									TIdentifier(ref id) => id.clone(),
 									_ => "".into_string()
 								});
 								let mut expect_ident = true;
@@ -267,45 +271,45 @@ impl Parser {
 									self.pos += 1;
 									let curr_tk = try!(self.get_token(self.pos));
 									match curr_tk.data {
-										TIdent(ref id) if expect_ident => {
+										TIdentifier(ref id) if expect_ident => {
 											args.push(id.clone());
 											expect_ident = false;
 										},
-										TComma => {
+										TPunctuator(PComma) => {
 											expect_ident = true;
 										},
-										TCloseParen => {
+										TPunctuator(PCloseParen) => {
 											self.pos += 1;
 											break;
 										},
-										_ if expect_ident => return Err(Expected(vec!(TIdent("identifier".into_string())), curr_tk, "arrow function")),
-										_ => return Err(Expected(vec!(TComma, TCloseParen), curr_tk, "arrow function"))
+										_ if expect_ident => return Err(Expected(vec!(TIdentifier("identifier".into_string())), curr_tk, "arrow function")),
+										_ => return Err(Expected(vec!(TPunctuator(PComma), TPunctuator(PCloseParen)), curr_tk, "arrow function"))
 									}
 								}
-								try!(self.expect(TArrow, "arrow function"));
+								try!(self.expect(TPunctuator(PArrow), "arrow function"));
 								let expr = try!(self.parse());
 								mk!(ArrowFunctionDeclExpr(args, box expr), token)
 							}
-							_ => return Err(Expected(vec!(TCloseParen), next_tok, "brackets"))
+							_ => return Err(Expected(vec!(TPunctuator(PCloseParen)), next_tok, "brackets"))
 						}
 					}
 				}
 			},
-			TOpenArray => {
+			TPunctuator(POpenBracket) => {
 				let mut array : Vec<Expr> = Vec::new();
-				let mut expect_comma_or_end = try!(self.get_token(self.pos)).data == TCloseArray;
+				let mut expect_comma_or_end = try!(self.get_token(self.pos)).data == TPunctuator(PCloseBracket);
 				loop {
 					let token = try!(self.get_token(self.pos));
-					if token.data == TCloseArray && expect_comma_or_end {
+					if token.data == TPunctuator(PCloseBracket) && expect_comma_or_end {
 						self.pos += 1;
 						break;
-					} else if token.data == TComma && expect_comma_or_end {
+					} else if token.data == TPunctuator(PComma) && expect_comma_or_end {
 						expect_comma_or_end = false;
-					} else if token.data == TComma && !expect_comma_or_end {
+					} else if token.data == TPunctuator(PComma) && !expect_comma_or_end {
 						array.push(mk!(ConstExpr(CNull)));
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseArray), token.clone(), "array declaration"));
+						return Err(Expected(vec!(TPunctuator(PComma), TPunctuator(PCloseBracket)), token.clone(), "array declaration"));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -316,31 +320,31 @@ impl Parser {
 				}
 				mk!(ArrayDeclExpr(array), token)
 			},
-			TOpenBlock if try!(self.get_token(self.pos)).data == TCloseBlock => {
+			TPunctuator(POpenBlock) if try!(self.get_token(self.pos)).data == TPunctuator(PCloseBlock) => {
 				self.pos += 1;
 				mk!(ObjectDeclExpr(box TreeMap::new()), token)
 			},
-			TOpenBlock if try!(self.get_token(self.pos + 1)).data == TColon => {
+			TPunctuator(POpenBlock) if try!(self.get_token(self.pos + 1)).data == TPunctuator(PColon) => {
 				let mut map = box TreeMap::new();
-				while try!(self.get_token(self.pos - 1)).data == TComma || map.len() == 0 {
+				while try!(self.get_token(self.pos - 1)).data == TPunctuator(PComma) || map.len() == 0 {
 					let tk = try!(self.get_token(self.pos));
 					let name = match tk.data {
-						TIdent(ref id) => id.clone(),
-						TString(ref str) => str.clone(),
-						_ => return Err(Expected(vec!(TIdent("identifier".into_string()), TString("string".into_string())), tk, "object declaration"))
+						TIdentifier(ref id) => id.clone(),
+						TStringLiteral(ref str) => str.clone(),
+						_ => return Err(Expected(vec!(TIdentifier("identifier".into_string()), TStringLiteral("string".into_string())), tk, "object declaration"))
 					};
 					self.pos += 1;
-					try!(self.expect(TColon, "object declaration"));
+					try!(self.expect(TPunctuator(PColon), "object declaration"));
 					let value = try!(self.parse());
 					map.insert(name, value);
 					self.pos += 1;
 				}
 				mk!(ObjectDeclExpr(map), token)
 			},
-			TOpenBlock => {
+			TPunctuator(POpenBlock) => {
 				let mut exprs = Vec::new();
 				loop {
-					if try!(self.get_token(self.pos)).data == TCloseBlock {
+					if try!(self.get_token(self.pos)).data == TPunctuator(PCloseBlock) {
 						break;
 					} else {
 						exprs.push(try!(self.parse()));
@@ -349,14 +353,16 @@ impl Parser {
 				self.pos += 1;
 				mk!(BlockExpr(exprs), token)
 			},
-			TNumber(num) =>
-				mk!(ConstExpr(CNum(num))),
-			TBinOp(BinNum(OpSub)) =>
+			TPunctuator(PSub) =>
 				mk!(UnaryOpExpr(UnaryMinus, box try!(self.parse()))),
-			TBinOp(BinNum(OpAdd)) =>
+			TPunctuator(PAdd) =>
 				mk!(UnaryOpExpr(UnaryPlus, box try!(self.parse()))),
-			TUnaryOp(UnaryNot) =>
+			TPunctuator(PNot) =>
 				mk!(UnaryOpExpr(UnaryNot, box try!(self.parse()))),
+			TPunctuator(PInc) =>
+				mk!(UnaryOpExpr(UnaryIncrementPre, box try!(self.parse()))),
+			TPunctuator(PDec) =>
+				mk!(UnaryOpExpr(UnaryDecrementPre, box try!(self.parse()))),
 			_ => return Err(Expected(Vec::new(), token.clone(), "script"))
 		};
 		if self.pos >= self.tokens.len() {
@@ -377,28 +383,28 @@ impl Parser {
 		let mut carry_on = true;
 		let mut result = expr.clone();
 		match next.data {
-			TDot => {
+			TPunctuator(PDot) => {
 				self.pos += 1;
 				let tk = try!(self.get_token(self.pos));
 				match tk.data {
-					TIdent(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_string())),
-					_ => return Err(Expected(vec!(TIdent("identifier".into_string())), tk, "field access"))
+					TIdentifier(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_string())),
+					_ => return Err(Expected(vec!(TIdentifier("identifier".into_string())), tk, "field access"))
 				}
 				self.pos += 1;
 			},
-			TOpenParen => {
+			TPunctuator(POpenParen) => {
 				let mut args = Vec::new();
-				let mut expect_comma_or_end = try!(self.get_token(self.pos + 1)).data == TCloseParen;
+				let mut expect_comma_or_end = try!(self.get_token(self.pos + 1)).data == TPunctuator(PCloseParen);
 				loop {
 					self.pos += 1;
 					let token = try!(self.get_token(self.pos));
-					if token.data == TCloseParen && expect_comma_or_end {
+					if token.data == TPunctuator(PCloseParen) && expect_comma_or_end {
 						self.pos += 1;
 						break;
-					} else if token.data == TComma && expect_comma_or_end {
+					} else if token.data == TPunctuator(PComma) && expect_comma_or_end {
 						expect_comma_or_end = false;
 					} else if expect_comma_or_end {
-						return Err(Expected(vec!(TComma, TCloseParen), token, "function call arguments"));
+						return Err(Expected(vec!(TPunctuator(PComma), TPunctuator(PCloseParen)), token, "function call arguments"));
 					} else {
 						let parsed = try!(self.parse());
 						self.pos -= 1;
@@ -408,45 +414,28 @@ impl Parser {
 				}
 				result = mk!(CallExpr(box expr, args));
 			},
-			TQuestion => {
+			TPunctuator(PQuestion) => {
 				self.pos += 1;
 				let if_e = try!(self.parse());
-				try!(self.expect(TColon, "if expression"));
+				try!(self.expect(TPunctuator(PColon), "if expression"));
 				let else_e = try!(self.parse());
 				result = mk!(IfExpr(box expr, box if_e, Some(box else_e)));
 			},
-			TOpenArray => {
+			TPunctuator(POpenBracket) => {
 				self.pos += 1;
 				let index = try!(self.parse());
-				try!(self.expect(TCloseArray, "array declaration"));
+				try!(self.expect(TPunctuator(PCloseBracket), "array index"));
 				result = mk!(GetFieldExpr(box expr, box index));
 			},
-			TSemicolon | TComment(_) => {
+			TPunctuator(PSemicolon) | TComment(_) => {
 				self.pos += 1;
 			},
-			TBinOp(op) => {
-				let precedence = op.get_precedence();
-				self.pos += 1;
-				let next = try!(self.parse());
-				result = match (next.clone()).def {
-					BinOpExpr(ref op2, ref a, ref b) if precedence <= op2.get_precedence() =>
-						mk!(BinOpExpr(*op2, b.clone(), box mk!(BinOpExpr(op.clone(), box expr, a.clone())))),
-					_ => mk!(BinOpExpr(op, box expr, box next))
-				}
-			},
-			TAssignOp(op) => {
-				self.pos += 1;
-				let next = try!(self.parse());
-				let boxed = box expr;
-				let op_result = mk!(BinOpExpr(op, boxed.clone(), box next));
-				result = mk!(AssignExpr(boxed, box op_result))
-			},
-			TEqual => {
+			TPunctuator(PAssign) => {
 				self.pos += 1;
 				let next = try!(self.parse());
 				result = mk!(AssignExpr(box expr, box next));
 			},
-			TArrow => {
+			TPunctuator(PArrow) => {
 				self.pos += 1;
 				let mut args = Vec::with_capacity(1);
 				match result.def {
@@ -456,6 +445,50 @@ impl Parser {
 				let next = try!(self.parse());
 				result = mk!(ArrowFunctionDeclExpr(args, box next));
 			},
+			TPunctuator(PAdd) =>
+				result = try!(self.binop(BinNum(OpAdd), expr)),
+			TPunctuator(PSub) =>
+				result = try!(self.binop(BinNum(OpSub), expr)),
+			TPunctuator(PMul) =>
+				result = try!(self.binop(BinNum(OpMul), expr)),
+			TPunctuator(PDiv) =>
+				result = try!(self.binop(BinNum(OpDiv), expr)),
+			TPunctuator(PMod) =>
+				result = try!(self.binop(BinNum(OpMod), expr)),
+			TPunctuator(PBoolAnd) =>
+				result = try!(self.binop(BinLog(LogAnd), expr)),
+			TPunctuator(PBoolOr) =>
+				result = try!(self.binop(BinLog(LogOr), expr)),
+			TPunctuator(PAnd) =>
+				result = try!(self.binop(BinBit(BitAnd), expr)),
+			TPunctuator(POr) =>
+				result = try!(self.binop(BinBit(BitOr), expr)),
+			TPunctuator(PXor) =>
+				result = try!(self.binop(BinBit(BitXor), expr)),
+			TPunctuator(PLeftSh) =>
+				result = try!(self.binop(BinBit(BitShl), expr)),
+			TPunctuator(PRightSh) =>
+				result = try!(self.binop(BinBit(BitShr), expr)),
+			TPunctuator(PEq) =>
+				result = try!(self.binop(BinComp(CompEqual), expr)),
+			TPunctuator(PNotEq) =>
+				result = try!(self.binop(BinComp(CompNotEqual), expr)),
+			TPunctuator(PStrictEq) =>
+				result = try!(self.binop(BinComp(CompStrictEqual), expr)),
+			TPunctuator(PStrictNotEq) =>
+				result = try!(self.binop(BinComp(CompStrictNotEqual), expr)),
+			TPunctuator(PLessThan) =>
+				result = try!(self.binop(BinComp(CompLessThan), expr)),
+			TPunctuator(PLessThanOrEq) =>
+				result = try!(self.binop(BinComp(CompLessThanOrEqual), expr)),
+			TPunctuator(PGreaterThan) =>
+				result = try!(self.binop(BinComp(CompGreaterThan), expr)),
+			TPunctuator(PGreaterThanOrEq) =>
+				result = try!(self.binop(BinComp(CompGreaterThanOrEqual), expr)),
+			TPunctuator(PInc) =>
+				result = mk!(UnaryOpExpr(UnaryIncrementPost, box try!(self.parse()))),
+			TPunctuator(PDec) =>
+				result = mk!(UnaryOpExpr(UnaryDecrementPost, box try!(self.parse()))),
 			_ => carry_on = false
 		};
 		if carry_on && self.pos < self.tokens.len() {
@@ -463,6 +496,22 @@ impl Parser {
 		} else {
 			Ok(result)
 		}
+	}
+	fn binop(&mut self, op:BinOp, orig:Expr) -> Result<Expr, ParseError> {
+		let (precedence, assoc) = op.get_precedence_and_assoc();
+		self.pos += 1;
+		let next = try!(self.parse());
+		Ok(match (next.clone()).def {
+			BinOpExpr(ref op2, ref a, ref b) => {
+				let other_precedence = op2.get_precedence();
+				if precedence < other_precedence || (precedence == other_precedence && !assoc) {
+					mk!(BinOpExpr(*op2, b.clone(), box mk!(BinOpExpr(op.clone(), box orig, a.clone()))))
+				} else {
+					mk!(BinOpExpr(op, box orig, box next))
+				}
+			},
+			_ => mk!(BinOpExpr(op, box orig, box next))
+		})
 	}
 	/// Returns an error if the next symbol is not `tk`
 	fn expect(&mut self, tk:TokenData, routine:&'static str) -> Result<(), ParseError> {
@@ -473,5 +522,9 @@ impl Parser {
 		} else {
 			Ok(())
 		}
+	}
+	/// Returns an error if the next symbol is not the punctuator `p`
+	fn expect_punc(&mut self, p:Punctuator, routine:&'static str) -> Result<(), ParseError> {
+		self.expect(TPunctuator(p), routine)
 	}
 }

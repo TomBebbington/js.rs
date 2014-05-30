@@ -1,6 +1,5 @@
 use std::fmt::{Formatter, Result, Show};
-use ast::op::{BinOp, UnaryOp, Operator};
-use ast::op::{UnaryNot, UnaryMinus, UnaryIncrement, UnaryDecrement};
+use ast::op::*;
 use ast::constant::Const;
 use ast::pos::Position;
 use collections::treemap::TreeMap;
@@ -72,11 +71,17 @@ pub enum ExprDef {
 	TypeOfExpr(Box<Expr>)
 }
 impl Operator for ExprDef {
+	fn get_assoc(&self) -> bool {
+		match *self {
+			ConstructExpr(_, _) | UnaryOpExpr(_, _) | TypeOfExpr(_) | IfExpr(_, _, _) | AssignExpr(_, _) => false,
+			_ => true
+		}
+	}
 	fn get_precedence(&self) -> uint {
 		match *self {
 			GetFieldExpr(_, _) | GetConstFieldExpr(_, _) => 1,
 			CallExpr(_, _) | ConstructExpr(_, _) => 2,
-			UnaryOpExpr(UnaryIncrement(_), _) | UnaryOpExpr(UnaryDecrement(_), _) => 3,
+			UnaryOpExpr(UnaryIncrementPost, _) | UnaryOpExpr(UnaryIncrementPre, _) | UnaryOpExpr(UnaryDecrementPost, _) | UnaryOpExpr(UnaryDecrementPre, _) => 3,
 			UnaryOpExpr(UnaryNot, _) | UnaryOpExpr(UnaryMinus, _) | TypeOfExpr(_) => 4,
 			BinOpExpr(op, _, _) => op.get_precedence(),
 			IfExpr(_, _, _) => 15,
