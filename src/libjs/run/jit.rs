@@ -1,20 +1,12 @@
-use syntax::ast::expr::{Expr, ConstExpr, BlockExpr, TypeOfExpr, LocalExpr, VarDeclExpr, GetConstFieldExpr, GetFieldExpr, CallExpr, WhileLoopExpr, IfExpr, SwitchExpr, ObjectDeclExpr, ArrayDeclExpr, FunctionDeclExpr, ArrowFunctionDeclExpr, UnaryOpExpr, BinOpExpr, ConstructExpr, ReturnExpr, ThrowExpr, AssignExpr};
-use syntax::ast::constant::{CNum, CInt, CString, CBool, CNull, CUndefined};
-use syntax::ast::op::{OpSub, OpAdd, OpMul, OpDiv, OpMod};
-use syntax::ast::op::{UnaryMinus, UnaryPlus, UnaryNot};
-use syntax::ast::op::{BinNum, BinBit, BinLog, BinComp};
-use syntax::ast::op::{BitAnd, BitOr, BitXor, BitShl, BitShr};
-use syntax::ast::op::{LogAnd, LogOr};
-use syntax::ast::op::{CompEqual, CompNotEqual, CompStrictEqual, CompStrictNotEqual, CompGreaterThan, CompGreaterThanOrEqual, CompLessThan, CompLessThanOrEqual};
-use stdlib::value::{Value, VNull, VFunction, ResultValue, to_value};
-use stdlib::function::FunctionData;
-use stdlib::{console, math, object, array, function, json, number, error, uri, string};
+use syntax::ast::expr::*;
+use syntax::ast::constant::*;
+use syntax::ast::op::*;
+use stdlib::value::{Value, VNull, ResultValue, to_value};
+use stdlib::*;
 use run::exec::Executor;
 use std::gc::Gc;
 use std::c_str::CString;
-use std::str::raw::from_c_str;
 use std::mem::size_of;
-use std::cell::RefCell;
 use jit::{Context, Function, Type, Types, Compilable, CDECL};
 use jit;
 

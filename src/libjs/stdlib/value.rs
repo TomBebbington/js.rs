@@ -1,5 +1,5 @@
 use stdlib::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
-use stdlib::function::{Function, FunctionData};
+use stdlib::function::Function;
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
 use std::fmt;

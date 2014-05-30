@@ -1,4 +1,4 @@
-use stdlib::value::{Value, ResultValue, VObject};
+use stdlib::value::{Value, ResultValue};
 use syntax::ast::expr::Expr;
 use run::jit::JITCompiler;
 /// An execution engine
