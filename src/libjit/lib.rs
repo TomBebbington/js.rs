@@ -26,7 +26,6 @@
 #![crate_id = "jit#0.1.2"]
 #![comment = "LibJIT Bindings"]
 #![crate_type = "dylib"]
-#![crate_type = "rlib"]
 #![allow(raw_pointer_deriving)]
 #![stable]
 

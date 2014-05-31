@@ -19,7 +19,6 @@ pub struct JITCompiler {
 }
 impl JITCompiler {
 	fn with_builder<R>(&self, cb: || -> R) -> R {
-		self.context.build_start();
 		let rv = cb();
 		self.context.build_end();
 		rv

@@ -1,17 +1,25 @@
-RUSTC ?= rustc -O
+RUSTC ?= rustc
 RUSTDOC ?= rustdoc
-.PHONY: all build doc libs libjit libjs libjs_syntax update-doc clean
-all: libs build doc
+LIBDIR ?= /usr/lib/llvm-3.5/lib
+.PHONY: all build doc genllvmdeps libs libllvm libjit libjs libjs_syntax update-doc clean
+all: genllvmdeps libs build doc
+genllvmdeps:
+	mkdir -p target
+	cd target && $(RUSTC) ../src/genllvmdeps/gen.rs -L .
+	target/genllvmdeps src/libllvm/llvmdeps.rs
 libjs:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjs/lib.rs -L .
 libjs_syntax:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjs_syntax/lib.rs -L .
+libllvm:
+	mkdir -p target
+	cd target && $(RUSTC) -O ../src/libllvm/lib.rs -L . -L $(LIBDIR)
 libjit:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjit/lib.rs -L .
-libs: libjit libjs_syntax libjs
+libs: libllvm libjit libjs_syntax libjs
 build:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/front/front.rs -L .
@@ -21,6 +29,7 @@ install:
 	sudo cp -f target/libjit*.so /usr/local/lib
 	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
 doc:
+	$(RUSTDOC) src/libllvm/lib.rs -o doc -L target
 	$(RUSTDOC) src/libjit/lib.rs -o doc -L target
 	$(RUSTDOC) src/libjs/lib.rs -o doc -L target
 	$(RUSTDOC) src/libjs_syntax/lib.rs -o doc -L target

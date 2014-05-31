@@ -1,6 +1,6 @@
 use stdlib::value::{Value, ResultValue, to_value, from_value};
 use stdlib::function::Function;
-use rand::random;
+use std::rand::random;
 use std::f64;
 
 /// Get the absolute value of a number

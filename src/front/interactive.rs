@@ -1,5 +1,5 @@
 use js::run::exec::Executor;
-use js::run::jit::JITCompiler;
+use js::run::llvm::LLVMCompiler;
 use syntax::Lexer;
 use syntax::Parser;
 use getopts::Matches;
@@ -19,7 +19,7 @@ impl Interactive {
 	/// Run the interactive mode
 	pub fn run(&self) {
 		print!("> ");
-		let mut engine : JITCompiler = Executor::new();
+		let mut engine : LLVMCompiler = Executor::new();
 		let verbose = self.m.opt_present("v");
 		let mut input = stdin();
 		loop {

@@ -19,5 +19,5 @@ function DiagModule(stdlib, foreign, heap) {
 
     return { diag: diag };
 }
-diag = DiagModule({ Math: Math }).diag;
-console.log(diag(10, 100))
+var diag = DiagModule({ Math: Math }).diag;
+assert(diag(4, 3) == 5);

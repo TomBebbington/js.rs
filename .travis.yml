@@ -1,16 +1,19 @@
 env:
   global:
     - secure: UDORPffOmJ4Ht0P9jGM8w2MhDpSBivIet4iJEW5q9Hx5tzTt7FUg2o9Tjl1EjGfM4khCBjjYQ9tmtOruY62wJoy4O91vo83iPhb58weaL81uvbd4WMUahcAwjB1U/qmS2UUmje5SO3pNswV49ZKK8aVy5QgGXLYbl+vc5ll89To=
-before_install:
-  - wget http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
-  - tar -xzvf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
-  - git clone git://git.savannah.gnu.org/libjit.git
+  matrix:
+    - LLVM_VERSION=3.3
+    - LLVM_VERSION=3.4
 install:
   - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
   - sudo apt-get install texinfo
-  - cd libjit
-  - ./auto_gen.sh
-  - ./configure 
+  - sudo sh -c "echo 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.4 main' >> /etc/apt/sources.list"
+  - sudo sh -c "echo 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise main' >> /etc/apt/sources.list"
+  - sudo sh -c "echo 'deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu precise main' >> /etc/apt/sources.list"
+  - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq --force-yes -y llvm-$LLVM_VERSION
+  - llvm-${LLVM_VERSION}-dev clang-$LLVM_VERSION lldb-$LLVM_VERSION
   - make
   - sudo make install
   - sudo cp /usr/local/lib/libjit* /usr/lib/

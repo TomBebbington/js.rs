@@ -2,7 +2,6 @@
 #![comment = "Javascript lexing and parsing"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
-#![crate_type = "rlib"]
 
 #![doc(
 	html_favicon_url = "http://tombebbington.github.io/favicon.png",

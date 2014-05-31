@@ -2,7 +2,6 @@
 #![comment = "Javascript execution"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
-#![crate_type = "rlib"]
 
 #![doc(
 	html_favicon_url = "http://tombebbington.github.io/favicon.png",
@@ -16,17 +15,19 @@
 //! JITCompiler and a Javascript standard library.
 extern crate collections;
 extern crate syntax = "js_syntax";
-extern crate rand;
 extern crate serialize;
 extern crate time;
 extern crate url;
 extern crate jit;
+extern crate llvm;
 /// The execution engines
 pub mod run {
 	/// Defines the base executor trait which the execution engines derive from
 	pub mod exec;
 	/// Just-In-Time Compilation using libJIT
 	pub mod jit;
+	/// Just-In-Time Compilation using LLVm
+	pub mod llvm;
 }
 /// The standard Javascript library
 pub mod stdlib {
