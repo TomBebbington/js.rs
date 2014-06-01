@@ -27,16 +27,18 @@
 #![comment = "LibJIT Bindings"]
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
-#![allow(raw_pointer_deriving)]
+#![allow(raw_pointer_deriving, dead_code, non_camel_case_types)]
+#![feature(globs, macro_rules)]
 #![stable]
-
 //! This crate wraps LibJIT
 
 extern crate libc;
-
+extern crate native;
 use std::ptr;
 use std::mem::transmute;
-use libc::{FILE, STDOUT_FILENO, c_int, fdopen, c_void, c_uint, c_char, c_float, c_long};
+use libc::{c_int, c_void, c_uint};
+use bindings::*;
+pub use bindings::{jit_nint, jit_nuint};
 /// A platform's application binary interface
 pub enum ABI {
 	/// The C application binary interface
@@ -51,124 +53,19 @@ pub enum CallFlags {
 	/// When the function is tail-recursive
 	JitCallTail = 4,
 }
-
-#[link(name = "jit")]
-extern {
-	fn jit_context_create() -> *c_void;
-	fn jit_context_destroy(context: *c_void);
-	fn jit_context_build_start(context: *c_void);
-	fn jit_context_build_end(context: *c_void);
-	fn jit_function_create(context: *c_void, signature: *c_void) -> *c_void;
-	fn jit_function_compile(function: *c_void);
-	fn jit_function_set_optimization_level(function: *c_void, level: c_uint);
-	fn jit_function_set_recompilable(function: *c_void);
-	fn jit_function_get_context(function: *c_void) -> *c_void;
-	fn jit_function_abandon(function: *c_void) -> *c_void;
-	fn jit_type_create_signature(abi: c_int, return_type: *c_void, params: **c_void, num_params: c_uint, incref: c_int) -> *c_void;
-	fn jit_type_create_struct(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
-	fn jit_type_create_union(fields: **c_void, num_fields: c_uint, incref: c_int) -> *c_void;
-	fn jit_type_create_pointer(pointee: *c_void, incref: c_int) -> *c_void;
-	fn jit_type_get_size(ty: *c_void) -> c_uint;
-	fn jit_type_get_kind(ty: *c_void) -> c_int;
-	fn jit_type_free(ty: *c_void) -> c_void;
-	fn jit_value_get_param(function: *c_void, param: c_uint) -> *c_void;
-	fn jit_value_get_type(val: *c_void) -> *c_void;
-	fn jit_insn_return(function: *c_void, value: *c_void);
-	fn jit_insn_throw(function: *c_void, value: *c_void);
-	fn jit_insn_default_return(function: *c_void);
-	fn jit_function_apply(function: *c_void, args: **c_void, return_area: *mut c_void);
-	fn jit_insn_add(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_mul(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_sub(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_div(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_and(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_or(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_xor(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_not(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_neg(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_load(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_value_create(function: *c_void, value_type: *c_void) -> *c_void;
-	fn jit_insn_label(function: *c_void, label: *mut c_void);
-	fn jit_insn_branch(function: *c_void, label: *mut c_void);
-	fn jit_insn_le(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_ge(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_lt(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_gt(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_eq(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_ne(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void;
-	fn jit_insn_branch_if(function: *c_void, value: *c_void, label: *mut c_void);
-	fn jit_insn_branch_if_not(function: *c_void, value: *c_void, label: *mut c_void);
-	fn jit_insn_jump_table(function: *c_void, value: *c_void, labels: *c_void, num_labels: c_uint);
-	fn jit_insn_store(function: *c_void, dest: *c_void, src: *c_void);
-	fn jit_insn_store_relative(function: *c_void, dest: *c_void, offset: c_int, src: *c_void);
-	fn jit_insn_call_native(function: *c_void, name: *c_char, native_func: *u8, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
-	fn jit_insn_call_indirect(function: *c_void, value: *c_void, signature: *c_void, args: **c_void, num_args: c_uint, flags: c_int) -> *c_void;
-	fn jit_insn_alloca(function: *c_void, size: *c_void) -> *c_void;
-	fn jit_insn_uses_catcher(function: *c_void) -> c_void;
-	fn jit_insn_acos(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_asin(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_atan(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_atan2(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
-	fn jit_insn_ceil(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_cos(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_cosh(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_exp(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_floor(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_log(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_log10(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_pow(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
-	fn jit_insn_rint(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_round(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_sin(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_sinh(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_sqrt(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_tan(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_tanh(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_trunc(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_is_nan(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_is_finite(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_is_inf(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_abs(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_insn_min(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
-	fn jit_insn_max(function: *c_void, value1: *c_void, value2: *c_void) -> *c_void;
-	fn jit_insn_sign(function: *c_void, value: *c_void) -> *c_void;
-	fn jit_dump_function (stream: *FILE, funcion: *c_void, name: *c_char);
-	fn jit_value_create_float32_constant(function: *c_void, value_type: *c_void, value: c_float) -> *c_void;
-	fn jit_value_create_float64_constant(function: *c_void, value_type: *c_void, value: f64) -> *c_void;
-	fn jit_value_create_nint_constant(function: *c_void, value_type: *c_void, value: c_int) -> *c_void;
-	fn jit_value_create_long_constant(function: *c_void, value_type: *c_void, value: c_long) -> *c_void;
-	fn jit_value_create_constant(function: *c_void, constant: *c_void) -> *c_void;
-	fn jit_function_to_closure(function: *c_void) -> *c_void;
-
-	static jit_type_void: *c_void;
-	static jit_type_sbyte: *c_void;
-	static jit_type_ubyte: *c_void;
-	static jit_type_short: *c_void;
-	static jit_type_ushort: *c_void;
-	static jit_type_int: *c_void;
-	static jit_type_uint: *c_void;
-	static jit_type_nint: *c_void;
-	static jit_type_nuint: *c_void;
-	static jit_type_long: *c_void;
-	static jit_type_ulong: *c_void;
-	static jit_type_float32: *c_void;
-	static jit_type_float64: *c_void;
-	static jit_type_nfloat: *c_void;
-	static jit_type_void_ptr: *c_void;
-	static jit_type_sys_bool: *c_void;
-	static jit_type_sys_char: *c_void;
-}
+mod bindings;
 /// Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.
 pub struct Context {
-	_context: *c_void
+	_context: jit_context_t
 }
 
 impl Context {
 	/// Create a new JIT Context
 	pub fn new() -> Box<Context> {
 		unsafe {
-			let context = jit_context_create();
-			box Context { _context: context }
+			box Context {
+				_context: jit_context_create()
+			}
 		}
 	}
 	/// Lock down the context to prevent multiple threads from using the builder at a time
@@ -186,8 +83,9 @@ impl Context {
 	/// Create a function in the context with the type signature given
 	pub fn create_function(&self, signature: &Type) -> Box<Function> {
 		unsafe {
-			let function = jit_function_create(self._context, signature._type);
-			box Function { _context: self, _function: function }
+			box Function {
+				_function: jit_function_create(self._context, signature._type)
+			}
 		}
 	}
 }
@@ -199,6 +97,8 @@ impl Drop for Context {
 		}
 	}
 }
+
+#[deriving(Show)]
 /// The types that a value can be
 bitflags!(
 	flags TypeKind: i32 {
@@ -222,12 +122,14 @@ bitflags!(
 		static Union 		= 15,
 		static Signature 	= 16,
 		static Pointer 		= 17,
-		static FirstTagged	= 32
+		static FirstTagged	= 32,
+		static SysBool 		= 10009,
+		static SysChar 		= 10010
 	}
 )
 /// A Type of a value to JIT
 pub struct Type {
-	_type: *c_void
+	_type: jit_type_t
 }
 impl Drop for Type {
 	fn drop(&mut self) {
@@ -238,43 +140,32 @@ impl Drop for Type {
 }
 impl Type {
 	/// Create a function signature, with the given ABI, return type and parameters
-	pub fn create_signature(abi: ABI, return_type: &Type, params: &[&Type]) -> Box<Type> {
+	pub fn create_signature(abi: ABI, return_type: &Type, params: &mut [&Type]) -> Box<Type> {
 		unsafe {
-			let mut ps: Vec<*c_void> = vec!();
-
-			for param in params.iter() {
-				ps.push(param._type);
+			let signature = jit_type_create_signature(abi as jit_abi_t, return_type._type, transmute(params.as_mut_ptr()), params.len() as c_uint, 1);
+			box Type {
+				_type: signature
 			}
-
-			let params = if ps.len() > 0 { ps.as_ptr() } else { 0 as **c_void };
-
-			let signature = jit_type_create_signature(abi as c_int, return_type._type, params, ps.len() as c_uint, 1);
-			box Type { _type: signature }
 		}
 	}
 
-	fn create_complex(fields: &[&Type], union: bool) -> Box<Type> {
+	fn create_complex(fields: &mut [&Type], union: bool) -> Box<Type> {
 		unsafe {
-			let mut fs: Vec<*c_void> = vec!();
-
-			for field in fields.iter() {
-				fs.push(field._type);
-			}
-
-			let fields = if fs.len() > 0 { fs.as_ptr() } else { 0 as **c_void };
 			let f = if union { jit_type_create_union } else { jit_type_create_struct };
-			let ty = f(fields, fs.len() as c_uint, 1);
-			box Type { _type: ty }
+			let ty = f(transmute(fields.as_mut_ptr()), fields.len() as c_uint, 1);
+			box Type {
+				_type: ty
+			}
 		}
 	}
 	/// Create a struct type with the given field types
-	pub fn create_struct(fields: &[&Type]) -> Box<Type> {
+	pub fn create_struct(fields: &mut [&Type]) -> Box<Type> {
 		Type::create_complex(fields, false)
 	}
 	/// Create a union type with the given field types
-	pub fn create_union(fields: &[&Type]) -> Box<Type> {
+	pub fn create_union(fields: &mut [&Type]) -> Box<Type> {
 		let inner = Type::create_complex(fields, true);
-		Type::create_struct(&[&*Types::get_int(), &*inner])
+		Type::create_struct(&mut [&*Types::get_int(), &*inner])
 	}
 	/// Create a pointer type with the given pointee type
 	pub fn create_pointer(pointee: &Type) -> Box<Type> {
@@ -284,7 +175,7 @@ impl Type {
 		}
 	}
 	/// Work out the size of this type
-	pub fn get_size(&self) -> c_uint {
+	pub fn get_size(&self) -> jit_nuint {
 		unsafe {
 			jit_type_get_size(self._type)
 		}
@@ -295,12 +186,19 @@ impl Type {
 			TypeKind::from_bits(jit_type_get_kind(self._type)).unwrap()
 		}
 	}
+	/// Get the reference this pointer points to
+	pub fn get_ref(&self) -> Box<Type> {
+		unsafe {
+			box Type {
+				_type: jit_type_get_ref(self._type)
+			}
+		}
+	}
 }
 #[deriving(Clone)]
 /// A Function to JIT
 pub struct Function {
-	_context: *Context,
-	_function: *c_void
+	_function: jit_function_t
 }
 impl Drop for Function {
 	fn drop(&mut self) {
@@ -310,14 +208,14 @@ impl Drop for Function {
 	}
 }
 impl Function {
-	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: *c_void, v1: *c_void, v2: *c_void) -> *c_void) -> Box<Value> {
+	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Box<Value> {
 		unsafe {
 			let value = f(self._function, v1._value, v2._value);
 			box Value { _value: value }
 		}
 	}
 
-	fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: *c_void, value: *c_void) -> *c_void) -> Box<Value> {
+	fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: jit_function_t, value: jit_value_t) -> jit_value_t) -> Box<Value> {
 		unsafe {
 			let value = f(self._function, value._value);
 			box Value { _value: value }
@@ -340,15 +238,6 @@ impl Function {
 	pub fn set_recompilable(&self) {
 		unsafe {
 			jit_function_set_recompilable(self._function);
-		}
-	}
-	/// Dump the function onto stdout
-	pub fn dump(&self, name: &str) {
-		unsafe {
-			let c_str = name.to_c_str().unwrap();
-			let mode = "w";
-			let stdout = fdopen(STDOUT_FILENO, transmute(&mode[0]));
-			jit_dump_function(stdout, self._function, c_str);
 		}
 	}
 	/// Compile the function
@@ -404,6 +293,10 @@ impl Function {
 	pub fn insn_div(&self, v1: &Value, v2: &Value) -> Box<Value> {
 		self.insn_binop(v1, v2, jit_insn_div)
 	}
+	/// Make an instruction that finds the remainder when the first number is divided by the second
+	pub fn insn_rem(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_rem)
+	}
 	/// Make an instruction that checks if the first value is lower than or equal to the second
 	pub fn insn_leq(&self, v1: &Value, v2: &Value) -> Box<Value> {
 		self.insn_binop(v1, v2, jit_insn_le)
@@ -444,6 +337,18 @@ impl Function {
 	pub fn insn_not(&self, value: &Value) -> Box<Value> {
 		self.insn_unop(value, jit_insn_not)
 	}
+	/// Make an instruction that performs a left bitwise shift on the first value by the second value
+	pub fn insn_shl(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_shl)
+	}
+	/// Make an instruction that performs a right bitwise shift on the first value by the second value
+	pub fn insn_shr(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_shr)
+	}
+	/// Make an instruction that performs a right bitwise shift on the first value by the second value
+	pub fn insn_ushr(&self, v1: &Value, v2: &Value) -> Box<Value> {
+		self.insn_binop(v1, v2, jit_insn_ushr)
+	}
 	/// Make an instruction that performs a bitwise negate on the value
 	pub fn insn_neg(&self, value: &Value) -> Box<Value> {
 		self.insn_unop(value, jit_insn_neg)
@@ -455,6 +360,10 @@ impl Function {
 			box Value { _value: dup_value }
 		}
 	}
+	/// Make an instruction that loads a value from a src value
+	pub fn insn_load(&self, src: &Value) -> Box<Value> {
+		self.insn_unop(src, jit_insn_load)
+	}
 	/// Make an instruction that stores a value at a destination value
 	pub fn insn_store(&self, dest: &Value, src: &Value) {
 		unsafe {
@@ -462,81 +371,58 @@ impl Function {
 		}
 	}
 	/// Make an instruction that stores a value a certain offset away from a destination value
-	pub fn insn_store_relative(&self, dest: &Value, offset: c_int, src: &Value) {
+	pub fn insn_store_relative(&self, dest: &Value, offset: int, src: &Value) {
 		unsafe {
-			jit_insn_store_relative(self._function, dest._value, offset, src._value);
+			jit_insn_store_relative(self._function, dest._value, offset as jit_nint, src._value);
 		}
 	}
 	/// Make an instruction that sets a label
 	pub fn insn_set_label(&self, label: &mut Label) {
 		unsafe {
-			// TODO: messy; I suspect transmute is REALLY BAD PRACTICE
-			let label_ptr: *mut c_void = transmute(&label._label);
-			jit_insn_label(self._function, label_ptr);
+			jit_insn_label(self._function, &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a certain label
 	pub fn insn_branch(&self, label: &mut Label) {
 		unsafe {
-			let label_ptr: *mut c_void = transmute(&label._label);
-			jit_insn_branch(self._function, label_ptr);
+			jit_insn_branch(self._function, &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a certain label if the value is true
 	pub fn insn_branch_if(&self, value: &Value, label: &mut Label) {
 		unsafe {
-			let label_ptr: *mut c_void = transmute(&label._label);
-			jit_insn_branch_if(self._function, value._value, label_ptr);
+			jit_insn_branch_if(self._function, value._value, &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a certain label if the value is false
 	pub fn insn_branch_if_not(&self, value: &Value, label: &mut Label) {
 		unsafe {
-			let label_ptr: *mut c_void = transmute(&label._label);
-			jit_insn_branch_if_not(self._function, value._value, label_ptr);
+			jit_insn_branch_if_not(self._function, value._value, &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a label in the table
-	pub fn insn_jump_table(&self, value: &Value, labels: &[Label]) {
-		let mut conv_labels = Vec::with_capacity(labels.len());
-		for label in labels.iter() {
-			conv_labels.push(label._label);
-		}
+	pub fn insn_jump_table(&self, value: &Value, labels: &mut [Label]) {
 		unsafe {
-			let labels_ptr: *c_void = transmute(conv_labels.as_slice().unsafe_ref(0));
+			let labels_ptr: *mut jit_label_t = transmute(labels.as_mut_ptr());
 			jit_insn_jump_table(self._function, value._value, labels_ptr, labels.len() as u32);
 		}
 	}
 	/// Make an instruction that calls a function that has the signature given with some arguments
-	pub fn insn_call_indirect(&self, func:&Function, signature: &Type, args: &[&Value]) -> Box<Value> {
+	pub fn insn_call_indirect(&self, func:&Function, signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		unsafe {
-			let mut as_: Vec<*c_void> = vec!();
-
-			for arg in args.iter() {
-				as_.push(arg._value);
-			}
-
-			let args = if as_.len() > 0 { as_.as_ptr() } else { 0 as **c_void };
 			box Value {
-				_value: jit_insn_call_indirect(self._function, func._function, signature._type, args, as_.len() as c_uint, JitCallNothrow as c_int)
+				_value: jit_insn_call_indirect(self._function, func._function, signature._type, transmute(args.as_mut_ptr()), args.len() as c_uint, JitCallNothrow as c_int)
 			}
 		}
 	}
 	/// Make an instruction that calls a native function that has the signature given with some arguments
-	fn insn_call_native(&self, name: &'static str, native_func: *u8,
-						signature: &Type, args: &[&Value]) -> Box<Value> {
+	fn insn_call_native(&self, name: &'static str, native_func: *mut c_void,
+						signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		unsafe {
-			let mut as_: Vec<*c_void> = vec!();
-
-			for arg in args.iter() {
-				as_.push(arg._value);
-			}
-
-			let args = if as_.len() > 0 { as_.as_ptr() } else { 0 as **c_void };
 			name.with_c_str(|name| {
 				box Value {
 					_value: jit_insn_call_native(self._function, name, native_func,
-												 signature._type, args, as_.len() as c_uint,
+												 signature._type, transmute(args.as_mut_ptr()), args.len() as c_uint,
 												 JitCallNothrow as c_int)
 				}
 			})
@@ -545,31 +431,31 @@ impl Function {
 	/// Make an instruction that calls a Rust function that has the signature given with no arguments and expects a return value
 	pub fn insn_call_native0<R>(&self, name: &'static str,
 								native_func: fn() -> R,
-								signature: &Type, args: &[&Value]) -> Box<Value> {
+								signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with a single argument and expects a return value
 	pub fn insn_call_native1<A,R>(&self, name: &'static str,
 								  native_func: fn(A) -> R,
-								  signature: &Type, args: &[&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with two arguments and expects a return value
 	pub fn insn_call_native2<A,B,R>(&self, name: &'static str,
 								  native_func: fn(A, B) -> R,
-								  signature: &Type, args: &[&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with three arguments and expects a return value
 	pub fn insn_call_native3<A,B,C,R>(&self, name: &'static str,
 								  native_func: fn(A, B, C) -> R,
-								  signature: &Type, args: &[&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with four arguments and expects a return value
 	pub fn insn_call_native4<A,B,C,D,R>(&self, name: &'static str,
 								  native_func: fn(A, B, C, D) -> R,
-								  signature: &Type, args: &[&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that allocates some space
@@ -579,17 +465,15 @@ impl Function {
 		}
 	}
 	/// Apply a function to some arguments and set the retval to the return value
-	pub fn apply<T>(&self, args: &[*c_void], retval: &mut T) {
+	pub fn apply<T>(&self, args: &mut [*mut c_void], retval: &mut T) {
 		unsafe {
-			let pargs = args;
-			jit_function_apply(self._function, pargs.as_ptr(), transmute(retval));
+			jit_function_apply(self._function, args.as_mut_ptr(), transmute(retval));
 		}
 	}
 	/// Execute a function and with some arguments
-	pub fn execute(&self, args: &[*c_void]) {
+	pub fn execute(&self, args: &mut [*mut c_void]) {
 		unsafe {
-			let pargs = args;
-			jit_function_apply(self._function, pargs.as_ptr(), ptr::mut_null());
+			jit_function_apply(self._function, args.as_mut_ptr(), ptr::mut_null());
 		}
 	}
 	/// Turn this function into a closure
@@ -603,6 +487,13 @@ impl Function {
 		unsafe {
 			let value = jit_value_create(self._function, value_type._type);
 			box Value { _value: value }
+		}
+	}
+	pub fn insn_convert(&self, v: &Value, t:&Type, overflow_check:bool) -> Box<Value> {
+		unsafe {
+			box Value {
+				_value: jit_insn_convert(self._function, v._value, t._type, overflow_check as c_int)
+			}
 		}
 	}
 	/// Make an instruction that gets the inverse cosine of the number given
@@ -713,17 +604,11 @@ impl Function {
 	pub fn insn_sign(&self, v: &Value) -> Box<Value> {
 		self.insn_unop(v, jit_insn_sign)
 	}
-	/// Convert it into a value
-	pub fn as_value(&self) -> Box<Value> {
-		box Value {
-			_value: self._function
-		}
-	}
 }
 #[deriving(Clone)]
 /// A Value that is being JITed
 pub struct Value {
-	_value: *c_void
+	_value: jit_value_t
 }
 impl Value {
 	/// Get the type of the value
@@ -738,16 +623,17 @@ impl Value {
 #[deriving(Hash, Eq)]
 /// A label in the code that can be branched to in instructions
 pub struct Label {
-	_label: *c_void
+	_label: jit_label_t
 }
 
 impl Label {
-	fn undefined() -> *c_void {
-		!0u32 as *c_void
-	}
 	/// Create a new label
-	pub fn new() -> Box<Label> {
-		box Label { _label: Label::undefined() }
+	pub fn new(func:&Function) -> Box<Label> {
+		unsafe {
+			box Label {
+				_label: jit_function_reserve_label(func._function)
+			}
+		}
 	}
 }
 /// Holds type constructors
@@ -805,12 +691,8 @@ impl Types {
 	pub fn get_vec() -> Box<Type> {
 		let uint_t = Types::get_uint();
 		let void_ptr_t = Types::get_void_ptr();
-		Type::create_struct(&[&*uint_t, &*uint_t, &*void_ptr_t])
+		Type::create_struct(&mut [&*uint_t, &*uint_t, &*void_ptr_t])
 	}
-}
-struct PointerConstant {
-	_type: *c_void,
-	_ptr: *c_void
 }
 /// A type that can be compiled into a LibJIT representation
 pub trait Compilable {
@@ -857,7 +739,7 @@ impl Compilable for uint {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_nuint, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_nuint, *self as jit_nint) 
 			}
 		}
 	}
@@ -866,7 +748,7 @@ impl Compilable for i32 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_int, *self) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_int, *self as jit_nint) 
 			}
 		}
 	}
@@ -875,7 +757,7 @@ impl Compilable for u32 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_uint, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_uint, *self as jit_nint) 
 			}
 		}
 	}
@@ -884,7 +766,7 @@ impl Compilable for i16 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_short, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_short, *self as jit_nint) 
 			}
 		}
 	}
@@ -893,7 +775,7 @@ impl Compilable for u16 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_ushort, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_ushort, *self as jit_nint) 
 			}
 		}
 	}
@@ -902,7 +784,7 @@ impl Compilable for i8 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_sbyte, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_sbyte, *self as jit_nint) 
 			}
 		}
 	}
@@ -911,7 +793,7 @@ impl Compilable for u8 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as jit_nint) 
 			}
 		}
 	}
@@ -920,7 +802,7 @@ impl Compilable for bool {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_sys_bool, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_sys_bool, *self as jit_nint) 
 			}
 		}
 	}
@@ -929,7 +811,7 @@ impl Compilable for char {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
 			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as i32) 
+				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as jit_nint) 
 			}
 		}
 	}
@@ -942,27 +824,15 @@ impl<'t> Compilable for &'t str {
 		func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
 		for i in range(0, self.len()) {
 			let char_i = self.char_at(i).compile(func);
-			func.insn_store_relative(bufptr, i as i32, char_i);
+			func.insn_store_relative(bufptr, i as int, char_i);
 		}
 		let null_term = '\0'.compile(func);
-		func.insn_store_relative(bufptr, self.len() as i32, null_term);
+		func.insn_store_relative(bufptr, self.len() as int, null_term);
 		bufptr
 	}
 }
 impl Compilable for String {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		self.as_slice().compile(func)
-	}
-}
-impl<'t, T> Compilable for &'t T {
-	fn compile(&self, func:&Function) -> Box<Value> {
-		unsafe {
-			box Value {
-				_value: jit_value_create_constant(func._function, transmute(&PointerConstant {
-					_type: jit_type_void_ptr,
-					_ptr: transmute(*self)
-				}))
-			}
-		}
 	}
 }
