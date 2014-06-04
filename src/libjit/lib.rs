@@ -28,17 +28,19 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 #![allow(raw_pointer_deriving, dead_code, non_camel_case_types)]
-#![feature(globs, macro_rules)]
+#![feature(globs)]
 #![stable]
 //! This crate wraps LibJIT
 
 extern crate libc;
 extern crate native;
+extern crate syntax;
 use std::ptr;
 use std::mem::transmute;
 use libc::{c_int, c_void, c_uint};
 use bindings::*;
 pub use bindings::{jit_nint, jit_nuint};
+
 /// A platform's application binary interface
 pub enum ABI {
 	/// The C application binary interface
@@ -620,12 +622,16 @@ impl Value {
 	}
 }
 
-#[deriving(Hash, Eq)]
+#[deriving(Eq)]
 /// A label in the code that can be branched to in instructions
 pub struct Label {
 	_label: jit_label_t
 }
-
+impl PartialEq for Label {
+	fn eq(&self, other:&Label) -> bool {
+		self._label == other._label
+	}
+}
 impl Label {
 	/// Create a new label
 	pub fn new(func:&Function) -> Box<Label> {

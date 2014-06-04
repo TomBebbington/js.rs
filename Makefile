@@ -1,6 +1,6 @@
-RUSTC ?= rustc -O
+RUSTC ?= rustc
 RUSTDOC ?= rustdoc
-.PHONY: all build doc libs libjit libjs libjs_syntax update-doc clean
+.PHONY: all build doc libs libjit libjit_macro libjs libjs_syntax update-doc clean
 all: libs build doc
 libjs:
 	mkdir -p target
@@ -8,10 +8,13 @@ libjs:
 libjs_syntax:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjs_syntax/lib.rs -L .
+libjit_macro:
+	mkdir -p target
+	cd target && $(RUSTC) ../src/libjit_macro/lib.rs -L .
 libjit:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjit/lib.rs -L .
-libs: libjit libjs_syntax libjs
+libs: libjit libjit_macro libjs_syntax libjs
 build:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/front/front.rs -L .

@@ -11,7 +11,7 @@ pub trait Operator {
 		(self.get_precedence(), self.get_assoc())
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A numeric operation between 2 values
 pub enum NumOp {
 	/// `a + b` - Addition
@@ -36,7 +36,7 @@ impl Show for NumOp {
 		})
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A unary operation on a single value
 pub enum UnaryOp {
 	/// `a++` - increment the value
@@ -65,7 +65,7 @@ impl Show for UnaryOp {
 		})
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A bitwise operation between 2 values
 pub enum BitOp {
 	/// `a & b` - Bitwise and
@@ -90,7 +90,7 @@ impl Show for BitOp {
 		})
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A comparitive operation between 2 values
 pub enum CompOp {
 	/// `a == b` - Equality
@@ -124,7 +124,7 @@ impl Show for CompOp {
 		})
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A logical operation between 2 boolean values
 pub enum LogOp {
 	/// `a && b` - Logical and
@@ -140,7 +140,7 @@ impl Show for LogOp {
 		})
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A binary operation between 2 values
 pub enum BinOp {
 	/// Numeric operation

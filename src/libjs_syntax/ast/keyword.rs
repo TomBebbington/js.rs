@@ -1,6 +1,6 @@
 use std::fmt::{Formatter, Result, Show};
 use std::from_str::FromStr;
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A Javascript Keyword
 pub enum Keyword {
 	/// The `break` keyword

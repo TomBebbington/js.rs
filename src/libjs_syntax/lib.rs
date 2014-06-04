@@ -31,6 +31,8 @@ pub mod ast {
 	pub mod constant;
 	/// Expression AST
 	pub mod expr;
+	/// Typed expression AST
+	pub mod typer;
 	/// Operations AST
 	pub mod op;
 	/// Keywords AST
@@ -41,6 +43,8 @@ pub mod ast {
 	pub mod pos;
 	/// Token AST
 	pub mod token;
+	/// Typing AST
+	pub mod types;
 }
 /// The lexer, which transforms a string stream into a sequence of tokens
 pub mod lexer;

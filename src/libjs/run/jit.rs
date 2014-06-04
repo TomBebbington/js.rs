@@ -1,6 +1,9 @@
 use syntax::ast::expr::*;
 use syntax::ast::constant::*;
 use syntax::ast::op::*;
+use syntax::ast::types::*;
+use syntax::ast::typer::resolve_type;
+use JSType = syntax::ast::types::Type;
 use stdlib::value::{Value, VNull, ResultValue, to_value};
 use stdlib::*;
 use run::exec::Executor;
@@ -8,8 +11,22 @@ use std::gc::Gc;
 use std::c_str::CString;
 use std::mem::size_of;
 use jit::{Context, Function, Type, Types, Compilable, CDECL};
+use jit::{UByte, SysChar, SysBool, Void, Int, UInt, Pointer, Float64, Signature};
 use jit;
 
+fn compile_type(js_type:&JSType) -> Box<Type> {
+	match *js_type {
+		UndefinedType | NullType | NativeObjectType | ObjectType | AnyType => Types::get_void_ptr(),
+		FunctionType => Types::get_void_ptr(),
+		StringType => Type::create_pointer(Types::get_char()),
+		BooleanType => jit_compile!(bool),
+		NumberType => Types::get_float64(),
+		IntegerType => jit_compile!(i32),
+		AnyOfType(ref types) => {
+			fail!("Unknown types: {}", types)
+		}
+	}
+}
 /// A Javascript JIT compiler
 pub struct JITCompiler {
 	/// The JIT Context
@@ -54,403 +71,157 @@ impl Executor<Function> for JITCompiler {
 	fn compile(&self, expr: &Expr) -> Box<Function> {
 		self.with_builder(|| {
 			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
-				let create_undef_value = Value::undefined;
-				let valuedata_t = Types::get_int();
-				let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
-				let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-				let cstring_t = Type::create_pointer(&*Types::get_char());
-				let create_value_sig = Type::create_signature(CDECL, &*value_t, &[]);
-				let undefined = || func.insn_call_native0("undefined", create_undef_value, &*create_value_sig, &[]);
+				let valuedata_t = jit_compile!(int);
+				let valuedata_ptr_t = jit_compile!(*$valuedata_t);
+				let value_t = valuedata_ptr_t;
+				let cstring_t = jit_compile!(*char);
+				let create_value_sig = jit_compile!(() -> $value_t);
+				let undefined = || {
+					let ptr = func.create_value(Types::get_void_ptr());
+					let val = 0u8.compile(func);
+					func.insn_store(ptr, val);
+					ptr
+				};
 				let args = func.get_param(0);
 				let global = func.get_param(1);
 				let scope = func.get_param(2);
 				let this = func.get_param(3);
 				match expr.def {
 					ConstExpr(CNull) => {
-						fn create_null_value() -> Value {
-							Value {
-								ptr: Gc::new(VNull)
-							}
-						}
-						func.insn_call_native0("create_null_value", create_null_value, &*create_value_sig, &[])
+						let ptr = func.create_value(jit_compile!(*void));
+						let val = 1u8.compile(func);
+						func.insn_store(ptr, val);
+						ptr
 					},
 					ConstExpr(CUndefined) => {
 						undefined()
 					},
 					ConstExpr(CBool(v)) => {
-						let create_bool_value = to_value::<bool>;
-						let val = v.compile(func);
-						let create_bool_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_bool()]);
-						func.insn_call_native1("create_bool_value", create_bool_value, &*create_bool_sig, &[&*val])
+						v.compile(func)
 					},
 					ConstExpr(CNum(n)) => {
-						let create_number_value = to_value::<f64>;
-						let val = n.compile(func);
-						let create_number_sig = Type::create_signature(CDECL, &*value_t, &[&*Types::get_float64()]);
-						func.insn_call_native1("create_number_value", create_number_value, &* create_number_sig, &[&*val])
+						n.compile(func)
 					},
 					ConstExpr(CString(ref s)) => {
-						let create_string_value = to_value::<*i8>;
-						let create_string_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_t]);
-						let bufptr = s.compile(func);
-						func.insn_call_native1("create_string_value", create_string_value, &* create_string_sig, &[&*bufptr])
+						s.compile(func)
 					},
-					GetConstFieldExpr(ref obj, ref field) => {
-						fn find_field(obj:Value, s: *i8) -> Value {
-							unsafe {
-								let cstr = CString::new(s, false);
-								obj.get_field_slice(cstr.as_str().unwrap())
-							}
-						}
-						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
-						let obj_i = compile_value(func, *obj);
-						let bufptr = field.compile(func);
-						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*bufptr])
-					},
-					GetFieldExpr(ref obj, ref field) => {
-						fn find_field(obj:Value, field:Value) -> Value {
-							obj.get_field(field.to_str())
-						}
-						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t]);
-						let obj_i = compile_value(func, *obj);
-						let field_i = compile_value(func, *field);
-						func.insn_call_native2("find_field", find_field, &*find_field_sig, &[&*obj_i, &*field_i])
-					},
-					ObjectDeclExpr(ref fields) => {
-						fn create_object_with_fields(mut c_fields: **i8, mut vals: *Value, num_fields: i32) -> Value {
-							let object = Value::new_obj(None);
-							for _ in range(0, num_fields) {
-								unsafe {
-									let cstr = CString::new(*c_fields, false);
-									let field = cstr.as_str().unwrap();
-									object.set_field_slice(field, *vals);
-									c_fields = ((c_fields as uint) + size_of::<*i8>()) as **i8;
-									vals = ((vals as uint) + size_of::<Value>()) as *Value;
-								}
-							}
-							object
-						}
-						let value_ptr_t = Type::create_pointer(&*value_t);
-						let cstring_ptr_t = Type::create_pointer(&*cstring_t);
-						let create_object_sig = Type::create_signature(CDECL, &*value_t, &[&*cstring_ptr_t, &*value_ptr_t, &*Types::get_int()]);
-						let num_fields_i = (fields.len() as i32).compile(func);
-						let fields_i = func.create_value(cstring_ptr_t);
-						let fields_size = (fields.len() as u32 * cstring_t.get_size()).compile(func);
-						func.insn_store(fields_i, func.insn_alloca(fields_size));
-						let values_i = func.create_value(value_ptr_t);
-						let values_size = (fields.len() as u32 * value_t.get_size()).compile(func);
-						func.insn_store(values_i, func.insn_alloca(values_size));
-						let mut i = 0i32;
-						for (key, value) in fields.iter() {
-							func.insn_store_relative(fields_i, i * cstring_t.get_size() as i32, key.compile(func));
-							func.insn_store_relative(values_i, i * value_t.get_size() as i32, compile_value(func, value));
-							i += 1i32;
-						}
-						func.insn_call_native3("create_object_with_fields", create_object_with_fields, &*create_object_sig, &[&*fields_i, &*values_i, &*num_fields_i])
-					},
-					ArrayDeclExpr(ref values) => {
-						fn create_array(mut vals: *Value, num_vals: i32) -> Value {
-							let array = Value::new_obj(None);
-							array.set_field_slice("length", to_value(num_vals));
-							for i in range(0, num_vals) {
-								unsafe {
-									array.set_field(i.to_str(), *vals);
-									vals = ((vals as uint) + size_of::<Value>()) as *Value;
-								}
-							}
-							array
-						}
-						let value_ptr_t = Type::create_pointer(&*value_t);
-						let create_array_sig = Type::create_signature(CDECL, &*value_t, &[&*value_ptr_t, &*Types::get_int()]);
-						let values_i = func.create_value(value_ptr_t);
-						let values_size = ((values.len() as u32 * value_t.get_size()) as i32).compile(func);
-						func.insn_store(values_i, func.insn_alloca(values_size));
-						let mut i = 0i32;
-						for val in values.iter() {
-							func.insn_store_relative(values_i, i * value_t.get_size() as i32, compile_value(func, val));
-							i += 1i32;
-						}
-						let num_values = (values.len() as i32).compile(func);
-						func.insn_call_native2("create_array", create_array, &*create_array_sig, &[&*values_i, &*num_values])
-					},
-					/*
-					FunctionDeclExpr(ref name, ref args, ref expr) => {
-						fn create_func_value(data: FunctionData, args: **i8, nargs: uint) -> Value {
-							let mut s_args = Vec::with_capacity(nargs);
-							for i in range(0, nargs) {
-								unsafe {
-									println!("{}", nargs);
-									let c_str = from_c_str(((args as uint) + i * size_of::<*i8>()) as *i8);
-									println!("{}", c_str);
-									s_args.push(c_str);
-								}
-							}
-							Value {
-								ptr: Gc::new(VFunction(RefCell::new(function::Function::new(data, s_args))))
-							}
-						}
-						let cstring_ptr_t = Type::create_pointer(&*value_t);
-						let args_i = func.create_value(&*cstring_ptr_t);
-						let nargs_i = args.len().compile(func);
-						let args_size = (args.len() * cstring_t.get_size() as uint).compile(func);
-						func.insn_store(args_i, func.insn_alloca(args_size));
-						for i in range(0i32, args.len() as i32) {
-							func.insn_store_relative(args_i, i * cstring_t.get_size() as i32, args.get(i as uint).compile(func))
-						}
-						// fn(args, global, scope, this)
-						let vec_t = Types::get_vec();
-						let sig_t = Type::create_signature(CDECL, &*value_t, &[&*vec_t, &*value_t, &*value_t, &*value_t]);
-						let new_func = func.get_context().create_function(&*sig_t);
-						let value = compile_value(new_func, &**expr);
-						new_func.insn_return(&*value);
-						new_func.dump(name.clone().unwrap().as_slice());
-						let make_func_sig_t = Type::create_signature(CDECL, &*value_t, &[&*sig_t, &*args_i.get_type(), &*nargs_i.get_type()]);
-						println!("{}", new_func.as_value().get_type().get_size());
-						func.insn_call_native3("create_func", create_func_value, &*make_func_sig_t, &[&*new_func.as_value(), &*args_i, &*nargs_i])
-					},
-					*/
-					BlockExpr(ref block) => {
-						let last = block.last();
-						for expr in block.iter() {
-							let comp = compile_value(func, expr);
-							if last.unwrap() == expr {
-								return comp
-							}
-						}
-						undefined()
-					},
-					ReturnExpr(None) => {
-						func.insn_default_return();
-						undefined()
-					},
-					ReturnExpr(Some(ref ret)) => {
-						let i_ret = compile_value(func, *ret);
-						func.insn_return(i_ret);
-						i_ret
-					},
-					ThrowExpr(ref val) => {
-						let i_val = compile_value(func, *val);
-						func.insn_throw(i_val);
-						i_val
-					},
-					LocalExpr(ref name) if name.as_slice() == "this" => box this,
-					LocalExpr(ref name) => {
-						fn find_field(obj:Value, s: *i8) -> Value {
-							unsafe {
-								let cstr = CString::new(s, false);
-								obj.get_field_slice(cstr.as_str().unwrap())
-							}
-						}
-						let find_field_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*cstring_t]);
-						let bufptr = name.compile(func);
-						func.insn_call_native2("get_local", find_field, &*find_field_sig, &[&scope, &*bufptr])
-					},
-					VarDeclExpr(ref vars) => {
-						fn set_field(obj:Value, s: *i8, val:Value) -> () {
-							unsafe {
-								let cstr = CString::new(s, false);
-								obj.set_field_slice(cstr.as_str().unwrap(), val);
-							}
-						}
-						let set_field_sig = Type::create_signature(CDECL, &*Types::get_void(), &[&*value_t, &*cstring_t, &*value_t]);
-						for tup in vars.iter() {
-							let (name, expr) = tup.clone();
-							let bufptr = name.compile(func);
-							let value = match expr {
-								Some(ex) => compile_value(func, &ex),
-								None => undefined()
-							};
-							func.insn_call_native3("set_local", set_field, &*set_field_sig, &[&scope, &*bufptr, &*value]);
-						}
-						undefined()
-					},
-					AssignExpr(ref assignee, ref value) => {
-						fn set_field(obj:Value, s: *i8, val:Value) -> () {
-							unsafe {
-								let cstr = CString::new(s, false);
-								obj.set_field_slice(cstr.as_str().unwrap(), val);
-							}
-						}
-						let set_field_sig = Type::create_signature(CDECL, &*Types::get_void(), &[&*value_t, &*cstring_t, &*value_t]);
-						let value_i = compile_value(func, &**value);
-						match assignee.def {
-							LocalExpr(ref name) => {
-								let bufptr = name.compile(func);
-								func.insn_call_native3("set_local", set_field, &*set_field_sig, &[&scope, &*bufptr, &*value_i]);
-							},
-							_ => fail!("Unimplemented assigning to {}", *assignee)
-						}
-						value_i
-					},
-					TypeOfExpr(ref ex) => {
-						fn get_val_type(v:Value) -> Value {
-							to_value(v.get_type())
-						}
-						let get_val_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);
-						let i_ex = compile_value(func, *ex);
-						func.insn_call_native1("get_value_type", get_val_type, &*get_val_sig, &[&*i_ex])
-					},
-					UnaryOpExpr(op, ref a) => {
-						let i_a = compile_value(func, *a);
-						let unop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t]);
-						let (name, op_func) = match op {
-							UnaryPlus => return i_a,
-							UnaryMinus => {
-								fn neg_value(a:Value) -> Value {
-									-a
-								}
-								("neg", neg_value)
-							}
-							UnaryNot => {
-								fn not_value(a: Value) -> Value {
-									!a
-								}
-								("not", not_value)
-							},
-							_ => fail!("Unimplemented {}", op)
-						};
-						func.insn_call_native1(name, op_func, unop_sig, &[&*i_a])
-					},
-					BinOpExpr(op, ref a, ref b) => {
+					BinOpExpr(BinNum(OpAdd), ref a, ref b) => {
 						let i_a = compile_value(func, *a);
 						let i_b = compile_value(func, *b);
-						let binop_sig = Type::create_signature(CDECL, &*value_t, &[&*value_t, &*value_t]);
-						
-						let (name, op_func) = match op {
-							BinNum(OpAdd) => {
-								fn add_values(a: Value, b:Value) -> Value {
-									a + b
-								}
-								("add", add_values)
-							},
-							BinNum(OpSub) => {
-								fn sub_values(a: Value, b:Value) -> Value {
-									a - b
-								}
-								("sub", sub_values)
-							},
-							BinNum(OpMul) => {
-								fn mul_values(a: Value, b:Value) -> Value {
-									a * b
-								}
-								("mul", mul_values)
-							},
-							BinNum(OpDiv) => {
-								fn div_values(a: Value, b:Value) -> Value {
-									a / b
-								}
-								("div", div_values)
-							},
-							BinNum(OpMod) => {
-								fn mod_values(a: Value, b:Value) -> Value {
-									a % b
-								}
-								("mod", mod_values)
-							},
-							BinBit(BitAnd) => {
-								fn and_values(a: Value, b:Value) -> Value {
-									a & b
-								}
-								("and", and_values)
-							},
-							BinBit(BitOr) => {
-								fn or_values(a: Value, b:Value) -> Value {
-									a | b
-								}
-								("or", or_values)
-							},
-							BinBit(BitXor) => {
-								fn xor_values(a: Value, b:Value) -> Value {
-									a ^ b
-								}
-								("xor", xor_values)
-							},
-							BinBit(BitShl) => {
-								fn shl_values(a: Value, b:Value) -> Value {
-									a << b
-								}
-								("shl", shl_values)
-							},
-							BinBit(BitShr) => {
-								fn shr_values(a: Value, b:Value) -> Value {
-									a >> b
-								}
-								("shr", shr_values)
-							},
-							BinLog(LogOr) => {
-								fn or_values(a: Value, b:Value) -> Value {
-									to_value(a.is_true() || b.is_true())
-								}
-								("or", or_values)
-							},
-							BinLog(LogAnd) => {
-								fn and_values(a: Value, b:Value) -> Value {
-									to_value(a.is_true() && b.is_true())
-								}
-								("and", and_values)
-							},
-							BinComp(CompEqual) | BinComp(CompStrictEqual) => {
-								fn eq_values(a: Value, b:Value) -> Value {
-									to_value(a == b)
-								}
-								("eq", eq_values)
-							},
-							BinComp(CompNotEqual) | BinComp(CompStrictNotEqual) => {
-								fn neq_values(a: Value, b:Value) -> Value {
-									to_value(a != b)
-								}
-								("neq", neq_values)
-							},
-							BinComp(CompLessThan) => {
-								fn lt_values(a: Value, b:Value) -> Value {
-									to_value(a < b)
-								}
-								("lt", lt_values)
-							},
-							BinComp(CompLessThanOrEqual) => {
-								fn lte_values(a: Value, b:Value) -> Value {
-									to_value(a <= b)
-								}
-								("lte", lte_values)
-							},
-							BinComp(CompGreaterThan) => {
-								fn gt_values(a: Value, b:Value) -> Value {
-									to_value(a > b)
-								}
-								("gt", gt_values)
-							},
-							BinComp(CompGreaterThanOrEqual) => {
-								fn gte_values(a: Value, b:Value) -> Value {
-									to_value(a >= b)
-								}
-								("gte", gte_values)
+						func.insn_add(i_a, i_b)
+					},
+					BinOpExpr(BinNum(OpSub), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_sub(i_a, i_b)
+					},
+					BinOpExpr(BinNum(OpMul), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_mul(i_a, i_b)
+					},
+					BinOpExpr(BinNum(OpDiv), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_div(i_a, i_b)
+					},
+					BinOpExpr(BinNum(OpMod), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_rem(i_a, i_b)
+					},
+					BinOpExpr(BinBit(BitAnd), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_and(i_a, i_b), jit_compile!(i32), false)
+					},
+					BinOpExpr(BinBit(BitOr), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_or(i_a, i_b), jit_compile!(i32), false)
+					},
+					BinOpExpr(BinBit(BitXor), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_xor(i_a, i_b), jit_compile!(i32), false)
+					},
+					BinOpExpr(BinBit(BitShl), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_shl(i_a, i_b), jit_compile!(i32), false)
+					},
+					BinOpExpr(BinBit(BitShr), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_shr(i_a, i_b), jit_compile!(i32), false)
+					},
+					BinOpExpr(BinComp(CompEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictEqual), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_eq(i_a, i_b), jit_compile!(bool), false)
+					},
+					BinOpExpr(BinComp(CompNotEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictNotEqual), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_neq(i_a, i_b), jit_compile!(bool), false)
+					},
+					BinOpExpr(BinComp(CompLessThan), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_lt(i_a, i_b), jit_compile!(bool), false)
+					},
+					BinOpExpr(BinComp(CompLessThanOrEqual), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_leq(i_a, i_b), jit_compile!(bool), false)
+					},
+					BinOpExpr(BinComp(CompGreaterThan), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_gt(i_a, i_b), jit_compile!(bool), false)
+					},
+					BinOpExpr(BinComp(CompGreaterThanOrEqual), ref a, ref b) => {
+						let i_a = compile_value(func, *a);
+						let i_b = compile_value(func, *b);
+						func.insn_convert(func.insn_geq(i_a, i_b), jit_compile!(bool), false)
+					},
+					UnaryOpExpr(UnaryMinus, ref a) => {
+						func.insn_neg(compile_value(func, *a))
+					},
+					UnaryOpExpr(UnaryNot, ref a) => {
+						let mut val = compile_value(func, *a);
+						val = func.insn_convert(val, jit_compile!(bool), false);
+						val = func.insn_neg(val);
+						func.insn_convert(val, jit_compile!(bool), false)
+					},
+					UnaryOpExpr(UnaryPlus, ref a) => {
+						compile_value(func, *a)
+					},
+					BlockExpr(ref exprs) => {
+						let mut result = undefined();
+						let last = exprs.last();
+						for expr in exprs.iter() {
+							let res = compile_value(func, expr);
+							if expr == last.unwrap() {
+								result = res;
 							}
-						};
-						func.insn_call_native2(name, op_func, binop_sig, &[&*i_a, &*i_b])
+						}
+						result
 					},
-					IfExpr(ref cond, ref expr, None) => {
-						let from_bool_value = to_value::<bool>;
-						let from_bool_sig = Type::create_signature(CDECL, &*Types::get_bool(), &[&*value_t]);
-						let i_cond = compile_value(func, *cond);
-						let i_cond_bool = func.insn_call_native1("to_bool", from_bool_value, from_bool_sig, &[&*i_cond]);
-						let value = func.insn_call_native0("create_undef_value", create_undef_value, &*create_value_sig, &[]);
-						let mut done_label = jit::Label::new();
-						func.insn_branch_if_not(i_cond_bool, done_label);
-						func.insn_store(value, compile_value(func, *expr));
-						func.insn_set_label(done_label);
-						value
-					},
+					ReturnExpr(Some(ref ex)) => {
+						let ret = compile_value(func, *ex);
+						func.insn_return(convert_to_value(func, ret));
+						ret
+					}
 					_ => fail!("Unimplemented {}", expr)
 				}
-			}
-			let valuedata_t = Types::get_int();
-			let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
-			let value_t = Type::create_struct(&[&*valuedata_ptr_t]);
-			let default_sig_t = Type::create_signature(CDECL, &*value_t, &[&*Types::get_vec(), &*value_t, &*value_t, &*value_t]);
-			let func = self.context.create_function(&*default_sig_t);
+			};
+			let value_t = jit_compile!(*int);
+			let vec_t = jit_compile!(Vec);
+			let default_sig_t = Type::create_signature(CDECL, value_t, &mut [&*vec_t, &*value_t, &*value_t, &*value_t]);
+			let func = self.context.create_function(default_sig_t);
 			let value = compile_value(func, expr);
-			func.insn_return(&*value);
-			func.dump("js.rs");
+			func.insn_return(convert_to_value(func, value));
 			func.set_optimization_level(5);
 			func.set_recompilable();
 			func.compile();
@@ -461,5 +232,53 @@ impl Executor<Function> for JITCompiler {
 		// global fn(global, scope, this)
 		let func: fn(Value, Value, Value) -> Value = comp.closure();
 		return Ok(func(self.global, self.global, self.global));
+	}
+}
+
+fn convert_to_value(func:&Function, val:&jit::Value) -> Box<jit::Value> {
+	let valuedata_t = jit_compile!(i32);
+	let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
+	let value_t = Type::create_struct(&mut [&*valuedata_ptr_t]);
+	let undef_value = Value::undefined;
+	let val_type = val.get_type();
+	let val_kind = val_type.get_kind();
+	if val_kind.contains(SysBool) || val_kind.contains(UByte) {
+		let bool_value = to_value::<bool>;
+		let sig = Type::create_signature(CDECL, value_t, &mut [&*jit_compile!(bool)]);
+		func.insn_call_native1("bool_value", bool_value, sig, &mut [val])
+	} else if val_kind.contains(Pointer) {
+		let ref_t = val_type.get_ref();
+		if ref_t.get_kind().contains(SysChar) {
+			fn string_value(val: *i8) -> Value {
+				unsafe {
+					let text = CString::new(val, false);
+					to_value(text.as_str().unwrap().into_string())
+				}
+			}
+			let sig = Type::create_signature(CDECL, value_t, &mut [&*val_type]);
+			func.insn_call_native1("string_value", string_value, sig, &mut [val])
+		} else {
+			fn ptr_value(ptr: *i8) -> Value {
+				match ptr.to_uint() {
+					0u => Value::undefined(),
+					1u => Value {
+						ptr: Gc::new(VNull)
+					},
+					ptr => fail!("Invalid pointer: {}", ptr)
+				}
+			}
+			let sig = Type::create_signature(CDECL, value_t, &mut [&*Types::get_void_ptr()]);
+			func.insn_call_native1("ptr_value", ptr_value, sig, &mut [val])
+		}
+	} else if val_kind.contains(Int) || val_kind.contains(UInt) {
+		let int_value = to_value::<i32>;
+		let sig = Type::create_signature(CDECL, value_t, &mut [&*jit_compile!(i32)]);
+		func.insn_call_native1("int_value", int_value, sig, &mut [val])
+	} else if val_kind.contains(Float64) {
+		let float_value = to_value::<f64>;
+		let sig = Type::create_signature(CDECL, value_t, &mut [&*Types::get_float64()]);
+		func.insn_call_native1("float_value", float_value, sig, &mut [val])
+	} else {
+		fail!("Invalid kind {}", val_kind.bits())
 	}
 }

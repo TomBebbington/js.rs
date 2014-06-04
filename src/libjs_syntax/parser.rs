@@ -15,8 +15,7 @@ macro_rules! mk (
 		Expr::new($def, $first.pos, try!(self.get_token(self.pos - 1)).pos)
 	);
 )
-#[deriving(Clone)]
-#[deriving(Eq)]
+#[deriving(Clone, PartialEq)]
 /// An error encountered during parsing an expression
 pub enum ParseError {
 	/// When it expected a certain kind of token, but got another as part of something

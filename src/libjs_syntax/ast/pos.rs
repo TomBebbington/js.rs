@@ -1,4 +1,4 @@
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A position in Javascript source code
 pub struct Position {
 	/// The column number

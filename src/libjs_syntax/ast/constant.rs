@@ -1,6 +1,6 @@
 use std::fmt::{Formatter, Result, Show};
 
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A Javascript constant
 pub enum Const {
 	/// A UTF-8 string, such as `"Hello, world"`

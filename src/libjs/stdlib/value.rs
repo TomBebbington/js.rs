@@ -9,7 +9,7 @@ use std::gc::Gc;
 use std::c_str::CString;
 use std::cell::RefCell;
 use std::iter::FromIterator;
-use std::cmp::Ord;
+use std::cmp::PartialOrd;
 #[must_use]
 /// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;
@@ -271,7 +271,7 @@ impl fmt::Show for Value {
 		}
 	}
 }
-impl Eq for Value {
+impl PartialEq for Value {
 	fn eq(&self, other:&Value) -> bool {
 		match (self.ptr.borrow().clone(), other.ptr.borrow().clone()) {
 			_ if self.ptr.ptr_eq(&other.ptr) => true,
@@ -376,7 +376,7 @@ impl Neg<Value> for Value {
 		to_value(-self.to_num())
 	}
 }
-impl Ord for Value {
+impl PartialOrd for Value {
 	fn lt(&self, other: &Value) -> bool {
 		self.to_num() < other.to_num()
 	}

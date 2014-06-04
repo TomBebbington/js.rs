@@ -2,8 +2,7 @@ use std::fmt::{Formatter, Result, Show};
 use ast::pos::Position;
 use ast::punc::Punctuator;
 use ast::keyword::Keyword;
-#[deriving(Clone)]
-#[deriving(Eq)]
+#[deriving(Clone, PartialEq)]
 /// A single of token of Javascript code including its position
 pub struct Token {
 	/// The token
@@ -25,8 +24,7 @@ impl Show for Token {
 		write!(f, "{}", self.data)
 	}
 }
-#[deriving(Clone)]
-#[deriving(Eq)]
+#[deriving(Clone, PartialEq)]
 /// A single token of Javacript code - a single word, symbol or constant
 pub enum TokenData {
 	/// A boolean literal, which is either `true` or `false`

@@ -3,7 +3,7 @@ use ast::op::*;
 use ast::constant::Const;
 use ast::pos::Position;
 use collections::treemap::TreeMap;
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A Javascript expression, including its position
 pub struct Expr {
 	/// The expression definition
@@ -24,7 +24,7 @@ impl Show for Expr {
 		write!(f, "{}", self.def)
 	}
 }
-#[deriving(Clone, Eq)]
+#[deriving(Clone, PartialEq)]
 /// A Javascript expression
 pub enum ExprDef {
 	/// Run a operation between 2 expressions
@@ -108,18 +108,8 @@ impl Show for ExprDef {
 			CallExpr(ref ex, ref args) => {
 				try!(write!(f, "{}", ex));
 				try!(write!(f, "{}", "("));
-				let last = args.iter().last();
-				match last {
-					Some(last_arg) => {
-						for arg in args.iter() {
-							try!(write!(f, "{}", arg));
-							if arg != last_arg {
-								try!(write!(f, "{}", ", "));
-							}
-						}
-					},
-					None => ()
-				}
+				let arg_strs:Vec<String> = args.iter().map(|arg| arg.to_str()).collect();
+				try!(write!(f, "{}", arg_strs.connect(",")));
 				write!(f, "{}", ")")
 			},
 			ConstructExpr(ref func, ref args) => write!(f, "new {}({})", func, args),
