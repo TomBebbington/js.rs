@@ -82,10 +82,9 @@ impl Executor<Function> for JITCompiler {
 					func.insn_store(ptr, val);
 					ptr
 				};
-				let args = func.get_param(0);
-				let global = func.get_param(1);
-				let scope = func.get_param(2);
-				let this = func.get_param(3);
+				let global = func.get_param(0);
+				let scope = func.get_param(1);
+				let this = func.get_param(2);
 				match expr.def {
 					ConstExpr(CNull) => {
 						let ptr = func.create_value(jit_compile!(*void));
@@ -217,8 +216,7 @@ impl Executor<Function> for JITCompiler {
 				}
 			};
 			let value_t = jit_compile!(*int);
-			let vec_t = jit_compile!(Vec);
-			let default_sig_t = Type::create_signature(CDECL, value_t, &mut [&*vec_t, &*value_t, &*value_t, &*value_t]);
+			let default_sig_t = Type::create_signature(CDECL, value_t, &mut [&*value_t, &*value_t, &*value_t]);
 			let func = self.context.create_function(default_sig_t);
 			let value = compile_value(func, expr);
 			func.insn_return(convert_to_value(func, value));

@@ -693,12 +693,6 @@ impl Types {
 	pub fn get_bool() -> Box<Type> {
 		box Type { _type: jit_type_sys_bool }
 	}
-	/// Vec<?> type
-	pub fn get_vec() -> Box<Type> {
-		let uint_t = Types::get_uint();
-		let void_ptr_t = Types::get_void_ptr();
-		Type::create_struct(&mut [&*uint_t, &*uint_t, &*void_ptr_t])
-	}
 }
 /// A type that can be compiled into a LibJIT representation
 pub trait Compilable {
