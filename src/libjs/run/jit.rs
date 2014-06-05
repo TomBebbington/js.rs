@@ -70,151 +70,6 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn compile(&self, expr: &Expr) -> Box<Function> {
 		self.with_builder(|| {
-			fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
-				let valuedata_t = jit_compile!(int);
-				let valuedata_ptr_t = jit_compile!(*$valuedata_t);
-				let value_t = valuedata_ptr_t;
-				let cstring_t = jit_compile!(*char);
-				let create_value_sig = jit_compile!(() -> $value_t);
-				let undefined = || {
-					let ptr = func.create_value(Types::get_void_ptr());
-					let val = 0u8.compile(func);
-					func.insn_store(ptr, val);
-					ptr
-				};
-				let global = func.get_param(0);
-				let scope = func.get_param(1);
-				let this = func.get_param(2);
-				match expr.def {
-					ConstExpr(CNull) => {
-						let ptr = func.create_value(jit_compile!(*void));
-						let val = 1u8.compile(func);
-						func.insn_store(ptr, val);
-						ptr
-					},
-					ConstExpr(CUndefined) => {
-						undefined()
-					},
-					ConstExpr(CBool(v)) => {
-						v.compile(func)
-					},
-					ConstExpr(CNum(n)) => {
-						n.compile(func)
-					},
-					ConstExpr(CString(ref s)) => {
-						s.compile(func)
-					},
-					BinOpExpr(BinNum(OpAdd), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_add(i_a, i_b)
-					},
-					BinOpExpr(BinNum(OpSub), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_sub(i_a, i_b)
-					},
-					BinOpExpr(BinNum(OpMul), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_mul(i_a, i_b)
-					},
-					BinOpExpr(BinNum(OpDiv), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_div(i_a, i_b)
-					},
-					BinOpExpr(BinNum(OpMod), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_rem(i_a, i_b)
-					},
-					BinOpExpr(BinBit(BitAnd), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_and(i_a, i_b), jit_compile!(i32), false)
-					},
-					BinOpExpr(BinBit(BitOr), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_or(i_a, i_b), jit_compile!(i32), false)
-					},
-					BinOpExpr(BinBit(BitXor), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_xor(i_a, i_b), jit_compile!(i32), false)
-					},
-					BinOpExpr(BinBit(BitShl), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_shl(i_a, i_b), jit_compile!(i32), false)
-					},
-					BinOpExpr(BinBit(BitShr), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_shr(i_a, i_b), jit_compile!(i32), false)
-					},
-					BinOpExpr(BinComp(CompEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictEqual), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_eq(i_a, i_b), jit_compile!(bool), false)
-					},
-					BinOpExpr(BinComp(CompNotEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictNotEqual), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_neq(i_a, i_b), jit_compile!(bool), false)
-					},
-					BinOpExpr(BinComp(CompLessThan), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_lt(i_a, i_b), jit_compile!(bool), false)
-					},
-					BinOpExpr(BinComp(CompLessThanOrEqual), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_leq(i_a, i_b), jit_compile!(bool), false)
-					},
-					BinOpExpr(BinComp(CompGreaterThan), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_gt(i_a, i_b), jit_compile!(bool), false)
-					},
-					BinOpExpr(BinComp(CompGreaterThanOrEqual), ref a, ref b) => {
-						let i_a = compile_value(func, *a);
-						let i_b = compile_value(func, *b);
-						func.insn_convert(func.insn_geq(i_a, i_b), jit_compile!(bool), false)
-					},
-					UnaryOpExpr(UnaryMinus, ref a) => {
-						func.insn_neg(compile_value(func, *a))
-					},
-					UnaryOpExpr(UnaryNot, ref a) => {
-						let mut val = compile_value(func, *a);
-						val = func.insn_convert(val, jit_compile!(bool), false);
-						val = func.insn_neg(val);
-						func.insn_convert(val, jit_compile!(bool), false)
-					},
-					UnaryOpExpr(UnaryPlus, ref a) => {
-						compile_value(func, *a)
-					},
-					BlockExpr(ref exprs) => {
-						let mut result = undefined();
-						let last = exprs.last();
-						for expr in exprs.iter() {
-							let res = compile_value(func, expr);
-							if expr == last.unwrap() {
-								result = res;
-							}
-						}
-						result
-					},
-					ReturnExpr(Some(ref ex)) => {
-						let ret = compile_value(func, *ex);
-						func.insn_return(convert_to_value(func, ret));
-						ret
-					}
-					_ => fail!("Unimplemented {}", expr)
-				}
-			};
 			let value_t = jit_compile!(*int);
 			let default_sig_t = Type::create_signature(CDECL, value_t, &mut [&*value_t, &*value_t, &*value_t]);
 			let func = self.context.create_function(default_sig_t);
@@ -276,5 +131,149 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> Box<jit::Value> {
 		func.insn_call_native1("float_value", float_value, sig, &mut [val])
 	} else {
 		fail!("Invalid kind {}", val_kind.bits())
+	}
+}
+
+fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
+	let value_t = jit_compile!(*int);
+	let cstring_t = jit_compile!(*char);
+	let create_value_sig = jit_compile!(() -> $value_t);
+	let undefined = || {
+		let ptr = func.create_value(Types::get_void_ptr());
+		let val = 0u8.compile(func);
+		func.insn_store(ptr, val);
+		ptr
+	};
+	let global = func.get_param(0);
+	let scope = func.get_param(1);
+	let this = func.get_param(2);
+	match expr.def {
+		ConstExpr(CNull) => {
+			let ptr = func.create_value(jit_compile!(*void));
+			let val = 1u8.compile(func);
+			func.insn_store(ptr, val);
+			ptr
+		},
+		ConstExpr(CUndefined) => {
+			undefined()
+		},
+		ConstExpr(CBool(v)) => {
+			v.compile(func)
+		},
+		ConstExpr(CNum(n)) => {
+			n.compile(func)
+		},
+		ConstExpr(CString(ref s)) => {
+			s.compile(func)
+		},
+		BinOpExpr(BinNum(OpAdd), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_add(i_a, i_b)
+		},
+		BinOpExpr(BinNum(OpSub), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_sub(i_a, i_b)
+		},
+		BinOpExpr(BinNum(OpMul), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_mul(i_a, i_b)
+		},
+		BinOpExpr(BinNum(OpDiv), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_div(i_a, i_b)
+		},
+		BinOpExpr(BinNum(OpMod), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_rem(i_a, i_b)
+		},
+		BinOpExpr(BinBit(BitAnd), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_and(i_a, i_b), jit_compile!(i32), false)
+		},
+		BinOpExpr(BinBit(BitOr), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_or(i_a, i_b), jit_compile!(i32), false)
+		},
+		BinOpExpr(BinBit(BitXor), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_xor(i_a, i_b), jit_compile!(i32), false)
+		},
+		BinOpExpr(BinBit(BitShl), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_shl(i_a, i_b), jit_compile!(i32), false)
+		},
+		BinOpExpr(BinBit(BitShr), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_shr(i_a, i_b), jit_compile!(i32), false)
+		},
+		BinOpExpr(BinComp(CompEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictEqual), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_eq(i_a, i_b), jit_compile!(bool), false)
+		},
+		BinOpExpr(BinComp(CompNotEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictNotEqual), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_neq(i_a, i_b), jit_compile!(bool), false)
+		},
+		BinOpExpr(BinComp(CompLessThan), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_lt(i_a, i_b), jit_compile!(bool), false)
+		},
+		BinOpExpr(BinComp(CompLessThanOrEqual), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_leq(i_a, i_b), jit_compile!(bool), false)
+		},
+		BinOpExpr(BinComp(CompGreaterThan), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_gt(i_a, i_b), jit_compile!(bool), false)
+		},
+		BinOpExpr(BinComp(CompGreaterThanOrEqual), ref a, ref b) => {
+			let i_a = compile_value(func, *a);
+			let i_b = compile_value(func, *b);
+			func.insn_convert(func.insn_geq(i_a, i_b), jit_compile!(bool), false)
+		},
+		UnaryOpExpr(UnaryMinus, ref a) => {
+			func.insn_neg(compile_value(func, *a))
+		},
+		UnaryOpExpr(UnaryNot, ref a) => {
+			let mut val = compile_value(func, *a);
+			val = func.insn_convert(val, jit_compile!(bool), false);
+			val = func.insn_neg(val);
+			func.insn_convert(val, jit_compile!(bool), false)
+		},
+		UnaryOpExpr(UnaryPlus, ref a) => {
+			compile_value(func, *a)
+		},
+		BlockExpr(ref exprs) => {
+			let mut result = undefined();
+			let last = exprs.last();
+			for expr in exprs.iter() {
+				let res = compile_value(func, expr);
+				if expr == last.unwrap() {
+					result = res;
+				}
+			}
+			result
+		},
+		ReturnExpr(Some(ref ex)) => {
+			let ret = compile_value(func, *ex);
+			func.insn_return(convert_to_value(func, ret));
+			ret
+		}
+		_ => fail!("Unimplemented {}", expr)
 	}
 }
