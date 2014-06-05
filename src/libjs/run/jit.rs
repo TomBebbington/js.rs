@@ -234,9 +234,7 @@ impl Executor<Function> for JITCompiler {
 }
 
 fn convert_to_value(func:&Function, val:&jit::Value) -> Box<jit::Value> {
-	let valuedata_t = jit_compile!(i32);
-	let valuedata_ptr_t = Type::create_pointer(&*valuedata_t);
-	let value_t = Type::create_struct(&mut [&*valuedata_ptr_t]);
+	let value_t = jit_compile!(*int);
 	let undef_value = Value::undefined;
 	let val_type = val.get_type();
 	let val_kind = val_type.get_kind();
