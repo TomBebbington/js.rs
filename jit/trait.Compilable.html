@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.Compilable.html'>Compilable</a><br/></div>
+        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait current' href='trait.Compilable.html'>Compilable</a><br/><a class='trait ' href='trait.NativeRef.html'>NativeRef</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,7 +39,7 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='index.html'>jit</a>::<a class='trait' href=''>Compilable</a><a class='source' id='src-4848' href='../src/jit/src/libjit/lib.rs.html#816-819'>[src]</a></h1>
+<h1 class='fqn'>Trait <a href='index.html'>jit</a>::<a class='trait' href=''>Compilable</a><a class='source' id='src-12135' href='../src/jit/src/libjit/lib.rs.html#764-767'>[src]</a></h1>
 <pre class='rust trait'>pub trait Compilable {
     fn <a href='#tymethod.compile' class='fnname'>compile</a>(&amp;self, func: &amp;<a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a>&gt;;
 }</pre><div class='docblock'><p>A type that can be compiled into a LibJIT representation</p>
@@ -48,10 +48,26 @@
             <div class='methods'>
         <h3 id='tymethod.compile' class='method'><code>fn <a href='#tymethod.compile' class='fnname'>compile</a>(&amp;self, func: &amp;<a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a>&gt;</code></h3><div class='docblock'><p>Get a JIT representation of this value</p>
 </div></div>
-                <h2 id='implementors'>Implementors</h2>
-                <ul class='item-list' id='implementors-list'>
-            <li><code><a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a></code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for ()</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for f64</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for f32</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for int</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for uint</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for i32</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for u32</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for i16</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for u16</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for i8</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for u8</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for bool</code></li><li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for char</code></li><li><code>impl&lt;'t&gt; <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for &amp;'t str</code></li><li><code>impl&lt;'t, T&gt; <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for &amp;'t T</code></li></ul><script type="text/javascript" async
-                                      src="../implementors/jit/trait.Compilable.js"></script></section>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for ()</code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.f64.html'>f64</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.f32.html'>f32</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.int.html'>int</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.uint.html'>uint</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.i32.html'>i32</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.u32.html'>u32</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.i16.html'>i16</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.u16.html'>u16</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.i8.html'>i8</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.u8.html'>u8</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a href='http://doc.rust-lang.org/std/primitive.char.html'>char</a></code></li>
+<li><code>impl&lt;'t&gt; <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for &amp;'t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a></code></li>
+<li><code>impl <a class='trait' href='../jit/trait.Compilable.html' title='jit::Compilable'>Compilable</a> for <a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a></code></li>
+</ul><script type="text/javascript" async
+                              src="../implementors/jit/trait.Compilable.js">
+                      </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

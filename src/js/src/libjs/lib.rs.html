@@ -93,6 +93,8 @@
 <span id='53'>53</span>
 <span id='54'>54</span>
 <span id='55'>55</span>
+<span id='56'>56</span>
+<span id='57'>57</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript execution&quot;</span>]</span>
@@ -105,7 +107,7 @@
 	<span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/js.rs/&quot;</span>
 )]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>experimental</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>globs</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>, <span class='ident'>globs</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
 
 <span class='doccomment'>//! This crate provides a Javascript execution library with an
@@ -117,6 +119,8 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit</span>;
+<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>syntax</span>)]</span>
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit_macro</span>;
 <span class='doccomment'>/// The execution engines
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>run</span> {
 	<span class='doccomment'>/// Defines the base executor trait which the execution engines derive from

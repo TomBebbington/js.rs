@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct current' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/></div>
+        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct current' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/><a class='trait ' href='trait.NativeRef.html'>NativeRef</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,15 +39,15 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Label</a><a class='source' id='src-4567' href='../src/jit/src/libjit/lib.rs.html#740-742'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Label</a><a class='source' id='src-11928' href='../src/jit/src/libjit/lib.rs.html#670-672'>[src]</a></h1>
 <pre class='rust struct'>pub struct Label {
     // some fields omitted
 }</pre><div class='docblock'><p>A label in the code that can be branched to in instructions</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a>&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(func: &amp;<a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a>&gt;</code></h4>
 <div class='docblock'><p>Create a new label</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a>) -&gt; bool</code></h4>
-<h4 id='method.ne' class='method'><code>fn <a href='#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a>) -&gt; bool</code></h4>
-</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/std/hash/trait.Hash.html' title='std::hash::Hash'>Hash</a> for <a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a></code></h3><div class='methods'><h4 id='method.hash' class='method'><code>fn <a href='#method.hash' class='fnname'>hash</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='http://doc.rust-lang.org/std/hash/sip/struct.SipState.html' title='std::hash::sip::SipState'>SipState</a>)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, other: &amp;<a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a>) -&gt; <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='#tymethod.ne' class='fnname'>ne</a>(&amp;self, &amp;Self) -&gt; <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='struct' href='../jit/struct.Label.html' title='jit::Label'>Label</a></code></h3><div class='methods'><h4 id='method.assert_receiver_is_total_eq' class='method'><code>fn <a href='#tymethod.assert_receiver_is_total_eq' class='fnname'>assert_receiver_is_total_eq</a>(&amp;self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

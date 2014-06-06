@@ -74,7 +74,7 @@
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
 
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A Javascript constant
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Const</span> {
 	<span class='doccomment'>/// A UTF-8 string, such as `&quot;Hello, world&quot;`

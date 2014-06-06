@@ -567,7 +567,6 @@
 <span id='527'>527</span>
 <span id='528'>528</span>
 <span id='529'>529</span>
-<span id='530'>530</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>token</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>expr</span>::<span class='op'>*</span>;
@@ -586,8 +585,7 @@
 		<span class='ident'>Expr</span>::<span class='ident'>new</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>def</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>first</span>.<span class='ident'>pos</span>, <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>get_token</span>(<span class='self'>self</span>.<span class='ident'>pos</span> <span class='op'>-</span> <span class='number'>1</span>)).<span class='ident'>pos</span>)
 	);
 )
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// An error encountered during parsing an expression
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ParseError</span> {
 	<span class='doccomment'>/// When it expected a certain kind of token, but got another as part of something

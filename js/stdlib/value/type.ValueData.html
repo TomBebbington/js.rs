@@ -39,14 +39,14 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='type' href=''>ValueData</a><a class='source' id='src-2857' href='../../../src/js/src/libjs/stdlib/value.rs.html#24-41'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='type' href=''>ValueData</a><a class='source' id='src-1910' href='../../../src/js/src/libjs/stdlib/value.rs.html#24-41'>[src]</a></h1>
 <pre class='rust enum'>pub enum ValueData {
     VNull,
     VUndefined,
-    VBoolean(bool),
+    VBoolean(<a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a>),
     VString(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
-    VNumber(f64),
-    VInteger(i32),
+    VNumber(<a href='http://doc.rust-lang.org/std/primitive.f64.html'>f64</a>),
+    VInteger(<a href='http://doc.rust-lang.org/std/primitive.i32.html'>i32</a>),
     VObject(<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='type' href='../../../js/stdlib/object/type.ObjectData.html' title='js::stdlib::object::ObjectData'>ObjectData</a>&gt;),
     VFunction(<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='struct' href='../../../js/stdlib/function/struct.Function.html' title='js::stdlib::function::Function'>Function</a>&gt;),
 }</pre><div class='docblock'><p>A Javascript value</p>

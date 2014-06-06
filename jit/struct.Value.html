@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct current' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/></div>
+        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct current' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/><a class='trait ' href='trait.NativeRef.html'>NativeRef</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,13 +39,16 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Value</a><a class='source' id='src-4516' href='../src/jit/src/libjit/lib.rs.html#725-727'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Value</a><a class='source' id='src-11853' href='../src/jit/src/libjit/lib.rs.html#643-645'>[src]</a></h1>
 <pre class='rust struct'>pub struct Value {
     // some fields omitted
 }</pre><div class='docblock'><p>A Value that is being JITed</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h3><div class='methods'><h4 id='method.get_type' class='method'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>&gt;</code></h4>
 <div class='docblock'><p>Get the type of the value</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../jit/trait.NativeRef.html' title='jit::NativeRef'>NativeRef</a> for <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h3><div class='methods'><h4 id='method.as_ptr' class='method'><code>unsafe fn <a href='#method.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; *mut c_void</code></h4>
+<h4 id='method.from_ptr' class='method'><code>unsafe fn <a href='#method.from_ptr' class='fnname'>from_ptr</a>(ptr: *mut c_void) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
+<h4 id='method.from_ptr_box' class='method'><code>unsafe fn <a href='#method.from_ptr_box' class='fnname'>from_ptr_box</a>(ptr: *mut c_void) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;Self&gt;</code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
 <h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, &amp;Self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>

@@ -236,7 +236,7 @@
 		(<span class='self'>self</span>.<span class='ident'>get_precedence</span>(), <span class='self'>self</span>.<span class='ident'>get_assoc</span>())
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A numeric operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>NumOp</span> {
 	<span class='doccomment'>/// `a + b` - Addition
@@ -261,7 +261,7 @@
 		})
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A unary operation on a single value
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>UnaryOp</span> {
 	<span class='doccomment'>/// `a++` - increment the value
@@ -290,7 +290,7 @@
 		})
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A bitwise operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BitOp</span> {
 	<span class='doccomment'>/// `a &amp; b` - Bitwise and
@@ -315,7 +315,7 @@
 		})
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A comparitive operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CompOp</span> {
 	<span class='doccomment'>/// `a == b` - Equality
@@ -349,7 +349,7 @@
 		})
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A logical operation between 2 boolean values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>LogOp</span> {
 	<span class='doccomment'>/// `a &amp;&amp; b` - Logical and
@@ -365,7 +365,7 @@
 		})
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A binary operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BinOp</span> {
 	<span class='doccomment'>/// Numeric operation

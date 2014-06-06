@@ -39,12 +39,12 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='../../index.html'>js</a>::<a href='../index.html'>run</a>::<a href='index.html'>exec</a>::<a class='trait' href=''>Executor</a><a class='source' id='src-19' href='../../../src/js/src/libjs/run/exec.rs.html#5-16'>[src]</a></h1>
+<h1 class='fqn'>Trait <a href='../../index.html'>js</a>::<a href='../index.html'>run</a>::<a href='index.html'>exec</a>::<a class='trait' href=''>Executor</a><a class='source' id='src-20' href='../../../src/js/src/libjs/run/exec.rs.html#5-16'>[src]</a></h1>
 <pre class='rust trait'>pub trait Executor&lt;T&gt; {
     fn <a href='#tymethod.new' class='fnname'>new</a>() -&gt; Self;
     fn <a href='#tymethod.set_global' class='fnname'>set_global</a>(&amp;mut self, name: <a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>, val: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>;
     fn <a href='#tymethod.get_global' class='fnname'>get_global</a>(&amp;self, name: <a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>;
-    fn <a href='#tymethod.compile' class='fnname'>compile</a>(&amp;self, expr: &amp;<a class='struct' href='../../../js_syntax/ast/expr/struct.Expr.html' title='js_syntax::ast::expr::Expr'>Expr</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;T&gt;;
+    fn <a href='#tymethod.compile' class='fnname'>compile</a>(&amp;self, expr: &amp;<a class='struct' href='http://tombebbington.github.io/js.rs/js_syntax/ast/expr/struct.Expr.html' title='js_syntax::ast::expr::Expr'>Expr</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;T&gt;;
     fn <a href='#tymethod.run' class='fnname'>run</a>(&amp;mut self, comp: <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;T&gt;) -&gt; <a class='type' href='../../../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a>;
 }</pre><div class='docblock'><p>An execution engine</p>
 </div>
@@ -53,13 +53,15 @@
         <h3 id='tymethod.new' class='method'><code>fn <a href='#tymethod.new' class='fnname'>new</a>() -&gt; Self</code></h3><div class='docblock'><p>Make a new execution engine</p>
 </div><h3 id='tymethod.set_global' class='method'><code>fn <a href='#tymethod.set_global' class='fnname'>set_global</a>(&amp;mut self, name: <a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>, val: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h3><div class='docblock'><p>Set a global variable called <code>name</code> with the value <code>val</code></p>
 </div><h3 id='tymethod.get_global' class='method'><code>fn <a href='#tymethod.get_global' class='fnname'>get_global</a>(&amp;self, name: <a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h3><div class='docblock'><p>Resolve the global variable <code>name</code></p>
-</div><h3 id='tymethod.compile' class='method'><code>fn <a href='#tymethod.compile' class='fnname'>compile</a>(&amp;self, expr: &amp;<a class='struct' href='../../../js_syntax/ast/expr/struct.Expr.html' title='js_syntax::ast::expr::Expr'>Expr</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;T&gt;</code></h3><div class='docblock'><p>Compile the expression</p>
+</div><h3 id='tymethod.compile' class='method'><code>fn <a href='#tymethod.compile' class='fnname'>compile</a>(&amp;self, expr: &amp;<a class='struct' href='http://tombebbington.github.io/js.rs/js_syntax/ast/expr/struct.Expr.html' title='js_syntax::ast::expr::Expr'>Expr</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;T&gt;</code></h3><div class='docblock'><p>Compile the expression</p>
 </div><h3 id='tymethod.run' class='method'><code>fn <a href='#tymethod.run' class='fnname'>run</a>(&amp;mut self, comp: <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;T&gt;) -&gt; <a class='type' href='../../../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a></code></h3><div class='docblock'><p>Run the compiled expression</p>
 </div></div>
-                <h2 id='implementors'>Implementors</h2>
-                <ul class='item-list' id='implementors-list'>
-            <li><code><a class='struct' href='../../../js/run/jit/struct.JITCompiler.html' title='js::run::jit::JITCompiler'>JITCompiler</a></code></li></ul><script type="text/javascript" async
-                                      src="../../../implementors/js/run/exec/trait.Executor.js"></script></section>
+        <h2 id='implementors'>Implementors</h2>
+        <ul class='item-list' id='implementors-list'>
+    <li><code>impl <a class='trait' href='../../../js/run/exec/trait.Executor.html' title='js::run::exec::Executor'>Executor</a>&lt;<a class='struct' href='../../../jit/struct.Function.html' title='jit::Function'>Function</a>&gt; for <a class='struct' href='../../../js/run/jit/struct.JITCompiler.html' title='js::run::jit::JITCompiler'>JITCompiler</a></code></li>
+</ul><script type="text/javascript" async
+                              src="../../../implementors/js/run/exec/trait.Executor.js">
+                      </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

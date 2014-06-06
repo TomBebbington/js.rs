@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/></div>
+        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/><a class='trait ' href='trait.NativeRef.html'>NativeRef</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,7 +39,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Context</a><a class='source' id='src-1371' href='../src/jit/src/libjit/lib.rs.html#162-164'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Context</a><a class='source' id='src-8868' href='../src/jit/src/libjit/lib.rs.html#70-72'>[src]</a></h1>
 <pre class='rust struct'>pub struct Context {
     // some fields omitted
 }</pre><div class='docblock'><p>Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.</p>
@@ -51,7 +51,10 @@
 <div class='docblock'><p>Unlock the context from this thread</p>
 </div><h4 id='method.create_function' class='method'><code>fn <a href='#method.create_function' class='fnname'>create_function</a>(&amp;self, signature: &amp;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a>&gt;</code></h4>
 <div class='docblock'><p>Create a function in the context with the type signature given</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.drop' class='method'><code>fn <a href='#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../jit/trait.NativeRef.html' title='jit::NativeRef'>NativeRef</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.as_ptr' class='method'><code>unsafe fn <a href='#method.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; *mut c_void</code></h4>
+<h4 id='method.from_ptr' class='method'><code>unsafe fn <a href='#method.from_ptr' class='fnname'>from_ptr</a>(ptr: *mut c_void) -&gt; <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h4>
+<h4 id='method.from_ptr_box' class='method'><code>unsafe fn <a href='#method.from_ptr_box' class='fnname'>from_ptr_box</a>(ptr: *mut c_void) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;Self&gt;</code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.drop' class='method'><code>fn <a href='#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

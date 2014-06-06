@@ -173,23 +173,13 @@
 <span id='133'>133</span>
 <span id='134'>134</span>
 <span id='135'>135</span>
-<span id='136'>136</span>
-<span id='137'>137</span>
-<span id='138'>138</span>
-<span id='139'>139</span>
-<span id='140'>140</span>
-<span id='141'>141</span>
-<span id='142'>142</span>
-<span id='143'>143</span>
-<span id='144'>144</span>
-<span id='145'>145</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>op</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>constant</span>::<span class='ident'>Const</span>;
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>pos</span>::<span class='ident'>Position</span>;
 <span class='kw'>use</span> <span class='ident'>collections</span>::<span class='ident'>treemap</span>::<span class='ident'>TreeMap</span>;
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A Javascript expression, including its position
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Expr</span> {
 	<span class='doccomment'>/// The expression definition
@@ -210,7 +200,7 @@
 		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='self'>self</span>.<span class='ident'>def</span>)
 	}
 }
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A Javascript expression
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ExprDef</span> {
 	<span class='doccomment'>/// Run a operation between 2 expressions
@@ -294,18 +284,8 @@
 			<span class='ident'>CallExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>ex</span>, <span class='kw-2'>ref</span> <span class='ident'>args</span>) <span class='op'>=&gt;</span> {
 				<span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>ex</span>));
 				<span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;(&quot;</span>));
-				<span class='kw'>let</span> <span class='ident'>last</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>iter</span>().<span class='ident'>last</span>();
-				<span class='kw'>match</span> <span class='ident'>last</span> {
-					<span class='prelude-val'>Some</span>(<span class='ident'>last_arg</span>) <span class='op'>=&gt;</span> {
-						<span class='kw'>for</span> <span class='ident'>arg</span> <span class='kw'>in</span> <span class='ident'>args</span>.<span class='ident'>iter</span>() {
-							<span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>arg</span>));
-							<span class='kw'>if</span> <span class='ident'>arg</span> <span class='op'>!=</span> <span class='ident'>last_arg</span> {
-								<span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;, &quot;</span>));
-							}
-						}
-					},
-					<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> ()
-				}
+				<span class='kw'>let</span> <span class='ident'>arg_strs</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>arg</span><span class='op'>|</span> <span class='ident'>arg</span>.<span class='ident'>to_str</span>()).<span class='ident'>collect</span>();
+				<span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>arg_strs</span>.<span class='ident'>connect</span>(<span class='string'>&quot;,&quot;</span>)));
 				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='string'>&quot;)&quot;</span>)
 			},
 			<span class='ident'>ConstructExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>func</span>, <span class='kw-2'>ref</span> <span class='ident'>args</span>) <span class='op'>=&gt;</span> <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;new {}({})&quot;</span>, <span class='ident'>func</span>, <span class='ident'>args</span>),
