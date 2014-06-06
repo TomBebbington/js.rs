@@ -40,7 +40,17 @@ use std::mem::transmute;
 use libc::{c_int, c_void, c_uint};
 use bindings::*;
 pub use bindings::{jit_nint, jit_nuint};
-
+/// A native reference
+pub trait NativeRef {
+	/// Returns an unsafe mutable pointer to the object
+	unsafe fn as_ptr(&self) -> *mut c_void;
+	#[inline]
+	unsafe fn from_ptr_box(ptr:*mut c_void) -> Box<Self> {
+		box NativeRef::from_ptr(ptr)
+	}
+	/// Make an unsafe pointer to the object
+	unsafe fn from_ptr(ptr:*mut c_void) -> Self;
+}
 /// A platform's application binary interface
 pub enum ABI {
 	/// The C application binary interface
@@ -60,34 +70,41 @@ mod bindings;
 pub struct Context {
 	_context: jit_context_t
 }
-
+impl NativeRef for Context {
+	#[inline]
+	unsafe fn as_ptr(&self) -> *mut c_void {
+		self.as_ptr()
+	}
+	#[inline]
+	unsafe fn from_ptr(ptr:*mut c_void) -> Context {
+		Context {
+			_context: ptr
+		}
+	}
+}
 impl Context {
 	/// Create a new JIT Context
 	pub fn new() -> Box<Context> {
 		unsafe {
-			box Context {
-				_context: jit_context_create()
-			}
+			NativeRef::from_ptr_box(jit_context_create())
 		}
 	}
 	/// Lock down the context to prevent multiple threads from using the builder at a time
 	pub fn build_start(&self) {
 		unsafe {
-			jit_context_build_start(self._context);
+			jit_context_build_start(self.as_ptr());
 		}
 	}
 	/// Unlock the context from this thread
 	pub fn build_end(&self) {
 		unsafe {
-			jit_context_build_end(self._context);
+			jit_context_build_end(self.as_ptr());
 		}
 	}
 	/// Create a function in the context with the type signature given
 	pub fn create_function(&self, signature: &Type) -> Box<Function> {
 		unsafe {
-			box Function {
-				_function: jit_function_create(self._context, signature._type)
-			}
+			NativeRef::from_ptr_box(jit_function_create(self.as_ptr(), signature.as_ptr()))
 		}
 	}
 }
@@ -95,7 +112,7 @@ impl Context {
 impl Drop for Context {
 	fn drop(&mut self) {
 		unsafe {
-			jit_context_destroy(self._context);
+			jit_context_destroy(self.as_ptr());
 		}
 	}
 }
@@ -133,10 +150,22 @@ bitflags!(
 pub struct Type {
 	_type: jit_type_t
 }
+impl NativeRef for Type {
+	#[inline]
+	unsafe fn as_ptr(&self) -> *mut c_void {
+		self.as_ptr()
+	}
+	#[inline]
+	unsafe fn from_ptr(ptr:*mut c_void) -> Type {
+		Type {
+			_type: ptr
+		}
+	}
+}
 impl Drop for Type {
 	fn drop(&mut self) {
 		unsafe {
-			jit_type_free(self._type);
+			jit_type_free(self.as_ptr());
 		}
 	}
 }
@@ -144,10 +173,8 @@ impl Type {
 	/// Create a function signature, with the given ABI, return type and parameters
 	pub fn create_signature(abi: ABI, return_type: &Type, params: &mut [&Type]) -> Box<Type> {
 		unsafe {
-			let signature = jit_type_create_signature(abi as jit_abi_t, return_type._type, transmute(params.as_mut_ptr()), params.len() as c_uint, 1);
-			box Type {
-				_type: signature
-			}
+			let signature = jit_type_create_signature(abi as jit_abi_t, return_type.as_ptr(), transmute(params.as_mut_ptr()), params.len() as c_uint, 1);
+			NativeRef::from_ptr_box(signature)
 		}
 	}
 
@@ -155,9 +182,7 @@ impl Type {
 		unsafe {
 			let f = if union { jit_type_create_union } else { jit_type_create_struct };
 			let ty = f(transmute(fields.as_mut_ptr()), fields.len() as c_uint, 1);
-			box Type {
-				_type: ty
-			}
+			NativeRef::from_ptr_box(ty)
 		}
 	}
 	/// Create a struct type with the given field types
@@ -172,28 +197,26 @@ impl Type {
 	/// Create a pointer type with the given pointee type
 	pub fn create_pointer(pointee: &Type) -> Box<Type> {
 		unsafe {
-			let ptr = jit_type_create_pointer(pointee._type, 1);
-			box Type { _type: ptr }
+			let ptr = jit_type_create_pointer(pointee.as_ptr(), 1);
+			NativeRef::from_ptr_box(ptr)
 		}
 	}
 	/// Work out the size of this type
 	pub fn get_size(&self) -> jit_nuint {
 		unsafe {
-			jit_type_get_size(self._type)
+			jit_type_get_size(self.as_ptr())
 		}
 	}
 	/// Get the kind of this type
 	pub fn get_kind(&self) -> TypeKind {
 		unsafe {
-			TypeKind::from_bits(jit_type_get_kind(self._type)).unwrap()
+			TypeKind::from_bits(jit_type_get_kind(self.as_ptr())).unwrap()
 		}
 	}
 	/// Get the reference this pointer points to
 	pub fn get_ref(&self) -> Box<Type> {
 		unsafe {
-			box Type {
-				_type: jit_type_get_ref(self._type)
-			}
+			NativeRef::from_ptr_box(jit_type_get_ref(self.as_ptr()))
 		}
 	}
 }
@@ -202,81 +225,93 @@ impl Type {
 pub struct Function {
 	_function: jit_function_t
 }
+impl NativeRef for Function {
+	#[inline]
+	unsafe fn as_ptr(&self) -> *mut c_void {
+		self.as_ptr()
+	}
+	#[inline]
+	unsafe fn from_ptr(ptr:*mut c_void) -> Function {
+		Function {
+			_function: ptr
+		}
+	}
+}
 impl Drop for Function {
 	fn drop(&mut self) {
 		unsafe {
-			jit_function_abandon(self._function);
+			jit_function_abandon(self.as_ptr());
 		}
 	}
 }
 impl Function {
 	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Box<Value> {
 		unsafe {
-			let value = f(self._function, v1._value, v2._value);
-			box Value { _value: value }
+			let value = f(self.as_ptr(), v1._value, v2._value);
+			NativeRef::from_ptr_box(value)
 		}
 	}
 
 	fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: jit_function_t, value: jit_value_t) -> jit_value_t) -> Box<Value> {
 		unsafe {
-			let value = f(self._function, value._value);
-			box Value { _value: value }
+			let value = f(self.as_ptr(), value.as_ptr());
+			NativeRef::from_ptr_box(value)
 		}
 	}
 	/// Get the context this function was made i
 	pub fn get_context(&self) -> Box<Context> {
 		unsafe {
-			let context = jit_function_get_context(self._function);
-			box Context {_context: context }
+			let context = jit_function_get_context(self.as_ptr());
+			NativeRef::from_ptr_box(context)
 		}
 	}
 	/// Set the optimization level of the function, where the bigger the level, the more effort should be spent optimising
 	pub fn set_optimization_level(&self, level: c_uint) {
 		unsafe {
-			jit_function_set_optimization_level(self._function, level);
+			jit_function_set_optimization_level(self.as_ptr(), level);
 		}
 	}
 	/// Make this funcition a candidate for recompilation
 	pub fn set_recompilable(&self) {
 		unsafe {
-			jit_function_set_recompilable(self._function);
+			jit_function_set_recompilable(self.as_ptr());
 		}
 	}
 	/// Compile the function
 	pub fn compile(&self) {
 		unsafe {
-			jit_function_compile(self._function);
+			jit_function_compile(self.as_ptr());
 		}
 	}
 	/// Get a parameter of the function as a JIT Value
-	pub fn get_param(&self, param: uint) -> Value {
+	pub fn get_param(&self, param: uint) -> Box<Value> {
 		unsafe {
-			let value = jit_value_get_param(self._function, param as c_uint);
-			Value { _value: value }
+			let value = jit_value_get_param(self.as_ptr(), param as c_uint);
+			NativeRef::from_ptr_box(value)
 		}
 	}
 	/// Notify libjit that this function has a catch block in it so it can prepare
 	pub fn insn_uses_catcher(&self) {
 		unsafe {
-			jit_insn_uses_catcher(self._function);
+			jit_insn_uses_catcher(self.as_ptr());
 		}
 	}
 	/// Throw an exception from the function with the value given
 	pub fn insn_throw(&self, retval: &Value) {
 		unsafe {
-			jit_insn_throw(self._function, retval._value);
+			jit_insn_throw(self.as_ptr(), retval.as_ptr());
 		}
 	}
 	/// Return from the function with the value given
 	pub fn insn_return(&self, retval: &Value) {
 		unsafe {
-			jit_insn_return(self._function, retval._value);
+			jit_insn_return(self.as_ptr(), retval.as_ptr());
 		}
 	}
 	/// Return from the function
 	pub fn insn_default_return(&self) {
 		unsafe {
-			jit_insn_default_return(self._function);
+			jit_insn_default_return(self.as_ptr());
 		}
 	}
 	/// Make an instruction that multiplies the values
@@ -358,8 +393,8 @@ impl Function {
 	/// Make an instruction that duplicates the value given
 	pub fn insn_dup(&self, value: &Value) -> Box<Value> {
 		unsafe {
-			let dup_value = jit_insn_load(self._function, value._value);
-			box Value { _value: dup_value }
+			let dup_value = jit_insn_load(self.as_ptr(), value.as_ptr());
+			NativeRef::from_ptr_box(dup_value)
 		}
 	}
 	/// Make an instruction that loads a value from a src value
@@ -369,52 +404,50 @@ impl Function {
 	/// Make an instruction that stores a value at a destination value
 	pub fn insn_store(&self, dest: &Value, src: &Value) {
 		unsafe {
-			jit_insn_store(self._function, dest._value, src._value);
+			jit_insn_store(self.as_ptr(), dest.as_ptr(), src.as_ptr());
 		}
 	}
 	/// Make an instruction that stores a value a certain offset away from a destination value
 	pub fn insn_store_relative(&self, dest: &Value, offset: int, src: &Value) {
 		unsafe {
-			jit_insn_store_relative(self._function, dest._value, offset as jit_nint, src._value);
+			jit_insn_store_relative(self.as_ptr(), dest.as_ptr(), offset as jit_nint, src.as_ptr());
 		}
 	}
 	/// Make an instruction that sets a label
 	pub fn insn_set_label(&self, label: &mut Label) {
 		unsafe {
-			jit_insn_label(self._function, &mut label._label);
+			jit_insn_label(self.as_ptr(), &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a certain label
 	pub fn insn_branch(&self, label: &mut Label) {
 		unsafe {
-			jit_insn_branch(self._function, &mut label._label);
+			jit_insn_branch(self.as_ptr(), &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a certain label if the value is true
 	pub fn insn_branch_if(&self, value: &Value, label: &mut Label) {
 		unsafe {
-			jit_insn_branch_if(self._function, value._value, &mut label._label);
+			jit_insn_branch_if(self.as_ptr(), value.as_ptr(), &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a certain label if the value is false
 	pub fn insn_branch_if_not(&self, value: &Value, label: &mut Label) {
 		unsafe {
-			jit_insn_branch_if_not(self._function, value._value, &mut label._label);
+			jit_insn_branch_if_not(self.as_ptr(), value.as_ptr(), &mut label._label);
 		}
 	}
 	/// Make an instruction that branches to a label in the table
 	pub fn insn_jump_table(&self, value: &Value, labels: &mut [Label]) {
 		unsafe {
 			let labels_ptr: *mut jit_label_t = transmute(labels.as_mut_ptr());
-			jit_insn_jump_table(self._function, value._value, labels_ptr, labels.len() as u32);
+			jit_insn_jump_table(self.as_ptr(), value.as_ptr(), labels_ptr, labels.len() as u32);
 		}
 	}
 	/// Make an instruction that calls a function that has the signature given with some arguments
 	pub fn insn_call_indirect(&self, func:&Function, signature: &Type, args: &mut [&Value]) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_insn_call_indirect(self._function, func._function, signature._type, transmute(args.as_mut_ptr()), args.len() as c_uint, JitCallNothrow as c_int)
-			}
+			NativeRef::from_ptr_box(jit_insn_call_indirect(self.as_ptr(), func.as_ptr(), signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint, JitCallNothrow as c_int))
 		}
 	}
 	/// Make an instruction that calls a native function that has the signature given with some arguments
@@ -423,8 +456,8 @@ impl Function {
 		unsafe {
 			name.with_c_str(|name| {
 				box Value {
-					_value: jit_insn_call_native(self._function, name, native_func,
-												 signature._type, transmute(args.as_mut_ptr()), args.len() as c_uint,
+					_value: jit_insn_call_native(self.as_ptr(), name, native_func,
+												 signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint,
 												 JitCallNothrow as c_int)
 				}
 			})
@@ -463,39 +496,37 @@ impl Function {
 	/// Make an instruction that allocates some space
 	pub fn insn_alloca(&self, size: &Value) -> Box<Value> {
 		unsafe {
-			box Value { _value: jit_insn_alloca(self._function, size._value) }
+			box Value { _value: jit_insn_alloca(self.as_ptr(), size.as_ptr()) }
 		}
 	}
 	/// Apply a function to some arguments and set the retval to the return value
 	pub fn apply<T>(&self, args: &mut [*mut c_void], retval: &mut T) {
 		unsafe {
-			jit_function_apply(self._function, args.as_mut_ptr(), transmute(retval));
+			jit_function_apply(self.as_ptr(), args.as_mut_ptr(), transmute(retval));
 		}
 	}
 	/// Execute a function and with some arguments
 	pub fn execute(&self, args: &mut [*mut c_void]) {
 		unsafe {
-			jit_function_apply(self._function, args.as_mut_ptr(), ptr::mut_null());
+			jit_function_apply(self.as_ptr(), args.as_mut_ptr(), ptr::mut_null());
 		}
 	}
 	/// Turn this function into a closure
 	pub fn closure<T>(&self) -> T {
 		unsafe {
-			transmute(jit_function_to_closure(self._function))
+			transmute(jit_function_to_closure(self.as_ptr()))
 		}
 	}
 	/// Create a new value with the given type
 	pub fn create_value(&self, value_type: &Type) -> Box<Value> {
 		unsafe {
-			let value = jit_value_create(self._function, value_type._type);
-			box Value { _value: value }
+			let value = jit_value_create(self.as_ptr(), value_type.as_ptr());
+			NativeRef::from_ptr_box(value)
 		}
 	}
 	pub fn insn_convert(&self, v: &Value, t:&Type, overflow_check:bool) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_insn_convert(self._function, v._value, t._type, overflow_check as c_int)
-			}
+			NativeRef::from_ptr_box(jit_insn_convert(self.as_ptr(), v.as_ptr(), t.as_ptr(), overflow_check as c_int))
 		}
 	}
 	/// Make an instruction that gets the inverse cosine of the number given
@@ -612,12 +643,24 @@ impl Function {
 pub struct Value {
 	_value: jit_value_t
 }
+impl NativeRef for Value {
+	#[inline]
+	unsafe fn as_ptr(&self) -> *mut c_void {
+		self._value
+	}
+	#[inline]
+	unsafe fn from_ptr(ptr:*mut c_void) -> Value {
+		Value {
+			_value: ptr
+		}
+	}
+}
 impl Value {
 	/// Get the type of the value
 	pub fn get_type(&self) -> Box<Type> {
 		unsafe {
-			let ty = jit_value_get_type(self._value);
-			box Type { _type: ty }
+			let ty = jit_value_get_type(self.as_ptr());
+			NativeRef::from_ptr_box(ty)
 		}
 	}
 }
@@ -628,6 +671,7 @@ pub struct Label {
 	_label: jit_label_t
 }
 impl PartialEq for Label {
+	#[inline]
 	fn eq(&self, other:&Label) -> bool {
 		self._label == other._label
 	}
@@ -637,7 +681,7 @@ impl Label {
 	pub fn new(func:&Function) -> Box<Label> {
 		unsafe {
 			box Label {
-				_label: jit_function_reserve_label(func._function)
+				_label: jit_function_reserve_label(func.as_ptr())
 			}
 		}
 	}
@@ -647,43 +691,63 @@ pub struct Types;
 impl Types {
 	/// Void type
 	pub fn get_void() -> Box<Type> {
-		box Type { _type: jit_type_void }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_void)
+		}
 	}
 	/// Integer type
 	pub fn get_int() -> Box<Type> {
-		box Type { _type: jit_type_int }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_int)
+		}
 	}
 	/// Unsigned integer type
 	pub fn get_uint() -> Box<Type> {
-		box Type { _type: jit_type_uint }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_uint)
+		}
 	}
 	/// Long integer type
 	pub fn get_long() -> Box<Type> {
-		box Type { _type: jit_type_long }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_long)
+		}
 	}
 	/// Unsigned long integer type
 	pub fn get_ulong() -> Box<Type> {
-		box Type { _type: jit_type_ulong }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_ulong)
+		}
 	}
 	/// 32-bit floating point type
 	pub fn get_float32() -> Box<Type> {
-		box Type { _type: jit_type_float32 }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_float32)
+		}
 	}
 	/// 64-bit floating point type
 	pub fn get_float64() -> Box<Type> {
-		box Type { _type: jit_type_float64 }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_float64)
+		}
 	}
 	/// Default floating point type
 	pub fn get_float() -> Box<Type> {
-		box Type { _type: jit_type_nfloat }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_nfloat)
+		}
 	}
 	/// A void pointer, which can represent any kind of pointer
 	pub fn get_void_ptr() -> Box<Type> {
-		box Type { _type: jit_type_void_ptr }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_void_ptr)
+		}
 	}
 	/// Character type
 	pub fn get_char() -> Box<Type> {
-		box Type { _type: jit_type_sys_char }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_sys_char)
+		}
 	}
 	/// C String type
 	pub fn get_cstring() -> Box<Type> {
@@ -691,7 +755,9 @@ impl Types {
 	}
 	/// Boolean type
 	pub fn get_bool() -> Box<Type> {
-		box Type { _type: jit_type_sys_bool }
+		unsafe {
+			NativeRef::from_ptr_box(jit_type_sys_bool)
+		}
 	}
 }
 /// A type that can be compiled into a LibJIT representation
@@ -702,117 +768,91 @@ pub trait Compilable {
 impl Compilable for () {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_void_ptr, 0)
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_void_ptr, 0))
 		}
 	}
 }
 impl Compilable for f64 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_float64_constant(func._function, jit_type_float64, *self) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_float64_constant(func.as_ptr(), jit_type_float64, *self) )
 		}
 	}
 }
 impl Compilable for f32 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_float32_constant(func._function, jit_type_float32, *self) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_float32_constant(func.as_ptr(), jit_type_float32, *self) )
 		}
 	}
 }
 impl Compilable for int {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_long_constant(func._function, jit_type_nint, *self as i64) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_long_constant(func.as_ptr(), jit_type_nint, *self as i64) )
 		}
 	}
 }
 impl Compilable for uint {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_nuint, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_nuint, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for i32 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_int, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_int, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for u32 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_uint, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_uint, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for i16 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_short, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_short, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for u16 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_ushort, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_ushort, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for i8 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_sbyte, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_sbyte, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for u8 {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_ubyte, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for bool {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_sys_bool, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_sys_bool, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for char {
 	fn compile(&self, func:&Function) -> Box<Value> {
 		unsafe {
-			box Value {
-				_value: jit_value_create_nint_constant(func._function, jit_type_ubyte, *self as jit_nint) 
-			}
+			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_ubyte, *self as jit_nint) )
 		}
 	}
 }
