@@ -23,6 +23,8 @@ extern crate url;
 extern crate jit;
 #[phase(syntax)]
 extern crate jit_macro;
+#[phase(syntax, link)]
+extern crate log;
 /// The execution engines
 pub mod run {
 	/// Defines the base executor trait which the execution engines derive from

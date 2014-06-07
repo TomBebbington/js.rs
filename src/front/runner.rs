@@ -17,22 +17,18 @@ impl Runner {
 	}
 	/// Run the script
 	pub fn run(&self, script: String) {
-		let verbose = self.m.opt_present("v");
 		let path = Path::new(script.as_slice());
 		if path.exists() {
 			let file = File::open(&path).unwrap();
+			debug!("Now lexing...");
 			let mut lexer = Lexer::new(BufferedReader::new(file));
 			lexer.lex().unwrap();
 			let tokens = lexer.tokens;
-			if verbose {
-				println!("Lexed into: {}", tokens);
-				println!("Parsing");
-			}
+			debug!("Now lexed into: {}", tokens);
+			debug!("Now parsing...");
 			let expr = Parser::new(tokens).parse_all().unwrap();
-			if verbose {
-				println!("Parsed as {}", expr);
-				println!("Now running");
-			}
+			debug!("Parsed as {}", expr);
+			debug!("Now running on JIT backend...");
 			match execute(&expr) {
 				Ok(v) =>
 					println!("{}", v),

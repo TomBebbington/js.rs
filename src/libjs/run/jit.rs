@@ -36,14 +36,17 @@ pub struct JITCompiler {
 }
 impl JITCompiler {
 	fn with_builder<R>(&self, cb: || -> R) -> R {
+		debug!("JIT compilation build starting...");
 		self.context.build_start();
 		let rv = cb();
+		debug!("JIT compilation build ending...");
 		self.context.build_end();
 		rv
 	}
 }
 impl Executor<Function> for JITCompiler {
 	fn new() -> JITCompiler {
+		debug!("Initialising global object...");
 		let global = Value::new_obj(None);
 		object::init(global);
 		console::init(global);
@@ -69,8 +72,9 @@ impl Executor<Function> for JITCompiler {
 		self.global.get_field(name)
 	}
 	fn compile(&self, expr: &Expr) -> Box<Function> {
+		debug!("Compiling {} in builder", expr);
 		self.with_builder(|| {
-			let value_t = Type::from::<*int>();
+			let value_t = Types::get_void_ptr();
 			let default_sig_t = Type::create_signature(CDECL, value_t, &mut [&*value_t, &*value_t, &*value_t]);
 			let func = self.context.create_function(default_sig_t);
 			let value = compile_value(func, expr);
@@ -82,7 +86,7 @@ impl Executor<Function> for JITCompiler {
 		})
 	}
 	fn run(&mut self, comp:Box<Function>) -> ResultValue {
-		// global fn(global, scope, this)
+		debug!("Running function");
 		let func: fn(Value, Value, Value) -> Value = comp.closure();
 		return Ok(func(self.global, self.global, self.global));
 	}
@@ -93,6 +97,7 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> Box<jit::Value> {
 	let undef_value = Value::undefined;
 	let val_type = val.get_type();
 	let val_kind = val_type.get_kind();
+	debug!("Converting JIT value of kind {} to Javascript value", val_kind.bits());
 	if val_kind.contains(SysBool) || val_kind.contains(UByte) {
 		let bool_value = to_value::<bool>;
 		let sig = Type::create_signature(CDECL, value_t, &mut [&*Type::from::<bool>()]);
@@ -147,6 +152,7 @@ fn compile_value(func:&Function, expr: &Expr) -> Box<jit::Value> {
 	let global = func.get_param(0);
 	let scope = func.get_param(1);
 	let this = func.get_param(2);
+	debug!("Compiling {} into a LibJIT value", expr);
 	match expr.def {
 		ConstExpr(CNull) => {
 			let ptr = func.create_value(Types::get_void_ptr());

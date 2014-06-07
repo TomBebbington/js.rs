@@ -7,13 +7,15 @@
 	html_root_url = "http://tombebbington.github.io/js.rs/"
 )]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
-
+#![feature(phase)]
 //! A Javascript execution command line tool
 
 extern crate js;
 extern crate syntax = "js_syntax";
 extern crate getopts;
 extern crate collections;
+#[phase(syntax, link)]
+extern crate log;
 /// Interactive mode
 pub mod interactive;
 /// Unit test mode
@@ -24,7 +26,6 @@ pub mod runner;
 pub fn main() {
 	let opts = [
 		getopts::optflag("h", "help", "Show this message"),
-		getopts::optflag("v", "verbose", "Enable verbose output"),
 		getopts::optflag("t", "tests", "Run tests"),
 		getopts::optflag("i", "interactive", "Run in interactive mode"),
 		getopts::optopt("s", "source-code", "Run some Javascript code", "The path to the source code")

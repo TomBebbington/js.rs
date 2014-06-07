@@ -18,28 +18,23 @@ impl Interactive {
 	}
 	/// Run the interactive mode
 	pub fn run(&self) {
+		debug!("Running interactive mode");
 		print!("> ");
 		let mut engine : JITCompiler = Executor::new();
-		let verbose = self.m.opt_present("v");
 		let mut input = stdin();
 		loop {
 			let line = input.read_line().unwrap();
+			debug!("Now parsing line {}", line);
 			let line_bytes = line.as_bytes();
-			if verbose {
-				println!("Lexing");
-			}
+			debug!("Now lexing...");
 			let mut lexer = Lexer::new(BufferedReader::new(BufReader::new(line_bytes)));
 			lexer.lex().unwrap();
 			let tokens = lexer.tokens;
-			if verbose {
-				println!("Tokens: {}", tokens);
-				println!("Parsing");
-			}
+			debug!("Lexed into tokens: {}", tokens);
+			debug!("Now parsing...");
 			let expr = Parser::new(tokens).parse_all().unwrap();
-			if verbose {
-				println!("Expression: {}", expr);
-				println!("Executing with LibJIT backend");
-			}
+			debug!("Parsed into expression: {}", expr);
+			debug!("Now executing with LibJIT backend...");
 			let compiled = engine.compile(&expr);
 			match engine.run(compiled) {
 				Ok(v) =>

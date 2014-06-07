@@ -51,28 +51,19 @@ impl Tests {
 				Err(desc)
 			}
 		}
-		let verbose = self.m.opt_present("v");
 		let file = path.display();
-		if verbose {
-			println!("Opened {} for testing", file);
-		}
+		debug!("Opened {} for testing", file);
 		let mut lexer = Lexer::new(BufferedReader::new(File::open(&path).unwrap()));
-		if verbose {
-			println!("Lexing");
-		}
+		debug!("Lexing");
 		lexer.lex().unwrap();
 		let tokens = lexer.tokens;
 		let attrs = find_attrs(tokens.clone());
 		let desc = attrs.find(&"description".into_string()).unwrap();
-		if verbose {
-			println!("Lexed into: {}", tokens);
-			println!("Parsing");
-		}
+		debug!("Lexed into: {}", tokens);
+		debug!("Parsing");
 		let expr = Parser::new(tokens).parse_all().unwrap();
-		if verbose {
-			println!("Parsed as {}", expr);
-			println!("Now running");
-		}
+		debug!("Parsed as {}", expr);
+		debug!("Now running");
 		let env = Value::new_obj(None);
 		env.set_field_slice("assert", Function::make(assert, ["condition"]));
 		match execute_env(&expr, env) {
