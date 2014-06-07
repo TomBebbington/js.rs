@@ -38,6 +38,7 @@ impl Interactive {
 			let expr = Parser::new(tokens).parse_all().unwrap();
 			if verbose {
 				println!("Expression: {}", expr);
+				println!("Executing with LibJIT backend");
 			}
 			let compiled = engine.compile(&expr);
 			match engine.run(compiled) {
