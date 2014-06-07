@@ -74,7 +74,7 @@ pub struct Context {
 impl NativeRef for Context {
 	#[inline]
 	unsafe fn as_ptr(&self) -> *mut c_void {
-		self.as_ptr()
+		self._context
 	}
 	#[inline]
 	unsafe fn from_ptr(ptr:*mut c_void) -> Context {
@@ -154,7 +154,7 @@ pub struct Type {
 impl NativeRef for Type {
 	#[inline]
 	unsafe fn as_ptr(&self) -> *mut c_void {
-		self.as_ptr()
+		self._type
 	}
 	#[inline]
 	unsafe fn from_ptr(ptr:*mut c_void) -> Type {
@@ -264,7 +264,7 @@ pub struct Function {
 impl NativeRef for Function {
 	#[inline]
 	unsafe fn as_ptr(&self) -> *mut c_void {
-		self.as_ptr()
+		self._function
 	}
 	#[inline]
 	unsafe fn from_ptr(ptr:*mut c_void) -> Function {
