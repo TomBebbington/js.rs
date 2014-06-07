@@ -290,6 +290,10 @@ impl Function {
 			NativeRef::from_ptr_box(value)
 		}
 	}
+	/// Make an instructional representation of a Rust value
+	pub fn insn_of<T:Compilable>(&self, val:&T) -> Box<Value> {
+		val.compile(self)
+	}
 	/// Notify libjit that this function has a catch block in it so it can prepare
 	pub fn insn_uses_catcher(&self) {
 		unsafe {
