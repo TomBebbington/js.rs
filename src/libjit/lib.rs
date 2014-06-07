@@ -37,7 +37,6 @@ extern crate native;
 extern crate syntax;
 use std::ptr;
 use std::mem::transmute;
-use std::intrinsics::type_id;
 use libc::{c_int, c_void, c_uint};
 use bindings::*;
 pub use bindings::{jit_nint, jit_nuint};
@@ -171,41 +170,6 @@ impl Drop for Type {
 	}
 }
 impl Type {
-	/// Convert a Rust type to a LibJIT type through generics
-	pub fn from<T:'static>() -> Box<Type> {
-		unsafe {
-			let id = type_id::<T>();
-			if id == type_id::<f64>() {
-				NativeRef::from_ptr_box(jit_type_float64)
-			} else if id == type_id::<f32>() {
-				NativeRef::from_ptr_box(jit_type_float32)
-			} else if id == type_id::<int>() {
-				NativeRef::from_ptr_box(jit_type_nint)
-			} else if id == type_id::<uint>() {
-				NativeRef::from_ptr_box(jit_type_nuint)
-			} else if id == type_id::<i32>() {
-				NativeRef::from_ptr_box(jit_type_int)
-			} else if id == type_id::<u32>() {
-				NativeRef::from_ptr_box(jit_type_uint)
-			} else if id == type_id::<i16>() {
-				NativeRef::from_ptr_box(jit_type_short)
-			} else if id == type_id::<u16>() {
-				NativeRef::from_ptr_box(jit_type_ushort)
-			} else if id == type_id::<i8>() {
-				NativeRef::from_ptr_box(jit_type_sbyte)
-			} else if id == type_id::<u8>() {
-				NativeRef::from_ptr_box(jit_type_ubyte)
-			} else if id == type_id::<char>() {
-				NativeRef::from_ptr_box(jit_type_sys_char)
-			} else if id == type_id::<bool>() {
-				NativeRef::from_ptr_box(jit_type_sys_bool)
-			} else if id == type_id::<&'static str>() || id == type_id::<String>() {
-				Types::get_cstring()
-			} else {
-				fail!("Type with id {} does not have a JIT counterpart", id)
-			}
-		}
-	}
 	/// Create a function signature, with the given ABI, return type and parameters
 	pub fn create_signature(abi: ABI, return_type: &Type, params: &mut [&Type]) -> Box<Type> {
 		unsafe {
