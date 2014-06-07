@@ -85,7 +85,6 @@ impl<B:Buffer> Lexer<B> {
 				Err(err) => return Err(err)
 			};
 			self.column_number += 1;
-			println!("{}", ch);
 			match ch {
 				'"' | '\'' => {
 					let mut buf = String::new();
