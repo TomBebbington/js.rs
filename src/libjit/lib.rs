@@ -44,7 +44,7 @@ pub use bindings::{jit_nint, jit_nuint};
 macro_rules! native_ref(
 	($name:ident, $field:ident, $pointer_ty:ty) => (
 		pub struct $name {
-			$field: *mut c_void
+			$field: $pointer_ty
 		}
 		impl NativeRef for $name {
 			#[inline]
