@@ -4,16 +4,16 @@ RUSTDOC ?= rustdoc
 all: libs build doc
 libjs:
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjs/lib.rs -L .
+	cd target && $(RUSTC) ../src/libjs/js.rs -L .
 libjs_syntax:
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjs_syntax/lib.rs -L .
+	cd target && $(RUSTC) ../src/libjs_syntax/js_syntax.rs -L .
 libjit_macro:
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjit_macro/lib.rs -L .
+	cd target && $(RUSTC) ../src/libjit_macro/jit_macro.rs -L .
 libjit:
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjit/lib.rs -L .
+	cd target && $(RUSTC) ../src/libjit/jit.rs -L .
 libs: libjit libjit_macro libjs_syntax libjs
 build:
 	mkdir -p target
@@ -24,10 +24,10 @@ install:
 	sudo cp -f target/libjit*.so /usr/local/lib
 	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
 doc:
-	$(RUSTDOC) src/libjit/lib.rs -o doc -L target
-	$(RUSTDOC) src/libjit_macro/lib.rs -o doc -L target
-	$(RUSTDOC) src/libjs/lib.rs -o doc -L target
-	$(RUSTDOC) src/libjs_syntax/lib.rs -o doc -L target
+	$(RUSTDOC) src/libjit/jit.rs -o doc -L target
+	$(RUSTDOC) src/libjit_macro/jit_macro.rs -o doc -L target
+	$(RUSTDOC) src/libjs/js.rs -o doc -L target
+	$(RUSTDOC) src/libjs_syntax/js_syntax.rs -o doc -L target
 	$(RUSTDOC) src/front/front.rs -o doc -L target
 update-doc: doc
 	rm -rf /tmp/doc
