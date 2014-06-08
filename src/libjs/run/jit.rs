@@ -68,7 +68,7 @@ impl Executor<Function> for JITCompiler {
 		debug!("Compiling {} in builder", expr);
 		self.context.build(|| {
 			let value_t = jit_compile!(*int);
-			let default_sig_t = Type::create_signature(CDECL, &value_t, &mut [&value_t, &value_t, &value_t]);
+			let default_sig_t = jit_compile!(($value_t, $value_t, $value_t) -> $value_t);
 			let func = Function::new(&self.context, &default_sig_t);
 			let value = compile_value(&func, expr);
 			func.insn_return(&convert_to_value(&func, &value));
@@ -94,7 +94,7 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 	debug!("Converting JIT value of kind {} to Javascript value", val_kind.bits());
 	if val_kind.contains(SysBool) || val_kind.contains(UByte) {
 		let bool_value = to_value::<bool>;
-		let sig = Type::create_signature(CDECL, &value_t, &mut [&jit_compile!(bool)]);
+		let sig = jit_compile!((bool) -> $value_t);
 		func.insn_call_native1("bool_value", bool_value, &sig, &mut [val])
 	} else if val_kind.contains(Pointer) {
 		let ref_t = val_type.get_ref();
@@ -105,7 +105,7 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 					to_value(text.as_str().unwrap().into_string())
 				}
 			}
-			let sig = Type::create_signature(CDECL, &value_t, &mut [&val_type]);
+			let sig = jit_compile!(($val_type) -> $value_t);
 			func.insn_call_native1("string_value", string_value, &sig, &mut [val])
 		} else {
 			fn ptr_value(ptr: *i8) -> Value {
@@ -117,16 +117,16 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 					ptr => fail!("Invalid pointer: {}", ptr)
 				}
 			}
-			let sig = Type::create_signature(CDECL, &value_t, &mut [&Types::get_void_ptr()]);
+			let sig = jit_compile!(($val_type) -> $value_t);
 			func.insn_call_native1("ptr_value", ptr_value, &sig, &mut [val])
 		}
 	} else if val_kind.contains(Int) || val_kind.contains(UInt) {
 		let int_value = to_value::<i32>;
-		let sig = Type::create_signature(CDECL, &value_t, &mut [&jit_compile!(i32)]);
+		let sig = jit_compile!((i32) -> $value_t);
 		func.insn_call_native1("int_value", int_value, &sig, &mut [val])
 	} else if val_kind.contains(Float64) {
 		let float_value = to_value::<f64>;
-		let sig = Type::create_signature(CDECL, &value_t, &mut [&Types::get_float64()]);
+		let sig = jit_compile!((f64) -> $value_t);
 		func.insn_call_native1("float_value", float_value, &sig, &mut [val])
 	} else {
 		fail!("Invalid kind {}", val_kind.bits())
@@ -136,7 +136,7 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
 	let value_t = jit_compile!(*int);
 	let cstring_t = jit_compile!(*char);
-	let create_value_sig = Type::create_signature(CDECL, &value_t, &mut []);
+	let create_value_sig = jit_compile!(() -> $value_t);
 	let undefined = || {
 		let ptr = func.create_value(&Types::get_void_ptr());
 		let val = 0u8.compile(func);

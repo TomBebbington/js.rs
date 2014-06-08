@@ -5,8 +5,7 @@
 #![feature(quote, globs, macro_registrar, managed_boxes)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 //! This crate provides a macro `jit_compile` which can compile a Rust type
-//! into its LibJIT counterpart. Its currently a bit glitchy when it comes 
-//! to function signatures but that is being worked on.
+//! into its LibJIT counterpart. It even supports functions!
 //! 
 //! For example:
 //! 
@@ -18,6 +17,7 @@
 //! fn main() {
 //! 	let ty = jit_compile!(i64);
 //! 	assert_eq(ty.get_size(), 8);
+//! 	let floor_sig = jit_compile!((f64) -> i32);
 //! }
 //! ```
 extern crate syntax;
@@ -79,9 +79,7 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 									let mut tts = toks.iter().peekable();
 									loop {
 										let parsed = try!(jit_parse_type(cx, &mut tts));
-										// &*parsed
-										let derefed = cx.expr_deref(span, parsed);
-										arg_types.push((&mut *cx).expr_addr_of(span, derefed));
+										arg_types.push(cx.expr_addr_of(parsed.span, parsed));
 										match tts.next() {
 											Some(v) =>
 												match *v {
@@ -96,11 +94,13 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 								}
 								tts.next();
 								try!(expect(cx, tts, RARROW));
-								let ret = try!(jit_parse_type(cx, tts));
-								let arg_types_ex = cx.expr(ret.span, ExprVec(arg_types));
+								let parsed_ret = try!(jit_parse_type(cx, tts));
+								let ret = cx.expr_addr_of(parsed_ret.span, parsed_ret);
+								let arg_types_ex = cx.expr(span, ExprVec(arg_types));
 								let func = quote_expr!(&mut*cx, ::jit::Type::create_signature);
 								let cdecl = quote_expr!(&mut*cx, ::jit::CDECL);
-								let arg_types_ex = cx.expr_mut_addr_of(span, arg_types_ex);
+								let arg_types_ex = cx.expr_mut_addr_of(arg_types_ex.span, arg_types_ex);
+								let arg_types_ex = cx.expr_method_call(span, arg_types_ex, cx.ident_of("as_mut_slice"), vec!());
 								let call = cx.expr_call(span, func, vec!(cdecl, ret, arg_types_ex));
 								Ok(call)
 
