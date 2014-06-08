@@ -64,7 +64,7 @@ impl Executor<Function> for JITCompiler {
 		self.context.with_builder(|| {
 			let value_t = jit_compile!(*int);
 			let default_sig_t = Type::create_signature(CDECL, &value_t, &mut [&value_t, &value_t, &value_t]);
-			let func = self.context.create_function(&default_sig_t);
+			let func = Function::new(&self.context, &default_sig_t);
 			let value = compile_value(&func, expr);
 			func.insn_return(&convert_to_value(&func, &value));
 			func.set_optimization_level(5);

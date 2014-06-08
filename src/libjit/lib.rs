@@ -96,12 +96,6 @@ impl Context {
 		}
 		rv
 	}
-	/// Create a function in the context with the type signature given
-	pub fn create_function(&self, signature: &Type) -> Function {
-		unsafe {
-			NativeRef::from_ptr(jit_function_create(self.as_ptr(), signature.as_ptr()))
-		}
-	}
 }
 
 impl Drop for Context {
@@ -247,6 +241,12 @@ impl Drop for Function {
 	}
 }
 impl Function {
+	/// Create a function in the context with the type signature given
+	pub fn new(context:&Context, signature: &Type) -> Function {
+		unsafe {
+			NativeRef::from_ptr(jit_function_create(context.as_ptr(), signature.as_ptr()))
+		}
+	}
 	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Value {
 		unsafe {
 			let value = f(self.as_ptr(), v1.as_ptr(), v2.as_ptr());
