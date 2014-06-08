@@ -4,7 +4,7 @@
 #![crate_type = "rlib"]
 #![feature(quote, globs, macro_registrar, managed_boxes)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
-//! This crate provides a macro `jit_compile` which can compile a Rust type
+//! This crate provides a macro `jit_type` which can compile a Rust type
 //! into its LibJIT counterpart. It even supports functions!
 //! 
 //! For example:
@@ -15,9 +15,9 @@
 //! #[phase(syntax)]
 //! extern crate jit_macro;
 //! fn main() {
-//! 	let ty = jit_compile!(i64);
+//! 	let ty = jit_type!(i64);
 //! 	assert_eq(ty.get_size(), 8);
-//! 	let floor_sig = jit_compile!((f64) -> i32);
+//! 	let floor_sig = jit_type!((f64) -> i32);
 //! }
 //! ```
 extern crate syntax;
@@ -33,8 +33,8 @@ use std::slice::Items;
 #[macro_registrar]
 #[doc(hidden)]
 pub fn macro_registrar(register: |Name, SyntaxExtension|) {
-	let expander = box BasicMacroExpander { expander: jit_compile, span: None };
-	register(token::intern("jit_compile"), NormalTT(expander, None))
+	let expander = box BasicMacroExpander { expander: jit_type, span: None };
+	register(token::intern("jit_type"), NormalTT(expander, None))
 }
 fn error(e:Option<TokenTree>, tok:Token) -> Result<(), String> {
 	match e {
@@ -161,7 +161,7 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 			Err("Not a type".into_string())
 	}
 }
-fn jit_compile(cx: &mut ExtCtxt, sp: Span, tts: &[TokenTree]) -> Box<MacResult> {
+fn jit_type(cx: &mut ExtCtxt, sp: Span, tts: &[TokenTree]) -> Box<MacResult> {
 	let mut iter = tts.iter().peekable();
 	MacExpr::new(match jit_parse_type(cx, &mut iter) {
 		Ok(v) => v,

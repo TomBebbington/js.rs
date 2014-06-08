@@ -14,12 +14,12 @@ use jit;
 
 fn compile_type(js_type:&JSType) -> Type {
 	match *js_type {
-		UndefinedType | NullType | NativeObjectType | ObjectType | AnyType => jit_compile!(*()),
-		FunctionType => jit_compile!(*() -> ()),
-		StringType => jit_compile!(String),
-		BooleanType => jit_compile!(bool),
-		NumberType => jit_compile!(f64),
-		IntegerType => jit_compile!(i32),
+		UndefinedType | NullType | NativeObjectType | ObjectType | AnyType => jit_type!(*()),
+		FunctionType => jit_type!(*() -> ()),
+		StringType => jit_type!(String),
+		BooleanType => jit_type!(bool),
+		NumberType => jit_type!(f64),
+		IntegerType => jit_type!(i32),
 		AnyOfType(ref types) => {
 			fail!("Unknown types: {}", types)
 		}
@@ -67,8 +67,8 @@ impl Executor<Function> for JITCompiler {
 	fn compile(&self, expr: &Expr) -> Function {
 		debug!("Compiling {} in builder", expr);
 		self.context.build(|| {
-			let value_t = jit_compile!(*int);
-			let default_sig_t = jit_compile!(($value_t, $value_t, $value_t) -> $value_t);
+			let value_t = jit_type!(*int);
+			let default_sig_t = jit_type!(($value_t, $value_t, $value_t) -> $value_t);
 			let func = Function::new(&self.context, &default_sig_t);
 			let value = compile_value(&func, expr);
 			func.insn_return(&convert_to_value(&func, &value));
@@ -87,14 +87,14 @@ impl Executor<Function> for JITCompiler {
 }
 
 fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
-	let value_t = jit_compile!(*int);
+	let value_t = jit_type!(*int);
 	let undef_value = Value::undefined;
 	let val_type = val.get_type();
 	let val_kind = val_type.get_kind();
 	debug!("Converting JIT value of kind {} to Javascript value", val_kind.bits());
 	if val_kind.contains(SysBool) || val_kind.contains(UByte) {
 		let bool_value = to_value::<bool>;
-		let sig = jit_compile!((bool) -> $value_t);
+		let sig = jit_type!((bool) -> $value_t);
 		func.insn_call_native1("bool_value", bool_value, &sig, &mut [val])
 	} else if val_kind.contains(Pointer) {
 		let ref_t = val_type.get_ref();
@@ -105,7 +105,7 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 					to_value(text.as_str().unwrap().into_string())
 				}
 			}
-			let sig = jit_compile!((String) -> $value_t);
+			let sig = jit_type!((String) -> $value_t);
 			func.insn_call_native1("string_value", string_value, &sig, &mut [val])
 		} else {
 			fn ptr_value(ptr: *i8) -> Value {
@@ -117,16 +117,16 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 					ptr => fail!("Invalid pointer: {}", ptr)
 				}
 			}
-			let sig = jit_compile!(($val_type) -> $value_t);
+			let sig = jit_type!(($val_type) -> $value_t);
 			func.insn_call_native1("ptr_value", ptr_value, &sig, &mut [val])
 		}
 	} else if val_kind.contains(Int) || val_kind.contains(UInt) {
 		let int_value = to_value::<i32>;
-		let sig = jit_compile!((i32) -> $value_t);
+		let sig = jit_type!((i32) -> $value_t);
 		func.insn_call_native1("int_value", int_value, &sig, &mut [val])
 	} else if val_kind.contains(Float64) {
 		let float_value = to_value::<f64>;
-		let sig = jit_compile!((f64) -> $value_t);
+		let sig = jit_type!((f64) -> $value_t);
 		func.insn_call_native1("float_value", float_value, &sig, &mut [val])
 	} else {
 		fail!("Invalid kind {}", val_kind.bits())
@@ -134,9 +134,9 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 }
 
 fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
-	let value_t = jit_compile!(*int);
-	let cstring_t = jit_compile!(*char);
-	let create_value_sig = jit_compile!(() -> $value_t);
+	let value_t = jit_type!(*int);
+	let cstring_t = jit_type!(*char);
+	let create_value_sig = jit_type!(() -> $value_t);
 	let undefined = || {
 		let ptr = func.create_value(&Types::get_void_ptr());
 		let val = 0u8.compile(func);
@@ -149,7 +149,7 @@ fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
 	debug!("Compiling {} into a LibJIT value", expr);
 	match expr.def {
 		ConstExpr(CNull) => {
-			let ptr = func.create_value(&jit_compile!(*void));
+			let ptr = func.create_value(&jit_type!(*void));
 			let val = 1u8.compile(func);
 			func.insn_store(&ptr, &val);
 			ptr
@@ -194,66 +194,66 @@ fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
 		BinOpExpr(BinBit(BitAnd), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_and(&i_a, &i_b), &jit_compile!(i32), false)
+			func.insn_convert(&func.insn_and(&i_a, &i_b), &jit_type!(i32), false)
 		},
 		BinOpExpr(BinBit(BitOr), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_or(&i_a, &i_b), &jit_compile!(i32), false)
+			func.insn_convert(&func.insn_or(&i_a, &i_b), &jit_type!(i32), false)
 		},
 		BinOpExpr(BinBit(BitXor), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_xor(&i_a, &i_b), &jit_compile!(i32), false)
+			func.insn_convert(&func.insn_xor(&i_a, &i_b), &jit_type!(i32), false)
 		},
 		BinOpExpr(BinBit(BitShl), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_shl(&i_a, &i_b), &jit_compile!(i32), false)
+			func.insn_convert(&func.insn_shl(&i_a, &i_b), &jit_type!(i32), false)
 		},
 		BinOpExpr(BinBit(BitShr), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_shr(&i_a, &i_b), &jit_compile!(i32), false)
+			func.insn_convert(&func.insn_shr(&i_a, &i_b), &jit_type!(i32), false)
 		},
 		BinOpExpr(BinComp(CompEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictEqual), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_eq(&i_a, &i_b), &jit_compile!(bool), false)
+			func.insn_convert(&func.insn_eq(&i_a, &i_b), &jit_type!(bool), false)
 		},
 		BinOpExpr(BinComp(CompNotEqual), ref a, ref b) | BinOpExpr(BinComp(CompStrictNotEqual), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_neq(&i_a, &i_b), &jit_compile!(bool), false)
+			func.insn_convert(&func.insn_neq(&i_a, &i_b), &jit_type!(bool), false)
 		},
 		BinOpExpr(BinComp(CompLessThan), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_lt(&i_a, &i_b), &jit_compile!(bool), false)
+			func.insn_convert(&func.insn_lt(&i_a, &i_b), &jit_type!(bool), false)
 		},
 		BinOpExpr(BinComp(CompLessThanOrEqual), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_leq(&i_a, &i_b), &jit_compile!(bool), false)
+			func.insn_convert(&func.insn_leq(&i_a, &i_b), &jit_type!(bool), false)
 		},
 		BinOpExpr(BinComp(CompGreaterThan), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_gt(&i_a, &i_b), &jit_compile!(bool), false)
+			func.insn_convert(&func.insn_gt(&i_a, &i_b), &jit_type!(bool), false)
 		},
 		BinOpExpr(BinComp(CompGreaterThanOrEqual), ref a, ref b) => {
 			let i_a = compile_value(func, *a);
 			let i_b = compile_value(func, *b);
-			func.insn_convert(&func.insn_geq(&i_a, &i_b), &jit_compile!(bool), false)
+			func.insn_convert(&func.insn_geq(&i_a, &i_b), &jit_type!(bool), false)
 		},
 		UnaryOpExpr(UnaryMinus, ref a) => {
 			func.insn_neg(&compile_value(func, *a))
 		},
 		UnaryOpExpr(UnaryNot, ref a) => {
 			let mut val = compile_value(func, *a);
-			val = func.insn_convert(&val, &jit_compile!(bool), false);
+			val = func.insn_convert(&val, &jit_type!(bool), false);
 			val = func.insn_neg(&val);
-			func.insn_convert(&val, &jit_compile!(bool), false)
+			func.insn_convert(&val, &jit_type!(bool), false)
 		},
 		UnaryOpExpr(UnaryPlus, ref a) => {
 			compile_value(func, *a)
