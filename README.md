@@ -1,29 +1,9 @@
 [![Build Status](https://travis-ci.org/TomBebbington/js.rs.svg?branch=master)](https://travis-ci.org/TomBebbington/js.rs)
-This is a Javascript lexer, parser and Just-in-Time written in Rust. Currently, it has support for some of the language.
+This is a Javascript lexer, parser and Just-in-Time compiler written in Rust. Currently, it has support for some of the language.
 
 Documentation
 -------------
 [View here](http://tombebbington.github.io/js.rs/js/index.html)
-
-Supported language features
----------------------------
-+ Functions
-+ Switch blocks (partial, ignore breaks)
-+ If blocks
-+ While blocks
-+ Object declarations
-+ Array declarations
-+ Strings
-+ Numbers
-
-Supported APIs
---------------
-+ Error (partial)
-+ Math
-+ Number
-+ JSON
-+ Console
-+ URI decoding / encoding (doesn't use JS rules)
 
 Contributing
 ------------
