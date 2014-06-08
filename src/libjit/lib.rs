@@ -287,7 +287,8 @@ impl Type {
 	/// Create a function signature, with the given ABI, return type and parameters
 	pub fn create_signature(abi: ABI, return_type: &Type, params: &mut [&Type]) -> Type {
 		unsafe {
-			let signature = jit_type_create_signature(abi as jit_abi_t, return_type.as_ptr(), transmute(params.as_mut_ptr()), params.len() as c_uint, 1);
+			let mut native_params:Vec<jit_type_t> = params.iter().map(|param| param.as_ptr()).collect();
+			let signature = jit_type_create_signature(abi as jit_abi_t, return_type.as_ptr(), native_params.as_mut_ptr(), params.len() as c_uint, 1);
 			NativeRef::from_ptr(signature)
 		}
 	}
