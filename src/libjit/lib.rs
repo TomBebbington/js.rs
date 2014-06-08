@@ -85,7 +85,7 @@ pub enum CallFlags {
 	JitCallTail = 4,
 }
 mod bindings;
-/// Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.
+/// Holds all of the functions you have built and compiled. There can be multiple, but normally there is only one.
 native_ref!(Context, _context, jit_context_t)
 impl Context {
 	/// Create a new JIT Context
