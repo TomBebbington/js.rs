@@ -250,7 +250,7 @@ impl Drop for Function {
 impl Function {
 	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Value {
 		unsafe {
-			let value = f(self.as_ptr(), v1._value, v2._value);
+			let value = f(self.as_ptr(), v1.as_ptr(), v2.as_ptr());
 			NativeRef::from_ptr(value)
 		}
 	}
@@ -668,16 +668,10 @@ impl Value {
 	}
 }
 
-#[deriving(Eq)]
+#[deriving(PartialEq)]
 /// A label in the code that can be branched to in instructions
 pub struct Label {
 	_label: jit_label_t
-}
-impl PartialEq for Label {
-	#[inline]
-	fn eq(&self, other:&Label) -> bool {
-		self._label == other._label
-	}
 }
 impl Label {
 	/// Create a new label
