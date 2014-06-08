@@ -4,8 +4,9 @@
 #![crate_type = "rlib"]
 #![feature(quote, globs, macro_registrar, managed_boxes)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
-//! This crate provides a macro `jit_compile` which can compile a Rust type identifier
-//! into its LibJIT counterpart.
+//! This crate provides a macro `jit_compile` which can compile a Rust type
+//! into its LibJIT counterpart. Its currently a bit glitchy when it comes 
+//! to function signatures but that is being worked on.
 //! 
 //! For example:
 //! 
