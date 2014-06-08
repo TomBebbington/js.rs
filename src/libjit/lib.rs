@@ -28,8 +28,10 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 #![allow(raw_pointer_deriving, dead_code, non_camel_case_types)]
+#![deny(unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, unused_must_use)]
 #![feature(globs, macro_rules)]
 #![stable]
+
 //! This crate wraps LibJIT
 
 extern crate libc;
@@ -128,7 +130,7 @@ pub struct Functions<'a> {
 	marker: marker::ContravariantLifetime<'a>
 }
 impl<'a> Functions<'a> {
-	pub fn new(ctx:&'a Context) -> Functions<'a> {
+	fn new(ctx:&'a Context) -> Functions<'a> {
 		unsafe {
 			Functions {
 				ctx: ctx.as_ptr(),
@@ -596,6 +598,7 @@ impl Function {
 			NativeRef::from_ptr(value)
 		}
 	}
+	/// Make an instruction that converts the value to the type given
 	pub fn insn_convert(&self, v: &Value, t:&Type, overflow_check:bool) -> Value {
 		unsafe {
 			NativeRef::from_ptr(jit_insn_convert(self.as_ptr(), v.as_ptr(), t.as_ptr(), overflow_check as c_int))

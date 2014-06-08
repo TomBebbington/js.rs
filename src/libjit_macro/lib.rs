@@ -3,6 +3,21 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 #![feature(quote, globs, macro_registrar, managed_boxes)]
+#![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
+//! This crate provides a macro `jit_compile` which can compile a Rust type identifier
+//! into its LibJIT counterpart.
+//! 
+//! For example:
+//! ```rust
+//! # #![feature(phase)]
+//! # extern crate regex;
+//! # #[phase(syntax)]
+//! # extern crate regex_macros;
+//! # fn main() {
+//! let ty = jit_compile!(i64);
+//! assert_eq(ty.get_size(), 8);
+//! #
+//! ```
 extern crate syntax;
 use syntax::ext::quote::rt::ToSource;
 use syntax::ast::*;
