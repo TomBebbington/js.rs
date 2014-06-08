@@ -25,8 +25,10 @@ install:
 	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
 doc:
 	$(RUSTDOC) src/libjit/lib.rs -o doc -L target
+	$(RUSTDOC) src/libjit_macro/lib.rs -o doc -L target
 	$(RUSTDOC) src/libjs/lib.rs -o doc -L target
 	$(RUSTDOC) src/libjs_syntax/lib.rs -o doc -L target
+	$(RUSTDOC) src/front/front.rs -o doc -L target
 update-doc: doc
 	rm -rf /tmp/doc
 	mv doc /tmp/doc
