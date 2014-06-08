@@ -454,11 +454,9 @@ impl Function {
 	fn insn_call_native(&self, name: &'static str, native_func: *mut c_void,
 						signature: &Type, args: &mut [&Value]) -> Value {
 		unsafe {
-			name.with_c_str(|name| {
-				NativeRef::from_ptr(jit_insn_call_native(self.as_ptr(), name, native_func,
-												 signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint,
-												 JitCallNothrow as c_int))
-			})
+			NativeRef::from_ptr(jit_insn_call_native(self.as_ptr(), name.to_c_str().unwrap(), native_func,
+											signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint,
+											JitCallNothrow as c_int))
 		}
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with no arguments and expects a return value
