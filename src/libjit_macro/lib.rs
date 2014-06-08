@@ -8,15 +8,16 @@
 //! into its LibJIT counterpart.
 //! 
 //! For example:
+//! 
 //! ```rust
-//! # #![feature(phase)]
-//! # extern crate regex;
-//! # #[phase(syntax)]
-//! # extern crate regex_macros;
-//! # fn main() {
-//! let ty = jit_compile!(i64);
-//! assert_eq(ty.get_size(), 8);
-//! #
+//! #![feature(phase)]
+//! extern crate jit;
+//! #[phase(syntax)]
+//! extern crate jit_macro;
+//! fn main() {
+//! 	let ty = jit_compile!(i64);
+//! 	assert_eq(ty.get_size(), 8);
+//! }
 //! ```
 extern crate syntax;
 use syntax::ext::quote::rt::ToSource;
