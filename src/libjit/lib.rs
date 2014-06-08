@@ -85,17 +85,16 @@ impl Context {
 			NativeRef::from_ptr(jit_context_create())
 		}
 	}
-	/// Lock down the context to prevent multiple threads from using the builder at a time
-	pub fn build_start(&self) {
+	/// Run a closure that can generate IR
+	pub fn with_builder<R>(&self, cb: || -> R) -> R {
 		unsafe {
 			jit_context_build_start(self.as_ptr());
 		}
-	}
-	/// Unlock the context from this thread
-	pub fn build_end(&self) {
+		let rv = cb();
 		unsafe {
 			jit_context_build_end(self.as_ptr());
 		}
+		rv
 	}
 	/// Create a function in the context with the type signature given
 	pub fn create_function(&self, signature: &Type) -> Function {

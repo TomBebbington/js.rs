@@ -32,14 +32,6 @@ pub struct JITCompiler {
 	/// An object representing the global object
 	pub global: Value
 }
-impl JITCompiler {
-	fn with_builder<R>(&self, cb: || -> R) -> R {
-		self.context.build_start();
-		let rv = cb();
-		self.context.build_end();
-		rv
-	}
-}
 impl Executor<Function> for JITCompiler {
 	fn new() -> JITCompiler {
 		debug!("Initialising global object...");
@@ -69,7 +61,7 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn compile(&self, expr: &Expr) -> Function {
 		debug!("Compiling {} in builder", expr);
-		self.with_builder(|| {
+		self.context.with_builder(|| {
 			let value_t = jit_compile!(*int);
 			let default_sig_t = Type::create_signature(CDECL, &value_t, &mut [&value_t, &value_t, &value_t]);
 			let func = self.context.create_function(&default_sig_t);
