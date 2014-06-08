@@ -95,7 +95,7 @@ impl Context {
 		}
 	}
 	/// Run a closure that can generate IR
-	pub fn with_builder<R>(&self, cb: || -> R) -> R {
+	pub fn build<R>(&self, cb: || -> R) -> R {
 		unsafe {
 			jit_context_build_start(self.as_ptr());
 		}

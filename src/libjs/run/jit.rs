@@ -61,7 +61,7 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn compile(&self, expr: &Expr) -> Function {
 		debug!("Compiling {} in builder", expr);
-		self.context.with_builder(|| {
+		self.context.build(|| {
 			let value_t = jit_compile!(*int);
 			let default_sig_t = Type::create_signature(CDECL, &value_t, &mut [&value_t, &value_t, &value_t]);
 			let func = Function::new(&self.context, &default_sig_t);
