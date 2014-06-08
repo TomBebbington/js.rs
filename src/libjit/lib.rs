@@ -33,8 +33,6 @@
 //! This crate wraps LibJIT
 
 extern crate libc;
-extern crate native;
-extern crate syntax;
 use std::ptr::{RawPtr, mut_null};
 use std::mem::transmute;
 use std::iter::Iterator;
