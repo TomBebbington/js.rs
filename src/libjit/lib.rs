@@ -158,6 +158,13 @@ impl NativeRef for Type {
 		}
 	}
 }
+impl Clone for Type {
+	fn clone(&self) -> Type {
+		unsafe {
+			NativeRef::from_ptr(jit_type_copy(self.as_ptr()))
+		}
+	}
+}
 impl Drop for Type {
 	fn drop(&mut self) {
 		unsafe {
