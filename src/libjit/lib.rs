@@ -28,7 +28,7 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 #![allow(raw_pointer_deriving, dead_code, non_camel_case_types)]
-#![feature(globs)]
+#![feature(globs, macro_rules)]
 #![stable]
 //! This crate wraps LibJIT
 
@@ -40,6 +40,29 @@ use std::mem::transmute;
 use libc::{c_int, c_void, c_uint};
 use bindings::*;
 pub use bindings::{jit_nint, jit_nuint};
+
+macro_rules! native_ref(
+	($name:ident, $field:ident, $pointer_ty:ty) => (
+		pub struct $name {
+			$field: *mut c_void
+		}
+		impl NativeRef for $name {
+			#[inline]
+			/// Convert to a native pointer
+			unsafe fn as_ptr(&self) -> $pointer_ty {
+				self.$field
+			}
+			#[inline]
+			/// Convert from a native pointer
+			unsafe fn from_ptr(ptr:$pointer_ty) -> $name {
+				$name {
+					$field: ptr
+				}
+			}
+		}
+	)
+)
+
 /// A native reference
 pub trait NativeRef {
 	/// Returns an unsafe mutable pointer to the object
@@ -63,21 +86,7 @@ pub enum CallFlags {
 }
 mod bindings;
 /// Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.
-pub struct Context {
-	_context: jit_context_t
-}
-impl NativeRef for Context {
-	#[inline]
-	unsafe fn as_ptr(&self) -> *mut c_void {
-		self._context
-	}
-	#[inline]
-	unsafe fn from_ptr(ptr:*mut c_void) -> Context {
-		Context {
-			_context: ptr
-		}
-	}
-}
+native_ref!(Context, _context, jit_context_t)
 impl Context {
 	/// Create a new JIT Context
 	pub fn new() -> Context {
@@ -107,7 +116,6 @@ impl Drop for Context {
 	}
 }
 
-#[deriving(Show)]
 /// The types that a value can be
 bitflags!(
 	flags TypeKind: i32 {
@@ -136,22 +144,8 @@ bitflags!(
 		static SysChar 		= 10010
 	}
 )
-/// A Type of a value to JIT
-pub struct Type {
-	_type: jit_type_t
-}
-impl NativeRef for Type {
-	#[inline]
-	unsafe fn as_ptr(&self) -> *mut c_void {
-		self._type
-	}
-	#[inline]
-	unsafe fn from_ptr(ptr:*mut c_void) -> Type {
-		Type {
-			_type: ptr
-		}
-	}
-}
+/// A type of a value to JIT compile
+native_ref!(Type, _type, jit_type_t)
 impl Clone for Type {
 	#[inline]
 	fn clone(&self) -> Type {
@@ -220,22 +214,8 @@ impl Type {
 	}
 }
 #[deriving(Clone)]
-/// A Function to JIT
-pub struct Function {
-	_function: jit_function_t
-}
-impl NativeRef for Function {
-	#[inline]
-	unsafe fn as_ptr(&self) -> *mut c_void {
-		self._function
-	}
-	#[inline]
-	unsafe fn from_ptr(ptr:*mut c_void) -> Function {
-		Function {
-			_function: ptr
-		}
-	}
-}
+/// A function to JIT compile
+native_ref!(Function, _function, jit_function_t)
 impl Drop for Function {
 	fn drop(&mut self) {
 		unsafe {
@@ -644,22 +624,8 @@ impl Function {
 	}
 }
 #[deriving(Clone)]
-/// A Value that is being JITed
-pub struct Value {
-	_value: jit_value_t
-}
-impl NativeRef for Value {
-	#[inline]
-	unsafe fn as_ptr(&self) -> *mut c_void {
-		self._value
-	}
-	#[inline]
-	unsafe fn from_ptr(ptr:*mut c_void) -> Value {
-		Value {
-			_value: ptr
-		}
-	}
-}
+/// A Value that is being JIT compiled
+native_ref!(Value, _value, jit_value_t)
 impl Value {
 	/// Get the type of the value
 	pub fn get_type(&self) -> Type {
