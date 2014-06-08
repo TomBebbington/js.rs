@@ -121,6 +121,7 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 						"bool" => Ok(quote_expr!(cx, ::jit::Types::get_bool())),
 						"f64" => Ok(quote_expr!(cx, ::jit::Types::get_float64())),
 						"f32" => Ok(quote_expr!(cx, ::jit::Types::get_float32())),
+						"String" => Ok(quote_expr!(cx, ::jit::Types::get_cstring())),
 						"Vec" => Ok(quote_expr!(cx, ::jit::Types::get_vec())),
 						id => Err(format!("Unexpected identifier {}", id))
 					};

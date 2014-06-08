@@ -14,11 +14,11 @@ use jit;
 
 fn compile_type(js_type:&JSType) -> Type {
 	match *js_type {
-		UndefinedType | NullType | NativeObjectType | ObjectType | AnyType => Types::get_void_ptr(),
-		FunctionType => Types::get_void_ptr(),
-		StringType => Type::create_pointer(&Types::get_char()),
+		UndefinedType | NullType | NativeObjectType | ObjectType | AnyType => jit_compile!(*()),
+		FunctionType => jit_compile!(*() -> ()),
+		StringType => jit_compile!(String),
 		BooleanType => jit_compile!(bool),
-		NumberType => Types::get_float64(),
+		NumberType => jit_compile!(f64),
 		IntegerType => jit_compile!(i32),
 		AnyOfType(ref types) => {
 			fail!("Unknown types: {}", types)
@@ -105,7 +105,7 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 					to_value(text.as_str().unwrap().into_string())
 				}
 			}
-			let sig = jit_compile!(($val_type) -> $value_t);
+			let sig = jit_compile!((String) -> $value_t);
 			func.insn_call_native1("string_value", string_value, &sig, &mut [val])
 		} else {
 			fn ptr_value(ptr: *i8) -> Value {
