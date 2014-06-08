@@ -35,8 +35,10 @@
 extern crate libc;
 extern crate native;
 extern crate syntax;
-use std::ptr;
+use std::ptr::{RawPtr, mut_null};
 use std::mem::transmute;
+use std::iter::Iterator;
+use std::kinds::marker;
 use libc::{c_int, c_void, c_uint};
 use bindings::*;
 pub use bindings::{jit_nint, jit_nuint};
@@ -92,10 +94,19 @@ pub fn supports_virtual_memory() -> bool {
 }
 /// A native reference
 pub trait NativeRef {
+
 	/// Returns an unsafe mutable pointer to the object
 	unsafe fn as_ptr(&self) -> *mut c_void;
 	/// Make an unsafe pointer to the object
 	unsafe fn from_ptr(ptr:*mut c_void) -> Self;
+	#[inline]
+	unsafe fn from_ptr_opt(ptr:*mut c_void) -> Option<Self> {
+		if ptr.is_null() {
+			None
+		} else {
+			Some(NativeRef::from_ptr(ptr))
+		}
+	}
 }
 /// A platform's application binary interface
 pub enum ABI {
@@ -112,6 +123,47 @@ pub enum CallFlags {
 	JitCallTail = 4,
 }
 mod bindings;
+/// An iterator over a context's functions
+pub struct Functions<'a> {
+	ctx: jit_context_t,
+	last: jit_function_t,
+	marker: marker::ContravariantLifetime<'a>
+}
+impl<'a> Functions<'a> {
+	pub fn new(ctx:&'a Context) -> Functions<'a> {
+		unsafe {
+			Functions {
+				ctx: ctx.as_ptr(),
+				last: RawPtr::null(),
+				marker: marker::ContravariantLifetime::<'a>
+			}
+		}
+	}
+}
+impl<'a> Iterator<Function> for Functions<'a> {
+	fn next(&mut self) -> Option<Function> {
+		unsafe {
+			let native_next = jit_function_next(self.ctx, self.last);
+			self.last = native_next;
+			NativeRef::from_ptr_opt(native_next)
+		}
+	}
+	fn size_hint(&self) -> (uint, Option<uint>) {
+		unsafe {
+			let mut size : uint = 0;
+			let mut last = self.last;
+			loop {
+				last = jit_function_next(self.ctx, last);
+				if last.is_null() {
+					break;
+				} else {
+					size += 1;
+				}
+			}
+			(size, Some(size))
+		}
+	}
+}
 /// Holds all of the functions you have built and compiled. There can be multiple, but normally there is only one.
 native_ref!(Context, _context, jit_context_t)
 impl Context {
@@ -131,6 +183,10 @@ impl Context {
 			jit_context_build_end(self.as_ptr());
 		}
 		rv
+	}
+	/// Iterate through all the functions in this context
+	pub fn iter_funcs<'t>(&'t self) -> Functions<'t> {
+		Functions::new(self)
 	}
 }
 
@@ -526,7 +582,7 @@ impl Function {
 	/// Execute a function and with some arguments
 	pub fn execute(&self, args: &mut [*mut c_void]) {
 		unsafe {
-			jit_function_apply(self.as_ptr(), args.as_mut_ptr(), ptr::mut_null());
+			jit_function_apply(self.as_ptr(), args.as_mut_ptr(), mut_null());
 		}
 	}
 	/// Turn this function into a closure

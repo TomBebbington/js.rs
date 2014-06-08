@@ -80,6 +80,7 @@ impl Executor<Function> for JITCompiler {
 	}
 	fn run(&mut self, comp:&Function) -> ResultValue {
 		debug!("Running function");
+		debug!("There are {} functions in context", self.context.iter_funcs().size_hint());
 		let func: fn(Value, Value, Value) -> Value = comp.closure();
 		return Ok(func(self.global, self.global, self.global));
 	}
