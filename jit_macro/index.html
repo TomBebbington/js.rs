@@ -39,25 +39,17 @@
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Crate <a class='mod' href=''>jit_macro</a><a class='source' id='src-0' href='../src/jit_macro/src/libjit_macro/lib.rs.html#1-170'>[src]</a></h1>
+<h1 class='fqn'>Crate <a class='mod' href=''>jit_macro</a><a class='source' id='src-0' href='../src/jit_macro/src/libjit_macro/lib.rs.html#1-171'>[src]</a></h1>
 <div class='docblock'><p>This crate provides a macro <code>jit_compile</code> which can compile a Rust type identifier
 into its LibJIT counterpart.</p>
 
-<p>For example:
-```rust</p>
-
-<h1 id="#![feature(phase)]" class='section-header'><a
-                           href="##![feature(phase)]">#![feature(phase)]</a></h1>
-<h1 id="extern-crate-regex;" class='section-header'><a
-                           href="#extern-crate-regex;">extern crate regex;</a></h1>
-<h1 id="#[phase(syntax)]" class='section-header'><a
-                           href="##[phase(syntax)]">#[phase(syntax)]</a></h1>
-<h1 id="extern-crate-regex_macros;" class='section-header'><a
-                           href="#extern-crate-regex_macros;">extern crate regex_macros;</a></h1>
-<h1 id="fn-main()-{" class='section-header'><a
-                           href="#fn-main()-{">fn main() {</a></h1>
-<p>let ty = jit_compile!(i64);
-assert_eq(ty.get_size(), 8);</p>
+<p>For example:</p>
+<pre class='rust '>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>)]</span>
+<span class='kw'>let</span> <span class='ident'>ty</span> <span class='op'>=</span> <span class='macro'>jit_compile</span><span class='macro'>!</span>(<span class='ident'>i64</span>);
+<span class='ident'>assert_eq</span>(<span class='ident'>ty</span>.<span class='ident'>get_size</span>(), <span class='number'>8</span>);
+<span class='attribute'>#
+</pre>
 </div></table></section>
     <section id='search' class="content hidden"></section>
 
