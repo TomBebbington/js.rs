@@ -25,8 +25,6 @@
 //! }
 //! ```
 extern crate syntax;
-extern crate collections;
-use collections::TreeMap;
 use syntax::ext::quote::rt::ToSource;
 use syntax::ast::*;
 use syntax::codemap::Span;
@@ -117,18 +115,19 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 						TTTok(span, LBRACE) => {
 							let toks = toks.slice(1, toks.len() - 1);
 							let mut tts = toks.iter().peekable();
-							let mut structure:TreeMap<String, P<Expr>> = TreeMap::new();
+							let mut names:Vec<P<Expr>> = Vec::new();
+							let mut types:Vec<P<Expr>> = Vec::new();
 							loop {
 								match tts.next() {
 									Some(ref v) => {
 										match **v {
 											TTTok(_, COMMA) =>
 												continue,
-											TTTok(_, IDENT(ident, _)) => {
-												let field_name = ident.to_source();
+											TTTok(span, IDENT(field_name, _)) => {
 												try!(expect(cx, &mut tts, COLON));
 												let field_type = try!(jit_parse_type(cx, &mut tts));
-												structure.insert(field_name, field_type);
+												names.push(cx.expr_str_uniq(span, get_ident(field_name)));
+												types.push(cx.expr_addr_of(field_type.span, field_type));
 											},
 											_ => return Err("Expected ident".into_string())
 										}
@@ -137,10 +136,15 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 								}
 							}
 							let func = quote_expr!(&mut*cx, ::jit::Type::create_struct);
-							let targs:Vec<P<Expr>> = structure.iter().map(|(_, t)| cx.expr_addr_of(t.span, *t)).collect();
-							let targs_vec = cx.expr(span, ExprVec(targs));
-							let targs_vec = cx.expr_method_call(span, targs_vec, cx.ident_of("as_mut_slice"), vec!());
-							Ok(cx.expr_call(span, func, vec!(targs_vec)))
+							let types_vec = cx.expr(span, ExprVec(types));
+							let types_vec_slices = cx.expr_method_call(span, types_vec, cx.ident_of("as_mut_slice"), vec!());
+							let names_vec = cx.expr(span, ExprVec(names));
+							let ident_type = cx.ident_of("ty");
+							Ok(cx.expr_block(cx.block(span, vec!(
+								cx.stmt_let(span, false, ident_type, cx.expr_call(span, func, vec!(types_vec_slices))),
+								cx.stmt_expr(cx.expr_method_call(span, cx.expr_ident(span, ident_type), cx.ident_of("set_names"), vec!(names_vec))),
+								cx.stmt_expr(cx.expr_ident(span, ident_type))
+							), None)))
 						},
 						_ => Err("Expected bracket".into_string())
 					}
