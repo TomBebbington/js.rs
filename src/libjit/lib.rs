@@ -62,7 +62,34 @@ macro_rules! native_ref(
 		}
 	)
 )
-
+/// Initialise the library and prepare for operations
+#[inline]
+pub fn init() -> () {
+	unsafe {
+		jit_init()
+	}
+}
+/// Check if the JIT is using a fallback interpreter
+#[inline]
+pub fn uses_interpreter() -> bool {
+	unsafe {
+		jit_uses_interpreter() != 0
+	}
+}
+/// Check if the JIT supports theads
+#[inline]
+pub fn supports_threads() -> bool {
+	unsafe {
+		jit_supports_threads() != 0
+	}
+}
+/// Check if the JIT supports virtual memory
+#[inline]
+pub fn supports_virtual_memory() -> bool {
+	unsafe {
+		jit_supports_virtual_memory() != 0
+	}
+}
 /// A native reference
 pub trait NativeRef {
 	/// Returns an unsafe mutable pointer to the object

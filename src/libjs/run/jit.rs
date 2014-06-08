@@ -34,6 +34,11 @@ pub struct JITCompiler {
 }
 impl Executor<Function> for JITCompiler {
 	fn new() -> JITCompiler {
+		debug!("Initialising LibJIT...");
+		jit::init();
+		debug!("JIT supports threads? {}", jit::supports_threads());
+		debug!("JIT supports virtual memory? {}", jit::supports_virtual_memory());
+		debug!("JIT using interpreter? {}", jit::uses_interpreter());
 		debug!("Initialising global object...");
 		let global = Value::new_obj(None);
 		object::init(global);
