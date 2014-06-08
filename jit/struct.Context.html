@@ -24,7 +24,7 @@
     <section class="sidebar">
         
 
-        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/><a class='trait ' href='trait.NativeRef.html'>NativeRef</a><br/></div>
+        <p class='location'><a href='index.html'>jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Context.html'>Context</a><br/><a class='struct ' href='struct.Function.html'>Function</a><br/><a class='struct ' href='struct.Functions.html'>Functions</a><br/><a class='struct ' href='struct.Label.html'>Label</a><br/><a class='struct ' href='struct.Type.html'>Type</a><br/><a class='struct ' href='struct.TypeKind.html'>TypeKind</a><br/><a class='struct ' href='struct.Types.html'>Types</a><br/><a class='struct ' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.Compilable.html'>Compilable</a><br/><a class='trait ' href='trait.NativeRef.html'>NativeRef</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.init.html'>init</a><br/><a class='fn ' href='fn.supports_threads.html'>supports_threads</a><br/><a class='fn ' href='fn.supports_virtual_memory.html'>supports_virtual_memory</a><br/><a class='fn ' href='fn.uses_interpreter.html'>uses_interpreter</a><br/></div>
     </section>
 
     <nav class="sub">
@@ -39,21 +39,20 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Context</a><a class='source' id='src-8868' href='../src/jit/src/libjit/lib.rs.html#70-72'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Context</a><a class='source' id='src-9045' href='../src/jit/src/libjit/lib.rs.html#48-50'>[src]</a></h1>
 <pre class='rust struct'>pub struct Context {
     // some fields omitted
-}</pre><div class='docblock'><p>Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a>&gt;</code></h4>
+}</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h4>
 <div class='docblock'><p>Create a new JIT Context</p>
-</div><h4 id='method.build_start' class='method'><code>fn <a href='#method.build_start' class='fnname'>build_start</a>(&amp;self)</code></h4>
-<div class='docblock'><p>Lock down the context to prevent multiple threads from using the builder at a time</p>
-</div><h4 id='method.build_end' class='method'><code>fn <a href='#method.build_end' class='fnname'>build_end</a>(&amp;self)</code></h4>
-<div class='docblock'><p>Unlock the context from this thread</p>
-</div><h4 id='method.create_function' class='method'><code>fn <a href='#method.create_function' class='fnname'>create_function</a>(&amp;self, signature: &amp;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;<a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a>&gt;</code></h4>
-<div class='docblock'><p>Create a function in the context with the type signature given</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../jit/trait.NativeRef.html' title='jit::NativeRef'>NativeRef</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.as_ptr' class='method'><code>unsafe fn <a href='#method.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; *mut c_void</code></h4>
-<h4 id='method.from_ptr' class='method'><code>unsafe fn <a href='#method.from_ptr' class='fnname'>from_ptr</a>(ptr: *mut c_void) -&gt; <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h4>
-<h4 id='method.from_ptr_box' class='method'><code>unsafe fn <a href='#method.from_ptr_box' class='fnname'>from_ptr_box</a>(ptr: *mut c_void) -&gt; <a class='struct' href='http://doc.rust-lang.org/alloc/owned/struct.Box.html' title='alloc::owned::Box'>Box</a>&lt;Self&gt;</code></h4>
+</div><h4 id='method.build' class='method'><code>fn <a href='#method.build' class='fnname'>build</a>&lt;R&gt;(&amp;self, cb: || -&gt; R) -&gt; R</code></h4>
+<div class='docblock'><p>Run a closure that can generate IR</p>
+</div><h4 id='method.iter_funcs' class='method'><code>fn <a href='#method.iter_funcs' class='fnname'>iter_funcs</a>&lt;'t&gt;(&amp;'t self) -&gt; <a class='struct' href='../jit/struct.Functions.html' title='jit::Functions'>Functions</a>&lt;'t&gt;</code></h4>
+<div class='docblock'><p>Iterate through all the functions in this context</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../jit/trait.NativeRef.html' title='jit::NativeRef'>NativeRef</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.as_ptr' class='method'><code>unsafe fn <a href='#method.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; jit_context_t</code></h4>
+<div class='docblock'><p>Convert to a native pointer</p>
+</div><h4 id='method.from_ptr' class='method'><code>unsafe fn <a href='#method.from_ptr' class='fnname'>from_ptr</a>(ptr: jit_context_t) -&gt; <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h4>
+<div class='docblock'><p>Convert from a native pointer</p>
+</div><h4 id='method.from_ptr_opt' class='method'><code>unsafe fn <a href='#method.from_ptr_opt' class='fnname'>from_ptr_opt</a>(ptr: *mut c_void) -&gt; <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt;</code></h4>
 </div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Drop.html' title='core::ops::Drop'>Drop</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></h3><div class='methods'><h4 id='method.drop' class='method'><code>fn <a href='#method.drop' class='fnname'>drop</a>(&amp;mut self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
@@ -92,11 +91,13 @@
     </div>
 
     <script>
-        var rootPath = "../";
-        var currentCrate = "jit";
+        window.rootPath = "../";
+        window.currentCrate = "jit";
+        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
+    
     <script async src="../search-index.js"></script>
 </body>
 </html>

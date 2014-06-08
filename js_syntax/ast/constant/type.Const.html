@@ -41,11 +41,11 @@
     <section id='main' class="content type">
 <h1 class='fqn'>Enum <a href='../../index.html'>js_syntax</a>::<a href='../index.html'>ast</a>::<a href='index.html'>constant</a>::<a class='type' href=''>Const</a><a class='source' id='src-14' href='../../../src/js_syntax/src/libjs_syntax/ast/constant.rs.html#5-20'>[src]</a></h1>
 <pre class='rust enum'>pub enum Const {
-    CString(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
-    CRegExp(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>, <a href='http://doc.rust-lang.org/core/primitive.bool.html'>bool</a>, <a href='http://doc.rust-lang.org/core/primitive.bool.html'>bool</a>),
-    CNum(<a href='http://doc.rust-lang.org/core/primitive.f64.html'>f64</a>),
-    CInt(<a href='http://doc.rust-lang.org/core/primitive.i32.html'>i32</a>),
-    CBool(<a href='http://doc.rust-lang.org/core/primitive.bool.html'>bool</a>),
+    CString(<a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>),
+    CRegExp(<a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a>, <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a>),
+    CNum(<a href='http://doc.rust-lang.org/std/primitive.f64.html'>f64</a>),
+    CInt(<a href='http://doc.rust-lang.org/std/primitive.i32.html'>i32</a>),
+    CBool(<a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a>),
     CNull,
     CUndefined,
 }</pre><div class='docblock'><p>A Javascript constant</p>
@@ -58,10 +58,10 @@
 </div></td></tr><tr><td id='variant.CNull'><code>CNull</code></td><td><div class='docblock'><p>The <code>null</code> value, which represents a non-existant value</p>
 </div></td></tr><tr><td id='variant.CUndefined'><code>CUndefined</code></td><td><div class='docblock'><p>The <code>undefined</code> value, which represents a field or index that doesn&#39;t exist</p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/fmt/trait.Show.html' title='core::fmt::Show'>Show</a> for <a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a></code></h3><div class='methods'><h4 id='method.fmt' class='method'><code>fn <a href='#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='http://doc.rust-lang.org/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
-</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a>) -&gt; <a href='http://doc.rust-lang.org/core/primitive.bool.html'>bool</a></code></h4>
-<h4 id='method.ne' class='method'><code>fn <a href='#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a>) -&gt; <a href='http://doc.rust-lang.org/core/primitive.bool.html'>bool</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a></code></h3><div class='methods'><h4 id='method.eq' class='method'><code>fn <a href='#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a>) -&gt; <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a>) -&gt; <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></h4>
 </div><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='type' href='../../../js_syntax/ast/constant/type.Const.html' title='js_syntax::ast::constant::Const'>Const</a></code></h4>
-<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, &amp;Self)</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -99,11 +99,13 @@
     </div>
 
     <script>
-        var rootPath = "../../../";
-        var currentCrate = "js_syntax";
+        window.rootPath = "../../../";
+        window.currentCrate = "js_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
+    
     <script async src="../../../search-index.js"></script>
 </body>
 </html>

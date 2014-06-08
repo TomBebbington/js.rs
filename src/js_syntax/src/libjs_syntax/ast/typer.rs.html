@@ -150,28 +150,28 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>FromIterator</span>;
 
 <span class='doccomment'>/// Type an expression
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>resolve_type</span>(<span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>resolve_type</span>(<span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 	<span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>def</span> {
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CInt</span>(_)) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>IntegerType</span>,
+			<span class='ident'>IntegerType</span>,
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CNum</span>(_)) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>NumberType</span>,
+			<span class='ident'>NumberType</span>,
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CRegExp</span>(_, _, _)) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>NativeObjectType</span>,
+			<span class='ident'>NativeObjectType</span>,
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CBool</span>(_)) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>BooleanType</span>,
+			<span class='ident'>BooleanType</span>,
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CNull</span>) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>NullType</span>,
+			<span class='ident'>NullType</span>,
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CUndefined</span>) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>UndefinedType</span>,
+			<span class='ident'>UndefinedType</span>,
 		<span class='ident'>ConstExpr</span>(<span class='ident'>CString</span>(_)) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>StringType</span>,
+			<span class='ident'>StringType</span>,
 		<span class='ident'>ObjectDeclExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>ObjectType</span>,
+			<span class='ident'>ObjectType</span>,
 		<span class='ident'>ArrayDeclExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>ObjectType</span>,
+			<span class='ident'>ObjectType</span>,
 		<span class='ident'>BinOpExpr</span>(<span class='ident'>BinNum</span>(<span class='ident'>OpAdd</span>), <span class='kw-2'>ref</span> <span class='ident'>a</span>, <span class='kw-2'>ref</span> <span class='ident'>b</span>) <span class='op'>=&gt;</span> {
-			<span class='kw'>box</span> <span class='kw'>match</span> (<span class='op'>*</span><span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>a</span>), <span class='op'>*</span><span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>b</span>)) {
+			<span class='kw'>match</span> (<span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>a</span>), <span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>b</span>)) {
 				(<span class='ident'>StringType</span>, _) <span class='op'>|</span> (_, <span class='ident'>StringType</span>) <span class='op'>=&gt;</span>
 					<span class='ident'>StringType</span>,
 				(<span class='ident'>IntegerType</span>, <span class='ident'>IntegerType</span>) <span class='op'>=&gt;</span>
@@ -180,71 +180,71 @@
 			}
 		},
 		<span class='ident'>BinOpExpr</span>(<span class='ident'>BinNum</span>(_), _, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>NumberType</span>,
+			<span class='ident'>NumberType</span>,
 		<span class='ident'>BinOpExpr</span>(<span class='ident'>BinBit</span>(_), _, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>IntegerType</span>,
+			<span class='ident'>IntegerType</span>,
 		<span class='ident'>BinOpExpr</span>(<span class='ident'>BinComp</span>(_), _, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>BooleanType</span>,
+			<span class='ident'>BooleanType</span>,
 		<span class='ident'>BinOpExpr</span>(<span class='ident'>BinLog</span>(_), _, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>BooleanType</span>,
+			<span class='ident'>BooleanType</span>,
 		<span class='ident'>UnaryOpExpr</span>(<span class='ident'>UnaryNot</span>, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>BooleanType</span>,
+			<span class='ident'>BooleanType</span>,
 		<span class='ident'>UnaryOpExpr</span>(<span class='ident'>UnaryPlus</span>, <span class='kw-2'>ref</span> <span class='ident'>inner</span>) <span class='op'>|</span> <span class='ident'>UnaryOpExpr</span>(<span class='ident'>UnaryMinus</span>, <span class='kw-2'>ref</span> <span class='ident'>inner</span>) <span class='op'>=&gt;</span>
 			<span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>inner</span>),
 		<span class='ident'>UnaryOpExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>NumberType</span>,
+			<span class='ident'>NumberType</span>,
 		<span class='ident'>BlockExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>exprs</span>) <span class='op'>=&gt;</span>
 			<span class='ident'>resolve_type</span>(<span class='ident'>exprs</span>.<span class='ident'>get</span>(<span class='ident'>exprs</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>)),
 		<span class='ident'>LocalExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>AnyType</span>,
+			<span class='ident'>AnyType</span>,
 		<span class='ident'>GetConstFieldExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>AnyType</span>,
+			<span class='ident'>AnyType</span>,
 		<span class='ident'>GetFieldExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>AnyType</span>,
+			<span class='ident'>AnyType</span>,
 		<span class='ident'>CallExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>AnyType</span>,
+			<span class='ident'>AnyType</span>,
 		<span class='ident'>WhileLoopExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>UndefinedType</span>,
+			<span class='ident'>UndefinedType</span>,
 		<span class='ident'>IfExpr</span>(_, <span class='kw-2'>ref</span> <span class='ident'>if_expr</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>else_expr</span>)) <span class='op'>=&gt;</span> {
 			<span class='kw'>let</span> <span class='ident'>if_type</span> <span class='op'>=</span> <span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>if_expr</span>);
 			<span class='kw'>let</span> <span class='ident'>else_type</span> <span class='op'>=</span> <span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>else_expr</span>);
 			<span class='kw'>if</span> <span class='ident'>if_type</span> <span class='op'>==</span> <span class='ident'>else_type</span> {
 				<span class='ident'>if_type</span>
 			} <span class='kw'>else</span> {
-				<span class='kw'>box</span> <span class='ident'>AnyOfType</span>(<span class='macro'>vec</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>if_type</span>, <span class='op'>*</span><span class='ident'>else_type</span>))
+				<span class='ident'>AnyOfType</span>(<span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>if_type</span>, <span class='ident'>else_type</span>))
 			}
 		},
 		<span class='ident'>IfExpr</span>(_, <span class='kw-2'>ref</span> <span class='ident'>if_expr</span>, <span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> {
-			<span class='kw'>let</span> <span class='ident'>if_type</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>if_expr</span>);
+			<span class='kw'>let</span> <span class='ident'>if_type</span> <span class='op'>=</span> <span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>if_expr</span>);
 			<span class='kw'>let</span> <span class='ident'>else_type</span> <span class='op'>=</span> <span class='ident'>UndefinedType</span>;
-			<span class='kw'>box</span> <span class='kw'>if</span> <span class='ident'>if_type</span> <span class='op'>==</span> <span class='ident'>else_type</span> {
+			<span class='kw'>if</span> <span class='ident'>if_type</span> <span class='op'>==</span> <span class='ident'>else_type</span> {
 				<span class='ident'>if_type</span>
 			} <span class='kw'>else</span> {
 				<span class='ident'>AnyOfType</span>(<span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>if_type</span>, <span class='ident'>else_type</span>))
 			}
 		},
 		<span class='ident'>SwitchExpr</span>(_, <span class='kw-2'>ref</span> <span class='ident'>matches</span>, <span class='prelude-val'>None</span>) <span class='op'>=&gt;</span> {
-			<span class='kw'>box</span> <span class='ident'>AnyOfType</span>(<span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>matches</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(_, <span class='kw-2'>ref</span> <span class='ident'>block</span>)<span class='op'>|</span> <span class='op'>*</span><span class='ident'>resolve_type</span>(<span class='ident'>block</span>.<span class='ident'>get</span>(<span class='ident'>block</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>)))))
+			<span class='ident'>AnyOfType</span>(<span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>matches</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(_, <span class='kw-2'>ref</span> <span class='ident'>block</span>)<span class='op'>|</span> <span class='ident'>resolve_type</span>(<span class='ident'>block</span>.<span class='ident'>get</span>(<span class='ident'>block</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>)))))
 		},
 		<span class='ident'>SwitchExpr</span>(_, <span class='kw-2'>ref</span> <span class='ident'>matches</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>def</span>)) <span class='op'>=&gt;</span> {
-			<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>types</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>matches</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(_, <span class='kw-2'>ref</span> <span class='ident'>block</span>)<span class='op'>|</span> <span class='op'>*</span><span class='ident'>resolve_type</span>(<span class='ident'>block</span>.<span class='ident'>get</span>(<span class='ident'>block</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>))));
-			<span class='ident'>types</span>.<span class='ident'>push</span>(<span class='op'>*</span><span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>def</span>));
-			<span class='kw'>box</span> <span class='ident'>AnyOfType</span>(<span class='ident'>types</span>)
+			<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>types</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>matches</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(_, <span class='kw-2'>ref</span> <span class='ident'>block</span>)<span class='op'>|</span> <span class='ident'>resolve_type</span>(<span class='ident'>block</span>.<span class='ident'>get</span>(<span class='ident'>block</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>))));
+			<span class='ident'>types</span>.<span class='ident'>push</span>(<span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>def</span>));
+			<span class='ident'>AnyOfType</span>(<span class='ident'>types</span>)
 		},
 		<span class='ident'>FunctionDeclExpr</span>(_, _, _) <span class='op'>|</span> <span class='ident'>ArrowFunctionDeclExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>FunctionType</span>,
+			<span class='ident'>FunctionType</span>,
 		<span class='ident'>ConstructExpr</span>(_, _) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>ObjectType</span>,
+			<span class='ident'>ObjectType</span>,
 		<span class='ident'>ReturnExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>UndefinedType</span>,
+			<span class='ident'>UndefinedType</span>,
 		<span class='ident'>ThrowExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>UndefinedType</span>,
+			<span class='ident'>UndefinedType</span>,
 		<span class='ident'>AssignExpr</span>(_, <span class='kw-2'>ref</span> <span class='ident'>what</span>) <span class='op'>=&gt;</span>
 			<span class='ident'>resolve_type</span>(<span class='op'>*</span><span class='ident'>what</span>),
 		<span class='ident'>VarDeclExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>UndefinedType</span>,
+			<span class='ident'>UndefinedType</span>,
 		<span class='ident'>TypeOfExpr</span>(_) <span class='op'>=&gt;</span>
-			<span class='kw'>box</span> <span class='ident'>StringType</span>
+			<span class='ident'>StringType</span>
 	}
 }
 </pre>
@@ -285,11 +285,13 @@
     </div>
 
     <script>
-        var rootPath = "../../../../../";
-        var currentCrate = "js_syntax";
+        window.rootPath = "../../../../../";
+        window.currentCrate = "js_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../../../jquery.js"></script>
     <script src="../../../../../main.js"></script>
+    
     <script async src="../../../../../search-index.js"></script>
 </body>
 </html>

@@ -664,7 +664,10 @@
             for (var j = 0; j < structs.length; j++) {
                 var code = $('<code>').append(structs[j]);
                 $.each(code.find('a'), function(idx, a) {
-                    $(a).attr('href', rootPath + $(a).attr('href'));
+                    var href = $(a).attr('href');
+                    if (!href.startsWith('http')) {
+                        $(a).attr('href', rootPath + $(a).attr('href'));
+                    }
                 });
                 var li = $('<li>').append(code);
                 list.append(li);
@@ -675,7 +678,7 @@
         window.register_implementors(window.pending_implementors);
     }
 
-    // See documentaiton in html/render.rs for what this is doing.
+    // See documentation in html/render.rs for what this is doing.
     var query = getQueryStringParams();
     if (query['gotosrc']) {
         window.location = $('#src-' + query['gotosrc']).attr('href');

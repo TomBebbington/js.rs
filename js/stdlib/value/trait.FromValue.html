@@ -39,7 +39,7 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='trait' href=''>FromValue</a><a class='source' id='src-4080' href='../../../src/js/src/libjs/stdlib/value.rs.html#399-402'>[src]</a></h1>
+<h1 class='fqn'>Trait <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='trait' href=''>FromValue</a><a class='source' id='src-5204' href='../../../src/js/src/libjs/stdlib/value.rs.html#399-402'>[src]</a></h1>
 <pre class='rust trait'>pub trait FromValue {
     fn <a href='#tymethod.from_value' class='fnname'>from_value</a>(value: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/core/result/type.Result.html' title='core::result::Result'>Result</a>&lt;Self, &amp;'static <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>&gt;;
 }</pre><div class='docblock'><p>Conversion to Rust values from Javascript values</p>
@@ -50,12 +50,12 @@
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a></code></li>
+    <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a></code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a href='http://doc.rust-lang.org/std/primitive.char.html'>char</a></code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a href='http://doc.rust-lang.org/std/primitive.f64.html'>f64</a></code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a href='http://doc.rust-lang.org/std/primitive.i32.html'>i32</a></code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></li>
-<li><code>impl&lt;T: <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a>&gt; <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a class='struct' href='http://doc.rust-lang.org/std/vec/struct.Vec.html' title='std::vec::Vec'>Vec</a>&lt;T&gt;</code></li>
+<li><code>impl&lt;T: <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a>&gt; <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a class='struct' href='http://doc.rust-lang.org/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a class='type' href='../../../js/stdlib/object/type.ObjectData.html' title='js::stdlib::object::ObjectData'>ObjectData</a></code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for <a class='type' href='http://doc.rust-lang.org/serialize/json/type.Json.html' title='serialize::json::Json'>Json</a></code></li>
 <li><code>impl <a class='trait' href='../../../js/stdlib/value/trait.FromValue.html' title='js::stdlib::value::FromValue'>FromValue</a> for ()</code></li>
@@ -100,11 +100,13 @@
     </div>
 
     <script>
-        var rootPath = "../../../";
-        var currentCrate = "js";
+        window.rootPath = "../../../";
+        window.currentCrate = "js";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
+    
     <script async src="../../../search-index.js"></script>
 </body>
 </html>

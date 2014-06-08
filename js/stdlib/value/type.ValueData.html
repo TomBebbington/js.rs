@@ -39,12 +39,12 @@
     </nav>
 
     <section id='main' class="content type">
-<h1 class='fqn'>Enum <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='type' href=''>ValueData</a><a class='source' id='src-1910' href='../../../src/js/src/libjs/stdlib/value.rs.html#24-41'>[src]</a></h1>
+<h1 class='fqn'>Enum <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='type' href=''>ValueData</a><a class='source' id='src-3034' href='../../../src/js/src/libjs/stdlib/value.rs.html#24-41'>[src]</a></h1>
 <pre class='rust enum'>pub enum ValueData {
     VNull,
     VUndefined,
     VBoolean(<a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a>),
-    VString(<a class='struct' href='http://doc.rust-lang.org/std/string/struct.String.html' title='std::string::String'>String</a>),
+    VString(<a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>),
     VNumber(<a href='http://doc.rust-lang.org/std/primitive.f64.html'>f64</a>),
     VInteger(<a href='http://doc.rust-lang.org/std/primitive.i32.html'>i32</a>),
     VObject(<a class='struct' href='http://doc.rust-lang.org/core/cell/struct.RefCell.html' title='core::cell::RefCell'>RefCell</a>&lt;<a class='type' href='../../../js/stdlib/object/type.ObjectData.html' title='js::stdlib::object::ObjectData'>ObjectData</a>&gt;),
@@ -60,7 +60,7 @@
 </div></td></tr><tr><td id='variant.VObject'><code>VObject</code></td><td><div class='docblock'><p><code>Object</code> - An object, such as <code>Math</code>, represented by a binary tree of string keys to Javascript values</p>
 </div></td></tr><tr><td id='variant.VFunction'><code>VFunction</code></td><td><div class='docblock'><p><code>Function</code> - A runnable block of code, such as <code>Math.sqrt</code>, which can take some variables and return a useful value or act upon an object</p>
 </div></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='http://doc.rust-lang.org/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h3><div class='methods'><h4 id='method.clone' class='method'><code>fn <a href='#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
-<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, &amp;Self)</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='#tymethod.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -98,11 +98,13 @@
     </div>
 
     <script>
-        var rootPath = "../../../";
-        var currentCrate = "js";
+        window.rootPath = "../../../";
+        window.currentCrate = "js";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
+    
     <script async src="../../../search-index.js"></script>
 </body>
 </html>

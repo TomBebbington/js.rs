@@ -39,21 +39,26 @@
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Crate <a class='mod' href=''>jit</a><a class='stability Stable' title=''>Stable</a><a class='source' id='src-0' href='../src/jit/src/libjit/lib.rs.html#26-878'>[src]</a></h1>
+<h1 class='fqn'>Crate <a class='mod' href=''>jit</a><a class='stability Stable' title=''>Stable</a><a class='source' id='src-0' href='../src/jit/src/libjit/lib.rs.html#26-944'>[src]</a></h1>
 <div class='docblock'><p>This crate wraps LibJIT</p>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                     <tr>
                         <td><a class='struct' href='struct.Context.html'
                                title='jit::Context'>Context</a></td>
-                        <td class='docblock short'><p>Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.</p>
-</td>
+                        <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
                         <td><a class='struct' href='struct.Function.html'
                                title='jit::Function'>Function</a></td>
-                        <td class='docblock short'><p>A Function to JIT</p>
+                        <td class='docblock short'></td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='struct' href='struct.Functions.html'
+                               title='jit::Functions'>Functions</a></td>
+                        <td class='docblock short'><p>An iterator over a context&#39;s functions</p>
 </td>
                     </tr>
                 
@@ -67,8 +72,7 @@
                     <tr>
                         <td><a class='struct' href='struct.Type.html'
                                title='jit::Type'>Type</a></td>
-                        <td class='docblock short'><p>A Type of a value to JIT</p>
-</td>
+                        <td class='docblock short'></td>
                     </tr>
                 
                     <tr>
@@ -87,8 +91,7 @@
                     <tr>
                         <td><a class='struct' href='struct.Value.html'
                                title='jit::Value'>Value</a></td>
-                        <td class='docblock short'><p>A Value that is being JITed</p>
-</td>
+                        <td class='docblock short'></td>
                     </tr>
                 </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
@@ -236,6 +239,35 @@
                         <td class='docblock short'><p>A native reference</p>
 </td>
                     </tr>
+                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                    <tr>
+                        <td><a class='fn' href='fn.init.html'
+                               title='jit::init'>init</a></td>
+                        <td class='docblock short'><p>Initialise the library and prepare for operations</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='fn' href='fn.supports_threads.html'
+                               title='jit::supports_threads'>supports_threads</a></td>
+                        <td class='docblock short'><p>Check if the JIT supports theads</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='fn' href='fn.supports_virtual_memory.html'
+                               title='jit::supports_virtual_memory'>supports_virtual_memory</a></td>
+                        <td class='docblock short'><p>Check if the JIT supports virtual memory</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='fn' href='fn.uses_interpreter.html'
+                               title='jit::uses_interpreter'>uses_interpreter</a></td>
+                        <td class='docblock short'><p>Check if the JIT is using a fallback interpreter</p>
+</td>
+                    </tr>
                 </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table>
                     <tr>
@@ -286,11 +318,13 @@
     </div>
 
     <script>
-        var rootPath = "../";
-        var currentCrate = "jit";
+        window.rootPath = "../";
+        window.currentCrate = "jit";
+        window.playgroundUrl = "";
     </script>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
+    
     <script async src="../search-index.js"></script>
 </body>
 </html>

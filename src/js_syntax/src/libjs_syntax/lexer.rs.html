@@ -453,7 +453,6 @@
 <span id='413'>413</span>
 <span id='414'>414</span>
 <span id='415'>415</span>
-<span id='416'>416</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>punc</span>::<span class='op'>*</span>;
 <span class='kw'>use</span> <span class='ident'>ast</span>::<span class='ident'>token</span>::<span class='op'>*</span>;
@@ -542,7 +541,6 @@
 				<span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>err</span>)
 			};
 			<span class='self'>self</span>.<span class='ident'>column_number</span> <span class='op'>+=</span> <span class='number'>1</span>;
-			<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>ch</span>);
 			<span class='kw'>match</span> <span class='ident'>ch</span> {
 				<span class='string'>&#39;&quot;&#39;</span> <span class='op'>|</span> <span class='string'>&#39;\&#39;&#39;</span> <span class='op'>=&gt;</span> {
 					<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>buf</span> <span class='op'>=</span> <span class='ident'>String</span>::<span class='ident'>new</span>();
@@ -909,11 +907,13 @@
     </div>
 
     <script>
-        var rootPath = "../../../../";
-        var currentCrate = "js_syntax";
+        window.rootPath = "../../../../";
+        window.currentCrate = "js_syntax";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
+    
     <script async src="../../../../search-index.js"></script>
 </body>
 </html>

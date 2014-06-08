@@ -916,6 +916,72 @@
 <span id='876'>876</span>
 <span id='877'>877</span>
 <span id='878'>878</span>
+<span id='879'>879</span>
+<span id='880'>880</span>
+<span id='881'>881</span>
+<span id='882'>882</span>
+<span id='883'>883</span>
+<span id='884'>884</span>
+<span id='885'>885</span>
+<span id='886'>886</span>
+<span id='887'>887</span>
+<span id='888'>888</span>
+<span id='889'>889</span>
+<span id='890'>890</span>
+<span id='891'>891</span>
+<span id='892'>892</span>
+<span id='893'>893</span>
+<span id='894'>894</span>
+<span id='895'>895</span>
+<span id='896'>896</span>
+<span id='897'>897</span>
+<span id='898'>898</span>
+<span id='899'>899</span>
+<span id='900'>900</span>
+<span id='901'>901</span>
+<span id='902'>902</span>
+<span id='903'>903</span>
+<span id='904'>904</span>
+<span id='905'>905</span>
+<span id='906'>906</span>
+<span id='907'>907</span>
+<span id='908'>908</span>
+<span id='909'>909</span>
+<span id='910'>910</span>
+<span id='911'>911</span>
+<span id='912'>912</span>
+<span id='913'>913</span>
+<span id='914'>914</span>
+<span id='915'>915</span>
+<span id='916'>916</span>
+<span id='917'>917</span>
+<span id='918'>918</span>
+<span id='919'>919</span>
+<span id='920'>920</span>
+<span id='921'>921</span>
+<span id='922'>922</span>
+<span id='923'>923</span>
+<span id='924'>924</span>
+<span id='925'>925</span>
+<span id='926'>926</span>
+<span id='927'>927</span>
+<span id='928'>928</span>
+<span id='929'>929</span>
+<span id='930'>930</span>
+<span id='931'>931</span>
+<span id='932'>932</span>
+<span id='933'>933</span>
+<span id='934'>934</span>
+<span id='935'>935</span>
+<span id='936'>936</span>
+<span id='937'>937</span>
+<span id='938'>938</span>
+<span id='939'>939</span>
+<span id='940'>940</span>
+<span id='941'>941</span>
+<span id='942'>942</span>
+<span id='943'>943</span>
+<span id='944'>944</span>
 </pre><pre class='rust '>
 <span class='comment'>/* Copyright (c) 2014, Peter Nelson
  * All rights reserved.
@@ -947,28 +1013,85 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;dylib&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;rlib&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>allow</span>(<span class='ident'>raw_pointer_deriving</span>, <span class='ident'>dead_code</span>, <span class='ident'>non_camel_case_types</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>globs</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>globs</span>, <span class='ident'>macro_rules</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>stable</span>]</span>
 <span class='doccomment'>//! This crate wraps LibJIT
 </span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>native</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>syntax</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ptr</span>::{<span class='ident'>RawPtr</span>, <span class='ident'>mut_null</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>mem</span>::<span class='ident'>transmute</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::<span class='ident'>Iterator</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>kinds</span>::<span class='ident'>marker</span>;
 <span class='kw'>use</span> <span class='ident'>libc</span>::{<span class='ident'>c_int</span>, <span class='ident'>c_void</span>, <span class='ident'>c_uint</span>};
 <span class='kw'>use</span> <span class='ident'>bindings</span>::<span class='op'>*</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>bindings</span>::{<span class='ident'>jit_nint</span>, <span class='ident'>jit_nuint</span>};
+
+<span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>native_ref</span>(
+	(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>:<span class='ident'>ident</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>pointer_ty</span>:<span class='ident'>ty</span>) <span class='op'>=&gt;</span> (
+		<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span> {
+			<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>
+		}
+		<span class='kw'>impl</span> <span class='ident'>NativeRef</span> <span class='kw'>for</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span> {
+			<span class='attribute'>#[<span class='ident'>inline</span>]</span>
+			<span class='doccomment'>/// Convert to a native pointer
+</span>			<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>as_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>pointer_ty</span> {
+				<span class='self'>self</span>.<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>
+			}
+			<span class='attribute'>#[<span class='ident'>inline</span>]</span>
+			<span class='doccomment'>/// Convert from a native pointer
+</span>			<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>:<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>pointer_ty</span>) <span class='op'>-&gt;</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span> {
+				<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>name</span> {
+					<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>: <span class='ident'>ptr</span>
+				}
+			}
+		}
+	)
+)
+<span class='doccomment'>/// Initialise the library and prepare for operations
+</span><span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>() <span class='op'>-&gt;</span> () {
+	<span class='kw'>unsafe</span> {
+		<span class='ident'>jit_init</span>()
+	}
+}
+<span class='doccomment'>/// Check if the JIT is using a fallback interpreter
+</span><span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>uses_interpreter</span>() <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+	<span class='kw'>unsafe</span> {
+		<span class='ident'>jit_uses_interpreter</span>() <span class='op'>!=</span> <span class='number'>0</span>
+	}
+}
+<span class='doccomment'>/// Check if the JIT supports theads
+</span><span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>supports_threads</span>() <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+	<span class='kw'>unsafe</span> {
+		<span class='ident'>jit_supports_threads</span>() <span class='op'>!=</span> <span class='number'>0</span>
+	}
+}
+<span class='doccomment'>/// Check if the JIT supports virtual memory
+</span><span class='attribute'>#[<span class='ident'>inline</span>]</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>supports_virtual_memory</span>() <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+	<span class='kw'>unsafe</span> {
+		<span class='ident'>jit_supports_virtual_memory</span>() <span class='op'>!=</span> <span class='number'>0</span>
+	}
+}
 <span class='doccomment'>/// A native reference
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>NativeRef</span> {
+
 	<span class='doccomment'>/// Returns an unsafe mutable pointer to the object
 </span>	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>as_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>;
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr_box</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Self</span><span class='op'>&gt;</span> {
-		<span class='kw'>box</span> <span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>)
-	}
 	<span class='doccomment'>/// Make an unsafe pointer to the object
 </span>	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>Self</span>;
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
+	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr_opt</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Self</span><span class='op'>&gt;</span> {
+		<span class='kw'>if</span> <span class='ident'>ptr</span>.<span class='ident'>is_null</span>() {
+			<span class='prelude-val'>None</span>
+		} <span class='kw'>else</span> {
+			<span class='prelude-val'>Some</span>(<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>))
+		}
+	}
 }
 <span class='doccomment'>/// A platform&#39;s application binary interface
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ABI</span> {
@@ -985,50 +1108,75 @@
 </span>	<span class='ident'>JitCallTail</span> <span class='op'>=</span> <span class='number'>4</span>,
 }
 <span class='kw'>mod</span> <span class='ident'>bindings</span>;
-<span class='doccomment'>/// Holds all of the functions you have built and compiled. There can be multuple, but normally there is only one.
-</span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Context</span> {
-	<span class='ident'>_context</span>: <span class='ident'>jit_context_t</span>
+<span class='doccomment'>/// An iterator over a context&#39;s functions
+</span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Functions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+	<span class='ident'>ctx</span>: <span class='ident'>jit_context_t</span>,
+	<span class='ident'>last</span>: <span class='ident'>jit_function_t</span>,
+	<span class='ident'>marker</span>: <span class='ident'>marker</span>::<span class='ident'>ContravariantLifetime</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>
 }
-<span class='kw'>impl</span> <span class='ident'>NativeRef</span> <span class='kw'>for</span> <span class='ident'>Context</span> {
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>as_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span> {
-		<span class='self'>self</span>.<span class='ident'>as_ptr</span>()
-	}
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>Context</span> {
-		<span class='ident'>Context</span> {
-			<span class='ident'>_context</span>: <span class='ident'>ptr</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Functions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>ctx</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Context</span>) <span class='op'>-&gt;</span> <span class='ident'>Functions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+		<span class='kw'>unsafe</span> {
+			<span class='ident'>Functions</span> {
+				<span class='ident'>ctx</span>: <span class='ident'>ctx</span>.<span class='ident'>as_ptr</span>(),
+				<span class='ident'>last</span>: <span class='ident'>RawPtr</span>::<span class='ident'>null</span>(),
+				<span class='ident'>marker</span>: <span class='ident'>marker</span>::<span class='ident'>ContravariantLifetime</span>::<span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>
+			}
 		}
 	}
 }
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Iterator</span><span class='op'>&lt;</span><span class='ident'>Function</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Functions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Function</span><span class='op'>&gt;</span> {
+		<span class='kw'>unsafe</span> {
+			<span class='kw'>let</span> <span class='ident'>native_next</span> <span class='op'>=</span> <span class='ident'>jit_function_next</span>(<span class='self'>self</span>.<span class='ident'>ctx</span>, <span class='self'>self</span>.<span class='ident'>last</span>);
+			<span class='self'>self</span>.<span class='ident'>last</span> <span class='op'>=</span> <span class='ident'>native_next</span>;
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_opt</span>(<span class='ident'>native_next</span>)
+		}
+	}
+	<span class='kw'>fn</span> <span class='ident'>size_hint</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>uint</span><span class='op'>&gt;</span>) {
+		<span class='kw'>unsafe</span> {
+			<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>size</span> : <span class='ident'>uint</span> <span class='op'>=</span> <span class='number'>0</span>;
+			<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>last</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>last</span>;
+			<span class='kw'>loop</span> {
+				<span class='ident'>last</span> <span class='op'>=</span> <span class='ident'>jit_function_next</span>(<span class='self'>self</span>.<span class='ident'>ctx</span>, <span class='ident'>last</span>);
+				<span class='kw'>if</span> <span class='ident'>last</span>.<span class='ident'>is_null</span>() {
+					<span class='kw'>break</span>;
+				} <span class='kw'>else</span> {
+					<span class='ident'>size</span> <span class='op'>+=</span> <span class='number'>1</span>;
+				}
+			}
+			(<span class='ident'>size</span>, <span class='prelude-val'>Some</span>(<span class='ident'>size</span>))
+		}
+	}
+}
+<span class='doccomment'>/// Holds all of the functions you have built and compiled. There can be multiple, but normally there is only one.
+</span><span class='macro'>native_ref</span><span class='macro'>!</span>(<span class='ident'>Context</span>, <span class='ident'>_context</span>, <span class='ident'>jit_context_t</span>)
 <span class='kw'>impl</span> <span class='ident'>Context</span> {
 	<span class='doccomment'>/// Create a new JIT Context
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Context</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>Context</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_context_create</span>())
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_context_create</span>())
 		}
 	}
-	<span class='doccomment'>/// Lock down the context to prevent multiple threads from using the builder at a time
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>build_start</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) {
+	<span class='doccomment'>/// Run a closure that can generate IR
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>build</span><span class='op'>&lt;</span><span class='ident'>R</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>cb</span>: <span class='op'>||</span> <span class='op'>-&gt;</span> <span class='ident'>R</span>) <span class='op'>-&gt;</span> <span class='ident'>R</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='ident'>jit_context_build_start</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
 		}
-	}
-	<span class='doccomment'>/// Unlock the context from this thread
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>build_end</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) {
+		<span class='kw'>let</span> <span class='ident'>rv</span> <span class='op'>=</span> <span class='ident'>cb</span>();
 		<span class='kw'>unsafe</span> {
 			<span class='ident'>jit_context_build_end</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
 		}
+		<span class='ident'>rv</span>
 	}
-	<span class='doccomment'>/// Create a function in the context with the type signature given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_function</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Function</span><span class='op'>&gt;</span> {
-		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_function_create</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>signature</span>.<span class='ident'>as_ptr</span>()))
-		}
+	<span class='doccomment'>/// Iterate through all the functions in this context
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter_funcs</span><span class='op'>&lt;</span><span class='lifetime'>&#39;t</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;t</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Functions</span><span class='op'>&lt;</span><span class='lifetime'>&#39;t</span><span class='op'>&gt;</span> {
+		<span class='ident'>Functions</span>::<span class='ident'>new</span>(<span class='self'>self</span>)
 	}
 }
 
 <span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Context</span> {
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
 		<span class='kw'>unsafe</span> {
 			<span class='ident'>jit_context_destroy</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
@@ -1036,7 +1184,6 @@
 	}
 }
 
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Show</span>)]</span>
 <span class='doccomment'>/// The types that a value can be
 </span><span class='macro'>bitflags</span><span class='macro'>!</span>(
 	<span class='ident'>flags</span> <span class='ident'>TypeKind</span>: <span class='ident'>i32</span> {
@@ -1065,23 +1212,18 @@
 		<span class='kw'>static</span> <span class='ident'>SysChar</span> 		<span class='op'>=</span> <span class='number'>10010</span>
 	}
 )
-<span class='doccomment'>/// A Type of a value to JIT
-</span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Type</span> {
-	<span class='ident'>_type</span>: <span class='ident'>jit_type_t</span>
-}
-<span class='kw'>impl</span> <span class='ident'>NativeRef</span> <span class='kw'>for</span> <span class='ident'>Type</span> {
+<span class='doccomment'>/// A type of a value to JIT compile
+</span><span class='macro'>native_ref</span><span class='macro'>!</span>(<span class='ident'>Type</span>, <span class='ident'>_type</span>, <span class='ident'>jit_type_t</span>)
+<span class='kw'>impl</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>Type</span> {
 	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>as_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span> {
-		<span class='self'>self</span>.<span class='ident'>as_ptr</span>()
-	}
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
-		<span class='ident'>Type</span> {
-			<span class='ident'>_type</span>: <span class='ident'>ptr</span>
+	<span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
+		<span class='kw'>unsafe</span> {
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_copy</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>()))
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Type</span> {
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
 		<span class='kw'>unsafe</span> {
 			<span class='ident'>jit_type_free</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
@@ -1090,34 +1232,34 @@
 }
 <span class='kw'>impl</span> <span class='ident'>Type</span> {
 	<span class='doccomment'>/// Create a function signature, with the given ABI, return type and parameters
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_signature</span>(<span class='ident'>abi</span>: <span class='ident'>ABI</span>, <span class='ident'>return_type</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>params</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_signature</span>(<span class='ident'>abi</span>: <span class='ident'>ABI</span>, <span class='ident'>return_type</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>params</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>]) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>signature</span> <span class='op'>=</span> <span class='ident'>jit_type_create_signature</span>(<span class='ident'>abi</span> <span class='kw'>as</span> <span class='ident'>jit_abi_t</span>, <span class='ident'>return_type</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>transmute</span>(<span class='ident'>params</span>.<span class='ident'>as_mut_ptr</span>()), <span class='ident'>params</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>, <span class='number'>1</span>);
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>signature</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>signature</span>)
 		}
 	}
 
-	<span class='kw'>fn</span> <span class='ident'>create_complex</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>], <span class='ident'>union</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>create_complex</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>], <span class='ident'>union</span>: <span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>f</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>union</span> { <span class='ident'>jit_type_create_union</span> } <span class='kw'>else</span> { <span class='ident'>jit_type_create_struct</span> };
 			<span class='kw'>let</span> <span class='ident'>ty</span> <span class='op'>=</span> <span class='ident'>f</span>(<span class='ident'>transmute</span>(<span class='ident'>fields</span>.<span class='ident'>as_mut_ptr</span>()), <span class='ident'>fields</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>, <span class='number'>1</span>);
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>ty</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ty</span>)
 		}
 	}
 	<span class='doccomment'>/// Create a struct type with the given field types
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_struct</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_struct</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>]) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='ident'>Type</span>::<span class='ident'>create_complex</span>(<span class='ident'>fields</span>, <span class='boolval'>false</span>)
 	}
 	<span class='doccomment'>/// Create a union type with the given field types
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_union</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_union</span>(<span class='ident'>fields</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Type</span>]) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>let</span> <span class='ident'>inner</span> <span class='op'>=</span> <span class='ident'>Type</span>::<span class='ident'>create_complex</span>(<span class='ident'>fields</span>, <span class='boolval'>true</span>);
-		<span class='ident'>Type</span>::<span class='ident'>create_struct</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>Types</span>::<span class='ident'>get_int</span>(), <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>inner</span>])
+		<span class='ident'>Type</span>::<span class='ident'>create_struct</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Types</span>::<span class='ident'>get_int</span>(), <span class='kw-2'>&amp;</span><span class='ident'>inner</span>])
 	}
 	<span class='doccomment'>/// Create a pointer type with the given pointee type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_pointer</span>(<span class='ident'>pointee</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_pointer</span>(<span class='ident'>pointee</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>ptr</span> <span class='op'>=</span> <span class='ident'>jit_type_create_pointer</span>(<span class='ident'>pointee</span>.<span class='ident'>as_ptr</span>(), <span class='number'>1</span>);
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>ptr</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>)
 		}
 	}
 	<span class='doccomment'>/// Work out the size of this type
@@ -1133,29 +1275,15 @@
 		}
 	}
 	<span class='doccomment'>/// Get the reference this pointer points to
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_ref</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_get_ref</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>()))
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_get_ref</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>()))
 		}
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
-<span class='doccomment'>/// A Function to JIT
-</span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Function</span> {
-	<span class='ident'>_function</span>: <span class='ident'>jit_function_t</span>
-}
-<span class='kw'>impl</span> <span class='ident'>NativeRef</span> <span class='kw'>for</span> <span class='ident'>Function</span> {
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>as_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span> {
-		<span class='self'>self</span>.<span class='ident'>as_ptr</span>()
-	}
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>Function</span> {
-		<span class='ident'>Function</span> {
-			<span class='ident'>_function</span>: <span class='ident'>ptr</span>
-		}
-	}
-}
+<span class='doccomment'>/// A function to JIT compile
+</span><span class='macro'>native_ref</span><span class='macro'>!</span>(<span class='ident'>Function</span>, <span class='ident'>_function</span>, <span class='ident'>jit_function_t</span>)
 <span class='kw'>impl</span> <span class='ident'>Drop</span> <span class='kw'>for</span> <span class='ident'>Function</span> {
 	<span class='kw'>fn</span> <span class='ident'>drop</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
 		<span class='kw'>unsafe</span> {
@@ -1164,24 +1292,36 @@
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Function</span> {
-	<span class='kw'>fn</span> <span class='ident'>insn_binop</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>f</span>: <span class='kw'>unsafe</span> <span class='kw'>extern</span> <span class='string'>&quot;C&quot;</span> <span class='kw'>fn</span>(<span class='ident'>function</span>: <span class='ident'>jit_function_t</span>, <span class='ident'>v1</span>: <span class='ident'>jit_value_t</span>, <span class='ident'>v2</span>: <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='doccomment'>/// Create a function in the context with the type signature given
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>context</span>:<span class='kw-2'>&amp;</span><span class='ident'>Context</span>, <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>) <span class='op'>-&gt;</span> <span class='ident'>Function</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>f</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>v1</span>.<span class='ident'>_value</span>, <span class='ident'>v2</span>.<span class='ident'>_value</span>);
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>value</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_function_create</span>(<span class='ident'>context</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>signature</span>.<span class='ident'>as_ptr</span>()))
+		}
+	}
+	<span class='doccomment'>/// Create a function in the context with the type signature given nested inside the parent function so it can access its local variables
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_nested</span>(<span class='ident'>context</span>:<span class='kw-2'>&amp;</span><span class='ident'>Context</span>, <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>parent</span>: <span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Function</span> {
+		<span class='kw'>unsafe</span> {
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_function_create_nested</span>(<span class='ident'>context</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>signature</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>parent</span>.<span class='ident'>as_ptr</span>()))
+		}
+	}
+	<span class='kw'>fn</span> <span class='ident'>insn_binop</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>f</span>: <span class='kw'>unsafe</span> <span class='kw'>extern</span> <span class='string'>&quot;C&quot;</span> <span class='kw'>fn</span>(<span class='ident'>function</span>: <span class='ident'>jit_function_t</span>, <span class='ident'>v1</span>: <span class='ident'>jit_value_t</span>, <span class='ident'>v2</span>: <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+		<span class='kw'>unsafe</span> {
+			<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>f</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>v1</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>v2</span>.<span class='ident'>as_ptr</span>());
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>value</span>)
 		}
 	}
 
-	<span class='kw'>fn</span> <span class='ident'>insn_unop</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>f</span>: <span class='kw'>unsafe</span> <span class='kw'>extern</span> <span class='string'>&quot;C&quot;</span> <span class='kw'>fn</span>(<span class='ident'>function</span>: <span class='ident'>jit_function_t</span>, <span class='ident'>value</span>: <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>insn_unop</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>f</span>: <span class='kw'>unsafe</span> <span class='kw'>extern</span> <span class='string'>&quot;C&quot;</span> <span class='kw'>fn</span>(<span class='ident'>function</span>: <span class='ident'>jit_function_t</span>, <span class='ident'>value</span>: <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>jit_value_t</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>f</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>value</span>.<span class='ident'>as_ptr</span>());
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>value</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>value</span>)
 		}
 	}
-	<span class='doccomment'>/// Get the context this function was made i
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_context</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Context</span><span class='op'>&gt;</span> {
+	<span class='doccomment'>/// Get the context this function was made in
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_context</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Context</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>context</span> <span class='op'>=</span> <span class='ident'>jit_function_get_context</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>context</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>context</span>)
 		}
 	}
 	<span class='doccomment'>/// Set the optimization level of the function, where the bigger the level, the more effort should be spent optimising
@@ -1190,7 +1330,7 @@
 			<span class='ident'>jit_function_set_optimization_level</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>level</span>);
 		}
 	}
-	<span class='doccomment'>/// Make this funcition a candidate for recompilation
+	<span class='doccomment'>/// Make this function a candidate for recompilation
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>set_recompilable</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) {
 		<span class='kw'>unsafe</span> {
 			<span class='ident'>jit_function_set_recompilable</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
@@ -1203,11 +1343,15 @@
 		}
 	}
 	<span class='doccomment'>/// Get a parameter of the function as a JIT Value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_param</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>param</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_param</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>param</span>: <span class='ident'>uint</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>jit_value_get_param</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>param</span> <span class='kw'>as</span> <span class='ident'>c_uint</span>);
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>value</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>value</span>)
 		}
+	}
+	<span class='doccomment'>/// Make an instructional representation of a Rust value
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_of</span><span class='op'>&lt;</span><span class='ident'>T</span>:<span class='ident'>Compilable</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>val</span>:<span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+		<span class='ident'>val</span>.<span class='ident'>compile</span>(<span class='self'>self</span>)
 	}
 	<span class='doccomment'>/// Notify libjit that this function has a catch block in it so it can prepare
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_uses_catcher</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) {
@@ -1234,90 +1378,90 @@
 		}
 	}
 	<span class='doccomment'>/// Make an instruction that multiplies the values
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_mul</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_mul</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_mul</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that adds the values
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_add</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_add</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_add</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that subtracts the second value from the first
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_sub</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that divides the first number by the second
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_div</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_div</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_div</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that finds the remainder when the first number is divided by the second
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_rem</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_rem</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_rem</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the first value is lower than or equal to the second
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_leq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_leq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_le</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the first value is greater than or equal to the second
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_geq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_geq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_ge</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the first value is lower than the second
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_lt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_lt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_lt</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the first value is greater than the second
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_gt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_gt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_gt</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the values are equal
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_eq</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the values are not equal
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_neq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_neq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_ne</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a bitwise and on the two values
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_and</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_and</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_and</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a bitwise or on the two values
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_or</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_or</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_or</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a bitwise xor on the two values
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_xor</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_xor</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_xor</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a bitwise not on the two values
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_not</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_not</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>value</span>, <span class='ident'>jit_insn_not</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a left bitwise shift on the first value by the second value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_shl</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_shl</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_shl</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a right bitwise shift on the first value by the second value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_shr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_shr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_shr</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a right bitwise shift on the first value by the second value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_ushr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_ushr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_ushr</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that performs a bitwise negate on the value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_neg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_neg</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>value</span>, <span class='ident'>jit_insn_neg</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that duplicates the value given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_dup</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_dup</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>dup_value</span> <span class='op'>=</span> <span class='ident'>jit_insn_load</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>value</span>.<span class='ident'>as_ptr</span>());
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>dup_value</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>dup_value</span>)
 		}
 	}
 	<span class='doccomment'>/// Make an instruction that loads a value from a src value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_load</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>src</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_load</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>src</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>src</span>, <span class='ident'>jit_insn_load</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that stores a value at a destination value
@@ -1364,58 +1508,54 @@
 		}
 	}
 	<span class='doccomment'>/// Make an instruction that calls a function that has the signature given with some arguments
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_indirect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>, <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_indirect</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>, <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_insn_call_indirect</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>signature</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>transmute</span>(<span class='ident'>args</span>.<span class='ident'>as_mut_ptr</span>()), <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>, <span class='ident'>JitCallNothrow</span> <span class='kw'>as</span> <span class='ident'>c_int</span>))
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_insn_call_indirect</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>signature</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>transmute</span>(<span class='ident'>args</span>.<span class='ident'>as_mut_ptr</span>()), <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>, <span class='ident'>JitCallNothrow</span> <span class='kw'>as</span> <span class='ident'>c_int</span>))
 		}
 	}
 	<span class='doccomment'>/// Make an instruction that calls a native function that has the signature given with some arguments
 </span>	<span class='kw'>fn</span> <span class='ident'>insn_call_native</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>, <span class='ident'>native_func</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>,
-						<span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+						<span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>name</span>.<span class='ident'>with_c_str</span>(<span class='op'>|</span><span class='ident'>name</span><span class='op'>|</span> {
-				<span class='kw'>box</span> <span class='ident'>Value</span> {
-					<span class='ident'>_value</span>: <span class='ident'>jit_insn_call_native</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>name</span>, <span class='ident'>native_func</span>,
-												 <span class='ident'>signature</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>transmute</span>(<span class='ident'>args</span>.<span class='ident'>as_mut_ptr</span>()), <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>,
-												 <span class='ident'>JitCallNothrow</span> <span class='kw'>as</span> <span class='ident'>c_int</span>)
-				}
-			})
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_insn_call_native</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>name</span>.<span class='ident'>to_c_str</span>().<span class='ident'>unwrap</span>(), <span class='ident'>native_func</span>,
+											<span class='ident'>signature</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>transmute</span>(<span class='ident'>args</span>.<span class='ident'>as_mut_ptr</span>()), <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>c_uint</span>,
+											<span class='ident'>JitCallNothrow</span> <span class='kw'>as</span> <span class='ident'>c_int</span>))
 		}
 	}
 	<span class='doccomment'>/// Make an instruction that calls a Rust function that has the signature given with no arguments and expects a return value
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_native0</span><span class='op'>&lt;</span><span class='ident'>R</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
 								<span class='ident'>native_func</span>: <span class='kw'>fn</span>() <span class='op'>-&gt;</span> <span class='ident'>R</span>,
-								<span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+								<span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_call_native</span>(<span class='ident'>name</span>, <span class='kw'>unsafe</span> { <span class='ident'>transmute</span>(<span class='ident'>native_func</span>) }, <span class='ident'>signature</span>, <span class='ident'>args</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that calls a Rust function that has the signature given with a single argument and expects a return value
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_native1</span><span class='op'>&lt;</span><span class='ident'>A</span>,<span class='ident'>R</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
 								  <span class='ident'>native_func</span>: <span class='kw'>fn</span>(<span class='ident'>A</span>) <span class='op'>-&gt;</span> <span class='ident'>R</span>,
-								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_call_native</span>(<span class='ident'>name</span>, <span class='kw'>unsafe</span> { <span class='ident'>transmute</span>(<span class='ident'>native_func</span>) }, <span class='ident'>signature</span>, <span class='ident'>args</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that calls a Rust function that has the signature given with two arguments and expects a return value
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_native2</span><span class='op'>&lt;</span><span class='ident'>A</span>,<span class='ident'>B</span>,<span class='ident'>R</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
 								  <span class='ident'>native_func</span>: <span class='kw'>fn</span>(<span class='ident'>A</span>, <span class='ident'>B</span>) <span class='op'>-&gt;</span> <span class='ident'>R</span>,
-								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_call_native</span>(<span class='ident'>name</span>, <span class='kw'>unsafe</span> { <span class='ident'>transmute</span>(<span class='ident'>native_func</span>) }, <span class='ident'>signature</span>, <span class='ident'>args</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that calls a Rust function that has the signature given with three arguments and expects a return value
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_native3</span><span class='op'>&lt;</span><span class='ident'>A</span>,<span class='ident'>B</span>,<span class='ident'>C</span>,<span class='ident'>R</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
 								  <span class='ident'>native_func</span>: <span class='kw'>fn</span>(<span class='ident'>A</span>, <span class='ident'>B</span>, <span class='ident'>C</span>) <span class='op'>-&gt;</span> <span class='ident'>R</span>,
-								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_call_native</span>(<span class='ident'>name</span>, <span class='kw'>unsafe</span> { <span class='ident'>transmute</span>(<span class='ident'>native_func</span>) }, <span class='ident'>signature</span>, <span class='ident'>args</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that calls a Rust function that has the signature given with four arguments and expects a return value
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_call_native4</span><span class='op'>&lt;</span><span class='ident'>A</span>,<span class='ident'>B</span>,<span class='ident'>C</span>,<span class='ident'>D</span>,<span class='ident'>R</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>name</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>,
 								  <span class='ident'>native_func</span>: <span class='kw'>fn</span>(<span class='ident'>A</span>, <span class='ident'>B</span>, <span class='ident'>C</span>, <span class='ident'>D</span>) <span class='op'>-&gt;</span> <span class='ident'>R</span>,
-								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+								  <span class='ident'>signature</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='kw-2'>&amp;</span><span class='ident'>Value</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_call_native</span>(<span class='ident'>name</span>, <span class='kw'>unsafe</span> { <span class='ident'>transmute</span>(<span class='ident'>native_func</span>) }, <span class='ident'>signature</span>, <span class='ident'>args</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that allocates some space
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_alloca</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>size</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_alloca</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>size</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='kw'>box</span> <span class='ident'>Value</span> { <span class='ident'>_value</span>: <span class='ident'>jit_insn_alloca</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>size</span>.<span class='ident'>as_ptr</span>()) }
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_insn_alloca</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>size</span>.<span class='ident'>as_ptr</span>()))
 		}
 	}
 	<span class='doccomment'>/// Apply a function to some arguments and set the retval to the return value
@@ -1427,7 +1567,7 @@
 	<span class='doccomment'>/// Execute a function and with some arguments
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>execute</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>args</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>]) {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>jit_function_apply</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>args</span>.<span class='ident'>as_mut_ptr</span>(), <span class='ident'>ptr</span>::<span class='ident'>mut_null</span>());
+			<span class='ident'>jit_function_apply</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>args</span>.<span class='ident'>as_mut_ptr</span>(), <span class='ident'>mut_null</span>());
 		}
 	}
 	<span class='doccomment'>/// Turn this function into a closure
@@ -1437,169 +1577,149 @@
 		}
 	}
 	<span class='doccomment'>/// Create a new value with the given type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value_type</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>create_value</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>value_type</span>: <span class='kw-2'>&amp;</span><span class='ident'>Type</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>value</span> <span class='op'>=</span> <span class='ident'>jit_value_create</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>value_type</span>.<span class='ident'>as_ptr</span>());
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>value</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>value</span>)
 		}
 	}
-	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_convert</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>t</span>:<span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>overflow_check</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_convert</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>t</span>:<span class='kw-2'>&amp;</span><span class='ident'>Type</span>, <span class='ident'>overflow_check</span>:<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_insn_convert</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>v</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>t</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>overflow_check</span> <span class='kw'>as</span> <span class='ident'>c_int</span>))
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_insn_convert</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>v</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>t</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>overflow_check</span> <span class='kw'>as</span> <span class='ident'>c_int</span>))
 		}
 	}
 	<span class='doccomment'>/// Make an instruction that gets the inverse cosine of the number given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_acos</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_acos</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_acos</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the inverse sine of the number given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_asin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_asin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_asin</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the inverse tangent of the number given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_atan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_atan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_atan</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the inverse tangent of the numbers given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_atan2</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_atan2</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_atan2</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that finds the nearest integer above a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_ceil</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_ceil</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_ceil</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the consine of the number given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_cos</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_cos</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_cos</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the hyperbolic consine of the number given
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_cosh</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_cosh</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_cosh</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the natural logarithm rased to the power of the number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_exp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_exp</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_exp</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that finds the nearest integer below a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_floor</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_floor</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_floor</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the natural logarithm of the number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_log</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_log</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_log</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the base 10 logarithm of the number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_log10</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_log10</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_log10</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the result of raising the first value to the power of the second value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_pow</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>:<span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_pow</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>:<span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_pow</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the result of rounding the value to the nearest integer
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_rint</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_rint</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_rint</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the result of rounding the value to the nearest integer
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_round</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_round</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_round</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the sine of the number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_sin</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the hyperbolic sine of the number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sinh</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sinh</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_sinh</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the square root of a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sqrt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sqrt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_sqrt</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the tangent of a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_tan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_tan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_tan</span>)
 	}
 	<span class='doccomment'>/// Make an instruction the gets the hyperbolic tangent of a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_tanh</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_tanh</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_tanh</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that truncates the value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_trunc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_trunc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_trunc</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the number is NaN
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_is_nan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_is_nan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_is_nan</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the number is finite
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_is_finite</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_is_finite</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_is_finite</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that checks if the number is  infinite
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_is_inf</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_is_inf</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_is_inf</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the absolute value of a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_abs</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_abs</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_abs</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the smallest of two numbers
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_min</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_min</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_min</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the biggest of two numbers
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_max</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_max</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>, <span class='ident'>v2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_binop</span>(<span class='ident'>v1</span>, <span class='ident'>v2</span>, <span class='ident'>jit_insn_max</span>)
 	}
 	<span class='doccomment'>/// Make an instruction that gets the sign of a number
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sign</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>insn_sign</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>insn_unop</span>(<span class='ident'>v</span>, <span class='ident'>jit_insn_sign</span>)
 	}
 }
 <span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
-<span class='doccomment'>/// A Value that is being JITed
-</span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Value</span> {
-	<span class='ident'>_value</span>: <span class='ident'>jit_value_t</span>
-}
-<span class='kw'>impl</span> <span class='ident'>NativeRef</span> <span class='kw'>for</span> <span class='ident'>Value</span> {
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>as_ptr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span> {
-		<span class='self'>self</span>.<span class='ident'>_value</span>
-	}
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_ptr</span>(<span class='ident'>ptr</span>:<span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-		<span class='ident'>Value</span> {
-			<span class='ident'>_value</span>: <span class='ident'>ptr</span>
-		}
-	}
-}
+<span class='doccomment'>/// A Value that is being JIT compiled
+</span><span class='macro'>native_ref</span><span class='macro'>!</span>(<span class='ident'>Value</span>, <span class='ident'>_value</span>, <span class='ident'>jit_value_t</span>)
 <span class='kw'>impl</span> <span class='ident'>Value</span> {
 	<span class='doccomment'>/// Get the type of the value
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_type</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_type</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
 			<span class='kw'>let</span> <span class='ident'>ty</span> <span class='op'>=</span> <span class='ident'>jit_value_get_type</span>(<span class='self'>self</span>.<span class='ident'>as_ptr</span>());
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>ty</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>ty</span>)
 		}
 	}
 }
 
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Eq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A label in the code that can be branched to in instructions
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Label</span> {
 	<span class='ident'>_label</span>: <span class='ident'>jit_label_t</span>
 }
-<span class='kw'>impl</span> <span class='ident'>PartialEq</span> <span class='kw'>for</span> <span class='ident'>Label</span> {
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>fn</span> <span class='ident'>eq</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>other</span>:<span class='kw-2'>&amp;</span><span class='ident'>Label</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-		<span class='self'>self</span>.<span class='ident'>_label</span> <span class='op'>==</span> <span class='ident'>other</span>.<span class='ident'>_label</span>
-	}
-}
 <span class='kw'>impl</span> <span class='ident'>Label</span> {
 	<span class='doccomment'>/// Create a new label
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Label</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Label</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='kw'>box</span> <span class='ident'>Label</span> {
+			<span class='ident'>Label</span> {
 				<span class='ident'>_label</span>: <span class='ident'>jit_function_reserve_label</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>())
 			}
 		}
@@ -1608,190 +1728,202 @@
 <span class='doccomment'>/// Holds type constructors
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Types</span>;
 <span class='kw'>impl</span> <span class='ident'>Types</span> {
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Void type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_void</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_void</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_void</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_void</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Integer type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_int</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_int</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_int</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_int</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Unsigned integer type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_uint</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_uint</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_uint</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_uint</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Long integer type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_long</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_long</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_long</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_long</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Unsigned long integer type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_ulong</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_ulong</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_ulong</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_ulong</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// 32-bit floating point type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_float32</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_float32</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_float32</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_float32</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// 64-bit floating point type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_float64</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_float64</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_float64</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_float64</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Default floating point type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_float</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_float</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_nfloat</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_nfloat</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// A void pointer, which can represent any kind of pointer
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_void_ptr</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_void_ptr</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_void_ptr</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_void_ptr</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Character type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_char</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_char</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_sys_char</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_sys_char</span>)
 		}
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// C String type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_cstring</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
-		<span class='ident'>Type</span>::<span class='ident'>create_pointer</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>Types</span>::<span class='ident'>get_char</span>())
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_cstring</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
+		<span class='ident'>Type</span>::<span class='ident'>create_pointer</span>(<span class='kw-2'>&amp;</span><span class='ident'>Types</span>::<span class='ident'>get_char</span>())
 	}
+	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Boolean type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_bool</span>() <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span> {
+</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_bool</span>() <span class='op'>-&gt;</span> <span class='ident'>Type</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_type_sys_bool</span>)
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_type_sys_bool</span>)
 		}
 	}
 }
 <span class='doccomment'>/// A type that can be compiled into a LibJIT representation
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Compilable</span> {
 	<span class='doccomment'>/// Get a JIT representation of this value
-</span>	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>;
+</span>	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> () {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_void_ptr</span>, <span class='number'>0</span>))
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_void_ptr</span>, <span class='number'>0</span>))
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>f64</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_float64_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_float64</span>, <span class='op'>*</span><span class='self'>self</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_float64_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_float64</span>, <span class='op'>*</span><span class='self'>self</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>f32</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_float32_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_float32</span>, <span class='op'>*</span><span class='self'>self</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_float32_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_float32</span>, <span class='op'>*</span><span class='self'>self</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>int</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_long_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_nint</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>i64</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_long_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_nint</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>i64</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>uint</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_nuint</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_nuint</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>i32</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_int</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_int</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>u32</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_uint</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_uint</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>i16</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_short</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_short</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>u16</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_ushort</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_ushort</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>i8</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_sbyte</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_sbyte</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>u8</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_ubyte</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_ubyte</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>bool</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_sys_bool</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_sys_bool</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>char</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>unsafe</span> {
-			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr_box</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_ubyte</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
+			<span class='ident'>NativeRef</span>::<span class='ident'>from_ptr</span>(<span class='ident'>jit_value_create_nint_constant</span>(<span class='ident'>func</span>.<span class='ident'>as_ptr</span>(), <span class='ident'>jit_type_ubyte</span>, <span class='op'>*</span><span class='self'>self</span> <span class='kw'>as</span> <span class='ident'>jit_nint</span>) )
 		}
 	}
 }
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;t</span><span class='op'>&gt;</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;t</span> <span class='ident'>str</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='kw'>let</span> <span class='ident'>cstring_t</span> <span class='op'>=</span> <span class='ident'>Types</span>::<span class='ident'>get_cstring</span>();
 		<span class='kw'>let</span> <span class='ident'>strlen_i</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>).<span class='ident'>compile</span>(<span class='ident'>func</span>);
-		<span class='kw'>let</span> <span class='ident'>bufptr</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>create_value</span>(<span class='ident'>cstring_t</span>);
-		<span class='ident'>func</span>.<span class='ident'>insn_store</span>(<span class='ident'>bufptr</span>, <span class='ident'>func</span>.<span class='ident'>insn_alloca</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>strlen_i</span>));
+		<span class='kw'>let</span> <span class='ident'>bufptr</span> <span class='op'>=</span> <span class='ident'>func</span>.<span class='ident'>create_value</span>(<span class='kw-2'>&amp;</span><span class='ident'>cstring_t</span>);
+		<span class='ident'>func</span>.<span class='ident'>insn_store</span>(<span class='kw-2'>&amp;</span><span class='ident'>bufptr</span>, <span class='kw-2'>&amp;</span><span class='ident'>func</span>.<span class='ident'>insn_alloca</span>(<span class='kw-2'>&amp;</span><span class='ident'>strlen_i</span>));
 		<span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>range</span>(<span class='number'>0</span>, <span class='self'>self</span>.<span class='ident'>len</span>()) {
 			<span class='kw'>let</span> <span class='ident'>char_i</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>char_at</span>(<span class='ident'>i</span>).<span class='ident'>compile</span>(<span class='ident'>func</span>);
-			<span class='ident'>func</span>.<span class='ident'>insn_store_relative</span>(<span class='ident'>bufptr</span>, <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='ident'>char_i</span>);
+			<span class='ident'>func</span>.<span class='ident'>insn_store_relative</span>(<span class='kw-2'>&amp;</span><span class='ident'>bufptr</span>, <span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>int</span>, <span class='kw-2'>&amp;</span><span class='ident'>char_i</span>);
 		}
 		<span class='kw'>let</span> <span class='ident'>null_term</span> <span class='op'>=</span> <span class='string'>&#39;\0&#39;</span>.<span class='ident'>compile</span>(<span class='ident'>func</span>);
-		<span class='ident'>func</span>.<span class='ident'>insn_store_relative</span>(<span class='ident'>bufptr</span>, <span class='self'>self</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>int</span>, <span class='ident'>null_term</span>);
+		<span class='ident'>func</span>.<span class='ident'>insn_store_relative</span>(<span class='kw-2'>&amp;</span><span class='ident'>bufptr</span>, <span class='self'>self</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>int</span>, <span class='kw-2'>&amp;</span><span class='ident'>null_term</span>);
 		<span class='ident'>bufptr</span>
 	}
 }
 <span class='kw'>impl</span> <span class='ident'>Compilable</span> <span class='kw'>for</span> <span class='ident'>String</span> {
-	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span> {
+	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>as_slice</span>().<span class='ident'>compile</span>(<span class='ident'>func</span>)
 	}
 }
@@ -1833,11 +1965,13 @@
     </div>
 
     <script>
-        var rootPath = "../../../../";
-        var currentCrate = "jit";
+        window.rootPath = "../../../../";
+        window.currentCrate = "jit";
+        window.playgroundUrl = "";
     </script>
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
+    
     <script async src="../../../../search-index.js"></script>
 </body>
 </html>
