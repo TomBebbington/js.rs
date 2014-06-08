@@ -257,6 +257,12 @@ impl Function {
 			NativeRef::from_ptr(jit_function_create(context.as_ptr(), signature.as_ptr()))
 		}
 	}
+	/// Create a function in the context with the type signature given nested inside the parent function so it can access its local variables
+	pub fn new_nested(context:&Context, signature: &Type, parent: &Function) -> Function {
+		unsafe {
+			NativeRef::from_ptr(jit_function_create_nested(context.as_ptr(), signature.as_ptr(), parent.as_ptr()))
+		}
+	}
 	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Value {
 		unsafe {
 			let value = f(self.as_ptr(), v1.as_ptr(), v2.as_ptr());
@@ -270,7 +276,7 @@ impl Function {
 			NativeRef::from_ptr(value)
 		}
 	}
-	/// Get the context this function was made i
+	/// Get the context this function was made in
 	pub fn get_context(&self) -> Context {
 		unsafe {
 			let context = jit_function_get_context(self.as_ptr());
