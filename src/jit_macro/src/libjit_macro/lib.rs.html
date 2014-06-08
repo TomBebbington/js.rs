@@ -223,13 +223,13 @@
 </span><span class='doccomment'>//! 
 </span><span class='doccomment'>//! ```rust
 </span><span class='doccomment'>//! #![feature(phase)]
-</span><span class='doccomment'>//! # extern crate regex;
-</span><span class='doccomment'>//! # #[phase(syntax)]
-</span><span class='doccomment'>//! # extern crate regex_macros;
-</span><span class='doccomment'>//! # fn main() {
-</span><span class='doccomment'>//! let ty = jit_compile!(i64);
-</span><span class='doccomment'>//! assert_eq(ty.get_size(), 8);
-</span><span class='doccomment'>//! #
+</span><span class='doccomment'>//! extern crate regex;
+</span><span class='doccomment'>//! #[phase(syntax)]
+</span><span class='doccomment'>//! extern crate regex_macros;
+</span><span class='doccomment'>//! fn main() {
+</span><span class='doccomment'>//! 	let ty = jit_compile!(i64);
+</span><span class='doccomment'>//! 	assert_eq(ty.get_size(), 8);
+</span><span class='doccomment'>//! }
 </span><span class='doccomment'>//! ```
 </span><span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>syntax</span>;
 <span class='kw'>use</span> <span class='ident'>syntax</span>::<span class='ident'>ext</span>::<span class='ident'>quote</span>::<span class='ident'>rt</span>::<span class='ident'>ToSource</span>;
