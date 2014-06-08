@@ -289,7 +289,7 @@ impl Function {
 			jit_function_set_optimization_level(self.as_ptr(), level);
 		}
 	}
-	/// Make this funcition a candidate for recompilation
+	/// Make this function a candidate for recompilation
 	pub fn set_recompilable(&self) {
 		unsafe {
 			jit_function_set_recompilable(self.as_ptr());
