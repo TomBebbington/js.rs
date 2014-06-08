@@ -92,14 +92,14 @@ pub fn supports_virtual_memory() -> bool {
 		jit_supports_virtual_memory() != 0
 	}
 }
-/// A native reference
+/// A structure that wraps a native object
 pub trait NativeRef {
-
-	/// Returns an unsafe mutable pointer to the object
+	/// Returns the native reference encapsulated by this object
 	unsafe fn as_ptr(&self) -> *mut c_void;
-	/// Make an unsafe pointer to the object
+	/// Returns a wrapped version of the native reference given, even if the reference is null
 	unsafe fn from_ptr(ptr:*mut c_void) -> Self;
 	#[inline]
+	/// Returns a wrapped version of the native reference given, and check if the reference is null
 	unsafe fn from_ptr_opt(ptr:*mut c_void) -> Option<Self> {
 		if ptr.is_null() {
 			None
