@@ -5,7 +5,7 @@
 #![feature(quote, globs, macro_registrar, managed_boxes)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 //! This crate provides a macro `jit_type` which can compile a Rust type
-//! into its LibJIT counterpart. It even supports functions!
+//! into its LibJIT counterpart. It even supports functions *and* structs!
 //! 
 //! For example:
 //! 
@@ -18,9 +18,15 @@
 //! 	let ty = jit_type!(i64);
 //! 	assert_eq(ty.get_size(), 8);
 //! 	let floor_sig = jit_type!((f64) -> i32);
+//! 	let double_array_ty = jit_type!({
+//! 		len: int,
+//! 		ptr: **f64
+//! 	});
 //! }
 //! ```
 extern crate syntax;
+extern crate collections;
+use collections::TreeMap;
 use syntax::ext::quote::rt::ToSource;
 use syntax::ast::*;
 use syntax::codemap::Span;
@@ -55,6 +61,8 @@ fn expect<'a>(_: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'a, TokenT
 			match curr {
 				TTTok(_, ref got) if *got == tok =>
 					Ok(()),
+				TTTok(_, ref tok) =>
+					Err(format!("Bad result {}", tok)),
 				_ =>
 					Err("Bad result".into_string())
 			}
@@ -74,7 +82,7 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 							if toks.len() == 0 {
 								Ok(quote_expr!(cx, ::jit::Types::get_void()))
 							} else {
-								let mut arg_types : Vec<@Expr> = Vec::new();
+								let mut arg_types : Vec<P<Expr>> = Vec::new();
 								{
 									let mut tts = toks.iter().peekable();
 									loop {
@@ -106,7 +114,35 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 
 							}
 						},
-						_ => Err("Expected bracker".into_string())
+						TTTok(span, LBRACE) => {
+							let toks = toks.slice(1, toks.len() - 1);
+							let mut tts = toks.iter().peekable();
+							let mut structure:TreeMap<String, P<Expr>> = TreeMap::new();
+							loop {
+								match tts.next() {
+									Some(ref v) => {
+										match **v {
+											TTTok(_, COMMA) =>
+												continue,
+											TTTok(_, IDENT(ident, _)) => {
+												let field_name = ident.to_source();
+												try!(expect(cx, &mut tts, COLON));
+												let field_type = try!(jit_parse_type(cx, &mut tts));
+												structure.insert(field_name, field_type);
+											},
+											_ => return Err("Expected ident".into_string())
+										}
+									},
+									None => break
+								}
+							}
+							let func = quote_expr!(&mut*cx, ::jit::Type::create_struct);
+							let targs:Vec<P<Expr>> = structure.iter().map(|(_, t)| cx.expr_addr_of(t.span, *t)).collect();
+							let targs_vec = cx.expr(span, ExprVec(targs));
+							let targs_vec = cx.expr_method_call(span, targs_vec, cx.ident_of("as_mut_slice"), vec!());
+							Ok(cx.expr_call(span, func, vec!(targs_vec)))
+						},
+						_ => Err("Expected bracket".into_string())
 					}
 				},
 				TTTok(_, IDENT(ident, _)) => {
