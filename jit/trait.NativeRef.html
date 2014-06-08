@@ -39,22 +39,23 @@
     </nav>
 
     <section id='main' class="content trait">
-<h1 class='fqn'>Trait <a href='index.html'>jit</a>::<a class='trait' href=''>NativeRef</a><a class='source' id='src-57' href='../src/jit/src/libjit/lib.rs.html#96-110'>[src]</a></h1>
+<h1 class='fqn'>Trait <a href='index.html'>jit</a>::<a class='trait' href=''>NativeRef</a><a class='source' id='src-55' href='../src/jit/src/libjit/lib.rs.html#96-110'>[src]</a></h1>
 <pre class='rust trait'>pub trait NativeRef {
     unsafe fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; *mut c_void;
     unsafe fn <a href='#tymethod.from_ptr' class='fnname'>from_ptr</a>(ptr: *mut c_void) -&gt; Self;
 
     unsafe fn <a href='#method.from_ptr_opt' class='fnname'>from_ptr_opt</a>(ptr: *mut c_void) -&gt; <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt; { ... }
-}</pre><div class='docblock'><p>A native reference</p>
+}</pre><div class='docblock'><p>A structure that wraps a native object</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.as_ptr' class='method'><code>unsafe fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; *mut c_void</code></h3><div class='docblock'><p>Returns an unsafe mutable pointer to the object</p>
-</div><h3 id='tymethod.from_ptr' class='method'><code>unsafe fn <a href='#tymethod.from_ptr' class='fnname'>from_ptr</a>(ptr: *mut c_void) -&gt; Self</code></h3><div class='docblock'><p>Make an unsafe pointer to the object</p>
+        <h3 id='tymethod.as_ptr' class='method'><code>unsafe fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; *mut c_void</code></h3><div class='docblock'><p>Returns the native reference encapsulated by this object</p>
+</div><h3 id='tymethod.from_ptr' class='method'><code>unsafe fn <a href='#tymethod.from_ptr' class='fnname'>from_ptr</a>(ptr: *mut c_void) -&gt; Self</code></h3><div class='docblock'><p>Returns a wrapped version of the native reference given, even if the reference is null</p>
 </div></div>
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
-        <h3 id='method.from_ptr_opt' class='method'><code>unsafe fn <a href='#method.from_ptr_opt' class='fnname'>from_ptr_opt</a>(ptr: *mut c_void) -&gt; <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt;</code></h3></div>
+        <h3 id='method.from_ptr_opt' class='method'><code>unsafe fn <a href='#method.from_ptr_opt' class='fnname'>from_ptr_opt</a>(ptr: *mut c_void) -&gt; <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt;</code></h3><div class='docblock'><p>Returns a wrapped version of the native reference given, and check if the reference is null</p>
+</div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl <a class='trait' href='../jit/trait.NativeRef.html' title='jit::NativeRef'>NativeRef</a> for <a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a></code></li>

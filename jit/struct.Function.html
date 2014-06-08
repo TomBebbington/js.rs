@@ -39,7 +39,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Function</a><a class='source' id='src-9954' href='../src/jit/src/libjit/lib.rs.html#48-50'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>jit</a>::<a class='struct' href=''>Function</a><a class='source' id='src-9950' href='../src/jit/src/libjit/lib.rs.html#48-50'>[src]</a></h1>
 <pre class='rust struct'>pub struct Function {
     // some fields omitted
 }</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(context: &amp;<a class='struct' href='../jit/struct.Context.html' title='jit::Context'>Context</a>, signature: &amp;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>) -&gt; <a class='struct' href='../jit/struct.Function.html' title='jit::Function'>Function</a></code></h4>
@@ -145,7 +145,8 @@
 </div><h4 id='method.create_value' class='method'><code>fn <a href='#method.create_value' class='fnname'>create_value</a>(&amp;self, value_type: &amp;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
 <div class='docblock'><p>Create a new value with the given type</p>
 </div><h4 id='method.insn_convert' class='method'><code>fn <a href='#method.insn_convert' class='fnname'>insn_convert</a>(&amp;self, v: &amp;<a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a>, t: &amp;<a class='struct' href='../jit/struct.Type.html' title='jit::Type'>Type</a>, overflow_check: <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a>) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
-<h4 id='method.insn_acos' class='method'><code>fn <a href='#method.insn_acos' class='fnname'>insn_acos</a>(&amp;self, v: &amp;<a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a>) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
+<div class='docblock'><p>Make an instruction that converts the value to the type given</p>
+</div><h4 id='method.insn_acos' class='method'><code>fn <a href='#method.insn_acos' class='fnname'>insn_acos</a>(&amp;self, v: &amp;<a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a>) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
 <div class='docblock'><p>Make an instruction that gets the inverse cosine of the number given</p>
 </div><h4 id='method.insn_asin' class='method'><code>fn <a href='#method.insn_asin' class='fnname'>insn_asin</a>(&amp;self, v: &amp;<a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a>) -&gt; <a class='struct' href='../jit/struct.Value.html' title='jit::Value'>Value</a></code></h4>
 <div class='docblock'><p>Make an instruction that gets the inverse sine of the number given</p>
