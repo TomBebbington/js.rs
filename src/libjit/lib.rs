@@ -583,8 +583,9 @@ impl Function {
 	fn insn_call_native(&self, name: &'static str, native_func: *mut c_void,
 						signature: &Type, args: &mut [&Value]) -> Value {
 		unsafe {
+			let mut native_args:Vec<jit_value_t> = args.iter().map(|arg| arg.as_ptr()).collect();
 			NativeRef::from_ptr(jit_insn_call_native(self.as_ptr(), name.to_c_str().unwrap(), native_func,
-											signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint,
+											signature.as_ptr(), native_args.as_mut_ptr(), args.len() as c_uint,
 											JitCallNothrow as c_int))
 		}
 	}
