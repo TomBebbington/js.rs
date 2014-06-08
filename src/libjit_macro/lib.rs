@@ -152,24 +152,23 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 				},
 				TTTok(_, IDENT(ident, _)) => {
 					let ident = ident.to_source();
-					let res = match ident.as_slice() {
-						"void" => Ok(quote_expr!(cx, ::jit::Types::get_void())),
-						"int" | "i32" => Ok(quote_expr!(cx, ::jit::Types::get_int())),
-						"uint" | "u32" => Ok(quote_expr!(cx, ::jit::Types::get_uint())),
-						"i64" => Ok(quote_expr!(cx, ::jit::Types::get_long())),
-						"u64" => Ok(quote_expr!(cx, ::jit::Types::get_ulong())),
-						"char" => Ok(quote_expr!(cx, ::jit::Types::get_char())),
-						"bool" => Ok(quote_expr!(cx, ::jit::Types::get_bool())),
-						"f64" => Ok(quote_expr!(cx, ::jit::Types::get_float64())),
-						"f32" => Ok(quote_expr!(cx, ::jit::Types::get_float32())),
-						"String" => Ok(quote_expr!(cx, ::jit::Types::get_cstring())),
-						"Vec" => Ok(quote_expr!(cx, ::jit::Types::get_vec())),
-						id => Err(format!("Unexpected identifier {}", id))
+					let type_id = match ident.as_slice() {
+						"void" => "void",
+						"int" | "i32" => "int",
+						"uint" | "u32" => "uint",
+						"i64" => "long",
+						"u64" => "ulong",
+						"char" => "char",
+						"bool" => "bool",
+						"f64" => "float64",
+						"f32" => "float32",
+						"String" => "cstring",
+						"Vec" => "vec",
+						id => return Err(format!("Unexpected identifier {}", id))
 					};
-					if res.is_ok() {
-						tts.next();
-					}
-					res
+					let full_type_id = cx.ident_of("get_".into_string().append(type_id).as_slice());
+					tts.next();
+					Ok(quote_expr!(cx, ::jit::Types::$full_type_id()))
 				},
 				TTTok(span, BINOP(STAR)) => {
 					tts.next();
