@@ -99,6 +99,7 @@ impl Context {
 }
 
 impl Drop for Context {
+	#[inline]
 	fn drop(&mut self) {
 		unsafe {
 			jit_context_destroy(self.as_ptr());
@@ -152,6 +153,7 @@ impl NativeRef for Type {
 	}
 }
 impl Clone for Type {
+	#[inline]
 	fn clone(&self) -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_copy(self.as_ptr()))
@@ -159,6 +161,7 @@ impl Clone for Type {
 	}
 }
 impl Drop for Type {
+	#[inline]
 	fn drop(&mut self) {
 		unsafe {
 			jit_type_free(self.as_ptr());
@@ -685,70 +688,82 @@ impl Label {
 /// Holds type constructors
 pub struct Types;
 impl Types {
+	#[inline]
 	/// Void type
 	pub fn get_void() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_void)
 		}
 	}
+	#[inline]
 	/// Integer type
 	pub fn get_int() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_int)
 		}
 	}
+	#[inline]
 	/// Unsigned integer type
 	pub fn get_uint() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_uint)
 		}
 	}
+	#[inline]
 	/// Long integer type
 	pub fn get_long() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_long)
 		}
 	}
+	#[inline]
 	/// Unsigned long integer type
 	pub fn get_ulong() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_ulong)
 		}
 	}
+	#[inline]
 	/// 32-bit floating point type
 	pub fn get_float32() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_float32)
 		}
 	}
+	#[inline]
 	/// 64-bit floating point type
 	pub fn get_float64() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_float64)
 		}
 	}
+	#[inline]
 	/// Default floating point type
 	pub fn get_float() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_nfloat)
 		}
 	}
+	#[inline]
 	/// A void pointer, which can represent any kind of pointer
 	pub fn get_void_ptr() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_void_ptr)
 		}
 	}
+	#[inline]
 	/// Character type
 	pub fn get_char() -> Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_sys_char)
 		}
 	}
+	#[inline]
 	/// C String type
 	pub fn get_cstring() -> Type {
 		Type::create_pointer(&Types::get_char())
 	}
+	#[inline]
 	/// Boolean type
 	pub fn get_bool() -> Type {
 		unsafe {
