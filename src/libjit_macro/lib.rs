@@ -126,7 +126,7 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 											TTTok(span, IDENT(field_name, _)) => {
 												try!(expect(cx, &mut tts, COLON));
 												let field_type = try!(jit_parse_type(cx, &mut tts));
-												names.push(cx.expr_str_uniq(span, get_ident(field_name)));
+												names.push(cx.expr_method_call(span, cx.expr_str(span, get_ident(field_name)), cx.ident_of("into_string"), vec!()));
 												types.push(cx.expr_addr_of(field_type.span, field_type));
 											},
 											_ => return Err("Expected ident".into_string())
@@ -140,11 +140,12 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 							let types_vec_slices = cx.expr_method_call(span, types_vec, cx.ident_of("as_mut_slice"), vec!());
 							let names_vec = cx.expr(span, ExprVec(names));
 							let ident_type = cx.ident_of("ty");
-							Ok(cx.expr_block(cx.block(span, vec!(
+							let final = cx.expr_block(cx.block(span, vec!(
 								cx.stmt_let(span, false, ident_type, cx.expr_call(span, func, vec!(types_vec_slices))),
-								cx.stmt_expr(cx.expr_method_call(span, cx.expr_ident(span, ident_type), cx.ident_of("set_names"), vec!(names_vec))),
-								cx.stmt_expr(cx.expr_ident(span, ident_type))
-							), None)))
+								cx.stmt_expr(cx.expr_method_call(span, cx.expr_ident(span, ident_type), cx.ident_of("set_names"), vec!(names_vec)))
+							), Some(cx.expr_ident(span, ident_type))));
+							println!("{}", final.to_source());
+							Ok(final)
 						},
 						_ => Err("Expected bracket".into_string())
 					}

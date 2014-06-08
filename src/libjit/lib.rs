@@ -36,6 +36,7 @@
 
 extern crate libc;
 use std::ptr::{RawPtr, mut_null};
+use std::str::raw::from_c_str;
 use std::mem::transmute;
 use std::iter::Iterator;
 use std::kinds::marker;
@@ -227,6 +228,43 @@ bitflags!(
 		static SysChar 		= 10010
 	}
 )
+/// A type field iterator
+pub struct Fields<'a> {
+	_type: jit_type_t,
+	index: c_uint,
+	marker: marker::ContravariantLifetime<'a>
+}
+impl<'a> Fields<'a> {
+	fn new(ty:&'a Type) -> Fields<'a> {
+		unsafe {
+			Fields {
+				_type: ty.as_ptr(),
+				index: 0 as c_uint,
+				marker: marker::ContravariantLifetime::<'a>
+			}
+		}
+	}
+}
+impl<'a> Iterator<(String, Type)> for Fields<'a> {
+	fn next(&mut self) -> Option<(String, Type)> {
+		unsafe {
+			let index = self.index;
+			self.index += 1;
+			if index < jit_type_num_fields(self._type) {
+				let name = from_c_str(jit_type_get_name(self._type, index));
+				let native_field = jit_type_get_field(self._type, index);
+				if name.len() == 0 || native_field.is_null() {
+					None
+				} else {
+					let field:Type = NativeRef::from_ptr(native_field);
+					Some((name, field))
+				}
+			} else {
+				None
+			}
+		}
+	}
+}
 /// A type of a value to JIT compile
 native_ref!(Type, _type, jit_type_t)
 impl Clone for Type {
@@ -256,8 +294,9 @@ impl Type {
 
 	fn create_complex(fields: &mut [&Type], union: bool) -> Type {
 		unsafe {
+			let mut native_fields:Vec<jit_type_t> = fields.iter().map(|field| field.as_ptr()).collect();
 			let f = if union { jit_type_create_union } else { jit_type_create_struct };
-			let ty = f(transmute(fields.as_mut_ptr()), fields.len() as c_uint, 1);
+			let ty:jit_type_t = f(native_fields.as_mut_ptr(), fields.len() as c_uint, 1);
 			NativeRef::from_ptr(ty)
 		}
 	}
@@ -294,6 +333,17 @@ impl Type {
 		unsafe {
 			NativeRef::from_ptr(jit_type_get_ref(self.as_ptr()))
 		}
+	}
+	/// Set the field names of this type
+	pub fn set_names(&self, names:&[String]) -> bool {
+		unsafe {
+			let native_names : Vec<*i8> = names.iter().map(|name| name.to_c_str().unwrap()).collect();
+			jit_type_set_names(self.as_ptr(), native_names.as_ptr() as *mut *mut i8, names.len() as u32) != 0
+		}
+	}
+	/// Iterator over the type's fields
+	pub fn iter_fields<'a>(&'a self) -> Fields<'a> {
+		Fields::new(self)
 	}
 }
 #[deriving(Clone)]
