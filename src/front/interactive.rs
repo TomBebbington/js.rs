@@ -36,7 +36,7 @@ impl Interactive {
 			debug!("Parsed into expression: {}", expr);
 			debug!("Now executing with LibJIT backend...");
 			let compiled = engine.compile(&expr);
-			match engine.run(compiled) {
+			match engine.run(&compiled) {
 				Ok(v) =>
 					println!("{}", v),
 				Err(v) =>

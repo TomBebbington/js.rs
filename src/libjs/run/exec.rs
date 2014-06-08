@@ -10,20 +10,20 @@ pub trait Executor<T> {
 	/// Resolve the global variable `name`
 	fn get_global(&self, name:String) -> Value;
 	/// Compile the expression
-	fn compile(&self, expr:&Expr) -> Box<T>;
+	fn compile(&self, expr:&Expr) -> T;
 	/// Run the compiled expression
-	fn run(&mut self, comp:Box<T>) -> ResultValue;
+	fn run(&mut self, comp:&T) -> ResultValue;
 }
 /// Execute an expression
 pub fn execute(expr:&Expr) -> ResultValue {
 	let mut exec:JITCompiler = Executor::new();
 	let compiled = exec.compile(expr);
-	exec.run(compiled)
+	exec.run(&compiled)
 }
 /// Execute an expression with an environment
 pub fn execute_env(expr:&Expr, env:Value) -> ResultValue {
 	let mut exec:JITCompiler = Executor::new();
 	exec.global.set_field_slice("__proto__", env);
 	let compiled = exec.compile(expr);
-	exec.run(compiled)
+	exec.run(&compiled)
 }

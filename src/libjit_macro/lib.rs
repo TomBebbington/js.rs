@@ -115,7 +115,8 @@ fn jit_parse_type<'a>(cx: &mut ExtCtxt, tts:&mut Peekable<&'a TokenTree, Items<'
 				TTTok(span, BINOP(STAR)) => {
 					tts.next();
 					let func = quote_expr!(&mut*cx, ::jit::Type::create_pointer);
-					let wv = try!(jit_parse_type(&mut*cx, tts));
+					let parsed_type = try!(jit_parse_type(&mut*cx, tts));
+					let wv = cx.expr_addr_of(span, parsed_type);
 					Ok(cx.expr_call(span, func, vec!(wv)))
 				},
 				TTTok(_, DOLLAR) => {

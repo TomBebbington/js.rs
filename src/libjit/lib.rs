@@ -44,10 +44,6 @@ pub use bindings::{jit_nint, jit_nuint};
 pub trait NativeRef {
 	/// Returns an unsafe mutable pointer to the object
 	unsafe fn as_ptr(&self) -> *mut c_void;
-	#[inline]
-	unsafe fn from_ptr_box(ptr:*mut c_void) -> Box<Self> {
-		box NativeRef::from_ptr(ptr)
-	}
 	/// Make an unsafe pointer to the object
 	unsafe fn from_ptr(ptr:*mut c_void) -> Self;
 }
@@ -84,9 +80,9 @@ impl NativeRef for Context {
 }
 impl Context {
 	/// Create a new JIT Context
-	pub fn new() -> Box<Context> {
+	pub fn new() -> Context {
 		unsafe {
-			NativeRef::from_ptr_box(jit_context_create())
+			NativeRef::from_ptr(jit_context_create())
 		}
 	}
 	/// Lock down the context to prevent multiple threads from using the builder at a time
@@ -102,9 +98,9 @@ impl Context {
 		}
 	}
 	/// Create a function in the context with the type signature given
-	pub fn create_function(&self, signature: &Type) -> Box<Function> {
+	pub fn create_function(&self, signature: &Type) -> Function {
 		unsafe {
-			NativeRef::from_ptr_box(jit_function_create(self.as_ptr(), signature.as_ptr()))
+			NativeRef::from_ptr(jit_function_create(self.as_ptr(), signature.as_ptr()))
 		}
 	}
 }
@@ -171,34 +167,34 @@ impl Drop for Type {
 }
 impl Type {
 	/// Create a function signature, with the given ABI, return type and parameters
-	pub fn create_signature(abi: ABI, return_type: &Type, params: &mut [&Type]) -> Box<Type> {
+	pub fn create_signature(abi: ABI, return_type: &Type, params: &mut [&Type]) -> Type {
 		unsafe {
 			let signature = jit_type_create_signature(abi as jit_abi_t, return_type.as_ptr(), transmute(params.as_mut_ptr()), params.len() as c_uint, 1);
-			NativeRef::from_ptr_box(signature)
+			NativeRef::from_ptr(signature)
 		}
 	}
 
-	fn create_complex(fields: &mut [&Type], union: bool) -> Box<Type> {
+	fn create_complex(fields: &mut [&Type], union: bool) -> Type {
 		unsafe {
 			let f = if union { jit_type_create_union } else { jit_type_create_struct };
 			let ty = f(transmute(fields.as_mut_ptr()), fields.len() as c_uint, 1);
-			NativeRef::from_ptr_box(ty)
+			NativeRef::from_ptr(ty)
 		}
 	}
 	/// Create a struct type with the given field types
-	pub fn create_struct(fields: &mut [&Type]) -> Box<Type> {
+	pub fn create_struct(fields: &mut [&Type]) -> Type {
 		Type::create_complex(fields, false)
 	}
 	/// Create a union type with the given field types
-	pub fn create_union(fields: &mut [&Type]) -> Box<Type> {
+	pub fn create_union(fields: &mut [&Type]) -> Type {
 		let inner = Type::create_complex(fields, true);
-		Type::create_struct(&mut [&*Types::get_int(), &*inner])
+		Type::create_struct(&mut [&Types::get_int(), &inner])
 	}
 	/// Create a pointer type with the given pointee type
-	pub fn create_pointer(pointee: &Type) -> Box<Type> {
+	pub fn create_pointer(pointee: &Type) -> Type {
 		unsafe {
 			let ptr = jit_type_create_pointer(pointee.as_ptr(), 1);
-			NativeRef::from_ptr_box(ptr)
+			NativeRef::from_ptr(ptr)
 		}
 	}
 	/// Work out the size of this type
@@ -214,9 +210,9 @@ impl Type {
 		}
 	}
 	/// Get the reference this pointer points to
-	pub fn get_ref(&self) -> Box<Type> {
+	pub fn get_ref(&self) -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_get_ref(self.as_ptr()))
+			NativeRef::from_ptr(jit_type_get_ref(self.as_ptr()))
 		}
 	}
 }
@@ -245,24 +241,24 @@ impl Drop for Function {
 	}
 }
 impl Function {
-	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Box<Value> {
+	fn insn_binop(&self, v1: &Value, v2: &Value, f: unsafe extern "C" fn(function: jit_function_t, v1: jit_value_t, v2: jit_value_t) -> jit_value_t) -> Value {
 		unsafe {
 			let value = f(self.as_ptr(), v1._value, v2._value);
-			NativeRef::from_ptr_box(value)
+			NativeRef::from_ptr(value)
 		}
 	}
 
-	fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: jit_function_t, value: jit_value_t) -> jit_value_t) -> Box<Value> {
+	fn insn_unop(&self, value: &Value, f: unsafe extern "C" fn(function: jit_function_t, value: jit_value_t) -> jit_value_t) -> Value {
 		unsafe {
 			let value = f(self.as_ptr(), value.as_ptr());
-			NativeRef::from_ptr_box(value)
+			NativeRef::from_ptr(value)
 		}
 	}
 	/// Get the context this function was made i
-	pub fn get_context(&self) -> Box<Context> {
+	pub fn get_context(&self) -> Context {
 		unsafe {
 			let context = jit_function_get_context(self.as_ptr());
-			NativeRef::from_ptr_box(context)
+			NativeRef::from_ptr(context)
 		}
 	}
 	/// Set the optimization level of the function, where the bigger the level, the more effort should be spent optimising
@@ -284,14 +280,14 @@ impl Function {
 		}
 	}
 	/// Get a parameter of the function as a JIT Value
-	pub fn get_param(&self, param: uint) -> Box<Value> {
+	pub fn get_param(&self, param: uint) -> Value {
 		unsafe {
 			let value = jit_value_get_param(self.as_ptr(), param as c_uint);
-			NativeRef::from_ptr_box(value)
+			NativeRef::from_ptr(value)
 		}
 	}
 	/// Make an instructional representation of a Rust value
-	pub fn insn_of<T:Compilable>(&self, val:&T) -> Box<Value> {
+	pub fn insn_of<T:Compilable>(&self, val:&T) -> Value {
 		val.compile(self)
 	}
 	/// Notify libjit that this function has a catch block in it so it can prepare
@@ -319,90 +315,90 @@ impl Function {
 		}
 	}
 	/// Make an instruction that multiplies the values
-	pub fn insn_mul(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_mul(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_mul)
 	}
 	/// Make an instruction that adds the values
-	pub fn insn_add(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_add(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_add)
 	}
 	/// Make an instruction that subtracts the second value from the first
-	pub fn insn_sub(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_sub(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_sub)
 	}
 	/// Make an instruction that divides the first number by the second
-	pub fn insn_div(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_div(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_div)
 	}
 	/// Make an instruction that finds the remainder when the first number is divided by the second
-	pub fn insn_rem(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_rem(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_rem)
 	}
 	/// Make an instruction that checks if the first value is lower than or equal to the second
-	pub fn insn_leq(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_leq(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_le)
 	}
 	/// Make an instruction that checks if the first value is greater than or equal to the second
-	pub fn insn_geq(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_geq(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_ge)
 	}
 	/// Make an instruction that checks if the first value is lower than the second
-	pub fn insn_lt(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_lt(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_lt)
 	}
 	/// Make an instruction that checks if the first value is greater than the second
-	pub fn insn_gt(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_gt(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_gt)
 	}
 	/// Make an instruction that checks if the values are equal
-	pub fn insn_eq(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_eq(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_eq)
 	}
 	/// Make an instruction that checks if the values are not equal
-	pub fn insn_neq(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_neq(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_ne)
 	}
 	/// Make an instruction that performs a bitwise and on the two values
-	pub fn insn_and(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_and(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_and)
 	}
 	/// Make an instruction that performs a bitwise or on the two values
-	pub fn insn_or(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_or(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_or)
 	}
 	/// Make an instruction that performs a bitwise xor on the two values
-	pub fn insn_xor(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_xor(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_xor)
 	}
 	/// Make an instruction that performs a bitwise not on the two values
-	pub fn insn_not(&self, value: &Value) -> Box<Value> {
+	pub fn insn_not(&self, value: &Value) -> Value {
 		self.insn_unop(value, jit_insn_not)
 	}
 	/// Make an instruction that performs a left bitwise shift on the first value by the second value
-	pub fn insn_shl(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_shl(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_shl)
 	}
 	/// Make an instruction that performs a right bitwise shift on the first value by the second value
-	pub fn insn_shr(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_shr(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_shr)
 	}
 	/// Make an instruction that performs a right bitwise shift on the first value by the second value
-	pub fn insn_ushr(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_ushr(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_ushr)
 	}
 	/// Make an instruction that performs a bitwise negate on the value
-	pub fn insn_neg(&self, value: &Value) -> Box<Value> {
+	pub fn insn_neg(&self, value: &Value) -> Value {
 		self.insn_unop(value, jit_insn_neg)
 	}
 	/// Make an instruction that duplicates the value given
-	pub fn insn_dup(&self, value: &Value) -> Box<Value> {
+	pub fn insn_dup(&self, value: &Value) -> Value {
 		unsafe {
 			let dup_value = jit_insn_load(self.as_ptr(), value.as_ptr());
-			NativeRef::from_ptr_box(dup_value)
+			NativeRef::from_ptr(dup_value)
 		}
 	}
 	/// Make an instruction that loads a value from a src value
-	pub fn insn_load(&self, src: &Value) -> Box<Value> {
+	pub fn insn_load(&self, src: &Value) -> Value {
 		self.insn_unop(src, jit_insn_load)
 	}
 	/// Make an instruction that stores a value at a destination value
@@ -449,58 +445,56 @@ impl Function {
 		}
 	}
 	/// Make an instruction that calls a function that has the signature given with some arguments
-	pub fn insn_call_indirect(&self, func:&Function, signature: &Type, args: &mut [&Value]) -> Box<Value> {
+	pub fn insn_call_indirect(&self, func:&Function, signature: &Type, args: &mut [&Value]) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_insn_call_indirect(self.as_ptr(), func.as_ptr(), signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint, JitCallNothrow as c_int))
+			NativeRef::from_ptr(jit_insn_call_indirect(self.as_ptr(), func.as_ptr(), signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint, JitCallNothrow as c_int))
 		}
 	}
 	/// Make an instruction that calls a native function that has the signature given with some arguments
 	fn insn_call_native(&self, name: &'static str, native_func: *mut c_void,
-						signature: &Type, args: &mut [&Value]) -> Box<Value> {
+						signature: &Type, args: &mut [&Value]) -> Value {
 		unsafe {
 			name.with_c_str(|name| {
-				box Value {
-					_value: jit_insn_call_native(self.as_ptr(), name, native_func,
+				NativeRef::from_ptr(jit_insn_call_native(self.as_ptr(), name, native_func,
 												 signature.as_ptr(), transmute(args.as_mut_ptr()), args.len() as c_uint,
-												 JitCallNothrow as c_int)
-				}
+												 JitCallNothrow as c_int))
 			})
 		}
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with no arguments and expects a return value
 	pub fn insn_call_native0<R>(&self, name: &'static str,
 								native_func: fn() -> R,
-								signature: &Type, args: &mut [&Value]) -> Box<Value> {
+								signature: &Type, args: &mut [&Value]) -> Value {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with a single argument and expects a return value
 	pub fn insn_call_native1<A,R>(&self, name: &'static str,
 								  native_func: fn(A) -> R,
-								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Value {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with two arguments and expects a return value
 	pub fn insn_call_native2<A,B,R>(&self, name: &'static str,
 								  native_func: fn(A, B) -> R,
-								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Value {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with three arguments and expects a return value
 	pub fn insn_call_native3<A,B,C,R>(&self, name: &'static str,
 								  native_func: fn(A, B, C) -> R,
-								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Value {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that calls a Rust function that has the signature given with four arguments and expects a return value
 	pub fn insn_call_native4<A,B,C,D,R>(&self, name: &'static str,
 								  native_func: fn(A, B, C, D) -> R,
-								  signature: &Type, args: &mut [&Value]) -> Box<Value> {
+								  signature: &Type, args: &mut [&Value]) -> Value {
 		self.insn_call_native(name, unsafe { transmute(native_func) }, signature, args)
 	}
 	/// Make an instruction that allocates some space
-	pub fn insn_alloca(&self, size: &Value) -> Box<Value> {
+	pub fn insn_alloca(&self, size: &Value) -> Value {
 		unsafe {
-			box Value { _value: jit_insn_alloca(self.as_ptr(), size.as_ptr()) }
+			NativeRef::from_ptr(jit_insn_alloca(self.as_ptr(), size.as_ptr()))
 		}
 	}
 	/// Apply a function to some arguments and set the retval to the return value
@@ -522,123 +516,123 @@ impl Function {
 		}
 	}
 	/// Create a new value with the given type
-	pub fn create_value(&self, value_type: &Type) -> Box<Value> {
+	pub fn create_value(&self, value_type: &Type) -> Value {
 		unsafe {
 			let value = jit_value_create(self.as_ptr(), value_type.as_ptr());
-			NativeRef::from_ptr_box(value)
+			NativeRef::from_ptr(value)
 		}
 	}
-	pub fn insn_convert(&self, v: &Value, t:&Type, overflow_check:bool) -> Box<Value> {
+	pub fn insn_convert(&self, v: &Value, t:&Type, overflow_check:bool) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_insn_convert(self.as_ptr(), v.as_ptr(), t.as_ptr(), overflow_check as c_int))
+			NativeRef::from_ptr(jit_insn_convert(self.as_ptr(), v.as_ptr(), t.as_ptr(), overflow_check as c_int))
 		}
 	}
 	/// Make an instruction that gets the inverse cosine of the number given
-	pub fn insn_acos(&self, v: &Value) -> Box<Value> {
+	pub fn insn_acos(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_acos)
 	}
 	/// Make an instruction that gets the inverse sine of the number given
-	pub fn insn_asin(&self, v: &Value) -> Box<Value> {
+	pub fn insn_asin(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_asin)
 	}
 	/// Make an instruction that gets the inverse tangent of the number given
-	pub fn insn_atan(&self, v: &Value) -> Box<Value> {
+	pub fn insn_atan(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_atan)
 	}
 	/// Make an instruction that gets the inverse tangent of the numbers given
-	pub fn insn_atan2(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_atan2(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_atan2)
 	}
 	/// Make an instruction that finds the nearest integer above a number
-	pub fn insn_ceil(&self, v: &Value) -> Box<Value> {
+	pub fn insn_ceil(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_ceil)
 	}
 	/// Make an instruction that gets the consine of the number given
-	pub fn insn_cos(&self, v: &Value) -> Box<Value> {
+	pub fn insn_cos(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_cos)
 	}
 	/// Make an instruction that gets the hyperbolic consine of the number given
-	pub fn insn_cosh(&self, v: &Value) -> Box<Value> {
+	pub fn insn_cosh(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_cosh)
 	}
 	/// Make an instruction that gets the natural logarithm rased to the power of the number
-	pub fn insn_exp(&self, v: &Value) -> Box<Value> {
+	pub fn insn_exp(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_exp)
 	}
 	/// Make an instruction that finds the nearest integer below a number
-	pub fn insn_floor(&self, v: &Value) -> Box<Value> {
+	pub fn insn_floor(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_floor)
 	}
 	/// Make an instruction that gets the natural logarithm of the number
-	pub fn insn_log(&self, v: &Value) -> Box<Value> {
+	pub fn insn_log(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_log)
 	}
 	/// Make an instruction that gets the base 10 logarithm of the number
-	pub fn insn_log10(&self, v: &Value) -> Box<Value> {
+	pub fn insn_log10(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_log10)
 	}
 	/// Make an instruction the gets the result of raising the first value to the power of the second value
-	pub fn insn_pow(&self, v1: &Value, v2:&Value) -> Box<Value> {
+	pub fn insn_pow(&self, v1: &Value, v2:&Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_pow)
 	}
 	/// Make an instruction the gets the result of rounding the value to the nearest integer
-	pub fn insn_rint(&self, v: &Value) -> Box<Value> {
+	pub fn insn_rint(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_rint)
 	}
 	/// Make an instruction the gets the result of rounding the value to the nearest integer
-	pub fn insn_round(&self, v: &Value) -> Box<Value> {
+	pub fn insn_round(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_round)
 	}
 	/// Make an instruction the gets the sine of the number
-	pub fn insn_sin(&self, v: &Value) -> Box<Value> {
+	pub fn insn_sin(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_sin)
 	}
 	/// Make an instruction the gets the hyperbolic sine of the number
-	pub fn insn_sinh(&self, v: &Value) -> Box<Value> {
+	pub fn insn_sinh(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_sinh)
 	}
 	/// Make an instruction the gets the square root of a number
-	pub fn insn_sqrt(&self, v: &Value) -> Box<Value> {
+	pub fn insn_sqrt(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_sqrt)
 	}
 	/// Make an instruction the gets the tangent of a number
-	pub fn insn_tan(&self, v: &Value) -> Box<Value> {
+	pub fn insn_tan(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_tan)
 	}
 	/// Make an instruction the gets the hyperbolic tangent of a number
-	pub fn insn_tanh(&self, v: &Value) -> Box<Value> {
+	pub fn insn_tanh(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_tanh)
 	}
 	/// Make an instruction that truncates the value
-	pub fn insn_trunc(&self, v: &Value) -> Box<Value> {
+	pub fn insn_trunc(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_trunc)
 	}
 	/// Make an instruction that checks if the number is NaN
-	pub fn insn_is_nan(&self, v: &Value) -> Box<Value> {
+	pub fn insn_is_nan(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_is_nan)
 	}
 	/// Make an instruction that checks if the number is finite
-	pub fn insn_is_finite(&self, v: &Value) -> Box<Value> {
+	pub fn insn_is_finite(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_is_finite)
 	}
 	/// Make an instruction that checks if the number is  infinite
-	pub fn insn_is_inf(&self, v: &Value) -> Box<Value> {
+	pub fn insn_is_inf(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_is_inf)
 	}
 	/// Make an instruction that gets the absolute value of a number
-	pub fn insn_abs(&self, v: &Value) -> Box<Value> {
+	pub fn insn_abs(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_abs)
 	}
 	/// Make an instruction that gets the smallest of two numbers
-	pub fn insn_min(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_min(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_min)
 	}
 	/// Make an instruction that gets the biggest of two numbers
-	pub fn insn_max(&self, v1: &Value, v2: &Value) -> Box<Value> {
+	pub fn insn_max(&self, v1: &Value, v2: &Value) -> Value {
 		self.insn_binop(v1, v2, jit_insn_max)
 	}
 	/// Make an instruction that gets the sign of a number
-	pub fn insn_sign(&self, v: &Value) -> Box<Value> {
+	pub fn insn_sign(&self, v: &Value) -> Value {
 		self.insn_unop(v, jit_insn_sign)
 	}
 }
@@ -661,10 +655,10 @@ impl NativeRef for Value {
 }
 impl Value {
 	/// Get the type of the value
-	pub fn get_type(&self) -> Box<Type> {
+	pub fn get_type(&self) -> Type {
 		unsafe {
 			let ty = jit_value_get_type(self.as_ptr());
-			NativeRef::from_ptr_box(ty)
+			NativeRef::from_ptr(ty)
 		}
 	}
 }
@@ -682,9 +676,9 @@ impl PartialEq for Label {
 }
 impl Label {
 	/// Create a new label
-	pub fn new(func:&Function) -> Box<Label> {
+	pub fn new(func:&Function) -> Label {
 		unsafe {
-			box Label {
+			Label {
 				_label: jit_function_reserve_label(func.as_ptr())
 			}
 		}
@@ -694,189 +688,189 @@ impl Label {
 pub struct Types;
 impl Types {
 	/// Void type
-	pub fn get_void() -> Box<Type> {
+	pub fn get_void() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_void)
+			NativeRef::from_ptr(jit_type_void)
 		}
 	}
 	/// Integer type
-	pub fn get_int() -> Box<Type> {
+	pub fn get_int() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_int)
+			NativeRef::from_ptr(jit_type_int)
 		}
 	}
 	/// Unsigned integer type
-	pub fn get_uint() -> Box<Type> {
+	pub fn get_uint() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_uint)
+			NativeRef::from_ptr(jit_type_uint)
 		}
 	}
 	/// Long integer type
-	pub fn get_long() -> Box<Type> {
+	pub fn get_long() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_long)
+			NativeRef::from_ptr(jit_type_long)
 		}
 	}
 	/// Unsigned long integer type
-	pub fn get_ulong() -> Box<Type> {
+	pub fn get_ulong() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_ulong)
+			NativeRef::from_ptr(jit_type_ulong)
 		}
 	}
 	/// 32-bit floating point type
-	pub fn get_float32() -> Box<Type> {
+	pub fn get_float32() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_float32)
+			NativeRef::from_ptr(jit_type_float32)
 		}
 	}
 	/// 64-bit floating point type
-	pub fn get_float64() -> Box<Type> {
+	pub fn get_float64() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_float64)
+			NativeRef::from_ptr(jit_type_float64)
 		}
 	}
 	/// Default floating point type
-	pub fn get_float() -> Box<Type> {
+	pub fn get_float() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_nfloat)
+			NativeRef::from_ptr(jit_type_nfloat)
 		}
 	}
 	/// A void pointer, which can represent any kind of pointer
-	pub fn get_void_ptr() -> Box<Type> {
+	pub fn get_void_ptr() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_void_ptr)
+			NativeRef::from_ptr(jit_type_void_ptr)
 		}
 	}
 	/// Character type
-	pub fn get_char() -> Box<Type> {
+	pub fn get_char() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_sys_char)
+			NativeRef::from_ptr(jit_type_sys_char)
 		}
 	}
 	/// C String type
-	pub fn get_cstring() -> Box<Type> {
-		Type::create_pointer(&*Types::get_char())
+	pub fn get_cstring() -> Type {
+		Type::create_pointer(&Types::get_char())
 	}
 	/// Boolean type
-	pub fn get_bool() -> Box<Type> {
+	pub fn get_bool() -> Type {
 		unsafe {
-			NativeRef::from_ptr_box(jit_type_sys_bool)
+			NativeRef::from_ptr(jit_type_sys_bool)
 		}
 	}
 }
 /// A type that can be compiled into a LibJIT representation
 pub trait Compilable {
 	/// Get a JIT representation of this value
-	fn compile(&self, func:&Function) -> Box<Value>;
+	fn compile(&self, func:&Function) -> Value;
 }
 impl Compilable for () {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_void_ptr, 0))
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_void_ptr, 0))
 		}
 	}
 }
 impl Compilable for f64 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_float64_constant(func.as_ptr(), jit_type_float64, *self) )
+			NativeRef::from_ptr(jit_value_create_float64_constant(func.as_ptr(), jit_type_float64, *self) )
 		}
 	}
 }
 impl Compilable for f32 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_float32_constant(func.as_ptr(), jit_type_float32, *self) )
+			NativeRef::from_ptr(jit_value_create_float32_constant(func.as_ptr(), jit_type_float32, *self) )
 		}
 	}
 }
 impl Compilable for int {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_long_constant(func.as_ptr(), jit_type_nint, *self as i64) )
+			NativeRef::from_ptr(jit_value_create_long_constant(func.as_ptr(), jit_type_nint, *self as i64) )
 		}
 	}
 }
 impl Compilable for uint {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_nuint, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_nuint, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for i32 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_int, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_int, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for u32 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_uint, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_uint, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for i16 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_short, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_short, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for u16 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_ushort, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_ushort, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for i8 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_sbyte, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_sbyte, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for u8 {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_ubyte, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_ubyte, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for bool {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_sys_bool, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_sys_bool, *self as jit_nint) )
 		}
 	}
 }
 impl Compilable for char {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		unsafe {
-			NativeRef::from_ptr_box(jit_value_create_nint_constant(func.as_ptr(), jit_type_ubyte, *self as jit_nint) )
+			NativeRef::from_ptr(jit_value_create_nint_constant(func.as_ptr(), jit_type_ubyte, *self as jit_nint) )
 		}
 	}
 }
 impl<'t> Compilable for &'t str {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		let cstring_t = Types::get_cstring();
 		let strlen_i = (self.len() as i32).compile(func);
-		let bufptr = func.create_value(cstring_t);
-		func.insn_store(bufptr, func.insn_alloca(&*strlen_i));
+		let bufptr = func.create_value(&cstring_t);
+		func.insn_store(&bufptr, &func.insn_alloca(&strlen_i));
 		for i in range(0, self.len()) {
 			let char_i = self.char_at(i).compile(func);
-			func.insn_store_relative(bufptr, i as int, char_i);
+			func.insn_store_relative(&bufptr, i as int, &char_i);
 		}
 		let null_term = '\0'.compile(func);
-		func.insn_store_relative(bufptr, self.len() as int, null_term);
+		func.insn_store_relative(&bufptr, self.len() as int, &null_term);
 		bufptr
 	}
 }
 impl Compilable for String {
-	fn compile(&self, func:&Function) -> Box<Value> {
+	fn compile(&self, func:&Function) -> Value {
 		self.as_slice().compile(func)
 	}
 }
