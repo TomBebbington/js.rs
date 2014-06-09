@@ -8,13 +8,11 @@ libjs:
 libjs_syntax:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/libjs_syntax/js_syntax.rs -L .
-libjit_macro:
-	mkdir -p target
-	cd target && $(RUSTC) ../src/libjit_macro/jit_macro.rs -L .
 libjit:
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjit/jit.rs -L .
-libs: libjit libjit_macro libjs_syntax libjs
+	cd libs/jit && make build
+	cp libs/jit/target/* target
+libs: libjit libjs_syntax libjs
 build:
 	mkdir -p target
 	cd target && $(RUSTC) ../src/js.rs/js.rs -L .
@@ -24,8 +22,6 @@ install:
 	sudo cp -f target/libjit*.so /usr/local/lib
 	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
 doc:
-	$(RUSTDOC) src/libjit/jit.rs -o doc -L target
-	$(RUSTDOC) src/libjit_macro/jit_macro.rs -o doc -L target
 	$(RUSTDOC) src/libjs/js.rs -o doc -L target
 	$(RUSTDOC) src/libjs_syntax/js_syntax.rs -o doc -L target
 	$(RUSTDOC) src/js.rs/js.rs -o doc -L target
