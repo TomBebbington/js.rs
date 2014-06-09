@@ -157,6 +157,27 @@
 <span id='117'>117</span>
 <span id='118'>118</span>
 <span id='119'>119</span>
+<span id='120'>120</span>
+<span id='121'>121</span>
+<span id='122'>122</span>
+<span id='123'>123</span>
+<span id='124'>124</span>
+<span id='125'>125</span>
+<span id='126'>126</span>
+<span id='127'>127</span>
+<span id='128'>128</span>
+<span id='129'>129</span>
+<span id='130'>130</span>
+<span id='131'>131</span>
+<span id='132'>132</span>
+<span id='133'>133</span>
+<span id='134'>134</span>
+<span id='135'>135</span>
+<span id='136'>136</span>
+<span id='137'>137</span>
+<span id='138'>138</span>
+<span id='139'>139</span>
+<span id='140'>140</span>
 </pre><pre class='rust '>
 <span class='comment'>/* Copyright (c) 2014, Peter Nelson
  * All rights reserved.
@@ -191,8 +212,29 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>unused_must_use</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>globs</span>, <span class='ident'>macro_rules</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>stable</span>]</span>
-
-<span class='doccomment'>//! This crate wraps LibJIT
+<span class='doccomment'>//! This crate wraps LibJIT in an idiomatic style.
+</span><span class='doccomment'>//! For example, here&#39;s a quick example which makes a multiply function using LibJIT:
+</span><span class='doccomment'>//! 
+</span><span class='doccomment'>//! ```rust
+</span><span class='doccomment'>//! extern crate jit;
+</span><span class='doccomment'>//! use jit::{C_DECL, Context, Function, Type, Types};
+</span><span class='doccomment'>//! fn main() {
+</span><span class='doccomment'>//! 	let cx = Context::new();
+</span><span class='doccomment'>//! 	cx.build(|| {
+</span><span class='doccomment'>//! 		// build the IR
+</span><span class='doccomment'>//! 		let sig = Type::create_signature(C_DECL, &amp;Types::get_int(), &amp;[&amp;Types::get_int(), &amp;Types::get_int()]);
+</span><span class='doccomment'>//! 		let func = Function::new(cx, sig);
+</span><span class='doccomment'>//! 		let x = func.get_param(0);
+</span><span class='doccomment'>//! 		let y = func.get_param(1);
+</span><span class='doccomment'>//! 		let result = func.insn_mul(&amp;x, &amp;y);
+</span><span class='doccomment'>//! 		func.insn_return(&amp;result);
+</span><span class='doccomment'>//! 		/// run the IR
+</span><span class='doccomment'>//! 		func.compile();
+</span><span class='doccomment'>//! 		let rfunc:fn(int, int) -&gt; int = func.closure();
+</span><span class='doccomment'>//! 		assert_eq(rfunc(4, 5), 20)
+</span><span class='doccomment'>//! 	});
+</span><span class='doccomment'>//! }
+</span><span class='doccomment'>//! ```
 </span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>libc</span>;
 <span class='kw'>use</span> <span class='ident'>bindings</span>::{
