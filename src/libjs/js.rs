@@ -1,4 +1,4 @@
-#![crate_id = "js"]
+#![crate_id = "js#0.1-pre"]
 #![comment = "Javascript execution"]
 #![license = "MIT"]
 #![crate_type = "dylib"]

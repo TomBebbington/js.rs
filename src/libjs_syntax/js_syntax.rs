@@ -1,4 +1,4 @@
-#![crate_id = "js_syntax"]
+#![crate_id = "js_syntax#0.1-pre"]
 #![comment = "Javascript lexing and parsing"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
