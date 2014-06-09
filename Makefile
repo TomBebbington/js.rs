@@ -17,7 +17,7 @@ libjit:
 libs: libjit libjit_macro libjs_syntax libjs
 build:
 	mkdir -p target
-	cd target && $(RUSTC) ../src/front/front.rs -L .
+	cd target && $(RUSTC) ../src/js.rs/js.rs -L .
 install:
 	sudo cp -f target/js.rs /usr/local/bin/
 	sudo cp -f target/libjs*.so /usr/local/lib
@@ -28,7 +28,7 @@ doc:
 	$(RUSTDOC) src/libjit_macro/jit_macro.rs -o doc -L target
 	$(RUSTDOC) src/libjs/js.rs -o doc -L target
 	$(RUSTDOC) src/libjs_syntax/js_syntax.rs -o doc -L target
-	$(RUSTDOC) src/front/front.rs -o doc -L target
+	$(RUSTDOC) src/js.rs/js.rs -o doc -L target
 update-doc: doc
 	rm -rf /tmp/doc
 	mv doc /tmp/doc
