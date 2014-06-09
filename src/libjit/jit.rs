@@ -31,8 +31,29 @@
 #![deny(unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, unused_must_use)]
 #![feature(globs, macro_rules)]
 #![stable]
-
-//! This crate wraps LibJIT
+//! This crate wraps LibJIT in an idiomatic style.
+//! For example, here's a quick example which makes a multiply function using LibJIT:
+//! 
+//! ```rust
+//! extern crate jit;
+//! use jit::{C_DECL, Context, Function, Type, Types};
+//! fn main() {
+//! 	let cx = Context::new();
+//! 	cx.build(|| {
+//! 		// build the IR
+//! 		let sig = Type::create_signature(C_DECL, &Types::get_int(), &[&Types::get_int(), &Types::get_int()]);
+//! 		let func = Function::new(cx, sig);
+//! 		let x = func.get_param(0);
+//! 		let y = func.get_param(1);
+//! 		let result = func.insn_mul(&x, &y);
+//! 		func.insn_return(&result);
+//! 		/// run the IR
+//! 		func.compile();
+//! 		let rfunc:fn(int, int) -> int = func.closure();
+//! 		assert_eq(rfunc(4, 5), 20)
+//! 	});
+//! }
+//! ```
 
 extern crate libc;
 use bindings::{
