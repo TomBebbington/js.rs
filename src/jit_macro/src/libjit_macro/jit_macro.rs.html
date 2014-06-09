@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="The jit_macro library documentation.">
 
-    <title>lib.rs.html -- source</title>
+    <title>jit_macro.rs.html -- source</title>
 
     <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
           rel='stylesheet' type='text/css'>
@@ -209,6 +209,48 @@
 <span id='169'>169</span>
 <span id='170'>170</span>
 <span id='171'>171</span>
+<span id='172'>172</span>
+<span id='173'>173</span>
+<span id='174'>174</span>
+<span id='175'>175</span>
+<span id='176'>176</span>
+<span id='177'>177</span>
+<span id='178'>178</span>
+<span id='179'>179</span>
+<span id='180'>180</span>
+<span id='181'>181</span>
+<span id='182'>182</span>
+<span id='183'>183</span>
+<span id='184'>184</span>
+<span id='185'>185</span>
+<span id='186'>186</span>
+<span id='187'>187</span>
+<span id='188'>188</span>
+<span id='189'>189</span>
+<span id='190'>190</span>
+<span id='191'>191</span>
+<span id='192'>192</span>
+<span id='193'>193</span>
+<span id='194'>194</span>
+<span id='195'>195</span>
+<span id='196'>196</span>
+<span id='197'>197</span>
+<span id='198'>198</span>
+<span id='199'>199</span>
+<span id='200'>200</span>
+<span id='201'>201</span>
+<span id='202'>202</span>
+<span id='203'>203</span>
+<span id='204'>204</span>
+<span id='205'>205</span>
+<span id='206'>206</span>
+<span id='207'>207</span>
+<span id='208'>208</span>
+<span id='209'>209</span>
+<span id='210'>210</span>
+<span id='211'>211</span>
+<span id='212'>212</span>
+<span id='213'>213</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;jit_macro&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;LibJIT Macro&quot;</span>]</span>
@@ -216,8 +258,8 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;rlib&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>quote</span>, <span class='ident'>globs</span>, <span class='ident'>macro_registrar</span>, <span class='ident'>managed_boxes</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
-<span class='doccomment'>//! This crate provides a macro `jit_compile` which can compile a Rust type identifier
-</span><span class='doccomment'>//! into its LibJIT counterpart.
+<span class='doccomment'>//! This crate provides a macro `jit_type` which can compile a Rust type
+</span><span class='doccomment'>//! into its LibJIT counterpart. It even supports functions *and* structs!
 </span><span class='doccomment'>//! 
 </span><span class='doccomment'>//! For example:
 </span><span class='doccomment'>//! 
@@ -227,8 +269,13 @@
 </span><span class='doccomment'>//! #[phase(syntax)]
 </span><span class='doccomment'>//! extern crate jit_macro;
 </span><span class='doccomment'>//! fn main() {
-</span><span class='doccomment'>//! 	let ty = jit_compile!(i64);
+</span><span class='doccomment'>//! 	let ty = jit_type!(i64);
 </span><span class='doccomment'>//! 	assert_eq(ty.get_size(), 8);
+</span><span class='doccomment'>//! 	let floor_sig = jit_type!((f64) -&gt; i32);
+</span><span class='doccomment'>//! 	let double_array_ty = jit_type!({
+</span><span class='doccomment'>//! 		len: int,
+</span><span class='doccomment'>//! 		ptr: **f64
+</span><span class='doccomment'>//! 	});
 </span><span class='doccomment'>//! }
 </span><span class='doccomment'>//! ```
 </span><span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>syntax</span>;
@@ -244,8 +291,8 @@
 <span class='attribute'>#[<span class='ident'>macro_registrar</span>]</span>
 <span class='attribute'>#[<span class='ident'>doc</span>(<span class='ident'>hidden</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>macro_registrar</span>(<span class='ident'>register</span>: <span class='op'>|</span><span class='ident'>Name</span>, <span class='ident'>SyntaxExtension</span><span class='op'>|</span>) {
-	<span class='kw'>let</span> <span class='ident'>expander</span> <span class='op'>=</span> <span class='kw'>box</span> <span class='ident'>BasicMacroExpander</span> { <span class='ident'>expander</span>: <span class='ident'>jit_compile</span>, <span class='ident'>span</span>: <span class='prelude-val'>None</span> };
-	<span class='ident'>register</span>(<span class='ident'>token</span>::<span class='ident'>intern</span>(<span class='string'>&quot;jit_compile&quot;</span>), <span class='ident'>NormalTT</span>(<span class='ident'>expander</span>, <span class='prelude-val'>None</span>))
+	<span class='kw'>let</span> <span class='ident'>expander</span> <span class='op'>=</span> <span class='kw'>box</span> <span class='ident'>BasicMacroExpander</span> { <span class='ident'>expander</span>: <span class='ident'>jit_type</span>, <span class='ident'>span</span>: <span class='prelude-val'>None</span> };
+	<span class='ident'>register</span>(<span class='ident'>token</span>::<span class='ident'>intern</span>(<span class='string'>&quot;jit_type&quot;</span>), <span class='ident'>NormalTT</span>(<span class='ident'>expander</span>, <span class='prelude-val'>None</span>))
 }
 <span class='kw'>fn</span> <span class='ident'>error</span>(<span class='ident'>e</span>:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>TokenTree</span><span class='op'>&gt;</span>, <span class='ident'>tok</span>:<span class='ident'>Token</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>String</span><span class='op'>&gt;</span> {
 	<span class='kw'>match</span> <span class='ident'>e</span> {
@@ -266,6 +313,8 @@
 			<span class='kw'>match</span> <span class='ident'>curr</span> {
 				<span class='ident'>TTTok</span>(_, <span class='kw-2'>ref</span> <span class='ident'>got</span>) <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>got</span> <span class='op'>==</span> <span class='ident'>tok</span> <span class='op'>=&gt;</span>
 					<span class='prelude-val'>Ok</span>(()),
+				<span class='ident'>TTTok</span>(_, <span class='kw-2'>ref</span> <span class='ident'>tok</span>) <span class='op'>=&gt;</span>
+					<span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Bad result {}&quot;</span>, <span class='ident'>tok</span>)),
 				_ <span class='op'>=&gt;</span>
 					<span class='prelude-val'>Err</span>(<span class='string'>&quot;Bad result&quot;</span>.<span class='ident'>into_string</span>())
 			}
@@ -285,14 +334,12 @@
 							<span class='kw'>if</span> <span class='ident'>toks</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> {
 								<span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_void</span>()))
 							} <span class='kw'>else</span> {
-								<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>arg_types</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='kw-2'>@</span><span class='ident'>Expr</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+								<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>arg_types</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>P</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 								{
 									<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tts</span> <span class='op'>=</span> <span class='ident'>toks</span>.<span class='ident'>iter</span>().<span class='ident'>peekable</span>();
 									<span class='kw'>loop</span> {
-										<span class='kw'>let</span> <span class='ident'>parsed</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>jit_parse_type</span>(<span class='ident'>cx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>tts</span>));<span class='comment'>
-										// &amp;*parsed
-										</span><span class='kw'>let</span> <span class='ident'>derefed</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_deref</span>(<span class='ident'>span</span>, <span class='ident'>parsed</span>);
-										<span class='ident'>arg_types</span>.<span class='ident'>push</span>((<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='ident'>cx</span>).<span class='ident'>expr_addr_of</span>(<span class='ident'>span</span>, <span class='ident'>derefed</span>));
+										<span class='kw'>let</span> <span class='ident'>parsed</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>jit_parse_type</span>(<span class='ident'>cx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>tts</span>));
+										<span class='ident'>arg_types</span>.<span class='ident'>push</span>(<span class='ident'>cx</span>.<span class='ident'>expr_addr_of</span>(<span class='ident'>parsed</span>.<span class='ident'>span</span>, <span class='ident'>parsed</span>));
 										<span class='kw'>match</span> <span class='ident'>tts</span>.<span class='ident'>next</span>() {
 											<span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span>
 												<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>v</span> {
@@ -307,38 +354,75 @@
 								}
 								<span class='ident'>tts</span>.<span class='ident'>next</span>();
 								<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>expect</span>(<span class='ident'>cx</span>, <span class='ident'>tts</span>, <span class='ident'>RARROW</span>));
-								<span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>jit_parse_type</span>(<span class='ident'>cx</span>, <span class='ident'>tts</span>));
-								<span class='kw'>let</span> <span class='ident'>arg_types_ex</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr</span>(<span class='ident'>ret</span>.<span class='ident'>span</span>, <span class='ident'>ExprVec</span>(<span class='ident'>arg_types</span>));
+								<span class='kw'>let</span> <span class='ident'>parsed_ret</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>jit_parse_type</span>(<span class='ident'>cx</span>, <span class='ident'>tts</span>));
+								<span class='kw'>let</span> <span class='ident'>ret</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_addr_of</span>(<span class='ident'>parsed_ret</span>.<span class='ident'>span</span>, <span class='ident'>parsed_ret</span>);
+								<span class='kw'>let</span> <span class='ident'>arg_types_ex</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr</span>(<span class='ident'>span</span>, <span class='ident'>ExprVec</span>(<span class='ident'>arg_types</span>));
 								<span class='kw'>let</span> <span class='ident'>func</span> <span class='op'>=</span> <span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span><span class='op'>*</span><span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Type</span>::<span class='ident'>create_signature</span>);
 								<span class='kw'>let</span> <span class='ident'>cdecl</span> <span class='op'>=</span> <span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span><span class='op'>*</span><span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>CDECL</span>);
-								<span class='kw'>let</span> <span class='ident'>arg_types_ex</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_mut_addr_of</span>(<span class='ident'>span</span>, <span class='ident'>arg_types_ex</span>);
+								<span class='kw'>let</span> <span class='ident'>arg_types_ex</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_mut_addr_of</span>(<span class='ident'>arg_types_ex</span>.<span class='ident'>span</span>, <span class='ident'>arg_types_ex</span>);
+								<span class='kw'>let</span> <span class='ident'>arg_types_ex</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_method_call</span>(<span class='ident'>span</span>, <span class='ident'>arg_types_ex</span>, <span class='ident'>cx</span>.<span class='ident'>ident_of</span>(<span class='string'>&quot;as_mut_slice&quot;</span>), <span class='macro'>vec</span><span class='macro'>!</span>());
 								<span class='kw'>let</span> <span class='ident'>call</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_call</span>(<span class='ident'>span</span>, <span class='ident'>func</span>, <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>cdecl</span>, <span class='ident'>ret</span>, <span class='ident'>arg_types_ex</span>));
 								<span class='prelude-val'>Ok</span>(<span class='ident'>call</span>)
 
 							}
 						},
-						_ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='string'>&quot;Expected bracker&quot;</span>.<span class='ident'>into_string</span>())
+						<span class='ident'>TTTok</span>(<span class='ident'>span</span>, <span class='ident'>LBRACE</span>) <span class='op'>=&gt;</span> {
+							<span class='kw'>let</span> <span class='ident'>toks</span> <span class='op'>=</span> <span class='ident'>toks</span>.<span class='ident'>slice</span>(<span class='number'>1</span>, <span class='ident'>toks</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>);
+							<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tts</span> <span class='op'>=</span> <span class='ident'>toks</span>.<span class='ident'>iter</span>().<span class='ident'>peekable</span>();
+							<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>names</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>P</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+							<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>types</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>P</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
+							<span class='kw'>loop</span> {
+								<span class='kw'>match</span> <span class='ident'>tts</span>.<span class='ident'>next</span>() {
+									<span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>v</span>) <span class='op'>=&gt;</span> {
+										<span class='kw'>match</span> <span class='op'>*</span><span class='op'>*</span><span class='ident'>v</span> {
+											<span class='ident'>TTTok</span>(_, <span class='ident'>COMMA</span>) <span class='op'>=&gt;</span>
+												<span class='kw'>continue</span>,
+											<span class='ident'>TTTok</span>(<span class='ident'>span</span>, <span class='ident'>IDENT</span>(<span class='ident'>field_name</span>, _)) <span class='op'>=&gt;</span> {
+												<span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>expect</span>(<span class='ident'>cx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>tts</span>, <span class='ident'>COLON</span>));
+												<span class='kw'>let</span> <span class='ident'>field_type</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>jit_parse_type</span>(<span class='ident'>cx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>tts</span>));
+												<span class='ident'>names</span>.<span class='ident'>push</span>(<span class='ident'>cx</span>.<span class='ident'>expr_method_call</span>(<span class='ident'>span</span>, <span class='ident'>cx</span>.<span class='ident'>expr_str</span>(<span class='ident'>span</span>, <span class='ident'>get_ident</span>(<span class='ident'>field_name</span>)), <span class='ident'>cx</span>.<span class='ident'>ident_of</span>(<span class='string'>&quot;into_string&quot;</span>), <span class='macro'>vec</span><span class='macro'>!</span>()));
+												<span class='ident'>types</span>.<span class='ident'>push</span>(<span class='ident'>cx</span>.<span class='ident'>expr_addr_of</span>(<span class='ident'>field_type</span>.<span class='ident'>span</span>, <span class='ident'>field_type</span>));
+											},
+											_ <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='string'>&quot;Expected ident&quot;</span>.<span class='ident'>into_string</span>())
+										}
+									},
+									<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='kw'>break</span>
+								}
+							}
+							<span class='kw'>let</span> <span class='ident'>func</span> <span class='op'>=</span> <span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span><span class='op'>*</span><span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Type</span>::<span class='ident'>create_struct</span>);
+							<span class='kw'>let</span> <span class='ident'>types_vec</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr</span>(<span class='ident'>span</span>, <span class='ident'>ExprVec</span>(<span class='ident'>types</span>));
+							<span class='kw'>let</span> <span class='ident'>types_vec_slices</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_method_call</span>(<span class='ident'>span</span>, <span class='ident'>types_vec</span>, <span class='ident'>cx</span>.<span class='ident'>ident_of</span>(<span class='string'>&quot;as_mut_slice&quot;</span>), <span class='macro'>vec</span><span class='macro'>!</span>());
+							<span class='kw'>let</span> <span class='ident'>names_vec</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr</span>(<span class='ident'>span</span>, <span class='ident'>ExprVec</span>(<span class='ident'>names</span>));
+							<span class='kw'>let</span> <span class='ident'>ident_type</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>ident_of</span>(<span class='string'>&quot;ty&quot;</span>);
+							<span class='kw'>let</span> <span class='ident'>final</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>expr_block</span>(<span class='ident'>cx</span>.<span class='ident'>block</span>(<span class='ident'>span</span>, <span class='macro'>vec</span><span class='macro'>!</span>(
+								<span class='ident'>cx</span>.<span class='ident'>stmt_let</span>(<span class='ident'>span</span>, <span class='boolval'>false</span>, <span class='ident'>ident_type</span>, <span class='ident'>cx</span>.<span class='ident'>expr_call</span>(<span class='ident'>span</span>, <span class='ident'>func</span>, <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>types_vec_slices</span>))),
+								<span class='ident'>cx</span>.<span class='ident'>stmt_expr</span>(<span class='ident'>cx</span>.<span class='ident'>expr_method_call</span>(<span class='ident'>span</span>, <span class='ident'>cx</span>.<span class='ident'>expr_ident</span>(<span class='ident'>span</span>, <span class='ident'>ident_type</span>), <span class='ident'>cx</span>.<span class='ident'>ident_of</span>(<span class='string'>&quot;set_names&quot;</span>), <span class='macro'>vec</span><span class='macro'>!</span>(<span class='ident'>names_vec</span>)))
+							), <span class='prelude-val'>Some</span>(<span class='ident'>cx</span>.<span class='ident'>expr_ident</span>(<span class='ident'>span</span>, <span class='ident'>ident_type</span>))));
+							<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>final</span>.<span class='ident'>to_source</span>());
+							<span class='prelude-val'>Ok</span>(<span class='ident'>final</span>)
+						},
+						_ <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='string'>&quot;Expected bracket&quot;</span>.<span class='ident'>into_string</span>())
 					}
 				},
 				<span class='ident'>TTTok</span>(_, <span class='ident'>IDENT</span>(<span class='ident'>ident</span>, _)) <span class='op'>=&gt;</span> {
 					<span class='kw'>let</span> <span class='ident'>ident</span> <span class='op'>=</span> <span class='ident'>ident</span>.<span class='ident'>to_source</span>();
-					<span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>ident</span>.<span class='ident'>as_slice</span>() {
-						<span class='string'>&quot;void&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_void</span>())),
-						<span class='string'>&quot;int&quot;</span> <span class='op'>|</span> <span class='string'>&quot;i32&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_int</span>())),
-						<span class='string'>&quot;uint&quot;</span> <span class='op'>|</span> <span class='string'>&quot;u32&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_uint</span>())),
-						<span class='string'>&quot;i64&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_long</span>())),
-						<span class='string'>&quot;u64&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_ulong</span>())),
-						<span class='string'>&quot;char&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_char</span>())),
-						<span class='string'>&quot;bool&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_bool</span>())),
-						<span class='string'>&quot;f64&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_float64</span>())),
-						<span class='string'>&quot;f32&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_float32</span>())),
-						<span class='string'>&quot;Vec&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='ident'>get_vec</span>())),
-						<span class='ident'>id</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Unexpected identifier {}&quot;</span>, <span class='ident'>id</span>))
+					<span class='kw'>let</span> <span class='ident'>type_id</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>ident</span>.<span class='ident'>as_slice</span>() {
+						<span class='string'>&quot;void&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;void&quot;</span>,
+						<span class='string'>&quot;int&quot;</span> <span class='op'>|</span> <span class='string'>&quot;i32&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;int&quot;</span>,
+						<span class='string'>&quot;uint&quot;</span> <span class='op'>|</span> <span class='string'>&quot;u32&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;uint&quot;</span>,
+						<span class='string'>&quot;i64&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;long&quot;</span>,
+						<span class='string'>&quot;u64&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;ulong&quot;</span>,
+						<span class='string'>&quot;char&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;char&quot;</span>,
+						<span class='string'>&quot;bool&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;bool&quot;</span>,
+						<span class='string'>&quot;f64&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;float64&quot;</span>,
+						<span class='string'>&quot;f32&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;float32&quot;</span>,
+						<span class='string'>&quot;String&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;cstring&quot;</span>,
+						<span class='string'>&quot;Vec&quot;</span> <span class='op'>=&gt;</span> <span class='string'>&quot;vec&quot;</span>,
+						<span class='ident'>id</span> <span class='op'>=&gt;</span> <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;Unexpected identifier {}&quot;</span>, <span class='ident'>id</span>))
 					};
-					<span class='kw'>if</span> <span class='ident'>res</span>.<span class='ident'>is_ok</span>() {
-						<span class='ident'>tts</span>.<span class='ident'>next</span>();
-					}
-					<span class='ident'>res</span>
+					<span class='kw'>let</span> <span class='ident'>full_type_id</span> <span class='op'>=</span> <span class='ident'>cx</span>.<span class='ident'>ident_of</span>(<span class='string'>&quot;get_&quot;</span>.<span class='ident'>into_string</span>().<span class='ident'>append</span>(<span class='ident'>type_id</span>).<span class='ident'>as_slice</span>());
+					<span class='ident'>tts</span>.<span class='ident'>next</span>();
+					<span class='prelude-val'>Ok</span>(<span class='macro'>quote_expr</span><span class='macro'>!</span>(<span class='ident'>cx</span>, ::<span class='ident'>jit</span>::<span class='ident'>Types</span>::<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>full_type_id</span>()))
 				},
 				<span class='ident'>TTTok</span>(<span class='ident'>span</span>, <span class='ident'>BINOP</span>(<span class='ident'>STAR</span>)) <span class='op'>=&gt;</span> {
 					<span class='ident'>tts</span>.<span class='ident'>next</span>();
@@ -371,7 +455,7 @@
 			<span class='prelude-val'>Err</span>(<span class='string'>&quot;Not a type&quot;</span>.<span class='ident'>into_string</span>())
 	}
 }
-<span class='kw'>fn</span> <span class='ident'>jit_compile</span>(<span class='ident'>cx</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ExtCtxt</span>, <span class='ident'>sp</span>: <span class='ident'>Span</span>, <span class='ident'>tts</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>TokenTree</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>MacResult</span><span class='op'>&gt;</span> {
+<span class='kw'>fn</span> <span class='ident'>jit_type</span>(<span class='ident'>cx</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>ExtCtxt</span>, <span class='ident'>sp</span>: <span class='ident'>Span</span>, <span class='ident'>tts</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>TokenTree</span>]) <span class='op'>-&gt;</span> <span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>MacResult</span><span class='op'>&gt;</span> {
 	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>iter</span> <span class='op'>=</span> <span class='ident'>tts</span>.<span class='ident'>iter</span>().<span class='ident'>peekable</span>();
 	<span class='ident'>MacExpr</span>::<span class='ident'>new</span>(<span class='kw'>match</span> <span class='ident'>jit_parse_type</span>(<span class='ident'>cx</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>iter</span>) {
 		<span class='prelude-val'>Ok</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>,

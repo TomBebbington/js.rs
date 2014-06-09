@@ -39,9 +39,9 @@
     </nav>
 
     <section id='main' class="content mod">
-<h1 class='fqn'>Crate <a class='mod' href=''>jit_macro</a><a class='source' id='src-0' href='../src/jit_macro/src/libjit_macro/lib.rs.html#1-171'>[src]</a></h1>
-<div class='docblock'><p>This crate provides a macro <code>jit_compile</code> which can compile a Rust type identifier
-into its LibJIT counterpart.</p>
+<h1 class='fqn'>Crate <a class='mod' href=''>jit_macro</a><a class='source' id='src-0' href='../src/jit_macro/src/libjit_macro/jit_macro.rs.html#1-213'>[src]</a></h1>
+<div class='docblock'><p>This crate provides a macro <code>jit_type</code> which can compile a Rust type
+into its LibJIT counterpart. It even supports functions <em>and</em> structs!</p>
 
 <p>For example:</p>
 <pre class='rust '>
@@ -50,8 +50,13 @@ into its LibJIT counterpart.</p>
 <span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>syntax</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit_macro</span>;
 <span class='kw'>fn</span> <span class='ident'>main</span>() {
-    <span class='kw'>let</span> <span class='ident'>ty</span> <span class='op'>=</span> <span class='macro'>jit_compile</span><span class='macro'>!</span>(<span class='ident'>i64</span>);
+    <span class='kw'>let</span> <span class='ident'>ty</span> <span class='op'>=</span> <span class='macro'>jit_type</span><span class='macro'>!</span>(<span class='ident'>i64</span>);
     <span class='ident'>assert_eq</span>(<span class='ident'>ty</span>.<span class='ident'>get_size</span>(), <span class='number'>8</span>);
+    <span class='kw'>let</span> <span class='ident'>floor_sig</span> <span class='op'>=</span> <span class='macro'>jit_type</span><span class='macro'>!</span>((<span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>i32</span>);
+    <span class='kw'>let</span> <span class='ident'>double_array_ty</span> <span class='op'>=</span> <span class='macro'>jit_type</span><span class='macro'>!</span>({
+        <span class='ident'>len</span>: <span class='ident'>int</span>,
+        <span class='ident'>ptr</span>: <span class='op'>*</span><span class='op'>*</span><span class='ident'>f64</span>
+    });
 }
 </pre>
 </div></table></section>
