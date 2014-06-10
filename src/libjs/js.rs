@@ -20,9 +20,9 @@ extern crate serialize;
 extern crate time;
 extern crate url;
 extern crate jit;
-#[phase(syntax)]
+#[phase(plugin)]
 extern crate jit_macro;
-#[phase(syntax, link)]
+#[phase(plugin, link)]
 extern crate log;
 /// The execution engines
 pub mod run {
