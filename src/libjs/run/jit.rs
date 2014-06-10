@@ -138,7 +138,7 @@ fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
 	let cstring_t = jit_type!(*char);
 	let create_value_sig = jit_type!(() -> $value_t);
 	let undefined = || {
-		let ptr = func.create_value(&Types::get_void_ptr());
+		let ptr = jit::Value::new(func, &Types::get_void_ptr());
 		let val = 0u8.compile(func);
 		func.insn_store(&ptr, &val);
 		ptr
@@ -149,7 +149,7 @@ fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
 	debug!("Compiling {} into a LibJIT value", expr);
 	match expr.def {
 		ConstExpr(CNull) => {
-			let ptr = func.create_value(&jit_type!(*void));
+			let ptr = jit::Value::new(func, &jit_type!(*void));
 			let val = 1u8.compile(func);
 			func.insn_store(&ptr, &val);
 			ptr
