@@ -14,7 +14,7 @@ extern crate js;
 extern crate syntax = "js_syntax";
 extern crate getopts;
 extern crate collections;
-#[phase(syntax, link)]
+#[phase(plugin, link)]
 extern crate log;
 /// Interactive mode
 pub mod interactive;
