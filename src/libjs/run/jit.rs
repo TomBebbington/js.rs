@@ -8,8 +8,8 @@ use stdlib::*;
 use run::exec::Executor;
 use std::gc::Gc;
 use std::c_str::CString;
-use jit::{Context, Function, Type, Types, Compilable, CDECL};
-use jit::{UByte, SysChar, SysBool, Void, Int, UInt, Pointer, Float64, Signature};
+use jit::{Context, Function, Type, Types, Compilable};
+use jit::{UByte, SysChar, SysBool, Int, UInt, Pointer, Float64};
 use jit;
 
 fn compile_type(js_type:&JSType) -> Type {
