@@ -10,7 +10,8 @@ use std::gc::Gc;
 use std::c_str::CString;
 use jit::{Context, Function, Type, Types, Compilable};
 use jit::{UByte, SysChar, SysBool, Int, UInt, Pointer, Float64};
-use jit;
+use jit::{init, supports_threads, supports_virtual_memory, uses_interpreter};
+use JitValue = jit::Value;
 
 fn compile_type(js_type:&JSType) -> Type {
 	match *js_type {
@@ -35,10 +36,10 @@ pub struct JITCompiler {
 impl Executor<Function> for JITCompiler {
 	fn new() -> JITCompiler {
 		debug!("Initialising LibJIT...");
-		jit::init();
-		debug!("JIT supports threads? {}", jit::supports_threads());
-		debug!("JIT supports virtual memory? {}", jit::supports_virtual_memory());
-		debug!("JIT using interpreter? {}", jit::uses_interpreter());
+		init();
+		debug!("JIT supports threads? {}", supports_threads());
+		debug!("JIT supports virtual memory? {}", supports_virtual_memory());
+		debug!("JIT using interpreter? {}", uses_interpreter());
 		debug!("Initialising global object...");
 		let global = Value::new_obj(None);
 		object::init(global);
@@ -86,7 +87,7 @@ impl Executor<Function> for JITCompiler {
 	}
 }
 
-fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
+fn convert_to_value(func:&Function, val:&JitValue) -> JitValue {
 	let value_t = jit_type!(*int);
 	let undef_value = Value::undefined;
 	let val_type = val.get_type();
@@ -133,12 +134,12 @@ fn convert_to_value(func:&Function, val:&jit::Value) -> jit::Value {
 	}
 }
 
-fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
+fn compile_value(func:&Function, expr: &Expr) -> JitValue {
 	let value_t = jit_type!(*int);
 	let cstring_t = jit_type!(*char);
 	let create_value_sig = jit_type!(() -> $value_t);
 	let undefined = || {
-		let ptr = jit::Value::new(func, &Types::get_void_ptr());
+		let ptr = JitValue::new(func, &Types::get_void_ptr());
 		let val = 0u8.compile(func);
 		func.insn_store(&ptr, &val);
 		ptr
@@ -149,7 +150,7 @@ fn compile_value(func:&Function, expr: &Expr) -> jit::Value {
 	debug!("Compiling {} into a LibJIT value", expr);
 	match expr.def {
 		ConstExpr(CNull) => {
-			let ptr = jit::Value::new(func, &jit_type!(*void));
+			let ptr = JitValue::new(func, &jit_type!(*void));
 			let val = 1u8.compile(func);
 			func.insn_store(&ptr, &val);
 			ptr
