@@ -87,8 +87,6 @@ impl Executor<Function> for JITCompiler {
 }
 
 fn convert_to_value(func:&Function, val:&JitValue) -> JitValue {
-	let value_t = get_type::<*int>();
-	let undef_value = Value::undefined;
 	let val_type = val.get_type();
 	let val_kind = val_type.get_kind();
 	debug!("Converting JIT value of kind {} to Javascript value", val_kind.bits());
@@ -134,9 +132,6 @@ fn convert_to_value(func:&Function, val:&JitValue) -> JitValue {
 }
 
 fn compile_value(func:&Function, expr: &Expr) -> JitValue {
-	let value_t = get_type::<*int>();
-	let cstring_t = get_type::<*char>();
-	let create_value_sig = get_type::<fn() -> *int>();
 	let undefined = || {
 		let ptr = JitValue::new(func, &get_type::<*int>());
 		let val = 0u8.compile(func);
