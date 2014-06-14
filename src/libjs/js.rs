@@ -20,8 +20,6 @@ extern crate serialize;
 extern crate time;
 extern crate url;
 extern crate jit;
-#[phase(plugin)]
-extern crate jit_macro;
 #[phase(plugin, link)]
 extern crate log;
 /// The execution engines
