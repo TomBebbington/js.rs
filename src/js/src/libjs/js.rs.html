@@ -94,10 +94,8 @@
 <span id='54'>54</span>
 <span id='55'>55</span>
 <span id='56'>56</span>
-<span id='57'>57</span>
-<span id='58'>58</span>
 </pre><pre class='rust '>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js#0.1-pre&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript execution&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;dylib&quot;</span>]</span>
@@ -119,9 +117,7 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit</span>;
-<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>syntax</span>)]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit_macro</span>;
-<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>syntax</span>, <span class='ident'>link</span>)]</span>
+<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
 <span class='doccomment'>/// The execution engines
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>run</span> {
