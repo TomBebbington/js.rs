@@ -33,7 +33,7 @@ pub fn main() {
 		getopts::optflag("i", "interactive", "Run in interactive mode"),
 		getopts::optopt("s", "source-code", "Run some Javascript code", "The path to the source code")
 	];
-	let m = getopts::getopts(std::os::args().as_slice(), opts).unwrap();
+	let m = getopts::getopts(std::os::args().as_slice(), opts).ok().expect("Could not parse arguments");
 	match m.opt_str("s") {
 		Some(path) => {
 			Runner::new(path).run()
