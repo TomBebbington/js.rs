@@ -39,13 +39,17 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>js.rs</a>::<a class='struct' href=''>Interactive</a><a class='source' id='src-22' href='../src/js.rs/src/js.rs/interactive.rs.html#9-11'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>js.rs</a>::<a class='struct' href=''>Interactive</a><a class='source' id='src-23' href='../src/js.rs/src/js.rs/interactive.rs.html#8-13'>[src]</a></h1>
 <pre class='rust struct'>pub struct Interactive {
-    // some fields omitted
+    pub engine: <a class='struct' href='../js/run/jit/struct.JITCompiler.html' title='js::run::jit::JITCompiler'>JITCompiler</a>,
+    pub input: <a class='struct' href='http://doc.rust-lang.org/std/io/buffered/struct.BufferedReader.html' title='std::io::buffered::BufferedReader'>BufferedReader</a>&lt;<a class='struct' href='http://doc.rust-lang.org/std/io/stdio/struct.StdReader.html' title='std::io::stdio::StdReader'>StdReader</a>&gt;,
 }</pre><div class='docblock'><p>An interactive command-line mode</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../js.rs/struct.Interactive.html' title='js.rs::Interactive'>Interactive</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(m: <a class='struct' href='http://doc.rust-lang.org/getopts/struct.Matches.html' title='getopts::Matches'>Matches</a>) -&gt; <a class='struct' href='../js.rs/struct.Interactive.html' title='js.rs::Interactive'>Interactive</a></code></h4>
+</div><h2 class='fields'>Fields</h2>
+<table><tr><td id='structfield.engine'><code>engine</code></td><td><div class='docblock'><p>The execution engine to run the expressions on</p>
+</div></td></tr><tr><td id='structfield.input'><code>input</code></td><td><div class='docblock'><p>The standard input stream to read from</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../js.rs/struct.Interactive.html' title='js.rs::Interactive'>Interactive</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../js.rs/struct.Interactive.html' title='js.rs::Interactive'>Interactive</a></code></h4>
 <div class='docblock'><p>Create a new interactive mode info</p>
-</div><h4 id='method.run' class='method'><code>fn <a href='#method.run' class='fnname'>run</a>(&amp;self)</code></h4>
+</div><h4 id='method.run' class='method'><code>fn <a href='#method.run' class='fnname'>run</a>(&amp;mut self)</code></h4>
 <div class='docblock'><p>Run the interactive mode</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

@@ -39,13 +39,15 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>js.rs</a>::<a class='struct' href=''>Runner</a><a class='source' id='src-2182' href='../src/js.rs/src/js.rs/runner.rs.html#8-10'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>js.rs</a>::<a class='struct' href=''>Runner</a><a class='source' id='src-2168' href='../src/js.rs/src/js.rs/runner.rs.html#7-10'>[src]</a></h1>
 <pre class='rust struct'>pub struct Runner {
-    // some fields omitted
+    pub path: <a class='struct' href='http://doc.rust-lang.org/std/path/posix/struct.Path.html' title='std::path::posix::Path'>Path</a>,
 }</pre><div class='docblock'><p>An command-line script executor</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../js.rs/struct.Runner.html' title='js.rs::Runner'>Runner</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(m: <a class='struct' href='http://doc.rust-lang.org/getopts/struct.Matches.html' title='getopts::Matches'>Matches</a>) -&gt; <a class='struct' href='../js.rs/struct.Runner.html' title='js.rs::Runner'>Runner</a></code></h4>
+</div><h2 class='fields'>Fields</h2>
+<table><tr><td id='structfield.path'><code>path</code></td><td><div class='docblock'><p>The path to the script</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../js.rs/struct.Runner.html' title='js.rs::Runner'>Runner</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(script: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='struct' href='../js.rs/struct.Runner.html' title='js.rs::Runner'>Runner</a></code></h4>
 <div class='docblock'><p>Create a new interactive mode info</p>
-</div><h4 id='method.run' class='method'><code>fn <a href='#method.run' class='fnname'>run</a>(&amp;self, script: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>)</code></h4>
+</div><h4 id='method.run' class='method'><code>fn <a href='#method.run' class='fnname'>run</a>(&amp;self)</code></h4>
 <div class='docblock'><p>Run the script</p>
 </div></div></section>
     <section id='search' class="content hidden"></section>
