@@ -2,23 +2,29 @@ use js::run::exec::Executor;
 use js::run::jit::JITCompiler;
 use syntax::Lexer;
 use syntax::Parser;
-use std::io::stdio::stdin;
+use std::io::stdio::{stdin, StdReader};
 use std::io::{BufReader, BufferedReader};
 /// An interactive command-line mode
-pub struct Interactive;
+pub struct Interactive {
+	/// The execution engine to run the expressions on
+	pub engine: JITCompiler,
+	/// The standard input stream to read from
+	pub input: BufferedReader<StdReader>
+}
 impl Interactive {
 	/// Create a new interactive mode info
 	pub fn new() -> Interactive {
-		Interactive
+		Interactive {
+			engine: Executor::new(),
+			input: stdin()
+		}
 	}
 	/// Run the interactive mode
-	pub fn run(&self) {
+	pub fn run(&mut self) {
 		debug!("Running interactive mode");
 		print!("> ");
-		let mut engine : JITCompiler = Executor::new();
-		let mut input = stdin();
 		loop {
-			let line = input.read_line().unwrap();
+			let line = self.input.read_line().unwrap();
 			debug!("Now parsing line {}", line);
 			let line_bytes = line.as_bytes();
 			debug!("Now lexing...");
@@ -30,8 +36,8 @@ impl Interactive {
 			let expr = Parser::new(tokens).parse_all().unwrap();
 			debug!("Parsed into expression: {}", expr);
 			debug!("Now executing with LibJIT backend...");
-			let compiled = engine.compile(&expr);
-			match engine.run(&compiled) {
+			let compiled = self.engine.compile(&expr);
+			match self.engine.run(&compiled) {
 				Ok(v) =>
 					println!("{}", v),
 				Err(v) =>

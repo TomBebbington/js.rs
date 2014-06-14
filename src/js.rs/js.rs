@@ -36,7 +36,7 @@ pub fn main() {
 	let m = getopts::getopts(std::os::args().as_slice(), opts).unwrap();
 	match m.opt_str("s") {
 		Some(path) => {
-			Runner::new().run(path)
+			Runner::new(path).run()
 		},
 		None if m.opt_present("h") => {
 			println!("{}", getopts::usage("Usage: js.rs [OPTIONS] [INPUT]", opts));
@@ -48,7 +48,7 @@ pub fn main() {
 			Interactive::new().run();
 		},
 		None if m.free.len() >= 2 => {
-			Runner::new().run(m.free.get(1).clone());
+			Runner::new(m.free.get(1).clone()).run();
 		},
 		None => {
 			println!("{}", getopts::short_usage("Usage: js.rs [OPTIONS] [INPUT]", opts));
