@@ -1,19 +1,14 @@
 use js::run::exec::execute;
 use syntax::Lexer;
 use syntax::Parser;
-use getopts::Matches;
 use std::io::{BufferedReader, File};
 use std::path::Path;
 /// An command-line script executor
-pub struct Runner {
-	m: Matches
-}
+pub struct Runner;
 impl Runner {
 	/// Create a new interactive mode info
-	pub fn new(m: Matches) -> Runner {
-		Runner {
-			m: m
-		}
+	pub fn new() -> Runner {
+		Runner
 	}
 	/// Run the script
 	pub fn run(&self, script: String) {

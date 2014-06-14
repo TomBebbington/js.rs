@@ -2,19 +2,14 @@ use js::run::exec::Executor;
 use js::run::jit::JITCompiler;
 use syntax::Lexer;
 use syntax::Parser;
-use getopts::Matches;
 use std::io::stdio::stdin;
 use std::io::{BufReader, BufferedReader};
 /// An interactive command-line mode
-pub struct Interactive {
-	m: Matches
-}
+pub struct Interactive;
 impl Interactive {
 	/// Create a new interactive mode info
-	pub fn new(m: Matches) -> Interactive {
-		Interactive {
-			m: m
-		}
+	pub fn new() -> Interactive {
+		Interactive
 	}
 	/// Run the interactive mode
 	pub fn run(&self) {

@@ -4,7 +4,6 @@ use js::stdlib::function::Function;
 use syntax::Lexer;
 use syntax::Parser;
 use syntax::ast::token::{Token, TComment};
-use getopts::Matches;
 use collections::treemap::TreeMap;
 use std::io::{BufferedReader, File};
 use std::io::fs::walk_dir;
@@ -27,15 +26,11 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
 	map
 }
 /// Test against unit tests
-pub struct Tests {
-	m: Matches
-}
+pub struct Tests;
 impl Tests {
 	/// Create a new unit tester
-	pub fn new(m: Matches) -> Tests {
-		Tests {
-			m: m
-		}
+	pub fn new() -> Tests {
+		Tests
 	}
 	/// Run a test
 	pub fn run_test(&self, path: Path) {

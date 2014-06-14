@@ -36,19 +36,19 @@ pub fn main() {
 	let m = getopts::getopts(std::os::args().as_slice(), opts).unwrap();
 	match m.opt_str("s") {
 		Some(path) => {
-			Runner::new(m).run(path)
+			Runner::new().run(path)
 		},
 		None if m.opt_present("h") => {
 			println!("{}", getopts::usage("Usage: js.rs [OPTIONS] [INPUT]", opts));
 		},
 		None if m.opt_present("t") || (m.free.len() >= 2 && m.free.get(1).as_slice() == "test") => {
-			Tests::new(m).run();
+			Tests::new().run();
 		},
 		None if m.opt_present("i") || (m.free.len() >= 2 && m.free.get(1).as_slice() == "interactive") => {
-			Interactive::new(m).run();
+			Interactive::new().run();
 		},
 		None if m.free.len() >= 2 => {
-			Runner::new(m.clone()).run(m.free.get(1).clone());
+			Runner::new().run(m.free.get(1).clone());
 		},
 		None => {
 			println!("{}", getopts::short_usage("Usage: js.rs [OPTIONS] [INPUT]", opts));
