@@ -245,10 +245,11 @@ fn compile_value(func:&Function, expr: &Expr) -> JitValue {
 			func.insn_neg(&compile_value(func, *a))
 		},
 		UnaryOpExpr(UnaryNot, ref a) => {
+			let bool_t = get_type::<bool>();
 			let mut val = compile_value(func, *a);
-			val = func.insn_convert(&val, &get_type::<bool>(), false);
+			val = func.insn_convert(&val, &bool_t, false);
 			val = func.insn_neg(&val);
-			func.insn_convert(&val, &get_type::<bool>(), false)
+			func.insn_convert(&val, &bool_t, false)
 		},
 		UnaryOpExpr(UnaryPlus, ref a) => {
 			compile_value(func, *a)
