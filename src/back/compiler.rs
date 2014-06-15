@@ -1,7 +1,7 @@
-use js::run::compiler::Compiler;
-use js_syntax::ast::constant::*;
-use js_syntax::ast::op::*;
-use js_syntax::ast::expr::Expr;
+use front::run::compiler::Compiler;
+use syntax::ast::constant::*;
+use syntax::ast::op::*;
+use syntax::ast::expr::Expr;
 use jit::{
 	Context,
 	Compilable,

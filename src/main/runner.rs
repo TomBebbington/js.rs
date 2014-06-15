@@ -1,12 +1,11 @@
-use js::run::compiler::Compiler;
-use js::run::executor::Executor;
-use js_jit::JitCompiler;
-use js_jit::JitExecutor;
+use back::{JitCompiler, JitExecutor};
+use front::run::compiler::Compiler;
+use front::run::executor::Executor;
 use jit::Context;
-use syntax::Lexer;
-use syntax::Parser;
 use std::io::{BufferedReader, File};
 use std::path::Path;
+use syntax::Lexer;
+use syntax::Parser;
 /// An command-line script executor
 pub struct Runner {
 	/// The path to the script

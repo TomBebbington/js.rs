@@ -1,4 +1,4 @@
-#![crate_id = "js_jit#0.1-pre"]
+#![crate_id = "github.com/TomBebbington/js.rs#back:0.1"]
 #![comment = "Javascript compilation and execution using LibJIT"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
@@ -13,8 +13,8 @@
 
 //! This crate provides a Javascript execution backend
 //! using LibJIT.
-extern crate js;
-extern crate js_syntax;
+extern crate front;
+extern crate syntax = "js_syntax";
 extern crate jit;
 pub use compiler::JitCompiler;
 pub use executor::JitExecutor;

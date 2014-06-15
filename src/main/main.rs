@@ -1,4 +1,4 @@
-#![crate_id = "js.rs"]
+#![crate_id = "github.com/TomBebbington/js.rs"]
 #![comment = "Javascript parsing and execution command line tool"]
 #![license = "MIT"]
 #![crate_type = "bin"]
@@ -10,14 +10,14 @@
 #![feature(phase)]
 //! A Javascript execution command line tool
 
-extern crate js;
-extern crate js_jit;
-extern crate jit;
-extern crate syntax = "js_syntax";
-extern crate getopts;
+extern crate back;
 extern crate collections;
+extern crate front;
+extern crate getopts;
+extern crate jit;
 #[phase(plugin, link)]
 extern crate log;
+extern crate syntax = "js_syntax";
 /// Interactive mode
 pub use interactive::Interactive;
 /// Unit test mode

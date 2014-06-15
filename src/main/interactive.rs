@@ -1,7 +1,6 @@
-use js::run::compiler::Compiler;
-use js::run::executor::Executor;
-use js_jit::JitCompiler;
-use js_jit::JitExecutor;
+use back::{JitCompiler, JitExecutor};
+use front::run::compiler::Compiler;
+use front::run::executor::Executor;
 use jit::Context;
 use syntax::Lexer;
 use syntax::Parser;

@@ -1,4 +1,4 @@
-#![crate_id = "js#0.1-pre"]
+#![crate_id = "github.com/TomBebbington/js.rs#front:0.1"]
 #![comment = "Javascript backend"]
 #![license = "MIT"]
 #![crate_type = "dylib"]

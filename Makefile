@@ -1,34 +1,31 @@
 RUSTC ?= rustc
 RUSTDOC ?= rustdoc
-.PHONY: all build doc libs libjit libjit_macro libjs libjs_syntax libjs_jit update-doc clean
-all: libs build doc
-libjs:
+.PHONY: all build doc libs libs/jit src/back src/front src/main src/syntax update-doc clean
+all: libs src build doc
+src/back: src/front src/syntax libs/jit
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjs/js.rs -L .
-libjs_syntax:
+	cd target && $(RUSTC) ../$@/back.rs -L .
+src/front: src/syntax
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjs_syntax/js_syntax.rs -L .
-libjs_jit:
+	cd target && $(RUSTC) ../$@/front.rs -L .
+src/main: src/back src/front libs/jit
 	mkdir -p target
-	cd target && $(RUSTC) ../src/libjs_jit/js_jit.rs -L .
-libjit:
+	cd target && $(RUSTC) ../$@/main.rs -L .
+src/syntax:
+	mkdir -p target
+	cd target && $(RUSTC) ../$@/syntax.rs -L .
+src: src/back src/front src/main src/syntax
+build: src/main
+libs/jit:
 	mkdir -p target
 	cd libs/jit && make build
 	cp libs/jit/target/* target
-libs: libjit libjs_syntax libjs libjs_jit
-build:
-	mkdir -p target
-	cd target && $(RUSTC) ../src/js.rs/js.rs -L .
-install:
-	sudo cp -f target/js.rs /usr/local/bin/
-	sudo cp -f target/libjs*.so /usr/local/lib
-	sudo cp -f target/libjit*.so /usr/local/lib
-	-sudo ln -s /usr/local/bin/js.rs /usr/bin/js.rs
+libs: libs/jit
 doc:
-	$(RUSTDOC) src/libjs/js.rs -o doc -L target
-	$(RUSTDOC) src/libjs_syntax/js_syntax.rs -o doc -L target
-	$(RUSTDOC) src/libjs_jit/js_jit.rs -o doc -L target
-	$(RUSTDOC) src/js.rs/js.rs -o doc -L target
+	$(RUSTDOC) src/syntax/syntax.rs -o doc -L target
+	$(RUSTDOC) src/front/front.rs -o doc -L target
+	$(RUSTDOC) src/back/back.rs -o doc -L target
+	$(RUSTDOC) src/main/main.rs -o doc -L target
 update-doc: doc
 	rm -rf /tmp/doc
 	mv doc /tmp/doc

@@ -1,4 +1,4 @@
-#![crate_id = "js_syntax#0.1-pre"]
+#![crate_id = "github.com/TomBebbington/js.rs#js_syntax:0.1"]
 #![comment = "Javascript lexing and parsing"]
 #![license = "MIT"]
 #![crate_type = "dylib"]

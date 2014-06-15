@@ -13,10 +13,10 @@ use jit::{
 	Pointer,
 	Float64
 };
-use JSVal = js::stdlib::value::Value;
-use js::stdlib::value::{VNull, ResultValue, to_value};
-use js::stdlib::value::ResultValue;
-use js::run::executor::Executor;
+use JSVal = front::stdlib::value::Value;
+use front::stdlib::value::{VNull, ResultValue, to_value};
+use front::stdlib::value::ResultValue;
+use front::run::executor::Executor;
 use std::gc::GC;
 use std::c_str::CString;
 /// A JIT executor
