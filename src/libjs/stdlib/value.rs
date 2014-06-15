@@ -19,6 +19,12 @@ pub struct Value {
 	/// The garbage-collected pointer
 	pub ptr: Gc<ValueData>
 }
+impl Deref<ValueData> for Value {
+	#[inline]
+	fn deref<'a>(&'a self) -> &'a ValueData {
+		&**self
+	}
+}
 #[deriving(Clone)]
 /// A Javascript value
 pub enum ValueData {
@@ -53,49 +59,49 @@ impl Value {
 	}
 	/// Returns true if the value is an object
 	pub fn is_object(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VObject(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null
 	pub fn is_null(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VNull => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null or undefined
 	pub fn is_null_or_undefined(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VNull | VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is a 64-bit floating-point number
 	pub fn is_double(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VNumber(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is a string
 	pub fn is_string(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VString(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is true
 	pub fn is_true(&self) -> bool {
-		match *self.ptr {
+		match **self {
 			VObject(_) => true,
 			VString(ref s) if s.as_slice() == "1" => true,
 			VNumber(n) if n >= 1.0 && n % 1.0 == 0.0 => true,
@@ -106,7 +112,7 @@ impl Value {
 	}
 	/// Converts the value into a 64-bit floating point number
 	pub fn to_num(&self) -> f64 {
-		match *self.ptr {
+		match **self {
 			VObject(_) | VUndefined | VFunction(_) => f64::NAN,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -120,7 +126,7 @@ impl Value {
 	}
 	/// Converts the value into a 32-bit integer
 	pub fn to_int(&self) -> i32 {
-		match *self.ptr {
+		match **self {
 			VObject(_) | VUndefined | VNull | VBoolean(false) | VFunction(_) => 0,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -133,7 +139,7 @@ impl Value {
 	}
 	/// Resolve the property in the object
 	pub fn get_prop(&self, field:String) -> Option<Property> {
-		let obj : ObjectData = match *self.ptr {
+		let obj : ObjectData = match **self {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) =>func.borrow().object.clone(),
 			_ => return None
@@ -162,7 +168,7 @@ impl Value {
 	}
 	/// Set the field in the value
 	pub fn set_field(&self, field:String, val:Value) -> Value {
-		match *self.ptr {
+		match **self {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), Property::new(val));
 			},
@@ -179,7 +185,7 @@ impl Value {
 	}
 	/// Set the property in the value
 	pub fn set_prop(&self, field:String, prop:Property) -> Property {
-		match *self.ptr {
+		match **self {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), prop);
 			},
@@ -220,7 +226,7 @@ impl Value {
 	}
 	/// Get the type of the value
 	pub fn get_type(&self) -> &'static str {
-		match *self.ptr {
+		match **self {
 			VNumber(_) | VInteger(_) => "number",
 			VString(_) => "string",
 			VBoolean(_) => "boolean",
@@ -238,7 +244,7 @@ impl Value {
 }
 impl fmt::Show for Value {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		match *self.ptr {
+		match **self {
 			VNull => write!(f, "null"),
 			VUndefined => write!(f, "undefined"),
 			VBoolean(v) => write!(f, "{}", v),
@@ -274,7 +280,7 @@ impl fmt::Show for Value {
 }
 impl PartialEq for Value {
 	fn eq(&self, other:&Value) -> bool {
-		match ((*self.ptr).clone(), (*other.ptr).clone()) {
+		match ((**self).clone(), (*other.ptr).clone()) {
 			_ if self.is_null_or_undefined() && other.is_null_or_undefined() => true,
 			(VString(_), _) | (_, VString(_)) => self.to_str() == other.to_str(),
 			(VBoolean(a), VBoolean(b)) if a == b => true,
@@ -288,7 +294,7 @@ impl PartialEq for Value {
 }
 impl ToJson for Value {
 	fn to_json( &self ) -> Json {
-		match *self.ptr {
+		match **self {
 			VNull | VUndefined => Null,
 			VBoolean(b) => Boolean(b),
 			VObject(ref obj) => {
