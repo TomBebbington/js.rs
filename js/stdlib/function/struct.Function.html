@@ -23,8 +23,7 @@
 
     <section class="sidebar">
         
-
-        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>function</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Function.html'>Function</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn._create.html'>_create</a><br/><a class='fn ' href='fn.init.html'>init</a><br/></div>
+        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>function</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Function.html'>Function</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn._create.html'>_create</a><a class='fn ' href='fn.init.html'>init</a></div>
     </section>
 
     <nav class="sub">
@@ -39,7 +38,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>function</a>::<a class='struct' href=''>Function</a><a class='source' id='src-3981' href='../../../src/js/src/libjs/stdlib/function.rs.html#10-17'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>function</a>::<a class='struct' href=''>Function</a><a class='source' id='src-3955' href='../../../src/js/src/libjs/stdlib/function.rs.html#10-17'>[src]</a></h1>
 <pre class='rust struct'>pub struct Function {
     pub object: <a class='type' href='../../../js/stdlib/object/type.ObjectData.html' title='js::stdlib::object::ObjectData'>ObjectData</a>,
     pub repr: <a class='type' href='../../../js/stdlib/function/type.FunctionData.html' title='js::stdlib::function::FunctionData'>FunctionData</a>,
@@ -51,7 +50,7 @@
 </div></td></tr><tr><td id='structfield.args'><code>args</code></td><td><div class='docblock'><p>The argument names of the function</p>
 </div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../js/stdlib/function/struct.Function.html' title='js::stdlib::function::Function'>Function</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(repr: <a class='type' href='../../../js/stdlib/function/type.FunctionData.html' title='js::stdlib::function::FunctionData'>FunctionData</a>, args: <a class='struct' href='http://doc.rust-lang.org/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;) -&gt; <a class='struct' href='../../../js/stdlib/function/struct.Function.html' title='js::stdlib::function::Function'>Function</a></code></h4>
 <div class='docblock'><p>Make a new function</p>
-</div><h4 id='method.make' class='method'><code>fn <a href='#method.make' class='fnname'>make</a>(repr: <a class='type' href='../../../js/stdlib/function/type.FunctionData.html' title='js::stdlib::function::FunctionData'>FunctionData</a>, args: &amp;<a href='http://doc.rust-lang.org/std/primitive.slice.html'>[&amp;'static <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>]</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+</div><h4 id='method.make' class='method'><code>fn <a href='#method.make' class='fnname'>make</a>(repr: <a class='type' href='../../../js/stdlib/function/type.FunctionData.html' title='js::stdlib::function::FunctionData'>FunctionData</a>, args: &amp;<a href='http://doc.rust-lang.org/std/primitive.slice.html'>[&amp;''static <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>]</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Create a function from function data and arguments</p>
 </div><h4 id='method.call' class='method'><code>fn <a href='#method.call' class='fnname'>call</a>(&amp;self, args: <a class='struct' href='http://doc.rust-lang.org/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>&gt;, global: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, scope: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, this: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a></code></h4>
 <div class='docblock'><p>Call with some args</p>
@@ -74,7 +73,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

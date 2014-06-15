@@ -23,7 +23,6 @@
 
     <section class="sidebar">
         
-
         
     </section>
 
@@ -104,8 +103,8 @@
 <span id='64'>64</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>u8</span>)]</span>
+<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>\#[<span class='ident'>repr</span>(<span class='ident'>u8</span>)]</span>
 <span class='doccomment'>/// Represents a Javascript type at parsing/compilation
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Type</span> {
 	<span class='doccomment'>/// `undefined`
@@ -185,7 +184,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

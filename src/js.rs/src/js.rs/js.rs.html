@@ -23,7 +23,6 @@
 
     <section class="sidebar">
         
-
         
     </section>
 
@@ -98,16 +97,16 @@
 <span id='58'>58</span>
 <span id='59'>59</span>
 </pre><pre class='rust '>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js.rs&quot;</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript parsing and execution command line tool&quot;</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;bin&quot;</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>doc</span>(
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js.rs&quot;</span>]</span>
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript parsing and execution command line tool&quot;</span>]</span>
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;bin&quot;</span>]</span>
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>doc</span>(
 	<span class='ident'>html_favicon_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/favicon.png&quot;</span>,
 	<span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/js.rs/&quot;</span>
 )]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>)]</span>
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
+<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>)]</span>
 <span class='doccomment'>//! A Javascript execution command line tool
 </span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>js</span>;
@@ -116,7 +115,7 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>syntax</span> <span class='op'>=</span> <span class='string'>&quot;js_syntax&quot;</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>getopts</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>collections</span>;
-<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span>
+<span class='attribute'>\#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
 <span class='doccomment'>/// Interactive mode
 </span><span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>interactive</span>::<span class='ident'>Interactive</span>;
@@ -175,7 +174,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

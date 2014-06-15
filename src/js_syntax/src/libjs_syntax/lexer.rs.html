@@ -23,7 +23,6 @@
 
     <section class="sidebar">
         
-
         
     </section>
 
@@ -484,11 +483,11 @@
 			<span class='ident'>peek_buffer</span>: <span class='ident'>String</span>::<span class='ident'>new</span>()
 		}
 	}
-	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
+	<span class='attribute'>\#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
 	<span class='kw'>fn</span> <span class='ident'>push_token</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>tk</span>:<span class='ident'>TokenData</span>) {
 		<span class='self'>self</span>.<span class='ident'>tokens</span>.<span class='ident'>push</span>(<span class='ident'>Token</span>::<span class='ident'>new</span>(<span class='ident'>tk</span>, <span class='self'>self</span>.<span class='ident'>line_number</span>, <span class='self'>self</span>.<span class='ident'>column_number</span>))
 	}
-	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
+	<span class='attribute'>\#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
 	<span class='kw'>fn</span> <span class='ident'>push_punc</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>punc</span>:<span class='ident'>Punctuator</span>) {
 		<span class='self'>self</span>.<span class='ident'>push_token</span>(<span class='ident'>TPunctuator</span>(<span class='ident'>punc</span>));
 	}
@@ -887,7 +886,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

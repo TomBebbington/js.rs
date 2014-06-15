@@ -23,8 +23,7 @@
 
     <section class="sidebar">
         
-
-        <p class='location'><a href='index.html'>js_jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.JitCompiler.html'>JitCompiler</a><br/><a class='struct current' href='struct.JitExecutor.html'>JitExecutor</a><br/></div>
+        <p class='location'><a href='index.html'>js_jit</a></p><div class='block struct'><h2>Structs</h2><a class='struct ' href='struct.JitCompiler.html'>JitCompiler</a><a class='struct current' href='struct.JitExecutor.html'>JitExecutor</a></div>
     </section>
 
     <nav class="sub">
@@ -45,10 +44,10 @@
 }</pre><div class='docblock'><p>A JIT executor</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../js_jit/struct.JitExecutor.html' title='js_jit::JitExecutor'>JitExecutor</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../js_jit/struct.JitExecutor.html' title='js_jit::JitExecutor'>JitExecutor</a></code></h4>
 <div class='docblock'><p>Create a new JIT executor</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='../js/run/executor/trait.Executor.html' title='js::run::executor::Executor'>Executor</a>&lt;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;'a&gt;, &amp;'a Function&lt;'a&gt;)</a>&gt; for <a class='struct' href='../js_jit/struct.JitExecutor.html' title='js_jit::JitExecutor'>JitExecutor</a></code></h3><div class='methods'><h4 id='method.get_global_obj' class='method'><code>fn <a href='#method.get_global_obj' class='fnname'>get_global_obj</a>(&amp;self) -&gt; <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>JSVal</a></code></h4>
-<h4 id='method.execute' class='method'><code>fn <a href='#method.execute' class='fnname'>execute</a>(&amp;self, comp: &amp;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;'a&gt;, &amp;'a Function&lt;'a&gt;)</a>) -&gt; <a class='type' href='../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a></code></h4>
-<h4 id='method.get_global' class='method'><code>fn <a href='#tymethod.get_global' class='fnname'>get_global</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
-<h4 id='method.set_global' class='method'><code>fn <a href='#tymethod.set_global' class='fnname'>set_global</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>, value: <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;''a&gt; <a class='trait' href='../js/run/executor/trait.Executor.html' title='js::run::executor::Executor'>Executor</a>&lt;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;''a&gt;, &amp;''a Function&lt;''a&gt;)</a>&gt; for <a class='struct' href='../js_jit/struct.JitExecutor.html' title='js_jit::JitExecutor'>JitExecutor</a></code></h3><div class='methods'><h4 id='method.get_global_obj' class='method'><code>fn <a href='#method.get_global_obj' class='fnname'>get_global_obj</a>(&amp;self) -&gt; <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>JSVal</a></code></h4>
+<h4 id='method.execute' class='method'><code>fn <a href='#method.execute' class='fnname'>execute</a>(&amp;self, comp: &amp;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;''a&gt;, &amp;''a Function&lt;''a&gt;)</a>) -&gt; <a class='type' href='../js/stdlib/value/type.ResultValue.html' title='js::stdlib::value::ResultValue'>ResultValue</a></code></h4>
+<h4 id='method.get_global' class='method'><code>fn <a href='#tymethod.get_global' class='fnname'>get_global</a>&lt;Compiled&gt;(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+<h4 id='method.set_global' class='method'><code>fn <a href='#tymethod.set_global' class='fnname'>set_global</a>&lt;Compiled&gt;(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>, value: <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -66,7 +65,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

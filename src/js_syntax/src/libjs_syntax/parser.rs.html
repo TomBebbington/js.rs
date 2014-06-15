@@ -23,7 +23,6 @@
 
     <section class="sidebar">
         
-
         
     </section>
 
@@ -585,7 +584,7 @@
 		<span class='ident'>Expr</span>::<span class='ident'>new</span>(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>def</span>, <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>first</span>.<span class='ident'>pos</span>, <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>get_token</span>(<span class='self'>self</span>.<span class='ident'>pos</span> <span class='op'>-</span> <span class='number'>1</span>)).<span class='ident'>pos</span>)
 	);
 )
-<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// An error encountered during parsing an expression
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>ParseError</span> {
 	<span class='doccomment'>/// When it expected a certain kind of token, but got another as part of something
@@ -632,7 +631,7 @@
 </span>	<span class='ident'>pos</span>: <span class='ident'>uint</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Parser</span> {
-	<span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
+	<span class='attribute'>\#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
 	<span class='doccomment'>/// Creates a new parser, using `tokens` as input
 </span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>tokens</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Token</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Parser</span> {
 		<span class='ident'>Parser</span> {<span class='ident'>tokens</span>: <span class='ident'>tokens</span>, <span class='ident'>pos</span>: <span class='number'>0</span>}
@@ -1115,7 +1114,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

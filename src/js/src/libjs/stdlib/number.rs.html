@@ -23,7 +23,6 @@
 
     <section class="sidebar">
         
-
         
     </section>
 
@@ -157,7 +156,7 @@
 		<span class='boolval'>false</span>
 	} <span class='kw'>else</span> {
 		<span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
-		<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>num</span>.<span class='ident'>ptr</span>.<span class='ident'>borrow</span>() {
+		<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>num</span>.<span class='ident'>ptr</span> {
 			<span class='ident'>VNumber</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>.<span class='ident'>is_finite</span>(),
 			<span class='ident'>VInteger</span>(_) <span class='op'>=&gt;</span> <span class='boolval'>true</span>,<span class='comment'> // integers can&#39;t be infinite
 			</span>_ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
@@ -178,7 +177,7 @@
 		<span class='boolval'>false</span>
 	} <span class='kw'>else</span> {
 		<span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
-		<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>num</span>.<span class='ident'>ptr</span>.<span class='ident'>borrow</span>() {
+		<span class='kw'>match</span> <span class='op'>*</span><span class='ident'>num</span>.<span class='ident'>ptr</span> {
 			<span class='ident'>VNumber</span>(<span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>v</span>.<span class='ident'>is_nan</span>(),
 			_ <span class='op'>=&gt;</span> <span class='boolval'>false</span>
 		}
@@ -227,7 +226,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

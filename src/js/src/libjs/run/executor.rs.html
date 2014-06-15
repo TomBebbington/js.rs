@@ -23,7 +23,6 @@
 
     <section class="sidebar">
         
-
         
     </section>
 
@@ -74,12 +73,12 @@
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Executor</span><span class='op'>&lt;</span><span class='ident'>Compiled</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// Get the global object associated with this executor
 </span>	<span class='kw'>fn</span> <span class='ident'>get_global_obj</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span>;
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
+	<span class='attribute'>\#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Get a field of the global object
 </span>	<span class='kw'>fn</span> <span class='ident'>get_global</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>field</span>: <span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>get_global_obj</span>().<span class='ident'>get_field</span>(<span class='ident'>field</span>)
 	}
-	<span class='attribute'>#[<span class='ident'>inline</span>]</span>
+	<span class='attribute'>\#[<span class='ident'>inline</span>]</span>
 	<span class='doccomment'>/// Set a field of the global object
 </span>	<span class='kw'>fn</span> <span class='ident'>set_global</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>field</span>: <span class='ident'>String</span>, <span class='ident'>value</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
 		<span class='self'>self</span>.<span class='ident'>get_global_obj</span>().<span class='ident'>set_field</span>(<span class='ident'>field</span>, <span class='ident'>value</span>)
@@ -105,7 +104,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

@@ -23,8 +23,7 @@
 
     <section class="sidebar">
         
-
-        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>value</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Value.html'>Value</a><br/></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.FromValue.html'>FromValue</a><br/><a class='trait ' href='trait.ToValue.html'>ToValue</a><br/></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.from_value.html'>from_value</a><br/><a class='fn ' href='fn.to_value.html'>to_value</a><br/></div>
+        <p class='location'><a href='../../index.html'>js</a>&#8203;::<a href='../index.html'>stdlib</a>&#8203;::<a href='index.html'>value</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Value.html'>Value</a></div><div class='block trait'><h2>Traits</h2><a class='trait ' href='trait.FromValue.html'>FromValue</a><a class='trait ' href='trait.ToValue.html'>ToValue</a></div><div class='block fn'><h2>Functions</h2><a class='fn ' href='fn.from_value.html'>from_value</a><a class='fn ' href='fn.to_value.html'>to_value</a></div>
     </section>
 
     <nav class="sub">
@@ -39,7 +38,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='struct' href=''>Value</a><a class='source' id='src-1007' href='../../../src/js/src/libjs/stdlib/value.rs.html#18-21'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='../../index.html'>js</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='struct' href=''>Value</a><a class='source' id='src-1008' href='../../../src/js/src/libjs/stdlib/value.rs.html#18-21'>[src]</a></h1>
 <pre class='rust struct'>pub struct Value {
     pub ptr: <a class='struct' href='http://doc.rust-lang.org/std/gc/struct.Gc.html' title='std::gc::Gc'>Gc</a>&lt;<a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a>&gt;,
 }</pre><div class='docblock'><p>A Garbage-collected Javascript value as represented in the interpreter</p>
@@ -69,19 +68,19 @@
 <div class='docblock'><p>Resolve the property in the object</p>
 </div><h4 id='method.get_field' class='method'><code>fn <a href='#method.get_field' class='fnname'>get_field</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn&#39;t exist</p>
-</div><h4 id='method.get_field_slice' class='method'><code>fn <a href='#method.get_field_slice' class='fnname'>get_field_slice</a>&lt;'t&gt;(&amp;self, field: &amp;'t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+</div><h4 id='method.get_field_slice' class='method'><code>fn <a href='#method.get_field_slice' class='fnname'>get_field_slice</a>&lt;''t&gt;(&amp;self, field: &amp;''t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn&#39;t exist</p>
 </div><h4 id='method.set_field' class='method'><code>fn <a href='#method.set_field' class='fnname'>set_field</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>, val: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Set the field in the value</p>
-</div><h4 id='method.set_field_slice' class='method'><code>fn <a href='#method.set_field_slice' class='fnname'>set_field_slice</a>&lt;'t&gt;(&amp;self, field: &amp;'t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>, val: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
+</div><h4 id='method.set_field_slice' class='method'><code>fn <a href='#method.set_field_slice' class='fnname'>set_field_slice</a>&lt;''t&gt;(&amp;self, field: &amp;''t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>, val: <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Set the field in the value</p>
 </div><h4 id='method.set_prop' class='method'><code>fn <a href='#method.set_prop' class='fnname'>set_prop</a>(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>, prop: <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a>) -&gt; <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a></code></h4>
 <div class='docblock'><p>Set the property in the value</p>
-</div><h4 id='method.set_prop_slice' class='method'><code>fn <a href='#method.set_prop_slice' class='fnname'>set_prop_slice</a>&lt;'t&gt;(&amp;self, field: &amp;'t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>, prop: <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a>) -&gt; <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a></code></h4>
+</div><h4 id='method.set_prop_slice' class='method'><code>fn <a href='#method.set_prop_slice' class='fnname'>set_prop_slice</a>&lt;''t&gt;(&amp;self, field: &amp;''t <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>, prop: <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a>) -&gt; <a class='struct' href='../../../js/stdlib/object/struct.Property.html' title='js::stdlib::object::Property'>Property</a></code></h4>
 <div class='docblock'><p>Set the property in the value</p>
 </div><h4 id='method.from_json' class='method'><code>fn <a href='#method.from_json' class='fnname'>from_json</a>(json: <a class='type' href='http://doc.rust-lang.org/serialize/json/type.Json.html' title='serialize::json::Json'>Json</a>) -&gt; <a class='type' href='../../../js/stdlib/value/type.ValueData.html' title='js::stdlib::value::ValueData'>ValueData</a></code></h4>
 <div class='docblock'><p>Convert from a JSON value to a JS value</p>
-</div><h4 id='method.get_type' class='method'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; &amp;'static <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a></code></h4>
+</div><h4 id='method.get_type' class='method'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; &amp;''static <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a></code></h4>
 <div class='docblock'><p>Get the type of the value</p>
 </div><h4 id='method.undefined' class='method'><code>fn <a href='#method.undefined' class='fnname'>undefined</a>() -&gt; <a class='struct' href='../../../js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Get the value for undefined</p>
@@ -124,7 +123,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&#9166;</dt>
+                <dt>&\#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>
