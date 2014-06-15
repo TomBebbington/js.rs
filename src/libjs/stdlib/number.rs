@@ -31,7 +31,7 @@ pub fn strict_is_finite(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultVal
 		false
 	} else {
 		let num = args.get(0);
-		match *num.ptr.borrow() {
+		match *num.ptr {
 			VNumber(v) => v.is_finite(),
 			VInteger(_) => true, // integers can't be infinite
 			_ => false
@@ -52,7 +52,7 @@ pub fn strict_is_nan(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue 
 		false
 	} else {
 		let num = args.get(0);
-		match *num.ptr.borrow() {
+		match *num.ptr {
 			VNumber(v) => v.is_nan(),
 			_ => false
 		}

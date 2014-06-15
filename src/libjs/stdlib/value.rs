@@ -5,7 +5,7 @@ use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null}
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, Rem, BitAnd, BitOr, BitXor};
 use std::f64;
-use std::gc::Gc;
+use std::gc::{Gc, GC};
 use std::c_str::CString;
 use std::cell::RefCell;
 use std::iter::FromIterator;
@@ -48,54 +48,54 @@ impl Value {
 			obj.insert(INSTANCE_PROTOTYPE.into_string(), Property::new(obj_proto));
 		}
 		Value {
-			ptr: Gc::new(VObject(RefCell::new(obj)))
+			ptr: box(GC) VObject(RefCell::new(obj))
 		}
 	}
 	/// Returns true if the value is an object
 	pub fn is_object(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VObject(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is undefined
 	pub fn is_undefined(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null
 	pub fn is_null(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VNull => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is null or undefined
 	pub fn is_null_or_undefined(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VNull | VUndefined => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is a 64-bit floating-point number
 	pub fn is_double(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VNumber(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is a string
 	pub fn is_string(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VString(_) => true,
 			_ => false
 		}
 	}
 	/// Returns true if the value is true
 	pub fn is_true(&self) -> bool {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VObject(_) => true,
 			VString(ref s) if s.as_slice() == "1" => true,
 			VNumber(n) if n >= 1.0 && n % 1.0 == 0.0 => true,
@@ -106,7 +106,7 @@ impl Value {
 	}
 	/// Converts the value into a 64-bit floating point number
 	pub fn to_num(&self) -> f64 {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VObject(_) | VUndefined | VFunction(_) => f64::NAN,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -120,7 +120,7 @@ impl Value {
 	}
 	/// Converts the value into a 32-bit integer
 	pub fn to_int(&self) -> i32 {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VObject(_) | VUndefined | VNull | VBoolean(false) | VFunction(_) => 0,
 			VString(ref str) => match from_str(str.as_slice()) {
 				Some(num) => num,
@@ -133,7 +133,7 @@ impl Value {
 	}
 	/// Resolve the property in the object
 	pub fn get_prop(&self, field:String) -> Option<Property> {
-		let obj : ObjectData = match *self.ptr.borrow() {
+		let obj : ObjectData = match *self.ptr {
 			VObject(ref obj) => obj.borrow().clone(),
 			VFunction(ref func) =>func.borrow().object.clone(),
 			_ => return None
@@ -152,7 +152,7 @@ impl Value {
 		match self.get_prop(field) {
 			Some(prop) => prop.value,
 			None => Value{
-				ptr: Gc::new(VUndefined)
+				ptr: box(GC) VUndefined
 			}
 		}
 	}
@@ -162,7 +162,7 @@ impl Value {
 	}
 	/// Set the field in the value
 	pub fn set_field(&self, field:String, val:Value) -> Value {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), Property::new(val));
 			},
@@ -179,7 +179,7 @@ impl Value {
 	}
 	/// Set the property in the value
 	pub fn set_prop(&self, field:String, prop:Property) -> Property {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VObject(ref obj) => {
 				obj.borrow_mut().insert(field.clone(), prop);
 			},
@@ -220,7 +220,7 @@ impl Value {
 	}
 	/// Get the type of the value
 	pub fn get_type(&self) -> &'static str {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VNumber(_) | VInteger(_) => "number",
 			VString(_) => "string",
 			VBoolean(_) => "boolean",
@@ -232,13 +232,13 @@ impl Value {
 	/// Get the value for undefined
 	pub fn undefined() -> Value {
 		Value {
-			ptr: Gc::new(VUndefined)
+			ptr: box(GC) VUndefined
 		}
 	}
 }
 impl fmt::Show for Value {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VNull => write!(f, "null"),
 			VUndefined => write!(f, "undefined"),
 			VBoolean(v) => write!(f, "{}", v),
@@ -266,15 +266,15 @@ impl fmt::Show for Value {
 			},
 			VInteger(v) => write!(f, "{}", v),
 			VFunction(ref v) => {
-				write!(f, "function({})\\{...\\}", v.borrow().args.connect(", "))
+				let args = v.borrow().args.connect(", ");
+				write!(f, "function({}){{...}}", args)
 			}
 		}
 	}
 }
 impl PartialEq for Value {
 	fn eq(&self, other:&Value) -> bool {
-		match (self.ptr.borrow().clone(), other.ptr.borrow().clone()) {
-			_ if self.ptr.ptr_eq(&other.ptr) => true,
+		match ((*self.ptr).clone(), (*other.ptr).clone()) {
 			_ if self.is_null_or_undefined() && other.is_null_or_undefined() => true,
 			(VString(_), _) | (_, VString(_)) => self.to_str() == other.to_str(),
 			(VBoolean(a), VBoolean(b)) if a == b => true,
@@ -288,7 +288,7 @@ impl PartialEq for Value {
 }
 impl ToJson for Value {
 	fn to_json( &self ) -> Json {
-		match *self.ptr.borrow() {
+		match *self.ptr {
 			VNull | VUndefined => Null,
 			VBoolean(b) => Boolean(b),
 			VObject(ref obj) => {
@@ -403,7 +403,7 @@ pub trait FromValue {
 impl ToValue for String {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VString(self.clone()))
+			ptr: box(GC) VString(self.clone())
 		}
 	}
 }
@@ -415,7 +415,7 @@ impl FromValue for String {
 impl<'s> ToValue for &'s str {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VString(String::from_str(*self)))
+			ptr: box(GC) VString(String::from_str(*self))
 		}
 	}
 }
@@ -430,7 +430,7 @@ impl ToValue for *i8 {
 impl ToValue for char {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VString(String::from_char(1, *self)))
+			ptr: box(GC) VString(String::from_char(1, *self))
 		}
 	}
 }
@@ -442,7 +442,7 @@ impl FromValue for char {
 impl ToValue for f64 {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VNumber(*self))
+			ptr: box(GC) VNumber(*self)
 		}
 	}
 }
@@ -454,7 +454,7 @@ impl FromValue for f64 {
 impl ToValue for i32 {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VInteger(*self))
+			ptr: box(GC) VInteger(*self)
 		}
 	}
 }
@@ -466,7 +466,7 @@ impl FromValue for i32 {
 impl ToValue for bool {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VBoolean(*self))
+			ptr: box(GC) VBoolean(*self)
 		}
 	}
 }
@@ -510,13 +510,13 @@ impl<T:FromValue> FromValue for Vec<T> {
 impl ToValue for ObjectData {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VObject(RefCell::new(self.clone())))
+			ptr: box(GC) VObject(RefCell::new(self.clone()))
 		}
 	}
 }
 impl FromValue for ObjectData {
 	fn from_value(v:Value) -> Result<ObjectData, &'static str> {
-		match *v.ptr.borrow() {
+		match *v.ptr {
 			VObject(ref obj) => Ok(obj.clone().borrow().deref().clone()),
 			VFunction(ref func) => {
 				Ok(func.borrow().object.clone())
@@ -528,7 +528,7 @@ impl FromValue for ObjectData {
 impl ToValue for Json {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(Value::from_json(self.clone()))
+			ptr: box(GC) Value::from_json(self.clone())
 		}
 	}
 }
@@ -540,7 +540,7 @@ impl FromValue for Json {
 impl ToValue for () {
 	fn to_value(&self) -> Value {
 		Value {
-			ptr: Gc::new(VNull)
+			ptr: box(GC) VNull
 		}
 	}
 }
@@ -554,7 +554,7 @@ impl<T:ToValue> ToValue for Option<T> {
 		match *self {
 			Some(ref v) => v.to_value(),
 			None => Value {
-				ptr: Gc::new(VNull)
+				ptr: box(GC) VNull
 			}
 		}
 	}

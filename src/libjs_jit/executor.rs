@@ -17,7 +17,7 @@ use JSVal = js::stdlib::value::Value;
 use js::stdlib::value::{VNull, ResultValue, to_value};
 use js::stdlib::value::ResultValue;
 use js::run::executor::Executor;
-use std::gc::Gc;
+use std::gc::GC;
 use std::c_str::CString;
 /// A JIT executor
 pub struct JitExecutor {
@@ -71,7 +71,7 @@ fn convert_to_value<'a>(func:&Function<'a>, val:&'a JITVal<'a>) -> JITVal<'a> {
 				match ptr.to_uint() {
 					0u => JSVal::undefined(),
 					1u => JSVal {
-						ptr: Gc::new(VNull)
+						ptr: box(GC) VNull
 					},
 					ptr => fail!("Invalid pointer: {}", ptr)
 				}

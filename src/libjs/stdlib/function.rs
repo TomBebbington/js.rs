@@ -2,7 +2,7 @@ use stdlib::object::{ObjectData, Property};
 use stdlib::value::{Value, VFunction, ResultValue, to_value};
 use collections::treemap::TreeMap;
 use std::iter::FromIterator;
-use std::gc::Gc;
+use std::gc::GC;
 use std::cell::RefCell;
 pub type FunctionData = fn(Vec<Value>, Value, Value, Value) -> ResultValue;
 #[deriving(Clone)]
@@ -25,7 +25,7 @@ impl Function {
 	/// Create a function from function data and arguments
 	pub fn make(repr: FunctionData, args:&[&'static str]) -> Value {
 		Value {
-			ptr: Gc::new(VFunction(RefCell::new(Function::new(repr, FromIterator::from_iter(args.iter().map(|arg|arg.to_string()))))))
+			ptr: box(GC) VFunction(RefCell::new(Function::new(repr, FromIterator::from_iter(args.iter().map(|arg|arg.to_string())))))
 		}
 	}
 	/// Call with some args

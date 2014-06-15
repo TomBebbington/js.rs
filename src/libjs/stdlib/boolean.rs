@@ -3,7 +3,7 @@ use std::gc::Gc;
 
 /// Create a new boolean
 pub fn make_boolean(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
-	Ok(Gc::new(VUndefined))
+	Ok(box VUndefined)
 }
 /// Create a new `Boolean` object
 pub fn _create(global: Value) -> Value {
