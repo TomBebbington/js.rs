@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors['js'] = ["impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Shl.html' title='core::ops::Shl'>Shl</a>&lt;<a class='struct' href='js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>, <a class='struct' href='js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>&gt; for <a class='struct' href='js/stdlib/value/struct.Value.html' title='js::stdlib::value::Value'>Value</a>",];
+implementors['front'] = ["impl <a class='trait' href='http://doc.rust-lang.org/core/ops/trait.Shl.html' title='core::ops::Shl'>Shl</a>&lt;<a class='struct' href='front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a>, <a class='struct' href='front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a>&gt; for <a class='struct' href='front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a>",];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

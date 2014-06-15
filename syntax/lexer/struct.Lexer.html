@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The syntax library documentation.">
+
+    <title>syntax::lexer::Lexer - Rust</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+          rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    <link rel="shortcut icon" href="http://tombebbington.github.io/favicon.png">
+</head>
+<body>
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    <section class="sidebar">
+        
+        <p class='location'><a href='../index.html'>syntax</a>&#8203;::<a href='index.html'>lexer</a></p><div class='block struct'><h2>Structs</h2><a class='struct current' href='struct.Lexer.html'>Lexer</a></div>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Search documentation..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'>Struct <a href='../index.html'>syntax</a>::<a href='index.html'>lexer</a>::<a class='struct' href=''>Lexer</a><a class='source' id='src-11120' href='../../src/syntax/src/syntax/lexer.rs.html#8-19'>[src]</a></h1>
+<pre class='rust struct'>pub struct Lexer&lt;B&gt; {
+    pub tokens: <a class='struct' href='http://doc.rust-lang.org/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../syntax/ast/token/struct.Token.html' title='syntax::ast::token::Token'>Token</a>&gt;,
+    // some fields omitted
+}</pre><div class='docblock'><p>A Javascript lexer</p>
+</div><h2 class='fields'>Fields</h2>
+<table><tr><td id='structfield.tokens'><code>tokens</code></td><td><div class='docblock'><p>The list of tokens generated so far</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;B: <a class='trait' href='http://doc.rust-lang.org/std/io/trait.Buffer.html' title='std::io::Buffer'>Buffer</a>&gt; <a class='struct' href='../../syntax/lexer/struct.Lexer.html' title='syntax::lexer::Lexer'>Lexer</a>&lt;B&gt;</code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(buffer: B) -&gt; <a class='struct' href='../../syntax/lexer/struct.Lexer.html' title='syntax::lexer::Lexer'>Lexer</a>&lt;B&gt;</code></h4>
+<div class='docblock'><p>Creates a new lexer with empty buffers</p>
+</div><h4 id='method.lex_str' class='method'><code>fn <a href='#method.lex_str' class='fnname'>lex_str</a>(script: &amp;<a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='http://doc.rust-lang.org/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../syntax/ast/token/struct.Token.html' title='syntax::ast::token::Token'>Token</a>&gt;</code></h4>
+<div class='docblock'><p>Processes an input stream from a string into an array of tokens</p>
+</div><h4 id='method.lex' class='method'><code>fn <a href='#method.lex' class='fnname'>lex</a>(&amp;mut self) -&gt; <a class='type' href='http://doc.rust-lang.org/std/io/type.IoResult.html' title='std::io::IoResult'>IoResult</a>&lt;()&gt;</code></h4>
+<div class='docblock'><p>Processes an input stream from the <code>buffer</code> into a vector of tokens</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&uarr;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&darr;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&\#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code> (or <code>str</code>), <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "syntax";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>
