@@ -11,6 +11,8 @@
 //! A Javascript execution command line tool
 
 extern crate js;
+extern crate js_jit;
+extern crate jit;
 extern crate syntax = "js_syntax";
 extern crate getopts;
 extern crate collections;

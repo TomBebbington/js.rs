@@ -1,5 +1,5 @@
 #![crate_id = "js#0.1-pre"]
-#![comment = "Javascript execution"]
+#![comment = "Javascript backend"]
 #![license = "MIT"]
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
@@ -11,23 +11,22 @@
 #![feature(phase, globs)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 
-//! This crate provides a Javascript execution library with an
-//! JITCompiler and a Javascript standard library.
+//! This crate provides the base for Javascript execution
+//! by including defining traits and the standard library.
 extern crate collections;
 extern crate syntax = "js_syntax";
 extern crate rand;
 extern crate serialize;
 extern crate time;
 extern crate url;
-extern crate jit;
 #[phase(plugin, link)]
 extern crate log;
-/// The execution engines
+/// The backend defining traits
 pub mod run {
-	/// Defines the base executor trait which the execution engines derive from
-	pub mod exec;
-	/// Just-In-Time Compilation using libJIT
-	pub mod jit;
+	/// Compilation of code
+	pub mod compiler;
+	/// Execution of compiled code
+	pub mod executor;
 }
 /// The standard Javascript library
 pub mod stdlib {

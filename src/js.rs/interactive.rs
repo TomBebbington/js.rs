@@ -1,21 +1,26 @@
-use js::run::exec::Executor;
-use js::run::jit::JITCompiler;
+use js::run::compiler::Compiler;
+use js::run::executor::Executor;
+use js_jit::JitCompiler;
+use js_jit::JitExecutor;
+use jit::Context;
 use syntax::Lexer;
 use syntax::Parser;
 use std::io::stdio::{stdin, StdReader};
 use std::io::{BufReader, BufferedReader};
 /// An interactive command-line mode
-pub struct Interactive {
+pub struct Interactive<'a> {
+	context: Context<'a>,
 	/// The execution engine to run the expressions on
-	pub engine: JITCompiler,
+	pub executor: JitExecutor,
 	/// The standard input stream to read from
 	pub input: BufferedReader<StdReader>
 }
-impl Interactive {
+impl<'a> Interactive<'a> {
 	/// Create a new interactive mode info
 	pub fn new() -> Interactive {
 		Interactive {
-			engine: Executor::new(),
+			context: Context::new(),
+			executor: JitExecutor::new(),
 			input: stdin()
 		}
 	}
@@ -35,9 +40,11 @@ impl Interactive {
 			debug!("Now parsing...");
 			let expr = Parser::new(tokens).parse_all().unwrap();
 			debug!("Parsed into expression: {}", expr);
-			debug!("Now executing with LibJIT backend...");
-			let compiled = self.engine.compile(&expr);
-			match self.engine.run(&compiled) {
+			debug!("Now compiling");
+			let compiler = JitCompiler::new(&self.context);
+			let compiled = compiler.compile(&expr);
+			debug!("Now executing");
+			match self.executor.execute(&compiled) {
 				Ok(v) =>
 					println!("{}", v),
 				Err(v) =>

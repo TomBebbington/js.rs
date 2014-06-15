@@ -1,4 +1,8 @@
-use js::run::exec::execute;
+use js::run::compiler::Compiler;
+use js::run::executor::Executor;
+use js_jit::JitCompiler;
+use js_jit::JitExecutor;
+use jit::Context;
 use syntax::Lexer;
 use syntax::Parser;
 use std::io::{BufferedReader, File};
@@ -27,8 +31,13 @@ impl Runner {
 			debug!("Now parsing...");
 			let expr = Parser::new(tokens).parse_all().unwrap();
 			debug!("Parsed as {}", expr);
+			debug!("Creating JIT Context");
+			let context = Context::new();
+			debug!("Compiling");
+			let compiler = JitCompiler::new(&context);
+			let result = compiler.compile(&expr);
 			debug!("Now running on JIT backend...");
-			match execute(&expr) {
+			match JitExecutor::new().execute(&result) {
 				Ok(v) =>
 					println!("{}", v),
 				Err(v) =>

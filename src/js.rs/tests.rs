@@ -1,4 +1,8 @@
-use js::run::exec::execute_env;
+use js::run::compiler::Compiler;
+use js::run::executor::Executor;
+use js_jit::JitCompiler;
+use js_jit::JitExecutor;
+use jit::Context;
 use js::stdlib::value::{ResultValue, Value, to_value, from_value};
 use js::stdlib::function::Function;
 use syntax::Lexer;
@@ -26,11 +30,15 @@ fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
 	map
 }
 /// Test against unit tests
-pub struct Tests;
-impl Tests {
+pub struct Tests<'a> {
+	context: Context<'a>
+}
+impl<'a> Tests<'a> {
 	/// Create a new unit tester
 	pub fn new() -> Tests {
-		Tests
+		Tests {
+			context: Context::new()
+		}
 	}
 	/// Run a test
 	pub fn run_test(&self, path: Path) {
@@ -61,7 +69,9 @@ impl Tests {
 		debug!("Now running");
 		let env = Value::new_obj(None);
 		env.set_field_slice("assert", Function::make(assert, ["condition"]));
-		match execute_env(&expr, env) {
+		let compiler = JitCompiler::new(&self.context);
+		let compiled = compiler.compile(&expr);
+		match JitExecutor::new().execute(&compiled) {
 			Ok(_) =>
 				println!("{}: {}: All tests passed successfully", file, desc),
 			Err(v) =>
