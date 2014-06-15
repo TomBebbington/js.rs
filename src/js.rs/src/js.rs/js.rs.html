@@ -95,6 +95,8 @@
 <span id='55'>55</span>
 <span id='56'>56</span>
 <span id='57'>57</span>
+<span id='58'>58</span>
+<span id='59'>59</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js.rs&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript parsing and execution command line tool&quot;</span>]</span>
@@ -109,6 +111,8 @@
 <span class='doccomment'>//! A Javascript execution command line tool
 </span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>js</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>js_jit</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>syntax</span> <span class='op'>=</span> <span class='string'>&quot;js_syntax&quot;</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>getopts</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>collections</span>;
@@ -131,7 +135,7 @@
 		<span class='ident'>getopts</span>::<span class='ident'>optflag</span>(<span class='string'>&quot;i&quot;</span>, <span class='string'>&quot;interactive&quot;</span>, <span class='string'>&quot;Run in interactive mode&quot;</span>),
 		<span class='ident'>getopts</span>::<span class='ident'>optopt</span>(<span class='string'>&quot;s&quot;</span>, <span class='string'>&quot;source-code&quot;</span>, <span class='string'>&quot;Run some Javascript code&quot;</span>, <span class='string'>&quot;The path to the source code&quot;</span>)
 	];
-	<span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>getopts</span>::<span class='ident'>getopts</span>(<span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>args</span>().<span class='ident'>as_slice</span>(), <span class='ident'>opts</span>).<span class='ident'>unwrap</span>();
+	<span class='kw'>let</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>getopts</span>::<span class='ident'>getopts</span>(<span class='ident'>std</span>::<span class='ident'>os</span>::<span class='ident'>args</span>().<span class='ident'>as_slice</span>(), <span class='ident'>opts</span>).<span class='ident'>ok</span>().<span class='ident'>expect</span>(<span class='string'>&quot;Could not parse arguments&quot;</span>);
 	<span class='kw'>match</span> <span class='ident'>m</span>.<span class='ident'>opt_str</span>(<span class='string'>&quot;s&quot;</span>) {
 		<span class='prelude-val'>Some</span>(<span class='ident'>path</span>) <span class='op'>=&gt;</span> {
 			<span class='ident'>Runner</span>::<span class='ident'>new</span>(<span class='ident'>path</span>).<span class='ident'>run</span>()

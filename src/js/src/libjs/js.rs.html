@@ -93,10 +93,9 @@
 <span id='53'>53</span>
 <span id='54'>54</span>
 <span id='55'>55</span>
-<span id='56'>56</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;js#0.1-pre&quot;</span>]</span>
-<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript execution&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript backend&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;dylib&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;rlib&quot;</span>]</span>
@@ -108,23 +107,22 @@
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>, <span class='ident'>globs</span>)]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
 
-<span class='doccomment'>//! This crate provides a Javascript execution library with an
-</span><span class='doccomment'>//! JITCompiler and a Javascript standard library.
+<span class='doccomment'>//! This crate provides the base for Javascript execution
+</span><span class='doccomment'>//! by including defining traits and the standard library.
 </span><span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>collections</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>syntax</span> <span class='op'>=</span> <span class='string'>&quot;js_syntax&quot;</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>serialize</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>jit</span>;
 <span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
-<span class='doccomment'>/// The execution engines
+<span class='doccomment'>/// The backend defining traits
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>run</span> {
-	<span class='doccomment'>/// Defines the base executor trait which the execution engines derive from
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>exec</span>;
-	<span class='doccomment'>/// Just-In-Time Compilation using libJIT
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>jit</span>;
+	<span class='doccomment'>/// Compilation of code
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>compiler</span>;
+	<span class='doccomment'>/// Execution of compiled code
+</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>executor</span>;
 }
 <span class='doccomment'>/// The standard Javascript library
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>stdlib</span> {
