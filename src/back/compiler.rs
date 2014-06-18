@@ -40,8 +40,8 @@ impl<'a> JitCompiler<'a> {
 		} else if val_kind.contains(Float64) {
 			let zero = 0.0f64.compile(&self.curr);
 			let not_zero = self.curr.insn_neq(&val, &zero);
-			let not_nan = self.curr.insn_not(&self.curr.insn_is_nan(&val));
-			convert(self.curr.insn_and(&not_zero, &not_nan))
+			let not_nan = !self.curr.insn_is_nan(&val);
+			convert(not_zero & not_nan)
 		} else if val_kind.contains(Int) || val_kind.contains(UInt) || val_kind.contains(NInt) || val_kind.contains(NUInt) {
 			let zero = 0i.compile(&self.curr); 
 			convert(self.curr.insn_neq(&val, &zero))
@@ -96,11 +96,11 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
 		let (c_left, _) = self.compile(left);
 		let (c_right, _) = self.compile(right);
 		(match op {
-			OpAdd => self.curr.insn_add(&c_left, &c_right),
-			OpSub => self.curr.insn_sub(&c_left, &c_right),
-			OpDiv => self.curr.insn_div(&c_left, &c_right),
-			OpMul => self.curr.insn_mul(&c_left, &c_right),
-			OpMod => self.curr.insn_rem(&c_left, &c_right),
+			OpAdd => c_left + c_right,
+			OpSub => c_left - c_right,
+			OpDiv => c_left / c_right,
+			OpMul => c_left * c_right,
+			OpMod => c_left % c_right
 		}, &self.curr)
 	}
 	fn compile_bit_op(&'a self, op:BitOp, left:&Expr, right:&Expr) -> CompiledValue<'a> {
@@ -110,11 +110,11 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
 		let (c_right, _) = self.compile(right);
 		let c_right = self.curr.insn_convert(&c_right, &int_t, false);
 		(match op {
-			BitAnd => self.curr.insn_and(&c_left, &c_right),
-			BitOr => self.curr.insn_or(&c_left, &c_right),
-			BitXor => self.curr.insn_xor(&c_left, &c_right),
-			BitShl => self.curr.insn_shl(&c_left, &c_right),
-			BitShr => self.curr.insn_shr(&c_left, &c_right)
+			BitAnd => c_left & c_right,
+			BitOr => c_left | c_right,
+			BitXor => c_left ^ c_right,
+			BitShl => c_left << c_right,
+			BitShr => c_left >> c_right
 		}, &self.curr)
 	}
 	fn compile_log_op(&'a self, op:LogOp, left:&Expr, right:&Expr) -> CompiledValue<'a> {
@@ -123,8 +123,8 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
 		let (c_right, _) = self.compile(right);
 		let c_right = self.convert_bool(c_right);
 		(match op {
-			LogAnd => self.curr.insn_and(&c_left, &c_right),
-			LogOr => self.curr.insn_or(&c_left, &c_right)
+			LogAnd => c_left & c_right,
+			LogOr => c_left | c_right
 		}, &self.curr)
 	}
 	fn compile_comp_op(&'a self, op:CompOp, left:&Expr, right:&Expr) -> CompiledValue<'a> {
@@ -150,10 +150,10 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
 	fn compile_unary_op(&'a self, op:UnaryOp, val:&Expr) -> CompiledValue<'a> {
 		let (c_val, _) = self.compile(val);
 		(match op {
-			UnaryMinus => self.curr.insn_neg(&c_val),
+			UnaryMinus => -c_val,
 			UnaryPlus => c_val,
 			UnaryNot => {
-				let c_not = self.curr.insn_not(&c_val);
+				let c_not = !c_val;
 				self.curr.insn_convert(&c_not, &get_type::<bool>(), false)
 			},
 			_ => unimplemented!()
