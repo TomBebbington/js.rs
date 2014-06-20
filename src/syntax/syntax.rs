@@ -5,8 +5,8 @@
 #![crate_type = "rlib"]
 
 #![doc(
-	html_favicon_url = "http://tombebbington.github.io/favicon.png",
-	html_root_url = "http://tombebbington.github.io/js.rs/"
+    html_favicon_url = "http://tombebbington.github.io/favicon.png",
+    html_root_url = "http://tombebbington.github.io/js.rs/"
 )]
 #![experimental]
 
@@ -27,24 +27,24 @@ pub use lexer::Lexer;
 pub use parser::Parser;
 /// The Abstract Syntax Trees for Javascript tokens and expressions
 pub mod ast {
-	/// Constant AST
-	pub mod constant;
-	/// Expression AST
-	pub mod expr;
-	/// Typed expression AST
-	pub mod typer;
-	/// Operations AST
-	pub mod op;
-	/// Keywords AST
-	pub mod keyword;
-	/// Punctation AST
-	pub mod punc;
-	/// Position AST
-	pub mod pos;
-	/// Token AST
-	pub mod token;
-	/// Typing AST
-	pub mod types;
+    /// Constant AST
+    pub mod constant;
+    /// Expression AST
+    pub mod expr;
+    /// Typed expression AST
+    pub mod typer;
+    /// Operations AST
+    pub mod op;
+    /// Keywords AST
+    pub mod keyword;
+    /// Punctation AST
+    pub mod punc;
+    /// Position AST
+    pub mod pos;
+    /// Token AST
+    pub mod token;
+    /// Typing AST
+    pub mod types;
 }
 /// The lexer, which transforms a string stream into a sequence of tokens
 pub mod lexer;

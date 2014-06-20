@@ -4,8 +4,8 @@
 #![crate_type = "dylib"]
 #![crate_type = "rlib"]
 #![doc(
-	html_favicon_url = "http://tombebbington.github.io/favicon.png",
-	html_root_url = "http://tombebbington.github.io/js.rs/"
+    html_favicon_url = "http://tombebbington.github.io/favicon.png",
+    html_root_url = "http://tombebbington.github.io/js.rs/"
 )]
 #![experimental]
 #![feature(phase, globs)]
