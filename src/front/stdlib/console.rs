@@ -20,12 +20,12 @@ pub fn error(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Create a new `console` object
 pub fn _create(global : Value) -> Value {
     let console = Value::new_obj(Some(global));
-    console.set_field_slice("log", Function::make(log, ["object"]));
-    console.set_field_slice("error", Function::make(error, ["error"]));
-    console.set_field_slice("exception", Function::make(error, ["error"]));
+    console.set_field("log", Function::make(log, ["object"]));
+    console.set_field("error", Function::make(error, ["error"]));
+    console.set_field("exception", Function::make(error, ["error"]));
     console
 }
 /// Initialise the global object with the `console` object
 pub fn init(global:Value) {
-    global.set_field_slice("console", _create(global));
+    global.set_field("console", _create(global));
 }

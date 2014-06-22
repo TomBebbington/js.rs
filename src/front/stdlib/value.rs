@@ -55,7 +55,7 @@ impl Value {
     pub fn new_obj(global: Option<Value>) -> Value {
         let mut obj : ObjectData = TreeMap::new();
         if global.is_some() {
-            let obj_proto = global.unwrap().get_field_slice("Object").get_field_slice(PROTOTYPE);
+            let obj_proto = global.unwrap().get_field("Object").get_field(PROTOTYPE);
             obj.insert(INSTANCE_PROTOTYPE.into_string(), Property::new(obj_proto));
         }
         Value::new(VObject(RefCell::new(obj)))
@@ -141,13 +141,13 @@ impl Value {
         }
     }
     /// Resolve the property in the object
-    pub fn get_prop(&self, field:String) -> Option<Property> {
+    pub fn get_prop<'a>(&self, field:&'a str) -> Option<Property> {
         let obj : ObjectData = match **self {
             VObject(ref obj) => obj.borrow().clone(),
             VFunction(ref func) =>func.borrow().object.clone(),
             _ => return None
         };
-        match obj.find(&field) {
+        match obj.find(&field.into_string()) {
             Some(val) => Some(*val),
             None => match obj.find(&PROTOTYPE.into_string()) {
                 Some(prop) => 
@@ -157,7 +157,7 @@ impl Value {
         }
     }
     /// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
-    pub fn get_field(&self, field:String) -> Value {
+    pub fn get_field<'a>(&self, field:&'a str) -> Value {
         match self.get_prop(field) {
             Some(prop) => prop.value,
             None => Value{
@@ -165,43 +165,31 @@ impl Value {
             }
         }
     }
-    /// Resolve the property in the object and get its value, or undefined if this is not an object or the field doesn't exist
-    pub fn get_field_slice<'t>(&self, field:&'t str) -> Value {
-        self.get_field(field.into_string())
-    }
     /// Set the field in the value
-    pub fn set_field(&self, field:String, val:Value) -> Value {
+    pub fn set_field<'a>(&self, field:&'a str, val:Value) -> Value {
         match **self {
             VObject(ref obj) => {
-                obj.borrow_mut().insert(field.clone(), Property::new(val));
+                obj.borrow_mut().insert(field.into_string(), Property::new(val));
             },
             VFunction(ref func) => {
-                func.borrow_mut().object.insert(field.clone(), Property::new(val));
+                func.borrow_mut().object.insert(field.into_string(), Property::new(val));
             },
             _ => ()
         }
         val
     }
-    /// Set the field in the value
-    pub fn set_field_slice<'t>(&self, field:&'t str, val:Value) -> Value {
-        self.set_field(field.into_string(), val)
-    }
     /// Set the property in the value
-    pub fn set_prop(&self, field:String, prop:Property) -> Property {
+    pub fn set_prop<'a>(&self, field:&'a str, prop:Property) -> Property {
         match **self {
             VObject(ref obj) => {
-                obj.borrow_mut().insert(field.clone(), prop);
+                obj.borrow_mut().insert(field.into_string(), prop);
             },
             VFunction(ref func) => {
-                func.borrow_mut().object.insert(field.clone(), prop);
+                func.borrow_mut().object.insert(field.into_string(), prop);
             },
             _ => ()
         }
         prop
-    }
-    /// Set the property in the value
-    pub fn set_prop_slice<'t>(&self, field:&'t str, prop:Property) -> Property {
-        self.set_prop(field.into_string(), prop)
     }
     /// Convert from a JSON value to a JS value
     pub fn from_json(json:Json) -> ValueData {
@@ -490,10 +478,10 @@ impl<T:ToValue> ToValue for Vec<T> {
 }
 impl<T:FromValue> FromValue for Vec<T> {
     fn from_value(v:Value) -> Result<Vec<T>, &'static str> {
-        let len = v.get_field_slice("length").to_int();
+        let len = v.get_field("length").to_int();
         let mut vec = Vec::with_capacity(len as uint);
         for i in range(0, len) {
-            vec.push(try!(from_value(v.get_field(i.to_str()))))
+            vec.push(try!(from_value(v.get_field(i.to_str().as_slice()))))
         }
         Ok(vec)
     }

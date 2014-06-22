@@ -11,12 +11,12 @@ pub trait Executor<Compiled> {
     fn get_global_obj(&self) -> Value;
     #[inline]
     /// Get a field of the global object
-    fn get_global(&self, field: String) -> Value {
+    fn get_global<'a>(&self, field: &'a str) -> Value {
         self.get_global_obj().get_field(field)
     }
     #[inline]
     /// Set a field of the global object
-    fn set_global(&self, field: String, value:Value) -> Value {
+    fn set_global<'a>(&self, field: &'a str, value:Value) -> Value {
         self.get_global_obj().set_field(field, value)
     }
     /// Execute a compiled expression

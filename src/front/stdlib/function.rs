@@ -38,5 +38,5 @@ pub fn _create(_ : Value) -> Value {
 }
 /// Initialise the global object with the `Function` object
 pub fn init(global:Value) {
-    global.set_field_slice("Function", _create(global));
+    global.set_field("Function", _create(global));
 }

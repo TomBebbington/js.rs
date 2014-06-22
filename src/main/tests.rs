@@ -67,7 +67,7 @@ impl<'a> Tests<'a> {
         debug!("Parsed as {}", expr);
         debug!("Now running");
         let env = Value::new_obj(None);
-        env.set_field_slice("assert", Function::make(assert, ["condition"]));
+        env.set_field("assert", Function::make(assert, ["condition"]));
         let compiler = JitCompiler::new(&self.context);
         let compiled = compiler.compile(&expr);
         match JitExecutor::new().execute(&compiled) {

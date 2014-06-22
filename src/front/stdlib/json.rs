@@ -21,11 +21,11 @@ pub fn stringify(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Create a new `JSON` object
 pub fn _create(global:Value) -> Value {
     let object = Value::new_obj(Some(global));
-    object.set_field_slice("stringify", Function::make(stringify, ["JSON"]));
-    object.set_field_slice("parse", Function::make(parse, ["JSON_string"]));
+    object.set_field("stringify", Function::make(stringify, ["JSON"]));
+    object.set_field("parse", Function::make(parse, ["JSON_string"]));
     object
 }
 /// Initialise the global object with the `JSON` object
 pub fn init(global:Value) {
-    global.set_field_slice("JSON", _create(global));
+    global.set_field("JSON", _create(global));
 }

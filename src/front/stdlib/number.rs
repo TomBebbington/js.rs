@@ -61,25 +61,25 @@ pub fn strict_is_nan(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue 
 /// Create a new `Number` object
 pub fn _create(global:Value) -> Value {
     let number = Value::new_obj(Some(global));
-    number.set_field_slice("NaN", to_value(NAN));
-    number.set_field_slice("MAX_VALUE", to_value(MAX_VALUE));
-    number.set_field_slice("MIN_VALUE", to_value(MIN_VALUE));
-    number.set_field_slice("POSITIVE_INFINITY", to_value(INFINITY));
-    number.set_field_slice("NEGATIVE_INFINITY", to_value(NEG_INFINITY));
-    number.set_field_slice("EPSILON", to_value(EPSILON));
-    number.set_field_slice("parseFloat", Function::make(parse_float, ["string"]));
-    number.set_field_slice("parseInt", Function::make(parse_int, ["string"]));
-    number.set_field_slice("isFinite", Function::make(strict_is_finite, ["num"]));
-    number.set_field_slice("isNaN", Function::make(strict_is_nan, ["num"]));
+    number.set_field("NaN", to_value(NAN));
+    number.set_field("MAX_VALUE", to_value(MAX_VALUE));
+    number.set_field("MIN_VALUE", to_value(MIN_VALUE));
+    number.set_field("POSITIVE_INFINITY", to_value(INFINITY));
+    number.set_field("NEGATIVE_INFINITY", to_value(NEG_INFINITY));
+    number.set_field("EPSILON", to_value(EPSILON));
+    number.set_field("parseFloat", Function::make(parse_float, ["string"]));
+    number.set_field("parseInt", Function::make(parse_int, ["string"]));
+    number.set_field("isFinite", Function::make(strict_is_finite, ["num"]));
+    number.set_field("isNaN", Function::make(strict_is_nan, ["num"]));
     number
 }
 /// Initialise the parse functions and `Number` on the global object
 pub fn init(global:Value) {
-    global.set_field_slice("NaN", to_value(NAN));
-    global.set_field_slice("Infinity", to_value(INFINITY));
-    global.set_field_slice("parseFloat", Function::make(parse_float, ["string"]));
-    global.set_field_slice("parseInt", Function::make(parse_int, ["string"]));
-    global.set_field_slice("isFinite", Function::make(is_finite, ["number"]));
-    global.set_field_slice("isNaN", Function::make(is_nan, ["num"]));
-    global.set_field_slice("Number", _create(global));
+    global.set_field("NaN", to_value(NAN));
+    global.set_field("Infinity", to_value(INFINITY));
+    global.set_field("parseFloat", Function::make(parse_float, ["string"]));
+    global.set_field("parseInt", Function::make(parse_int, ["string"]));
+    global.set_field("isFinite", Function::make(is_finite, ["number"]));
+    global.set_field("isNaN", Function::make(is_nan, ["num"]));
+    global.set_field("Number", _create(global));
 }

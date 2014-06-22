@@ -38,8 +38,8 @@ pub fn decode_uri_component(args:Vec<Value>, _:Value, _:Value, _:Value) -> Resul
 }
 /// Initialise the URI functions on the global object
 pub fn init(global:Value) {
-    global.set_field_slice("encodeURI", Function::make(encode_uri, ["uri"]));
-    global.set_field_slice("encodeURIComponent", Function::make(encode_uri_component, ["uri_comp"]));
-    global.set_field_slice("decodeURI", Function::make(decode_uri, ["uri"]));
-    global.set_field_slice("decodeURIComponent", Function::make(decode_uri_component, ["uri_comp"]));
+    global.set_field("encodeURI", Function::make(encode_uri, ["uri"]));
+    global.set_field("encodeURIComponent", Function::make(encode_uri_component, ["uri_comp"]));
+    global.set_field("decodeURI", Function::make(decode_uri, ["uri"]));
+    global.set_field("decodeURIComponent", Function::make(decode_uri_component, ["uri_comp"]));
 }

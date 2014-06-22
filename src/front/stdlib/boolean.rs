@@ -13,5 +13,5 @@ pub fn _create(global: Value) -> Value {
 /// Initialise the global object with the `Boolean` object
 pub fn init(global:Value) {
     let global_ptr = global.borrow();
-    global_ptr.set_field_slice("Boolean", _create(global));
+    global_ptr.set_field("Boolean", _create(global));
 }

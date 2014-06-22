@@ -4,7 +4,7 @@ use stdlib::object::{PROTOTYPE, Property};
 
 /// Create new string
 pub fn make_string(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
-    this.set_field_slice("length", to_value(0i32));
+    this.set_field("length", to_value(0i32));
     Ok(Value::undefined())
 }
 /// Get a string's length
@@ -24,11 +24,11 @@ pub fn _create(global: Value) -> Value {
         get: Function::make(get_string_length, []),
         set: Value::undefined()
     };
-    proto.set_prop_slice("length", prop);
-    string.set_field_slice(PROTOTYPE, proto);
+    proto.set_prop("length", prop);
+    string.set_field(PROTOTYPE, proto);
     string
 }
 /// Initialise the `String` object on the global object
 pub fn init(global:Value) {
-    global.set_field_slice("String", _create(global));
+    global.set_field("String", _create(global));
 }
