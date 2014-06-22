@@ -46,6 +46,11 @@ pub enum ValueData {
     VFunction(RefCell<Function>)
 }
 impl Value {
+    #[inline]
+    /// Move some value data into a new value
+    pub fn new(data: ValueData) -> Value {
+        Value::new(data)
+    }
     /// Returns a new empty object
     pub fn new_obj(global: Option<Value>) -> Value {
         let mut obj : ObjectData = TreeMap::new();
@@ -53,9 +58,7 @@ impl Value {
             let obj_proto = global.unwrap().get_field_slice("Object").get_field_slice(PROTOTYPE);
             obj.insert(INSTANCE_PROTOTYPE.into_string(), Property::new(obj_proto));
         }
-        Value {
-            ptr: box(GC) VObject(RefCell::new(obj))
-        }
+        Value::new(VObject(RefCell::new(obj)))
     }
     /// Returns true if the value is an object
     pub fn is_object(&self) -> bool {
@@ -237,9 +240,7 @@ impl Value {
     }
     /// Get the value for undefined
     pub fn undefined() -> Value {
-        Value {
-            ptr: box(GC) VUndefined
-        }
+        Value::new(VUndefined)
     }
 }
 impl fmt::Show for Value {
@@ -408,9 +409,7 @@ pub trait FromValue {
 }
 impl ToValue for String {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VString(self.clone())
-        }
+        Value::new(VString(self.clone()))
     }
 }
 impl FromValue for String {
@@ -420,9 +419,7 @@ impl FromValue for String {
 }
 impl<'s> ToValue for &'s str {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VString(String::from_str(*self))
-        }
+        Value::new(VString(String::from_str(*self)))
     }
 }
 impl ToValue for *i8 {
@@ -435,9 +432,7 @@ impl ToValue for *i8 {
 }
 impl ToValue for char {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VString(String::from_char(1, *self))
-        }
+        Value::new(VString(String::from_char(1, *self)))
     }
 }
 impl FromValue for char {
@@ -447,9 +442,7 @@ impl FromValue for char {
 }
 impl ToValue for f64 {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VNumber(*self)
-        }
+        Value::new(VNumber(*self))
     }
 }
 impl FromValue for f64 {
@@ -459,9 +452,7 @@ impl FromValue for f64 {
 }
 impl ToValue for i32 {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VInteger(*self)
-        }
+        Value::new(VInteger(*self))
     }
 }
 impl FromValue for i32 {
@@ -471,9 +462,7 @@ impl FromValue for i32 {
 }
 impl ToValue for bool {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VBoolean(*self)
-        }
+        Value::new(VBoolean(*self))
     }
 }
 impl FromValue for bool {
@@ -515,9 +504,7 @@ impl<T:FromValue> FromValue for Vec<T> {
 }
 impl ToValue for ObjectData {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VObject(RefCell::new(self.clone()))
-        }
+        Value::new(VObject(RefCell::new(self.clone())))
     }
 }
 impl FromValue for ObjectData {
@@ -533,9 +520,7 @@ impl FromValue for ObjectData {
 }
 impl ToValue for Json {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) Value::from_json(self.clone())
-        }
+        Value::new(Value::from_json(self.clone()))
     }
 }
 impl FromValue for Json {
@@ -545,9 +530,7 @@ impl FromValue for Json {
 }
 impl ToValue for () {
     fn to_value(&self) -> Value {
-        Value {
-            ptr: box(GC) VNull
-        }
+        Value::new(VNull)
     }
 }
 impl FromValue for () {
@@ -559,9 +542,7 @@ impl<T:ToValue> ToValue for Option<T> {
     fn to_value(&self) -> Value {
         match *self {
             Some(ref v) => v.to_value(),
-            None => Value {
-                ptr: box(GC) VNull
-            }
+            None => Value::new(VNull)
         }
     }
 }

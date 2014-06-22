@@ -24,9 +24,7 @@ impl Function {
     }
     /// Create a function from function data and arguments
     pub fn make(repr: FunctionData, args:&[&'static str]) -> Value {
-        Value {
-            ptr: box(GC) VFunction(RefCell::new(Function::new(repr, FromIterator::from_iter(args.iter().map(|arg|arg.to_string())))))
-        }
+        Value::new(VFunction(RefCell::new(Function::new(repr, FromIterator::from_iter(args.iter().map(|arg|arg.to_string()))))))
     }
     /// Call with some args
     pub fn call(&self, args: Vec<Value>, global:Value, scope:Value, this:Value) -> ResultValue {
