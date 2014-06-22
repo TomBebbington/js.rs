@@ -55,7 +55,7 @@ impl<B:Buffer> Lexer<B> {
             })
         }
     }
-    fn peek_for(&mut self, peek:char) -> bool {
+    fn next_is(&mut self, peek:char) -> bool {
         if self.peek_buffer.len() > 0 {
             let matched = self.peek_buffer.as_slice().char_at(self.peek_buffer.len() - 1) == peek;
             if matched {
@@ -147,7 +147,7 @@ impl<B:Buffer> Lexer<B> {
                     }
                     self.push_token(TStringLiteral(buf))
                 },
-                '0' if self.peek_for('x') => {
+                '0' if self.next_is('x') => {
                     let mut buf = String::new();
                     loop {
                         match try!(self.next()) {
@@ -260,7 +260,7 @@ impl<B:Buffer> Lexer<B> {
                 '?' => {
                     self.push_punc(PQuestion);
                 },
-                '/' if self.peek_for('/') => {
+                '/' if self.next_is('/') => {
                     let mut buf = String::new();
                     loop {
                         match try!(self.next()) {
@@ -270,82 +270,82 @@ impl<B:Buffer> Lexer<B> {
                     }
                     self.push_token(TComment(buf));
                 },
-                '/' if self.peek_for('*') => {
+                '/' if self.next_is('*') => {
                     let mut buf = String::new();
                     loop {
                         match try!(self.next()) {
                             '\n' => break,
-                            '*' if self.peek_for('/') => break,
+                            '*' if self.next_is('/') => break,
                             ch => buf.push_char(ch)
                         }
                     }
                     self.push_token(TComment(buf));
                 },
-                '/' if self.peek_for('=') => {
+                '/' if self.next_is('=') => {
                     self.push_punc(PAssignDiv);
                 },
                 '/' => {
                     self.push_punc(PDiv);
                 },
-                '*' if self.peek_for('=') => {
+                '*' if self.next_is('=') => {
                     self.push_punc(PAssignMul);
                 },
                 '*' => {
                     self.push_punc(PMul);
                 },
-                '+' if self.peek_for('=') => {
+                '+' if self.next_is('=') => {
                     self.push_punc(PAssignAdd);
                 },
-                '+' if self.peek_for('+') => {
+                '+' if self.next_is('+') => {
                     self.push_punc(PInc);
                 },
                 '+' => {
                     self.push_punc(PAdd);
                 },
-                '-' if self.peek_for('=') => {
+                '-' if self.next_is('=') => {
                     self.push_punc(PAssignSub);
                 },
-                '-' if self.peek_for('-') => {
+                '-' if self.next_is('-') => {
                     self.push_punc(PDec);
                 },
                 '-' => {
                     self.push_punc(PSub);
                 },
-                '%' if self.peek_for('=') => {
+                '%' if self.next_is('=') => {
                     self.push_punc(PAssignMod);
                 },
                 '%' => {
                     self.push_punc(PMod);
                 },
-                '|' if self.peek_for('|') => {
+                '|' if self.next_is('|') => {
                     self.push_punc(PBoolOr);
                 },
-                '|' if self.peek_for('=') => {
+                '|' if self.next_is('=') => {
                     self.push_punc(PAssignOr);
                 },
                 '|' => {
                     self.push_punc(POr);
                 },
-                '&' if self.peek_for('&') => {
+                '&' if self.next_is('&') => {
                     self.push_punc(PBoolAnd);
                 },
-                '&' if self.peek_for('=') => {
+                '&' if self.next_is('=') => {
                     self.push_punc(PAssignAnd);
                 },
                 '&' => {
                     self.push_punc(PAnd);
                 },
-                '^' if self.peek_for('=') => {
+                '^' if self.next_is('=') => {
                     self.push_punc(PAssignXor);
                 },
                 '^' => {
                     self.push_punc(PXor);
                 },
-                '=' if self.peek_for('>') => {
+                '=' if self.next_is('>') => {
                     self.push_punc(PArrow);
                 },
-                '=' if self.peek_for('=') => {
-                    if self.peek_for('=') {
+                '=' if self.next_is('=') => {
+                    if self.next_is('=') {
                         self.push_punc(PStrictEq);
                     } else {
                         self.push_punc(PEq);
@@ -354,11 +354,11 @@ impl<B:Buffer> Lexer<B> {
                 '=' => {
                     self.push_punc(PAssign);
                 },
-                '<' if self.peek_for('=') => {
+                '<' if self.next_is('=') => {
                     self.push_punc(PLessThanOrEq);
                 },
-                '<' if self.peek_for('<') => {
-                    if self.peek_for('=') {
+                '<' if self.next_is('<') => {
+                    if self.next_is('=') {
                         self.push_punc(PAssignLeftSh);
                     } else {
                         self.push_punc(PLeftSh);
@@ -367,14 +367,14 @@ impl<B:Buffer> Lexer<B> {
                 '<' => {
                     self.push_punc(PLessThan);
                 },
-                '>' if self.peek_for('=') => {
+                '>' if self.next_is('=') => {
                     self.push_punc(PGreaterThanOrEq);
                 },
-                '>' if self.peek_for('>') => {
-                    if self.peek_for('=') {
+                '>' if self.next_is('>') => {
+                    if self.next_is('=') {
                         self.push_punc(PAssignRightSh);
-                    } else if self.peek_for('>') {
-                        if self.peek_for('=') {
+                    } else if self.next_is('>') {
+                        if self.next_is('=') {
                             self.push_punc(PAssignURightSh);
                         } else {
                             self.push_punc(PURightSh);
@@ -386,8 +386,8 @@ impl<B:Buffer> Lexer<B> {
                 '>' => {
                         self.push_punc(PGreaterThan);
                 },
-                '!' if self.peek_for('=') => {
-                    if self.peek_for('=') {
+                '!' if self.next_is('=') => {
+                    if self.next_is('=') {
                         self.push_punc(PStrictNotEq);
                     } else {
                         self.push_punc(PNotEq);
