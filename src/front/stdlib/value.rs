@@ -472,23 +472,19 @@ impl FromValue for bool {
 }
 impl<'s, T:ToValue> ToValue for &'s [T] {
     fn to_value(&self) -> Value {
-        let mut arr = TreeMap::new();
-        let mut i = 0;
-        for item in self.iter() {
-            arr.insert(i.to_str().into_string(), Property::new(item.to_value()));
-            i += 1;
-        }
+        let mut i = 0u;
+        let mut arr:ObjectData = self.iter().map(|elem| {
+            (i.to_str(), Property::new(elem.to_value()))
+        }).collect();
         to_value(arr)
     }
 }
 impl<T:ToValue> ToValue for Vec<T> {
     fn to_value(&self) -> Value {
-        let mut arr = TreeMap::new();
-        let mut i = 0;
-        for item in self.iter() {
-            arr.insert(i.to_str().into_string(), Property::new(item.to_value()));
-            i += 1;
-        }
+        let mut i = 0u;
+        let mut arr:ObjectData = self.iter().map(|elem| {
+            (i.to_str(), Property::new(elem.to_value()))
+        }).collect();
         to_value(arr)
     }
 }
