@@ -13,5 +13,7 @@ pub fn _create(_: Value) -> Value {
 }
 /// Initialise the global object with the `Array` object
 pub fn init(global:Value) {
-    global.set_field("Array", _create(global));
+	js_extend!(global, {
+		"Array": _create(global)
+	});
 }

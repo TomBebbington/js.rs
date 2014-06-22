@@ -157,37 +157,39 @@ pub fn tan(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 }
 /// Create a new `Math` object
 pub fn _create(global : Value) -> Value {
-    let math = Value::new_obj(Some(global));
-    math.set_field("E", to_value(f64::consts::E));
-    math.set_field("LN2", to_value(f64::consts::LN_2));
-    math.set_field("LN10", to_value(f64::consts::LN_10));
-    math.set_field("LOG2E", to_value(f64::consts::LOG2_E));
-    math.set_field("LOG10E", to_value(f64::consts::LOG10_E));
-    math.set_field("SQRT1_2", to_value(0.5f64.sqrt()));
-    math.set_field("SQRT2", to_value(f64::consts::SQRT2));
-    math.set_field("PI", to_value(f64::consts::PI));
-    math.set_field("abs", Function::make(abs, ["num1", "num2"]));
-    math.set_field("acos", Function::make(acos, ["num1", "num2"]));
-    math.set_field("asin", Function::make(asin, ["num1", "num2"]));
-    math.set_field("atan", Function::make(atan, ["num1", "num2"]));
-    math.set_field("atan2", Function::make(atan2, ["num1", "num2"]));
-    math.set_field("cbrt", Function::make(cbrt, ["num1", "num2"]));
-    math.set_field("ceil", Function::make(ceil, ["num1", "num2"]));
-    math.set_field("cos", Function::make(cos, ["num1", "num2"]));
-    math.set_field("exp", Function::make(exp, ["num1", "num2"]));
-    math.set_field("floor", Function::make(floor, ["num"]));
-    math.set_field("log", Function::make(log, ["num1", "num2"]));
-    math.set_field("max", Function::make(max, ["num1", "num2"]));
-    math.set_field("min", Function::make(min, ["num1", "num2"]));
-    math.set_field("pow", Function::make(pow, ["num1", "num2"]));
-    math.set_field("random", Function::make(_random, []));
-    math.set_field("round", Function::make(round, ["num"]));
-    math.set_field("sin", Function::make(sin, ["num"]));
-    math.set_field("sqrt", Function::make(sqrt, ["num"]));
-    math.set_field("tan", Function::make(tan, ["num"]));
-    math
+    js!(global, {
+        "E": f64::consts::E,
+        "LN2": f64::consts::LN_2,
+        "LN10": f64::consts::LN_10,
+        "LOG2E": f64::consts::LOG2_E,
+        "LOG10E": f64::consts::LOG10_E,
+        "SQRT1_2": 0.5f64.sqrt(),
+        "SQRT2": f64::consts::SQRT2,
+        "PI": f64::consts::PI,
+        "abs": Function::make(abs, ["num1", "num2"]),
+        "acos": Function::make(acos, ["num1", "num2"]),
+        "asin": Function::make(asin, ["num1", "num2"]),
+        "atan": Function::make(atan, ["num1", "num2"]),
+        "atan2": Function::make(atan2, ["num1", "num2"]),
+        "cbrt": Function::make(cbrt, ["num1", "num2"]),
+        "ceil": Function::make(ceil, ["num1", "num2"]),
+        "cos": Function::make(cos, ["num1", "num2"]),
+        "exp": Function::make(exp, ["num1", "num2"]),
+        "floor": Function::make(floor, ["num"]),
+        "log": Function::make(log, ["num1", "num2"]),
+        "max": Function::make(max, ["num1", "num2"]),
+        "min": Function::make(min, ["num1", "num2"]),
+        "pow": Function::make(pow, ["num1", "num2"]),
+        "random": Function::make(_random, []),
+        "round": Function::make(round, ["num"]),
+        "sin": Function::make(sin, ["num"]),
+        "sqrt": Function::make(sqrt, ["num"]),
+        "tan": Function::make(tan, ["num"])
+    })
 }
 /// Initialise the `Math` object on the global object
 pub fn init(global:Value) {
-    global.set_field("Math", _create(global));
+    js_extend!(global, {
+        "Math": _create(global)
+    });
 }

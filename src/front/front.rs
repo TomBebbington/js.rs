@@ -8,7 +8,7 @@
     html_root_url = "http://tombebbington.github.io/js.rs/"
 )]
 #![experimental]
-#![feature(phase, globs)]
+#![feature(phase, macro_rules, globs)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint, unreachable_code, unnecessary_allocation, unnecessary_typecast, unnecessary_allocation, uppercase_variables, non_camel_case_types, unused_must_use)]
 
 //! This crate provides the base for Javascript execution
@@ -21,6 +21,9 @@ extern crate time;
 extern crate url;
 #[phase(plugin, link)]
 extern crate log;
+#[macro_escape]
+/// A javascript value macro
+pub mod macro;
 /// The backend defining traits
 pub mod run {
     /// Compilation of code

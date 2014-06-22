@@ -395,7 +395,20 @@ pub trait FromValue {
     /// Convert this value to a Javascript value
     fn from_value(value:Value) -> Result<Self, &'static str>;
 }
+impl ToValue for Value {
+    #[inline(always)]
+    fn to_value(&self) -> Value {
+        *self
+    }
+}
+impl FromValue for Value {
+    #[inline(always)]
+    fn from_value(v:Value) -> Result<Value, &'static str> {
+        Ok(v)
+    }
+}
 impl ToValue for String {
+    #[inline(always)]
     fn to_value(&self) -> Value {
         Value::new(VString(self.clone()))
     }

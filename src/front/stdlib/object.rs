@@ -100,17 +100,22 @@ pub fn has_own_prop(args:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValu
 /// Create a new `Object` object
 pub fn _create(global:Value) -> Value {
     let object = Function::make(make_object, []);
-    let prototype = Value::new_obj(Some(global));
-    prototype.set_field("hasOwnProperty", Function::make(has_own_prop, ["property"]));
-    prototype.set_field("toString", Function::make(to_string, []));
-    object.set_field("length", to_value(1i32));
-    object.set_field(PROTOTYPE, prototype);
-    object.set_field("setPrototypeOf", Function::make(get_proto_of, ["object", "prototype"]));
-    object.set_field("getPrototypeOf", Function::make(get_proto_of, ["object"]));
-    object.set_field("defineProperty", Function::make(define_prop, ["object", "property"]));
+    let prototype = js!(global, {
+        "hasOwnProperty": Function::make(has_own_prop, ["property"]),
+        "toString": Function::make(to_string, [])
+    });
+    js_extend!(object, {
+        "length": 1i32,
+        PROTOTYPE: prototype,
+        "setPrototypeOf": Function::make(get_proto_of, ["object", "prototype"]),
+        "getPrototypeOf": Function::make(get_proto_of, ["object"]),
+        "defineProperty": Function::make(define_prop, ["object", "property"])
+    });
     object
 }
 /// Initialise the `Object` object on the global object
 pub fn init(global:Value) {
-    global.set_field("Object", _create(global));
+    js_extend!(global, {
+        "Object": _create(global)
+    });
 }

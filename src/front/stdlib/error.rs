@@ -17,15 +17,18 @@ pub fn to_string(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
 }
 /// Create a new `Error` object
 pub fn _create(global: Value) -> Value {
-    let prototype = Value::new_obj(Some(global));
-    prototype.set_field("message", to_value(""));
-    prototype.set_field("name", to_value("Error"));
-    prototype.set_field("toString", Function::make(to_string, []));
+    let prototype = js!(global, {
+        "message": "",
+        "name": "Error",
+        "toString": Function::make(to_string, [])
+    });
     let error = Function::make(make_error, ["message"]);
     error.set_field(PROTOTYPE, prototype);
     error
 }
 /// Initialise the global object with the `Error` object
 pub fn init(global:Value) {
-    global.set_field("Error", _create(global));
+    js_extend!(global, {
+        "Error": _create(global)
+    });
 }
