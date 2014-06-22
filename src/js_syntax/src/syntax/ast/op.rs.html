@@ -225,186 +225,186 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
 <span class='doccomment'>/// Represents an operator
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Operator</span> {
-	<span class='doccomment'>/// Get the associativity as a boolean that is true if it goes rightwards
-</span>	<span class='kw'>fn</span> <span class='ident'>get_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
-	<span class='doccomment'>/// Get the precedence as an unsigned integer, where the lower it is, the more precedence/priority it has
-</span>	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
-	<span class='attribute'>\#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
-	<span class='doccomment'>/// Get the precedence and associativity of this operator
-</span>	<span class='kw'>fn</span> <span class='ident'>get_precedence_and_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='ident'>bool</span>) {
-		(<span class='self'>self</span>.<span class='ident'>get_precedence</span>(), <span class='self'>self</span>.<span class='ident'>get_assoc</span>())
-	}
+    <span class='doccomment'>/// Get the associativity as a boolean that is true if it goes rightwards
+</span>    <span class='kw'>fn</span> <span class='ident'>get_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span>;
+    <span class='doccomment'>/// Get the precedence as an unsigned integer, where the lower it is, the more precedence/priority it has
+</span>    <span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span>;
+    <span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span>
+    <span class='doccomment'>/// Get the precedence and associativity of this operator
+</span>    <span class='kw'>fn</span> <span class='ident'>get_precedence_and_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>uint</span>, <span class='ident'>bool</span>) {
+        (<span class='self'>self</span>.<span class='ident'>get_precedence</span>(), <span class='self'>self</span>.<span class='ident'>get_assoc</span>())
+    }
 }
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A numeric operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>NumOp</span> {
-	<span class='doccomment'>/// `a + b` - Addition
-</span>	<span class='ident'>OpAdd</span>,
-	<span class='doccomment'>/// `a - b` - Subtraction
-</span>	<span class='ident'>OpSub</span>,
-	<span class='doccomment'>/// `a / b` - Division
-</span>	<span class='ident'>OpDiv</span>,
-	<span class='doccomment'>/// `a * b` - Multiplication
-</span>	<span class='ident'>OpMul</span>,
-	<span class='doccomment'>/// `a % b` - Modulus
-</span>	<span class='ident'>OpMod</span>
+    <span class='doccomment'>/// `a + b` - Addition
+</span>    <span class='ident'>OpAdd</span>,
+    <span class='doccomment'>/// `a - b` - Subtraction
+</span>    <span class='ident'>OpSub</span>,
+    <span class='doccomment'>/// `a / b` - Division
+</span>    <span class='ident'>OpDiv</span>,
+    <span class='doccomment'>/// `a * b` - Multiplication
+</span>    <span class='ident'>OpMul</span>,
+    <span class='doccomment'>/// `a % b` - Modulus
+</span>    <span class='ident'>OpMod</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>NumOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>OpAdd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;+&quot;</span>,
-			<span class='ident'>OpSub</span> <span class='op'>=&gt;</span> <span class='string'>&quot;-&quot;</span>,
-			<span class='ident'>OpDiv</span> <span class='op'>=&gt;</span> <span class='string'>&quot;/&quot;</span>,
-			<span class='ident'>OpMul</span> <span class='op'>=&gt;</span> <span class='string'>&quot;*&quot;</span>,
-			<span class='ident'>OpMod</span> <span class='op'>=&gt;</span> <span class='string'>&quot;%&quot;</span>
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>OpAdd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;+&quot;</span>,
+            <span class='ident'>OpSub</span> <span class='op'>=&gt;</span> <span class='string'>&quot;-&quot;</span>,
+            <span class='ident'>OpDiv</span> <span class='op'>=&gt;</span> <span class='string'>&quot;/&quot;</span>,
+            <span class='ident'>OpMul</span> <span class='op'>=&gt;</span> <span class='string'>&quot;*&quot;</span>,
+            <span class='ident'>OpMod</span> <span class='op'>=&gt;</span> <span class='string'>&quot;%&quot;</span>
+        })
+    }
 }
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A unary operation on a single value
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>UnaryOp</span> {
-	<span class='doccomment'>/// `a++` - increment the value
-</span>	<span class='ident'>UnaryIncrementPost</span>,
-	<span class='doccomment'>/// `++a` - increment the value
-</span>	<span class='ident'>UnaryIncrementPre</span>,
-	<span class='doccomment'>/// `a--` - decrement the value
-</span>	<span class='ident'>UnaryDecrementPost</span>,
-	<span class='doccomment'>/// `--a` - decrement the value
-</span>	<span class='ident'>UnaryDecrementPre</span>,
-	<span class='doccomment'>/// `-a` - negate the value
-</span>	<span class='ident'>UnaryMinus</span>,
-	<span class='doccomment'>/// `+a` - convert to a number
-</span>	<span class='ident'>UnaryPlus</span>,
-	<span class='doccomment'>/// `!a` - get the opposite of the boolean value
-</span>	<span class='ident'>UnaryNot</span>
+    <span class='doccomment'>/// `a++` - increment the value
+</span>    <span class='ident'>UnaryIncrementPost</span>,
+    <span class='doccomment'>/// `++a` - increment the value
+</span>    <span class='ident'>UnaryIncrementPre</span>,
+    <span class='doccomment'>/// `a--` - decrement the value
+</span>    <span class='ident'>UnaryDecrementPost</span>,
+    <span class='doccomment'>/// `--a` - decrement the value
+</span>    <span class='ident'>UnaryDecrementPre</span>,
+    <span class='doccomment'>/// `-a` - negate the value
+</span>    <span class='ident'>UnaryMinus</span>,
+    <span class='doccomment'>/// `+a` - convert to a number
+</span>    <span class='ident'>UnaryPlus</span>,
+    <span class='doccomment'>/// `!a` - get the opposite of the boolean value
+</span>    <span class='ident'>UnaryNot</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>UnaryOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>UnaryIncrementPost</span> <span class='op'>|</span> <span class='ident'>UnaryIncrementPre</span> <span class='op'>=&gt;</span> <span class='string'>&quot;++&quot;</span>,
-			<span class='ident'>UnaryDecrementPost</span> <span class='op'>|</span> <span class='ident'>UnaryDecrementPre</span> <span class='op'>=&gt;</span> <span class='string'>&quot;--&quot;</span>,
-			<span class='ident'>UnaryPlus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;+&quot;</span>,
-			<span class='ident'>UnaryMinus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;-&quot;</span>,
-			<span class='ident'>UnaryNot</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!&quot;</span>
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>UnaryIncrementPost</span> <span class='op'>|</span> <span class='ident'>UnaryIncrementPre</span> <span class='op'>=&gt;</span> <span class='string'>&quot;++&quot;</span>,
+            <span class='ident'>UnaryDecrementPost</span> <span class='op'>|</span> <span class='ident'>UnaryDecrementPre</span> <span class='op'>=&gt;</span> <span class='string'>&quot;--&quot;</span>,
+            <span class='ident'>UnaryPlus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;+&quot;</span>,
+            <span class='ident'>UnaryMinus</span> <span class='op'>=&gt;</span> <span class='string'>&quot;-&quot;</span>,
+            <span class='ident'>UnaryNot</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!&quot;</span>
+        })
+    }
 }
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A bitwise operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BitOp</span> {
-	<span class='doccomment'>/// `a &amp; b` - Bitwise and
-</span>	<span class='ident'>BitAnd</span>,
-	<span class='doccomment'>/// `a | b` - Bitwise or
-</span>	<span class='ident'>BitOr</span>,
-	<span class='doccomment'>/// `a ^ b` - Bitwise xor
-</span>	<span class='ident'>BitXor</span>,
-	<span class='doccomment'>/// `a &lt;&lt; b` - Bit-shift leftwards
-</span>	<span class='ident'>BitShl</span>,
-	<span class='doccomment'>/// `a &gt;&gt; b` - Bit-shift rightrights
-</span>	<span class='ident'>BitShr</span>
+    <span class='doccomment'>/// `a &amp; b` - Bitwise and
+</span>    <span class='ident'>BitAnd</span>,
+    <span class='doccomment'>/// `a | b` - Bitwise or
+</span>    <span class='ident'>BitOr</span>,
+    <span class='doccomment'>/// `a ^ b` - Bitwise xor
+</span>    <span class='ident'>BitXor</span>,
+    <span class='doccomment'>/// `a &lt;&lt; b` - Bit-shift leftwards
+</span>    <span class='ident'>BitShl</span>,
+    <span class='doccomment'>/// `a &gt;&gt; b` - Bit-shift rightrights
+</span>    <span class='ident'>BitShr</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>BitOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>BitAnd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&amp;&quot;</span>,
-			<span class='ident'>BitOr</span> <span class='op'>=&gt;</span> <span class='string'>&quot;|&quot;</span>,
-			<span class='ident'>BitXor</span> <span class='op'>=&gt;</span> <span class='string'>&quot;^&quot;</span>,
-			<span class='ident'>BitShl</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&lt;&lt;&quot;</span>,
-			<span class='ident'>BitShr</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&gt;&gt;&quot;</span>
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>BitAnd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&amp;&quot;</span>,
+            <span class='ident'>BitOr</span> <span class='op'>=&gt;</span> <span class='string'>&quot;|&quot;</span>,
+            <span class='ident'>BitXor</span> <span class='op'>=&gt;</span> <span class='string'>&quot;^&quot;</span>,
+            <span class='ident'>BitShl</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&lt;&lt;&quot;</span>,
+            <span class='ident'>BitShr</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&gt;&gt;&quot;</span>
+        })
+    }
 }
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A comparitive operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CompOp</span> {
-	<span class='doccomment'>/// `a == b` - Equality
-</span>	<span class='ident'>CompEqual</span>,
-	<span class='doccomment'>/// `a != b` - Unequality
-</span>	<span class='ident'>CompNotEqual</span>,
-	<span class='doccomment'>/// `a === b` - Strict equality
-</span>	<span class='ident'>CompStrictEqual</span>,
-	<span class='doccomment'>/// `a !== b` - Strict unequality
-</span>	<span class='ident'>CompStrictNotEqual</span>,
-	<span class='doccomment'>/// `a &gt; b` - If `a` is greater than `b`
-</span>	<span class='ident'>CompGreaterThan</span>,
-	<span class='doccomment'>/// `a &gt;= b` - If `a` is greater than or equal to `b`
-</span>	<span class='ident'>CompGreaterThanOrEqual</span>,
-	<span class='doccomment'>/// `a &lt; b` - If `a` is less than `b`
-</span>	<span class='ident'>CompLessThan</span>,
-	<span class='doccomment'>/// `a &lt;= b` - If `a` is less than or equal to `b`
-</span>	<span class='ident'>CompLessThanOrEqual</span>,
+    <span class='doccomment'>/// `a == b` - Equality
+</span>    <span class='ident'>CompEqual</span>,
+    <span class='doccomment'>/// `a != b` - Unequality
+</span>    <span class='ident'>CompNotEqual</span>,
+    <span class='doccomment'>/// `a === b` - Strict equality
+</span>    <span class='ident'>CompStrictEqual</span>,
+    <span class='doccomment'>/// `a !== b` - Strict unequality
+</span>    <span class='ident'>CompStrictNotEqual</span>,
+    <span class='doccomment'>/// `a &gt; b` - If `a` is greater than `b`
+</span>    <span class='ident'>CompGreaterThan</span>,
+    <span class='doccomment'>/// `a &gt;= b` - If `a` is greater than or equal to `b`
+</span>    <span class='ident'>CompGreaterThanOrEqual</span>,
+    <span class='doccomment'>/// `a &lt; b` - If `a` is less than `b`
+</span>    <span class='ident'>CompLessThan</span>,
+    <span class='doccomment'>/// `a &lt;= b` - If `a` is less than or equal to `b`
+</span>    <span class='ident'>CompLessThanOrEqual</span>,
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>CompOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>CompEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;==&quot;</span>,
-			<span class='ident'>CompNotEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!=&quot;</span>,
-			<span class='ident'>CompStrictEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;===&quot;</span>,
-			<span class='ident'>CompStrictNotEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!==&quot;</span>,
-			<span class='ident'>CompGreaterThan</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&gt;&quot;</span>,
-			<span class='ident'>CompGreaterThanOrEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&gt;=&quot;</span>,
-			<span class='ident'>CompLessThan</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&lt;&quot;</span>,
-			<span class='ident'>CompLessThanOrEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&lt;=&quot;</span>
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>CompEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;==&quot;</span>,
+            <span class='ident'>CompNotEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!=&quot;</span>,
+            <span class='ident'>CompStrictEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;===&quot;</span>,
+            <span class='ident'>CompStrictNotEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;!==&quot;</span>,
+            <span class='ident'>CompGreaterThan</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&gt;&quot;</span>,
+            <span class='ident'>CompGreaterThanOrEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&gt;=&quot;</span>,
+            <span class='ident'>CompLessThan</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&lt;&quot;</span>,
+            <span class='ident'>CompLessThanOrEqual</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&lt;=&quot;</span>
+        })
+    }
 }
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A logical operation between 2 boolean values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>LogOp</span> {
-	<span class='doccomment'>/// `a &amp;&amp; b` - Logical and
-</span>	<span class='ident'>LogAnd</span>,
-	<span class='doccomment'>/// `a || b` - Logical or
-</span>	<span class='ident'>LogOr</span>
+    <span class='doccomment'>/// `a &amp;&amp; b` - Logical and
+</span>    <span class='ident'>LogAnd</span>,
+    <span class='doccomment'>/// `a || b` - Logical or
+</span>    <span class='ident'>LogOr</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>LogOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>LogAnd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&amp;&amp;&quot;</span>,
-			<span class='ident'>LogOr</span> <span class='op'>=&gt;</span> <span class='string'>&quot;||&quot;</span>
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>LogAnd</span> <span class='op'>=&gt;</span> <span class='string'>&quot;&amp;&amp;&quot;</span>,
+            <span class='ident'>LogOr</span> <span class='op'>=&gt;</span> <span class='string'>&quot;||&quot;</span>
+        })
+    }
 }
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A binary operation between 2 values
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>BinOp</span> {
-	<span class='doccomment'>/// Numeric operation
-</span>	<span class='ident'>BinNum</span>(<span class='ident'>NumOp</span>),
-	<span class='doccomment'>/// Bitwise operation
-</span>	<span class='ident'>BinBit</span>(<span class='ident'>BitOp</span>),
-	<span class='doccomment'>/// Comparitive operation
-</span>	<span class='ident'>BinComp</span>(<span class='ident'>CompOp</span>),
-	<span class='doccomment'>/// Logical operation
-</span>	<span class='ident'>BinLog</span>(<span class='ident'>LogOp</span>)
+    <span class='doccomment'>/// Numeric operation
+</span>    <span class='ident'>BinNum</span>(<span class='ident'>NumOp</span>),
+    <span class='doccomment'>/// Bitwise operation
+</span>    <span class='ident'>BinBit</span>(<span class='ident'>BitOp</span>),
+    <span class='doccomment'>/// Comparitive operation
+</span>    <span class='ident'>BinComp</span>(<span class='ident'>CompOp</span>),
+    <span class='doccomment'>/// Logical operation
+</span>    <span class='ident'>BinLog</span>(<span class='ident'>LogOp</span>)
 }
 <span class='kw'>impl</span> <span class='ident'>Operator</span> <span class='kw'>for</span> <span class='ident'>BinOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>get_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
-		<span class='boolval'>true</span>
-	}
-	<span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
-		<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>BinNum</span>(<span class='ident'>OpMul</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpDiv</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpMod</span>) <span class='op'>=&gt;</span> <span class='number'>5</span>,
-			<span class='ident'>BinNum</span>(<span class='ident'>OpAdd</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpSub</span>) <span class='op'>=&gt;</span> <span class='number'>6</span>,
-			<span class='ident'>BinBit</span>(<span class='ident'>BitShl</span>) <span class='op'>|</span> <span class='ident'>BinBit</span>(<span class='ident'>BitShr</span>) <span class='op'>=&gt;</span> <span class='number'>7</span>,
-			<span class='ident'>BinComp</span>(<span class='ident'>CompLessThan</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompLessThanOrEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompGreaterThan</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompGreaterThanOrEqual</span>) <span class='op'>=&gt;</span> <span class='number'>8</span>,
-			<span class='ident'>BinComp</span>(<span class='ident'>CompEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompNotEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompStrictEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompStrictNotEqual</span>) <span class='op'>=&gt;</span> <span class='number'>9</span>,
-			<span class='ident'>BinBit</span>(<span class='ident'>BitAnd</span>) <span class='op'>=&gt;</span> <span class='number'>10</span>,
-			<span class='ident'>BinBit</span>(<span class='ident'>BitXor</span>) <span class='op'>=&gt;</span> <span class='number'>11</span>,
-			<span class='ident'>BinBit</span>(<span class='ident'>BitOr</span>) <span class='op'>=&gt;</span> <span class='number'>12</span>,
-			<span class='ident'>BinLog</span>(<span class='ident'>LogAnd</span>) <span class='op'>=&gt;</span> <span class='number'>13</span>,
-			<span class='ident'>BinLog</span>(<span class='ident'>LogOr</span>) <span class='op'>=&gt;</span> <span class='number'>14</span>,
-			
-		}
-	}
+    <span class='kw'>fn</span> <span class='ident'>get_assoc</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+        <span class='boolval'>true</span>
+    }
+    <span class='kw'>fn</span> <span class='ident'>get_precedence</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>uint</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>BinNum</span>(<span class='ident'>OpMul</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpDiv</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpMod</span>) <span class='op'>=&gt;</span> <span class='number'>5</span>,
+            <span class='ident'>BinNum</span>(<span class='ident'>OpAdd</span>) <span class='op'>|</span> <span class='ident'>BinNum</span>(<span class='ident'>OpSub</span>) <span class='op'>=&gt;</span> <span class='number'>6</span>,
+            <span class='ident'>BinBit</span>(<span class='ident'>BitShl</span>) <span class='op'>|</span> <span class='ident'>BinBit</span>(<span class='ident'>BitShr</span>) <span class='op'>=&gt;</span> <span class='number'>7</span>,
+            <span class='ident'>BinComp</span>(<span class='ident'>CompLessThan</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompLessThanOrEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompGreaterThan</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompGreaterThanOrEqual</span>) <span class='op'>=&gt;</span> <span class='number'>8</span>,
+            <span class='ident'>BinComp</span>(<span class='ident'>CompEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompNotEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompStrictEqual</span>) <span class='op'>|</span> <span class='ident'>BinComp</span>(<span class='ident'>CompStrictNotEqual</span>) <span class='op'>=&gt;</span> <span class='number'>9</span>,
+            <span class='ident'>BinBit</span>(<span class='ident'>BitAnd</span>) <span class='op'>=&gt;</span> <span class='number'>10</span>,
+            <span class='ident'>BinBit</span>(<span class='ident'>BitXor</span>) <span class='op'>=&gt;</span> <span class='number'>11</span>,
+            <span class='ident'>BinBit</span>(<span class='ident'>BitOr</span>) <span class='op'>=&gt;</span> <span class='number'>12</span>,
+            <span class='ident'>BinLog</span>(<span class='ident'>LogAnd</span>) <span class='op'>=&gt;</span> <span class='number'>13</span>,
+            <span class='ident'>BinLog</span>(<span class='ident'>LogOr</span>) <span class='op'>=&gt;</span> <span class='number'>14</span>,
+            
+        }
+    }
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>BinOp</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>BinNum</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>(),
-			<span class='ident'>BinBit</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>(),
-			<span class='ident'>BinComp</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>(),
-			<span class='ident'>BinLog</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>()
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>BinNum</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>(),
+            <span class='ident'>BinBit</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>(),
+            <span class='ident'>BinComp</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>(),
+            <span class='ident'>BinLog</span>(<span class='ident'>op</span>) <span class='op'>=&gt;</span> <span class='ident'>op</span>.<span class='ident'>to_str</span>()
+        })
+    }
 }
 </pre>
 </section>
@@ -424,7 +424,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

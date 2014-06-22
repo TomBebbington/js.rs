@@ -103,68 +103,68 @@
 <span id='64'>64</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
-<span class='attribute'>\#[<span class='ident'>repr</span>(<span class='ident'>u8</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>u8</span>)]</span>
 <span class='doccomment'>/// Represents a Javascript type at parsing/compilation
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Type</span> {
-	<span class='doccomment'>/// `undefined`
-</span>	<span class='ident'>UndefinedType</span>,
-	<span class='doccomment'>/// `null`
-</span>	<span class='ident'>NullType</span>,
-	<span class='doccomment'>/// `boolean`
-</span>	<span class='ident'>BooleanType</span>,
-	<span class='doccomment'>/// `number`
-</span>	<span class='ident'>NumberType</span>,
-	<span class='doccomment'>/// `number`
-</span>	<span class='ident'>IntegerType</span>,
-	<span class='doccomment'>/// `string`
-</span>	<span class='ident'>StringType</span>,
-	<span class='doccomment'>/// A native object
-</span>	<span class='ident'>NativeObjectType</span>,
-	<span class='doccomment'>/// `function`
-</span>	<span class='ident'>FunctionType</span>,
-	<span class='doccomment'>/// `object`
-</span>	<span class='ident'>ObjectType</span>,
-	<span class='doccomment'>/// Any of these types
-</span>	<span class='ident'>AnyOfType</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span>),
-	<span class='doccomment'>/// Any type
-</span>	<span class='ident'>AnyType</span>
+    <span class='doccomment'>/// `undefined`
+</span>    <span class='ident'>UndefinedType</span>,
+    <span class='doccomment'>/// `null`
+</span>    <span class='ident'>NullType</span>,
+    <span class='doccomment'>/// `boolean`
+</span>    <span class='ident'>BooleanType</span>,
+    <span class='doccomment'>/// `number`
+</span>    <span class='ident'>NumberType</span>,
+    <span class='doccomment'>/// `number`
+</span>    <span class='ident'>IntegerType</span>,
+    <span class='doccomment'>/// `string`
+</span>    <span class='ident'>StringType</span>,
+    <span class='doccomment'>/// A native object
+</span>    <span class='ident'>NativeObjectType</span>,
+    <span class='doccomment'>/// `function`
+</span>    <span class='ident'>FunctionType</span>,
+    <span class='doccomment'>/// `object`
+</span>    <span class='ident'>ObjectType</span>,
+    <span class='doccomment'>/// Any of these types
+</span>    <span class='ident'>AnyOfType</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Type</span><span class='op'>&gt;</span>),
+    <span class='doccomment'>/// Any type
+</span>    <span class='ident'>AnyType</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Type</span> {
-	<span class='doccomment'>/// Normalise the type
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>normalise</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
-		<span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>clone</span>() {
-			<span class='ident'>AnyOfType</span>(<span class='kw-2'>ref</span> <span class='ident'>tys</span>) <span class='kw'>if</span> <span class='ident'>tys</span>.<span class='ident'>is_empty</span>() <span class='op'>=&gt;</span> <span class='ident'>UndefinedType</span>,
-			<span class='ident'>AnyOfType</span>(<span class='kw-2'>ref</span> <span class='ident'>tys</span>) <span class='kw'>if</span> <span class='ident'>tys</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='ident'>tys</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>clone</span>(),
-			<span class='ident'>thing</span> <span class='op'>=&gt;</span> <span class='ident'>thing</span>
-		}
-	}
+    <span class='doccomment'>/// Normalise the type
+</span>    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>normalise</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) {
+        <span class='op'>*</span><span class='self'>self</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>clone</span>() {
+            <span class='ident'>AnyOfType</span>(<span class='kw-2'>ref</span> <span class='ident'>tys</span>) <span class='kw'>if</span> <span class='ident'>tys</span>.<span class='ident'>is_empty</span>() <span class='op'>=&gt;</span> <span class='ident'>UndefinedType</span>,
+            <span class='ident'>AnyOfType</span>(<span class='kw-2'>ref</span> <span class='ident'>tys</span>) <span class='kw'>if</span> <span class='ident'>tys</span>.<span class='ident'>len</span>() <span class='op'>==</span> <span class='number'>0</span> <span class='op'>=&gt;</span> <span class='ident'>tys</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>clone</span>(),
+            <span class='ident'>thing</span> <span class='op'>=&gt;</span> <span class='ident'>thing</span>
+        }
+    }
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Type</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>UndefinedType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;undefined&quot;</span>),
-			<span class='ident'>NullType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;null&quot;</span>),
-			<span class='ident'>BooleanType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;boolean&quot;</span>),
-			<span class='ident'>NumberType</span> <span class='op'>|</span> <span class='ident'>IntegerType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;number&quot;</span>),
-			<span class='ident'>StringType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;string&quot;</span>),
-			<span class='ident'>NativeObjectType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;native&quot;</span>),
-			<span class='ident'>FunctionType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;function&quot;</span>),
-			<span class='ident'>ObjectType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;object&quot;</span>),
-			<span class='ident'>AnyOfType</span>(<span class='kw-2'>ref</span> <span class='ident'>tys</span>) <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;any of {}&quot;</span>, <span class='ident'>tys</span>),
-			<span class='ident'>AnyType</span> <span class='op'>=&gt;</span>
-				<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;any&quot;</span>),
-		}
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>UndefinedType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;undefined&quot;</span>),
+            <span class='ident'>NullType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;null&quot;</span>),
+            <span class='ident'>BooleanType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;boolean&quot;</span>),
+            <span class='ident'>NumberType</span> <span class='op'>|</span> <span class='ident'>IntegerType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;number&quot;</span>),
+            <span class='ident'>StringType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;string&quot;</span>),
+            <span class='ident'>NativeObjectType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;native&quot;</span>),
+            <span class='ident'>FunctionType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;function&quot;</span>),
+            <span class='ident'>ObjectType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;object&quot;</span>),
+            <span class='ident'>AnyOfType</span>(<span class='kw-2'>ref</span> <span class='ident'>tys</span>) <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;any of {}&quot;</span>, <span class='ident'>tys</span>),
+            <span class='ident'>AnyType</span> <span class='op'>=&gt;</span>
+                <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;any&quot;</span>),
+        }
+    }
 }
 </pre>
 </section>
@@ -184,7 +184,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

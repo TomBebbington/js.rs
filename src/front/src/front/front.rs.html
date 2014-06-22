@@ -92,19 +92,22 @@
 <span id='53'>53</span>
 <span id='54'>54</span>
 <span id='55'>55</span>
+<span id='56'>56</span>
+<span id='57'>57</span>
+<span id='58'>58</span>
 </pre><pre class='rust '>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;github.com/TomBebbington/js.rs#front:0.1&quot;</span>]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript backend&quot;</span>]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;dylib&quot;</span>]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;rlib&quot;</span>]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>doc</span>(
-	<span class='ident'>html_favicon_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/favicon.png&quot;</span>,
-	<span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/js.rs/&quot;</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;github.com/TomBebbington/js.rs#front:0.1&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript backend&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>license</span> <span class='op'>=</span> <span class='string'>&quot;MIT&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;dylib&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_type</span> <span class='op'>=</span> <span class='string'>&quot;rlib&quot;</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>doc</span>(
+    <span class='ident'>html_favicon_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/favicon.png&quot;</span>,
+    <span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://tombebbington.github.io/js.rs/&quot;</span>
 )]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>experimental</span>]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>, <span class='ident'>globs</span>)]</span>
-<span class='attribute'>\#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>experimental</span>]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>feature</span>(<span class='ident'>phase</span>, <span class='ident'>macro_rules</span>, <span class='ident'>globs</span>)]</span>
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>deny</span>(<span class='ident'>non_uppercase_statics</span>, <span class='ident'>missing_doc</span>, <span class='ident'>unnecessary_parens</span>, <span class='ident'>unrecognized_lint</span>, <span class='ident'>unreachable_code</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>unnecessary_typecast</span>, <span class='ident'>unnecessary_allocation</span>, <span class='ident'>uppercase_variables</span>, <span class='ident'>non_camel_case_types</span>, <span class='ident'>unused_must_use</span>)]</span>
 
 <span class='doccomment'>//! This crate provides the base for Javascript execution
 </span><span class='doccomment'>//! by including defining traits and the standard library.
@@ -114,39 +117,42 @@
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>serialize</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>time</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>url</span>;
-<span class='attribute'>\#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span>
+<span class='attribute'>#[<span class='ident'>phase</span>(<span class='ident'>plugin</span>, <span class='ident'>link</span>)]</span>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>log</span>;
+<span class='attribute'>#[<span class='ident'>macro_escape</span>]</span>
+<span class='doccomment'>/// A javascript value macro
+</span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>macro</span>;
 <span class='doccomment'>/// The backend defining traits
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>run</span> {
-	<span class='doccomment'>/// Compilation of code
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>compiler</span>;
-	<span class='doccomment'>/// Execution of compiled code
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>executor</span>;
+    <span class='doccomment'>/// Compilation of code
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>compiler</span>;
+    <span class='doccomment'>/// Execution of compiled code
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>executor</span>;
 }
 <span class='doccomment'>/// The standard Javascript library
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>stdlib</span> {
-	<span class='doccomment'>/// Javascript values, utility methods and conversion between Javascript values and Rust values
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>value</span>;
-	<span class='doccomment'>/// The global `Function` object and function value representations
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>function</span>;
-	<span class='doccomment'>/// The global `Object` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>object</span>;
-	<span class='doccomment'>/// The global `Array` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>array</span>;
-	<span class='doccomment'>/// The global `console` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>console</span>;
-	<span class='doccomment'>/// The global `Math` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span>;
-	<span class='doccomment'>/// The global `JSON` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>json</span>;
-	<span class='doccomment'>/// The global `Number` object with related functions and constants
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>number</span>;
-	<span class='doccomment'>/// The global `Error` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>error</span>;
-	<span class='doccomment'>/// Contains global methods concerning URIs
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>uri</span>;
-	<span class='doccomment'>/// The global `String` object
-</span>	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>string</span>;
+    <span class='doccomment'>/// Javascript values, utility methods and conversion between Javascript values and Rust values
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>value</span>;
+    <span class='doccomment'>/// The global `Function` object and function value representations
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>function</span>;
+    <span class='doccomment'>/// The global `Object` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>object</span>;
+    <span class='doccomment'>/// The global `Array` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>array</span>;
+    <span class='doccomment'>/// The global `console` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>console</span>;
+    <span class='doccomment'>/// The global `Math` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span>;
+    <span class='doccomment'>/// The global `JSON` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>json</span>;
+    <span class='doccomment'>/// The global `Number` object with related functions and constants
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>number</span>;
+    <span class='doccomment'>/// The global `Error` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>error</span>;
+    <span class='doccomment'>/// Contains global methods concerning URIs
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>uri</span>;
+    <span class='doccomment'>/// The global `String` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>string</span>;
 }
 </pre>
 </section>
@@ -166,7 +172,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

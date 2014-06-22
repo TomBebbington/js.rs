@@ -68,6 +68,9 @@
 <span id='29'>29</span>
 <span id='30'>30</span>
 <span id='31'>31</span>
+<span id='32'>32</span>
+<span id='33'>33</span>
+<span id='34'>34</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::<span class='ident'>PROTOTYPE</span>;
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
@@ -75,30 +78,33 @@
 
 <span class='doccomment'>/// Create a new error
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make_error</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>this</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>this</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;message&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>to_str</span>().<span class='ident'>into_string</span>()));
-	}
-	<span class='prelude-val'>Ok</span>(<span class='ident'>Value</span>::<span class='ident'>undefined</span>())
+    <span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>this</span>.<span class='ident'>set_field</span>(<span class='string'>&quot;message&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>to_str</span>().<span class='ident'>into_string</span>()));
+    }
+    <span class='prelude-val'>Ok</span>(<span class='ident'>Value</span>::<span class='ident'>undefined</span>())
 }
 <span class='doccomment'>/// Get the string representation of the error
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>to_string</span>(_:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>this</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>this</span>.<span class='ident'>get_field_slice</span>(<span class='string'>&quot;name&quot;</span>);
-	<span class='kw'>let</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='ident'>this</span>.<span class='ident'>get_field_slice</span>(<span class='string'>&quot;message&quot;</span>);
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}: {}&quot;</span>, <span class='ident'>name</span>, <span class='ident'>message</span>).<span class='ident'>into_string</span>()))
+    <span class='kw'>let</span> <span class='ident'>name</span> <span class='op'>=</span> <span class='ident'>this</span>.<span class='ident'>get_field</span>(<span class='string'>&quot;name&quot;</span>);
+    <span class='kw'>let</span> <span class='ident'>message</span> <span class='op'>=</span> <span class='ident'>this</span>.<span class='ident'>get_field</span>(<span class='string'>&quot;message&quot;</span>);
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}: {}&quot;</span>, <span class='ident'>name</span>, <span class='ident'>message</span>).<span class='ident'>into_string</span>()))
 }
 <span class='doccomment'>/// Create a new `Error` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_create</span>(<span class='ident'>global</span>: <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-	<span class='kw'>let</span> <span class='ident'>prototype</span> <span class='op'>=</span> <span class='ident'>Value</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>Some</span>(<span class='ident'>global</span>));
-	<span class='ident'>prototype</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;message&quot;</span>, <span class='ident'>to_value</span>(<span class='string'>&quot;&quot;</span>));
-	<span class='ident'>prototype</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;name&quot;</span>, <span class='ident'>to_value</span>(<span class='string'>&quot;Error&quot;</span>));
-	<span class='ident'>prototype</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;toString&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>to_string</span>, []));
-	<span class='kw'>let</span> <span class='ident'>error</span> <span class='op'>=</span> <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>make_error</span>, [<span class='string'>&quot;message&quot;</span>]);
-	<span class='ident'>error</span>.<span class='ident'>set_field_slice</span>(<span class='ident'>PROTOTYPE</span>, <span class='ident'>prototype</span>);
-	<span class='ident'>error</span>
+    <span class='kw'>let</span> <span class='ident'>prototype</span> <span class='op'>=</span> <span class='macro'>js</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;message&quot;</span>: <span class='string'>&quot;&quot;</span>,
+        <span class='string'>&quot;name&quot;</span>: <span class='string'>&quot;Error&quot;</span>,
+        <span class='string'>&quot;toString&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>to_string</span>, [])
+    });
+    <span class='kw'>let</span> <span class='ident'>error</span> <span class='op'>=</span> <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>make_error</span>, [<span class='string'>&quot;message&quot;</span>]);
+    <span class='ident'>error</span>.<span class='ident'>set_field</span>(<span class='ident'>PROTOTYPE</span>, <span class='ident'>prototype</span>);
+    <span class='ident'>error</span>
 }
 <span class='doccomment'>/// Initialise the global object with the `Error` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Error&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
+    <span class='macro'>js_extend</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;Error&quot;</span>: <span class='ident'>_create</span>(<span class='ident'>global</span>)
+    });
 }
 </pre>
 </section>
@@ -118,7 +124,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

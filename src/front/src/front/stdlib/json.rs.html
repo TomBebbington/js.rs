@@ -68,37 +68,41 @@
 <span id='29'>29</span>
 <span id='30'>30</span>
 <span id='31'>31</span>
+<span id='32'>32</span>
+<span id='33'>33</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::<span class='ident'>Function</span>;
 <span class='kw'>use</span> <span class='ident'>serialize</span>::<span class='ident'>json</span>::{<span class='ident'>ToJson</span>, <span class='ident'>from_str</span>};
 <span class='doccomment'>/// Parse a JSON string into a Javascript object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>parse</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='kw'>match</span> <span class='ident'>from_str</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>to_str</span>().<span class='ident'>as_slice</span>()) {
-		<span class='prelude-val'>Ok</span>(<span class='ident'>json</span>) <span class='op'>=&gt;</span> {
-			<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>json</span>))
-		},
-		<span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
-			<span class='prelude-val'>Err</span>(<span class='ident'>to_value</span>(<span class='ident'>err</span>.<span class='ident'>to_str</span>()))
-		}
-	}
+    <span class='kw'>match</span> <span class='ident'>from_str</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>).<span class='ident'>to_str</span>().<span class='ident'>as_slice</span>()) {
+        <span class='prelude-val'>Ok</span>(<span class='ident'>json</span>) <span class='op'>=&gt;</span> {
+            <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>json</span>))
+        },
+        <span class='prelude-val'>Err</span>(<span class='ident'>err</span>) <span class='op'>=&gt;</span> {
+            <span class='prelude-val'>Err</span>(<span class='ident'>to_value</span>(<span class='ident'>err</span>.<span class='ident'>to_str</span>()))
+        }
+    }
 }
 <span class='doccomment'>/// Process a Javascript object into a JSON string
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>stringify</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='kw'>let</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
-	<span class='kw'>let</span> <span class='ident'>json</span> <span class='op'>=</span> <span class='ident'>obj</span>.<span class='ident'>to_json</span>();
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>json</span>.<span class='ident'>to_pretty_str</span>()))
+    <span class='kw'>let</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>);
+    <span class='kw'>let</span> <span class='ident'>json</span> <span class='op'>=</span> <span class='ident'>obj</span>.<span class='ident'>to_json</span>();
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>json</span>.<span class='ident'>to_pretty_str</span>()))
 }
 <span class='doccomment'>/// Create a new `JSON` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_create</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-	<span class='kw'>let</span> <span class='ident'>object</span> <span class='op'>=</span> <span class='ident'>Value</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>Some</span>(<span class='ident'>global</span>));
-	<span class='ident'>object</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;stringify&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>stringify</span>, [<span class='string'>&quot;JSON&quot;</span>]));
-	<span class='ident'>object</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;parse&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>parse</span>, [<span class='string'>&quot;JSON_string&quot;</span>]));
-	<span class='ident'>object</span>
+    <span class='macro'>js</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;stringify&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>stringify</span>, [<span class='string'>&quot;JSON&quot;</span>]),
+        <span class='string'>&quot;parse&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>parse</span>, [<span class='string'>&quot;JSON_string&quot;</span>])
+    })
 }
 <span class='doccomment'>/// Initialise the global object with the `JSON` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;JSON&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
+    <span class='macro'>js_extend</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;JSON&quot;</span>: <span class='ident'>_create</span>(<span class='ident'>global</span>)
+    });
 }
 </pre>
 </section>
@@ -118,7 +122,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

@@ -38,16 +38,16 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='index.html'>back</a>::<a class='struct' href=''>JitExecutor</a><a class='source' id='src-1025' href='../src/back/src/back/executor.rs.html#23-25'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='index.html'>back</a>::<a class='struct' href=''>JitExecutor</a><a class='source' id='src-964' href='../src/back/src/back/executor.rs.html#23-25'>[src]</a></h1>
 <pre class='rust struct'>pub struct JitExecutor {
     // some fields omitted
 }</pre><div class='docblock'><p>A JIT executor</p>
 </div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../back/struct.JitExecutor.html' title='back::JitExecutor'>JitExecutor</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>() -&gt; <a class='struct' href='../back/struct.JitExecutor.html' title='back::JitExecutor'>JitExecutor</a></code></h4>
 <div class='docblock'><p>Create a new JIT executor</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;''a&gt; <a class='trait' href='../front/run/executor/trait.Executor.html' title='front::run::executor::Executor'>Executor</a>&lt;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;''a&gt;, &amp;''a Function&lt;''a&gt;)</a>&gt; for <a class='struct' href='../back/struct.JitExecutor.html' title='back::JitExecutor'>JitExecutor</a></code></h3><div class='methods'><h4 id='method.get_global_obj' class='method'><code>fn <a href='#method.get_global_obj' class='fnname'>get_global_obj</a>(&amp;self) -&gt; <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>JSVal</a></code></h4>
-<h4 id='method.execute' class='method'><code>fn <a href='#method.execute' class='fnname'>execute</a>(&amp;self, comp: &amp;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;''a&gt;, &amp;''a Function&lt;''a&gt;)</a>) -&gt; <a class='type' href='../front/stdlib/value/type.ResultValue.html' title='front::stdlib::value::ResultValue'>ResultValue</a></code></h4>
-<h4 id='method.get_global' class='method'><code>fn <a href='#tymethod.get_global' class='fnname'>get_global</a>&lt;Compiled&gt;(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>) -&gt; <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
-<h4 id='method.set_global' class='method'><code>fn <a href='#tymethod.set_global' class='fnname'>set_global</a>&lt;Compiled&gt;(&amp;self, field: <a class='struct' href='http://doc.rust-lang.org/collections/string/struct.String.html' title='collections::string::String'>String</a>, value: <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='../front/run/executor/trait.Executor.html' title='front::run::executor::Executor'>Executor</a>&lt;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;'a&gt;, &amp;'a Function&lt;'a&gt;)</a>&gt; for <a class='struct' href='../back/struct.JitExecutor.html' title='back::JitExecutor'>JitExecutor</a></code></h3><div class='methods'><h4 id='method.get_global_obj' class='method'><code>fn <a href='#method.get_global_obj' class='fnname'>get_global_obj</a>(&amp;self) -&gt; <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>JSVal</a></code></h4>
+<h4 id='method.execute' class='method'><code>fn <a href='#method.execute' class='fnname'>execute</a>(&amp;self, comp: &amp;<a href='http://doc.rust-lang.org/std/primitive.tuple.html'>(JITVal&lt;'a&gt;, &amp;'a Function&lt;'a&gt;)</a>) -&gt; <a class='type' href='../front/stdlib/value/type.ResultValue.html' title='front::stdlib::value::ResultValue'>ResultValue</a></code></h4>
+<h4 id='method.get_global' class='method'><code>fn <a href='#tymethod.get_global' class='fnname'>get_global</a>&lt;Compiled&gt;(&amp;self, field: &amp;'a <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
+<h4 id='method.set_global' class='method'><code>fn <a href='#tymethod.set_global' class='fnname'>set_global</a>&lt;Compiled&gt;(&amp;self, field: &amp;'a <a href='http://doc.rust-lang.org/std/primitive.str.html'>str</a>, value: <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a>) -&gt; <a class='struct' href='../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -65,7 +65,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

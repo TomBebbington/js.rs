@@ -210,159 +210,159 @@
  * form, typically through a library such as LibJIT or LLVM.
 */
 </span><span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Compiler</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>Compiled</span><span class='op'>&gt;</span> {
-	<span class='doccomment'>/// Compile an expression
-</span>	<span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Compiling {}&quot;</span>, <span class='ident'>expr</span>);
-		<span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>def</span>.<span class='ident'>clone</span>() {
-			<span class='ident'>UnaryOpExpr</span>(<span class='ident'>op</span>, <span class='ident'>ex</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_unary_op</span>(<span class='ident'>op</span>, <span class='ident'>ex</span>),
-			<span class='ident'>BinOpExpr</span>(<span class='ident'>op</span>, <span class='ident'>left</span>, <span class='ident'>right</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_bin_op</span>(<span class='ident'>op</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
-			<span class='ident'>ConstExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>c</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_const</span>(<span class='ident'>c</span>),
-			<span class='ident'>LocalExpr</span>(<span class='ident'>l</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_local</span>(<span class='ident'>l</span>),
-			<span class='ident'>BlockExpr</span>(<span class='ident'>vals</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_block</span>(<span class='ident'>vals</span>),
-			<span class='ident'>GetConstFieldExpr</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_get_const_field</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>),
-			<span class='ident'>GetFieldExpr</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_get_field</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>),
-			<span class='ident'>CallExpr</span>(<span class='ident'>func</span>, <span class='ident'>args</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_call</span>(<span class='ident'>func</span>, <span class='ident'>args</span>),
-			<span class='ident'>WhileLoopExpr</span>(<span class='ident'>cond</span>, <span class='ident'>expr</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_while_loop</span>(<span class='ident'>cond</span>, <span class='ident'>expr</span>),
-			<span class='ident'>IfExpr</span>(<span class='ident'>cond</span>, <span class='ident'>if_expr</span>, <span class='ident'>else_expr</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_if</span>(<span class='ident'>cond</span>, <span class='ident'>if_expr</span>, <span class='ident'>else_expr</span>),
-			<span class='ident'>SwitchExpr</span>(<span class='ident'>value</span>, <span class='ident'>cases</span>, <span class='ident'>default</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_switch</span>(<span class='ident'>value</span>, <span class='ident'>cases</span>, <span class='ident'>default</span>),
-			<span class='ident'>ObjectDeclExpr</span>(<span class='ident'>fields</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_object_decl</span>(<span class='ident'>fields</span>),
-			<span class='ident'>ArrayDeclExpr</span>(<span class='ident'>values</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_array_decl</span>(<span class='ident'>values</span>),
-			<span class='ident'>FunctionDeclExpr</span>(<span class='ident'>name</span>, <span class='ident'>args</span>, <span class='ident'>ret</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_function_decl</span>(<span class='ident'>name</span>, <span class='ident'>args</span>, <span class='ident'>ret</span>),
-			<span class='ident'>ArrowFunctionDeclExpr</span>(<span class='ident'>args</span>, <span class='ident'>ret</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_arrow_function_decl</span>(<span class='ident'>args</span>, <span class='ident'>ret</span>),
-			<span class='ident'>ConstructExpr</span>(<span class='ident'>func</span>, <span class='ident'>args</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_construct</span>(<span class='ident'>func</span>, <span class='ident'>args</span>),
-			<span class='ident'>ReturnExpr</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_return</span>(<span class='ident'>val</span>),
-			<span class='ident'>ThrowExpr</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_throw</span>(<span class='ident'>val</span>),
-			<span class='ident'>AssignExpr</span>(<span class='ident'>left</span>, <span class='ident'>right</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_assign</span>(<span class='ident'>left</span>, <span class='ident'>right</span>),
-			<span class='ident'>VarDeclExpr</span>(<span class='ident'>vars</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_var_decl</span>(<span class='ident'>vars</span>),
-			<span class='ident'>TypeOfExpr</span>(<span class='ident'>expr</span>) <span class='op'>=&gt;</span>
-				<span class='self'>self</span>.<span class='ident'>compile_typeof</span>(<span class='ident'>expr</span>)
-		}
-	}
-	<span class='doccomment'>/// Compile a unary operation
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_unary_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>UnaryOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a binary operation
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_bin_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>op</span>:<span class='ident'>BinOp</span>, <span class='ident'>left</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, <span class='ident'>right</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='kw'>match</span> <span class='ident'>op</span> {
-			<span class='ident'>BinNum</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_num_op</span>(<span class='ident'>num</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
-			<span class='ident'>BinBit</span>(<span class='ident'>bit</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_bit_op</span>(<span class='ident'>bit</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
-			<span class='ident'>BinComp</span>(<span class='ident'>comp</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_comp_op</span>(<span class='ident'>comp</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
-			<span class='ident'>BinLog</span>(<span class='ident'>log</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_log_op</span>(<span class='ident'>log</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
-		}
-	}
-	<span class='doccomment'>/// Compile a numeric operation
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_num_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>NumOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a bitwise operation
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_bit_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>BitOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a comparitive operation
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_comp_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>CompOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a logical operation
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_log_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>LogOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a constant
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_const</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Const</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a local variable
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_local</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a block of expressions
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_block</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile constant field access for an object
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_get_const_field</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile field access for an object
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_get_field</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a call to a function with some arguments
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_call</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a while loop
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_while_loop</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile an if statement
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_if</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a switch statement
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_switch</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile an object declaration
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_object_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile an array declaration
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_array_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a function declaration
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_function_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile an arrow function declaration
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_arrow_function_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a construction of an object
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_construct</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a return expression
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_return</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a throw expression
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_throw</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile an assignment
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_assign</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a variable declaration
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_var_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>String</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
-	<span class='doccomment'>/// Compile a typeof expression
-</span>	<span class='kw'>fn</span> <span class='ident'>compile_typeof</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
-		<span class='macro'>unimplemented</span><span class='macro'>!</span>()
-	}
+    <span class='doccomment'>/// Compile an expression
+</span>    <span class='kw'>fn</span> <span class='ident'>compile</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>expr</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>debug</span><span class='macro'>!</span>(<span class='string'>&quot;Compiling {}&quot;</span>, <span class='ident'>expr</span>);
+        <span class='kw'>match</span> <span class='ident'>expr</span>.<span class='ident'>def</span>.<span class='ident'>clone</span>() {
+            <span class='ident'>UnaryOpExpr</span>(<span class='ident'>op</span>, <span class='ident'>ex</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_unary_op</span>(<span class='ident'>op</span>, <span class='ident'>ex</span>),
+            <span class='ident'>BinOpExpr</span>(<span class='ident'>op</span>, <span class='ident'>left</span>, <span class='ident'>right</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_bin_op</span>(<span class='ident'>op</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
+            <span class='ident'>ConstExpr</span>(<span class='kw-2'>ref</span> <span class='ident'>c</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_const</span>(<span class='ident'>c</span>),
+            <span class='ident'>LocalExpr</span>(<span class='ident'>l</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_local</span>(<span class='ident'>l</span>),
+            <span class='ident'>BlockExpr</span>(<span class='ident'>vals</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_block</span>(<span class='ident'>vals</span>),
+            <span class='ident'>GetConstFieldExpr</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_get_const_field</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>),
+            <span class='ident'>GetFieldExpr</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_get_field</span>(<span class='ident'>obj</span>, <span class='ident'>field</span>),
+            <span class='ident'>CallExpr</span>(<span class='ident'>func</span>, <span class='ident'>args</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_call</span>(<span class='ident'>func</span>, <span class='ident'>args</span>),
+            <span class='ident'>WhileLoopExpr</span>(<span class='ident'>cond</span>, <span class='ident'>expr</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_while_loop</span>(<span class='ident'>cond</span>, <span class='ident'>expr</span>),
+            <span class='ident'>IfExpr</span>(<span class='ident'>cond</span>, <span class='ident'>if_expr</span>, <span class='ident'>else_expr</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_if</span>(<span class='ident'>cond</span>, <span class='ident'>if_expr</span>, <span class='ident'>else_expr</span>),
+            <span class='ident'>SwitchExpr</span>(<span class='ident'>value</span>, <span class='ident'>cases</span>, <span class='ident'>default</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_switch</span>(<span class='ident'>value</span>, <span class='ident'>cases</span>, <span class='ident'>default</span>),
+            <span class='ident'>ObjectDeclExpr</span>(<span class='ident'>fields</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_object_decl</span>(<span class='ident'>fields</span>),
+            <span class='ident'>ArrayDeclExpr</span>(<span class='ident'>values</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_array_decl</span>(<span class='ident'>values</span>),
+            <span class='ident'>FunctionDeclExpr</span>(<span class='ident'>name</span>, <span class='ident'>args</span>, <span class='ident'>ret</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_function_decl</span>(<span class='ident'>name</span>, <span class='ident'>args</span>, <span class='ident'>ret</span>),
+            <span class='ident'>ArrowFunctionDeclExpr</span>(<span class='ident'>args</span>, <span class='ident'>ret</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_arrow_function_decl</span>(<span class='ident'>args</span>, <span class='ident'>ret</span>),
+            <span class='ident'>ConstructExpr</span>(<span class='ident'>func</span>, <span class='ident'>args</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_construct</span>(<span class='ident'>func</span>, <span class='ident'>args</span>),
+            <span class='ident'>ReturnExpr</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_return</span>(<span class='ident'>val</span>),
+            <span class='ident'>ThrowExpr</span>(<span class='ident'>val</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_throw</span>(<span class='ident'>val</span>),
+            <span class='ident'>AssignExpr</span>(<span class='ident'>left</span>, <span class='ident'>right</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_assign</span>(<span class='ident'>left</span>, <span class='ident'>right</span>),
+            <span class='ident'>VarDeclExpr</span>(<span class='ident'>vars</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_var_decl</span>(<span class='ident'>vars</span>),
+            <span class='ident'>TypeOfExpr</span>(<span class='ident'>expr</span>) <span class='op'>=&gt;</span>
+                <span class='self'>self</span>.<span class='ident'>compile_typeof</span>(<span class='ident'>expr</span>)
+        }
+    }
+    <span class='doccomment'>/// Compile a unary operation
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_unary_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>UnaryOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a binary operation
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_bin_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>op</span>:<span class='ident'>BinOp</span>, <span class='ident'>left</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, <span class='ident'>right</span>:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='kw'>match</span> <span class='ident'>op</span> {
+            <span class='ident'>BinNum</span>(<span class='ident'>num</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_num_op</span>(<span class='ident'>num</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
+            <span class='ident'>BinBit</span>(<span class='ident'>bit</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_bit_op</span>(<span class='ident'>bit</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
+            <span class='ident'>BinComp</span>(<span class='ident'>comp</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_comp_op</span>(<span class='ident'>comp</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
+            <span class='ident'>BinLog</span>(<span class='ident'>log</span>) <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>compile_log_op</span>(<span class='ident'>log</span>, <span class='ident'>left</span>, <span class='ident'>right</span>),
+        }
+    }
+    <span class='doccomment'>/// Compile a numeric operation
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_num_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>NumOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a bitwise operation
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_bit_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>BitOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a comparitive operation
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_comp_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>CompOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a logical operation
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_log_op</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>LogOp</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a constant
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_const</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Const</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a local variable
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_local</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a block of expressions
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_block</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile constant field access for an object
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_get_const_field</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile field access for an object
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_get_field</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a call to a function with some arguments
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_call</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a while loop
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_while_loop</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile an if statement
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_if</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a switch statement
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_switch</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>Expr</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile an object declaration
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_object_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='ident'>TreeMap</span><span class='op'>&lt;</span><span class='ident'>String</span>, <span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile an array declaration
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_array_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a function declaration
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_function_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile an arrow function declaration
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_arrow_function_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a construction of an object
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_construct</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a return expression
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_return</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Box</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a throw expression
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_throw</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile an assignment
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_assign</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a variable declaration
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_var_decl</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='ident'>Vec</span><span class='op'>&lt;</span>(<span class='ident'>String</span>, <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Expr</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
+    <span class='doccomment'>/// Compile a typeof expression
+</span>    <span class='kw'>fn</span> <span class='ident'>compile_typeof</span>(<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='self'>self</span>, _:<span class='kw-2'>&amp;</span><span class='ident'>Expr</span>) <span class='op'>-&gt;</span> <span class='ident'>Compiled</span> {
+        <span class='macro'>unimplemented</span><span class='macro'>!</span>()
+    }
 }
 </pre>
 </section>
@@ -382,7 +382,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

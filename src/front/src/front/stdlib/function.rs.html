@@ -89,42 +89,42 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>GC</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cell</span>::<span class='ident'>RefCell</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>FunctionData</span> <span class='op'>=</span> <span class='kw'>fn</span>(<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, <span class='ident'>Value</span>, <span class='ident'>Value</span>, <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span>;
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>)]</span>
 <span class='doccomment'>/// A Javascript function
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Function</span> {
-	<span class='doccomment'>/// The fields associated with the function
-</span>	<span class='kw'>pub</span> <span class='ident'>object</span> : <span class='ident'>ObjectData</span>,
-	<span class='doccomment'>/// This function&#39;s JIT representation
-</span>	<span class='kw'>pub</span> <span class='ident'>repr</span> : <span class='ident'>FunctionData</span>,
-	<span class='doccomment'>/// The argument names of the function
-</span>	<span class='kw'>pub</span> <span class='ident'>args</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>
+    <span class='doccomment'>/// The fields associated with the function
+</span>    <span class='kw'>pub</span> <span class='ident'>object</span> : <span class='ident'>ObjectData</span>,
+    <span class='doccomment'>/// This function&#39;s JIT representation
+</span>    <span class='kw'>pub</span> <span class='ident'>repr</span> : <span class='ident'>FunctionData</span>,
+    <span class='doccomment'>/// The argument names of the function
+</span>    <span class='kw'>pub</span> <span class='ident'>args</span> : <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>
 }
 <span class='kw'>impl</span> <span class='ident'>Function</span> {
-	<span class='doccomment'>/// Make a new function
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>repr</span> : <span class='ident'>FunctionData</span>, <span class='ident'>args</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Function</span> {
-		<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>TreeMap</span>::<span class='ident'>new</span>();
-		<span class='ident'>obj</span>.<span class='ident'>insert</span>(<span class='string'>&quot;arguments&quot;</span>.<span class='ident'>into_string</span>(), <span class='ident'>Property</span>::<span class='ident'>new</span>(<span class='ident'>to_value</span>(<span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>)));
-		<span class='ident'>Function</span> {<span class='ident'>object</span>: <span class='ident'>obj</span>, <span class='ident'>repr</span>: <span class='ident'>repr</span>, <span class='ident'>args</span>: <span class='ident'>args</span>}
-	}
-	<span class='doccomment'>/// Create a function from function data and arguments
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make</span>(<span class='ident'>repr</span>: <span class='ident'>FunctionData</span>, <span class='ident'>args</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-		<span class='ident'>Value</span> {
-			<span class='ident'>ptr</span>: <span class='kw'>box</span>(<span class='ident'>GC</span>) <span class='ident'>VFunction</span>(<span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>Function</span>::<span class='ident'>new</span>(<span class='ident'>repr</span>, <span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>args</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>arg</span><span class='op'>|</span><span class='ident'>arg</span>.<span class='ident'>to_string</span>())))))
-		}
-	}
-	<span class='doccomment'>/// Call with some args
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>args</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, <span class='ident'>global</span>:<span class='ident'>Value</span>, <span class='ident'>scope</span>:<span class='ident'>Value</span>, <span class='ident'>this</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-		(<span class='self'>self</span>.<span class='ident'>repr</span>)(<span class='ident'>args</span>, <span class='ident'>global</span>, <span class='ident'>scope</span>, <span class='ident'>this</span>)
-	}
+    <span class='doccomment'>/// Make a new function
+</span>    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>repr</span> : <span class='ident'>FunctionData</span>, <span class='ident'>args</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>String</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Function</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>obj</span> <span class='op'>=</span> <span class='ident'>TreeMap</span>::<span class='ident'>new</span>();
+        <span class='ident'>obj</span>.<span class='ident'>insert</span>(<span class='string'>&quot;arguments&quot;</span>.<span class='ident'>into_string</span>(), <span class='ident'>Property</span>::<span class='ident'>new</span>(<span class='ident'>to_value</span>(<span class='ident'>args</span>.<span class='ident'>len</span>() <span class='kw'>as</span> <span class='ident'>i32</span>)));
+        <span class='ident'>Function</span> {<span class='ident'>object</span>: <span class='ident'>obj</span>, <span class='ident'>repr</span>: <span class='ident'>repr</span>, <span class='ident'>args</span>: <span class='ident'>args</span>}
+    }
+    <span class='doccomment'>/// Create a function from function data and arguments
+</span>    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make</span>(<span class='ident'>repr</span>: <span class='ident'>FunctionData</span>, <span class='ident'>args</span>:<span class='kw-2'>&amp;</span>[<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;static</span> <span class='ident'>str</span>]) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+        <span class='ident'>Value</span>::<span class='ident'>new</span>(<span class='ident'>VFunction</span>(<span class='ident'>RefCell</span>::<span class='ident'>new</span>(<span class='ident'>Function</span>::<span class='ident'>new</span>(<span class='ident'>repr</span>, <span class='ident'>FromIterator</span>::<span class='ident'>from_iter</span>(<span class='ident'>args</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>arg</span><span class='op'>|</span><span class='ident'>arg</span>.<span class='ident'>to_string</span>()))))))
+    }
+    <span class='doccomment'>/// Call with some args
+</span>    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>call</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>args</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, <span class='ident'>global</span>:<span class='ident'>Value</span>, <span class='ident'>scope</span>:<span class='ident'>Value</span>, <span class='ident'>this</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+        (<span class='self'>self</span>.<span class='ident'>repr</span>)(<span class='ident'>args</span>, <span class='ident'>global</span>, <span class='ident'>scope</span>, <span class='ident'>this</span>)
+    }
 }
 <span class='doccomment'>/// Create a new `Function` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_create</span>(_ : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-	<span class='kw'>let</span> <span class='ident'>function</span> : <span class='ident'>ObjectData</span> <span class='op'>=</span> <span class='ident'>TreeMap</span>::<span class='ident'>new</span>();
-	<span class='ident'>to_value</span>(<span class='ident'>function</span>)
+    <span class='kw'>let</span> <span class='ident'>function</span> : <span class='ident'>ObjectData</span> <span class='op'>=</span> <span class='ident'>TreeMap</span>::<span class='ident'>new</span>();
+    <span class='ident'>to_value</span>(<span class='ident'>function</span>)
 }
 <span class='doccomment'>/// Initialise the global object with the `Function` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Function&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
+    <span class='macro'>js_extend</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;Function&quot;</span>: <span class='ident'>_create</span>(<span class='ident'>global</span>)
+    });
 }
 </pre>
 </section>
@@ -144,7 +144,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

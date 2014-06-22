@@ -230,6 +230,8 @@
 <span id='191'>191</span>
 <span id='192'>192</span>
 <span id='193'>193</span>
+<span id='194'>194</span>
+<span id='195'>195</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>, <span class='ident'>from_value</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::<span class='ident'>Function</span>;
@@ -238,191 +240,193 @@
 
 <span class='doccomment'>/// Get the absolute value of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>abs</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>abs</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>abs</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the arccos of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>acos</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>acos</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>acos</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the arcsine of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>asin</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>asin</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>asin</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the arctangent of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>atan</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>atan</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>atan</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the arctangent of a numbers
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>atan2</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>atan2</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>1</span>).<span class='ident'>to_num</span>())
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>atan2</span>(<span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>1</span>).<span class='ident'>to_num</span>())
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the cubic root of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cbrt</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>cbrt</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>cbrt</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get lowest integer above a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ceil</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>ceil</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>ceil</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the cosine of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cos</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>cos</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>cos</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the power to raise the natural logarithm to get the number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>exp</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>exp</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>exp</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the highest integer below a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>floor</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>floor</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>floor</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the natural logarithm of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>log</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>log</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>E</span>)
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>log</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>E</span>)
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the maximum of several numbers
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>max</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>f64</span>::<span class='ident'>NEG_INFINITY</span>;
-	<span class='kw'>for</span> <span class='ident'>arg</span> <span class='kw'>in</span> <span class='ident'>args</span>.<span class='ident'>iter</span>() {
-		<span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>arg</span>.<span class='ident'>to_num</span>();
-		<span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>max</span>.<span class='ident'>max</span>(<span class='ident'>num</span>);
-	}
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>max</span>))
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>f64</span>::<span class='ident'>NEG_INFINITY</span>;
+    <span class='kw'>for</span> <span class='ident'>arg</span> <span class='kw'>in</span> <span class='ident'>args</span>.<span class='ident'>iter</span>() {
+        <span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>arg</span>.<span class='ident'>to_num</span>();
+        <span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>max</span>.<span class='ident'>max</span>(<span class='ident'>num</span>);
+    }
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>max</span>))
 }
 <span class='doccomment'>/// Get the minimum of several numbers
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>min</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>f64</span>::<span class='ident'>INFINITY</span>;
-	<span class='kw'>for</span> <span class='ident'>arg</span> <span class='kw'>in</span> <span class='ident'>args</span>.<span class='ident'>iter</span>() {
-		<span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>arg</span>.<span class='ident'>to_num</span>();
-		<span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>max</span>.<span class='ident'>min</span>(<span class='ident'>num</span>);
-	}
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>max</span>))
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>f64</span>::<span class='ident'>INFINITY</span>;
+    <span class='kw'>for</span> <span class='ident'>arg</span> <span class='kw'>in</span> <span class='ident'>args</span>.<span class='ident'>iter</span>() {
+        <span class='kw'>let</span> <span class='ident'>num</span> <span class='op'>=</span> <span class='ident'>arg</span>.<span class='ident'>to_num</span>();
+        <span class='ident'>max</span> <span class='op'>=</span> <span class='ident'>max</span>.<span class='ident'>min</span>(<span class='ident'>num</span>);
+    }
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>max</span>))
 }
 <span class='doccomment'>/// Raise a number to a power
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>pow</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>2</span> {
-		<span class='kw'>let</span> <span class='ident'>num</span> : <span class='ident'>f64</span> <span class='op'>=</span> <span class='ident'>from_value</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>();
-		<span class='kw'>let</span> <span class='ident'>power</span> : <span class='ident'>f64</span> <span class='op'>=</span> <span class='ident'>from_value</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>1</span>)).<span class='ident'>unwrap</span>();
-		<span class='ident'>num</span>.<span class='ident'>powf</span>(<span class='ident'>power</span>)
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>2</span> {
+        <span class='kw'>let</span> <span class='ident'>num</span> : <span class='ident'>f64</span> <span class='op'>=</span> <span class='ident'>from_value</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>();
+        <span class='kw'>let</span> <span class='ident'>power</span> : <span class='ident'>f64</span> <span class='op'>=</span> <span class='ident'>from_value</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>1</span>)).<span class='ident'>unwrap</span>();
+        <span class='ident'>num</span>.<span class='ident'>powf</span>(<span class='ident'>power</span>)
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Generate a random floating-point number between 0 and 1
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_random</span>(_:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>()))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='ident'>random</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>()))
 }
 <span class='doccomment'>/// Round a number to the nearest integer
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>round</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>round</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>round</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the sine of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sin</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>sin</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>sin</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the square root of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sqrt</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>sqrt</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>sqrt</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Get the tangent of a number
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>tan</span>(<span class='ident'>args</span>:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-	<span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
-		<span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>tan</span>()
-	} <span class='kw'>else</span> {
-		<span class='ident'>f64</span>::<span class='ident'>NAN</span>
-	}))
+    <span class='prelude-val'>Ok</span>(<span class='ident'>to_value</span>(<span class='kw'>if</span> <span class='ident'>args</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>1</span> {
+        <span class='ident'>from_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>(<span class='op'>*</span><span class='ident'>args</span>.<span class='ident'>get</span>(<span class='number'>0</span>)).<span class='ident'>unwrap</span>().<span class='ident'>tan</span>()
+    } <span class='kw'>else</span> {
+        <span class='ident'>f64</span>::<span class='ident'>NAN</span>
+    }))
 }
 <span class='doccomment'>/// Create a new `Math` object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_create</span>(<span class='ident'>global</span> : <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
-	<span class='kw'>let</span> <span class='ident'>math</span> <span class='op'>=</span> <span class='ident'>Value</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>Some</span>(<span class='ident'>global</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;E&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>E</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;LN2&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LN_2</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;LN10&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LN_10</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;LOG2E&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LOG2_E</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;LOG10E&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LOG10_E</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;SQRT1_2&quot;</span>, <span class='ident'>to_value</span>(<span class='number'>0.5f64</span>.<span class='ident'>sqrt</span>()));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;SQRT2&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>SQRT2</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;PI&quot;</span>, <span class='ident'>to_value</span>(<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>PI</span>));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;abs&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>abs</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;acos&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>acos</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;asin&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>asin</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;atan&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>atan</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;atan2&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>atan2</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;cbrt&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>cbrt</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;ceil&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>ceil</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;cos&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>cos</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;exp&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>exp</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;floor&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>floor</span>, [<span class='string'>&quot;num&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;log&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>log</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;max&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>max</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;min&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>min</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;pow&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>pow</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;random&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>_random</span>, []));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;round&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>round</span>, [<span class='string'>&quot;num&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;sin&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>sin</span>, [<span class='string'>&quot;num&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;sqrt&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>sqrt</span>, [<span class='string'>&quot;num&quot;</span>]));
-	<span class='ident'>math</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;tan&quot;</span>, <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>tan</span>, [<span class='string'>&quot;num&quot;</span>]));
-	<span class='ident'>math</span>
+    <span class='macro'>js</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;E&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>E</span>,
+        <span class='string'>&quot;LN2&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LN_2</span>,
+        <span class='string'>&quot;LN10&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LN_10</span>,
+        <span class='string'>&quot;LOG2E&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LOG2_E</span>,
+        <span class='string'>&quot;LOG10E&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>LOG10_E</span>,
+        <span class='string'>&quot;SQRT1_2&quot;</span>: <span class='number'>0.5f64</span>.<span class='ident'>sqrt</span>(),
+        <span class='string'>&quot;SQRT2&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>SQRT2</span>,
+        <span class='string'>&quot;PI&quot;</span>: <span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>PI</span>,
+        <span class='string'>&quot;abs&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>abs</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;acos&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>acos</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;asin&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>asin</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;atan&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>atan</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;atan2&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>atan2</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;cbrt&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>cbrt</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;ceil&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>ceil</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;cos&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>cos</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;exp&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>exp</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;floor&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>floor</span>, [<span class='string'>&quot;num&quot;</span>]),
+        <span class='string'>&quot;log&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>log</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;max&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>max</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;min&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>min</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;pow&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>pow</span>, [<span class='string'>&quot;num1&quot;</span>, <span class='string'>&quot;num2&quot;</span>]),
+        <span class='string'>&quot;random&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>_random</span>, []),
+        <span class='string'>&quot;round&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>round</span>, [<span class='string'>&quot;num&quot;</span>]),
+        <span class='string'>&quot;sin&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>sin</span>, [<span class='string'>&quot;num&quot;</span>]),
+        <span class='string'>&quot;sqrt&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>sqrt</span>, [<span class='string'>&quot;num&quot;</span>]),
+        <span class='string'>&quot;tan&quot;</span>: <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>tan</span>, [<span class='string'>&quot;num&quot;</span>])
+    })
 }
 <span class='doccomment'>/// Initialise the `Math` object on the global object
 </span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init</span>(<span class='ident'>global</span>:<span class='ident'>Value</span>) {
-	<span class='ident'>global</span>.<span class='ident'>set_field_slice</span>(<span class='string'>&quot;Math&quot;</span>, <span class='ident'>_create</span>(<span class='ident'>global</span>));
+    <span class='macro'>js_extend</span><span class='macro'>!</span>(<span class='ident'>global</span>, {
+        <span class='string'>&quot;Math&quot;</span>: <span class='ident'>_create</span>(<span class='ident'>global</span>)
+    });
 }
 </pre>
 </section>
@@ -442,7 +446,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

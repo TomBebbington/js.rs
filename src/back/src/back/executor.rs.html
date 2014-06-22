@@ -139,18 +139,18 @@
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>JITVal</span> <span class='op'>=</span> <span class='ident'>jit</span>::<span class='ident'>Value</span>;
 <span class='kw'>use</span> <span class='ident'>jit</span>::{
-	<span class='ident'>get_type</span>,
-	<span class='ident'>Function</span>,
-	<span class='ident'>Compilable</span>,
-	<span class='ident'>UByte</span>,
-	<span class='ident'>SysChar</span>,
-	<span class='ident'>SysBool</span>,
-	<span class='ident'>NInt</span>,
-	<span class='ident'>NUInt</span>,
-	<span class='ident'>Int</span>,
-	<span class='ident'>UInt</span>,
-	<span class='ident'>Pointer</span>,
-	<span class='ident'>Float64</span>
+    <span class='ident'>get_type</span>,
+    <span class='ident'>Function</span>,
+    <span class='ident'>Compile</span>,
+    <span class='ident'>UByte</span>,
+    <span class='ident'>SysChar</span>,
+    <span class='ident'>SysBool</span>,
+    <span class='ident'>NInt</span>,
+    <span class='ident'>NUInt</span>,
+    <span class='ident'>Int</span>,
+    <span class='ident'>UInt</span>,
+    <span class='ident'>Pointer</span>,
+    <span class='ident'>Float64</span>
 };
 <span class='kw'>use</span> <span class='ident'>JSVal</span> <span class='op'>=</span> <span class='ident'>front</span>::<span class='ident'>stdlib</span>::<span class='ident'>value</span>::<span class='ident'>Value</span>;
 <span class='kw'>use</span> <span class='ident'>front</span>::<span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>VNull</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
@@ -160,81 +160,81 @@
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>c_str</span>::<span class='ident'>CString</span>;
 <span class='doccomment'>/// A JIT executor
 </span><span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>JitExecutor</span> {
-	<span class='ident'>global</span>: <span class='ident'>JSVal</span>
+    <span class='ident'>global</span>: <span class='ident'>JSVal</span>
 }
 <span class='kw'>impl</span> <span class='ident'>JitExecutor</span> {
-	<span class='doccomment'>/// Create a new JIT executor
-</span>	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>JitExecutor</span> {
-		<span class='ident'>JitExecutor</span> {
-			<span class='ident'>global</span>: <span class='ident'>JSVal</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>None</span>)
-		}
-	}
+    <span class='doccomment'>/// Create a new JIT executor
+</span>    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>JitExecutor</span> {
+        <span class='ident'>JitExecutor</span> {
+            <span class='ident'>global</span>: <span class='ident'>JSVal</span>::<span class='ident'>new_obj</span>(<span class='prelude-val'>None</span>)
+        }
+    }
 
 }
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>Executor</span><span class='op'>&lt;</span>(<span class='ident'>JITVal</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Function</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>)<span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>JitExecutor</span> {
-	<span class='attribute'>\#[<span class='ident'>inline</span>]</span>
-	<span class='kw'>fn</span> <span class='ident'>get_global_obj</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
-		<span class='self'>self</span>.<span class='ident'>global</span>
-	}
-	<span class='kw'>fn</span> <span class='ident'>execute</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>comp</span>:<span class='kw-2'>&amp;</span>(<span class='ident'>JITVal</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Function</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>)) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
-		<span class='kw'>let</span> <span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>, <span class='kw-2'>ref</span> <span class='ident'>func</span>) <span class='op'>=</span> <span class='ident'>comp</span>;
-		<span class='ident'>func</span>.<span class='ident'>insn_return</span>(<span class='kw-2'>&amp;</span><span class='ident'>convert_to_value</span>(<span class='op'>*</span><span class='ident'>func</span>, <span class='ident'>val</span>));
-		<span class='ident'>func</span>.<span class='ident'>set_optimization_level</span>(<span class='number'>5</span>);
-		<span class='ident'>func</span>.<span class='ident'>set_recompilable</span>();
-		<span class='ident'>func</span>.<span class='ident'>compile</span>();
-		<span class='kw'>let</span> <span class='ident'>func</span>: <span class='kw'>fn</span>(<span class='ident'>JSVal</span>, <span class='ident'>JSVal</span>, <span class='ident'>JSVal</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>func</span>.<span class='ident'>closure3</span>() };
-		<span class='prelude-val'>Ok</span>(<span class='ident'>func</span>(<span class='self'>self</span>.<span class='ident'>global</span>, <span class='self'>self</span>.<span class='ident'>global</span>, <span class='self'>self</span>.<span class='ident'>global</span>))
-	}
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>get_global_obj</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
+        <span class='self'>self</span>.<span class='ident'>global</span>
+    }
+    <span class='kw'>fn</span> <span class='ident'>execute</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>comp</span>:<span class='kw-2'>&amp;</span>(<span class='ident'>JITVal</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>, <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Function</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>)) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+        <span class='kw'>let</span> <span class='kw-2'>&amp;</span>(<span class='kw-2'>ref</span> <span class='ident'>val</span>, <span class='kw-2'>ref</span> <span class='ident'>func</span>) <span class='op'>=</span> <span class='ident'>comp</span>;
+        <span class='ident'>func</span>.<span class='ident'>insn_return</span>(<span class='kw-2'>&amp;</span><span class='ident'>convert_to_value</span>(<span class='op'>*</span><span class='ident'>func</span>, <span class='ident'>val</span>));
+        <span class='ident'>func</span>.<span class='ident'>set_optimization_level</span>(<span class='number'>5</span>);
+        <span class='ident'>func</span>.<span class='ident'>set_recompilable</span>();
+        <span class='ident'>func</span>.<span class='ident'>compile</span>();
+        <span class='kw'>let</span> <span class='ident'>func</span>: <span class='kw'>fn</span>(<span class='ident'>JSVal</span>, <span class='ident'>JSVal</span>, <span class='ident'>JSVal</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>func</span>.<span class='ident'>closure3</span>() };
+        <span class='prelude-val'>Ok</span>(<span class='ident'>func</span>(<span class='self'>self</span>.<span class='ident'>global</span>, <span class='self'>self</span>.<span class='ident'>global</span>, <span class='self'>self</span>.<span class='ident'>global</span>))
+    }
 }
 
 <span class='kw'>fn</span> <span class='ident'>convert_to_value</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='ident'>func</span>:<span class='kw-2'>&amp;</span><span class='ident'>Function</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>, <span class='ident'>val</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>JITVal</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>JITVal</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
-	<span class='kw'>let</span> <span class='ident'>val_type</span> <span class='op'>=</span> <span class='ident'>val</span>.<span class='ident'>get_type</span>();
-	<span class='kw'>let</span> <span class='ident'>val_kind</span> <span class='op'>=</span> <span class='ident'>val_type</span>.<span class='ident'>get_kind</span>();
-	<span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>SysBool</span>) <span class='op'>||</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>UByte</span>) {
-		<span class='kw'>let</span> <span class='ident'>bool_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>;
-		<span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
-		<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;bool_value&quot;</span>, <span class='ident'>bool_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
-	} <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>Pointer</span>) {
-		<span class='kw'>let</span> <span class='ident'>ref_t</span> <span class='op'>=</span> <span class='ident'>val_type</span>.<span class='ident'>get_ref</span>();
-		<span class='kw'>if</span> <span class='ident'>ref_t</span>.<span class='ident'>get_kind</span>().<span class='ident'>contains</span>(<span class='ident'>SysChar</span>) {
-			<span class='kw'>fn</span> <span class='ident'>string_value</span>(<span class='ident'>val</span>: <span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
-				<span class='kw'>unsafe</span> {
-					<span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>val</span>, <span class='boolval'>false</span>);
-					<span class='ident'>to_value</span>(<span class='ident'>text</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>().<span class='ident'>into_string</span>())
-				}
-			}
-			<span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
-			<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;string_value&quot;</span>, <span class='ident'>string_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
-		} <span class='kw'>else</span> {
-			<span class='kw'>fn</span> <span class='ident'>ptr_value</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
-				<span class='kw'>match</span> <span class='ident'>ptr</span>.<span class='ident'>to_uint</span>() {
-					<span class='number'>0u</span> <span class='op'>=&gt;</span> <span class='ident'>JSVal</span>::<span class='ident'>undefined</span>(),
-					<span class='number'>1u</span> <span class='op'>=&gt;</span> <span class='ident'>JSVal</span> {
-						<span class='ident'>ptr</span>: <span class='kw'>box</span>(<span class='ident'>GC</span>) <span class='ident'>VNull</span>
-					},
-					<span class='ident'>ptr</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Invalid pointer: {}&quot;</span>, <span class='ident'>ptr</span>)
-				}
-			}
-			<span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
-			<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;ptr_value&quot;</span>, <span class='ident'>ptr_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
-		}
-	} <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>Int</span>) <span class='op'>||</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>UInt</span>) {
-		<span class='kw'>let</span> <span class='ident'>int_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>;
-		<span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
-		<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;int_value&quot;</span>, <span class='ident'>int_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
-	} <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>NInt</span>) <span class='op'>||</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>NUInt</span>) {
-		<span class='kw'>fn</span> <span class='ident'>sys_int_value</span>(<span class='ident'>num</span>:<span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
-			<span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>(<span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>i32</span>)
-		}
-		<span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
-		<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;sys_int_value&quot;</span>, <span class='ident'>sys_int_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
-	} <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>Float64</span>) {
-		<span class='kw'>let</span> <span class='ident'>float_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
-		<span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
-		<span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;float_value&quot;</span>, <span class='ident'>float_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
-	} <span class='kw'>else</span> {
-		<span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Invalid kind {}&quot;</span>, <span class='ident'>val_kind</span>.<span class='ident'>bits</span>())
-	}
+    <span class='kw'>let</span> <span class='ident'>val_type</span> <span class='op'>=</span> <span class='ident'>val</span>.<span class='ident'>get_type</span>();
+    <span class='kw'>let</span> <span class='ident'>val_kind</span> <span class='op'>=</span> <span class='ident'>val_type</span>.<span class='ident'>get_kind</span>();
+    <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>SysBool</span>) <span class='op'>||</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>UByte</span>) {
+        <span class='kw'>let</span> <span class='ident'>bool_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>bool</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>bool</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
+        <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;bool_value&quot;</span>, <span class='ident'>bool_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
+    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>Pointer</span>) {
+        <span class='kw'>let</span> <span class='ident'>ref_t</span> <span class='op'>=</span> <span class='ident'>val_type</span>.<span class='ident'>get_ref</span>();
+        <span class='kw'>if</span> <span class='ident'>ref_t</span>.<span class='ident'>get_kind</span>().<span class='ident'>contains</span>(<span class='ident'>SysChar</span>) {
+            <span class='kw'>fn</span> <span class='ident'>string_value</span>(<span class='ident'>val</span>: <span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
+                <span class='kw'>unsafe</span> {
+                    <span class='kw'>let</span> <span class='ident'>text</span> <span class='op'>=</span> <span class='ident'>CString</span>::<span class='ident'>new</span>(<span class='ident'>val</span>, <span class='boolval'>false</span>);
+                    <span class='ident'>to_value</span>(<span class='ident'>text</span>.<span class='ident'>as_str</span>().<span class='ident'>unwrap</span>().<span class='ident'>into_string</span>())
+                }
+            }
+            <span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>String</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
+            <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;string_value&quot;</span>, <span class='ident'>string_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
+        } <span class='kw'>else</span> {
+            <span class='kw'>fn</span> <span class='ident'>ptr_value</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
+                <span class='kw'>match</span> <span class='ident'>ptr</span>.<span class='ident'>to_uint</span>() {
+                    <span class='number'>0u</span> <span class='op'>=&gt;</span> <span class='ident'>JSVal</span>::<span class='ident'>undefined</span>(),
+                    <span class='number'>1u</span> <span class='op'>=&gt;</span> <span class='ident'>JSVal</span> {
+                        <span class='ident'>ptr</span>: <span class='kw'>box</span>(<span class='ident'>GC</span>) <span class='ident'>VNull</span>
+                    },
+                    <span class='ident'>ptr</span> <span class='op'>=&gt;</span> <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Invalid pointer: {}&quot;</span>, <span class='ident'>ptr</span>)
+                }
+            }
+            <span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='op'>*</span><span class='ident'>i8</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
+            <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;ptr_value&quot;</span>, <span class='ident'>ptr_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
+        }
+    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>Int</span>) <span class='op'>||</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>UInt</span>) {
+        <span class='kw'>let</span> <span class='ident'>int_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>i32</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
+        <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;int_value&quot;</span>, <span class='ident'>int_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
+    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>NInt</span>) <span class='op'>||</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>NUInt</span>) {
+        <span class='kw'>fn</span> <span class='ident'>sys_int_value</span>(<span class='ident'>num</span>:<span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='ident'>JSVal</span> {
+            <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>i32</span><span class='op'>&gt;</span>(<span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>i32</span>)
+        }
+        <span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>int</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
+        <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;sys_int_value&quot;</span>, <span class='ident'>sys_int_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
+    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>val_kind</span>.<span class='ident'>contains</span>(<span class='ident'>Float64</span>) {
+        <span class='kw'>let</span> <span class='ident'>float_value</span> <span class='op'>=</span> <span class='ident'>to_value</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>sig</span> <span class='op'>=</span> <span class='ident'>get_type</span>::<span class='op'>&lt;</span><span class='kw'>fn</span>(<span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='ident'>int</span><span class='op'>&gt;</span>();
+        <span class='ident'>func</span>.<span class='ident'>insn_call_native1</span>(<span class='string'>&quot;float_value&quot;</span>, <span class='ident'>float_value</span>, <span class='kw-2'>&amp;</span><span class='ident'>sig</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>val</span>])
+    } <span class='kw'>else</span> {
+        <span class='macro'>fail</span><span class='macro'>!</span>(<span class='string'>&quot;Invalid kind {}&quot;</span>, <span class='ident'>val_kind</span>.<span class='ident'>bits</span>())
+    }
 }
 </pre>
 </section>
@@ -254,7 +254,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>

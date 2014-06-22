@@ -183,146 +183,146 @@
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>fmt</span>::{<span class='ident'>Formatter</span>, <span class='prelude-ty'>Result</span>, <span class='ident'>Show</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>from_str</span>::<span class='ident'>FromStr</span>;
-<span class='attribute'>\#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
+<span class='attribute'>#[<span class='ident'>deriving</span>(<span class='ident'>Clone</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='doccomment'>/// A Javascript Keyword
 </span><span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>Keyword</span> {
-	<span class='doccomment'>/// The `break` keyword
-</span>	<span class='ident'>KBreak</span>,
-	<span class='doccomment'>/// The `case` keyword
-</span>	<span class='ident'>KCase</span>,
-	<span class='doccomment'>/// The `catch` keyword
-</span>	<span class='ident'>KCatch</span>,
-	<span class='doccomment'>/// The `class` keyword, which is reserved for future use
-</span>	<span class='ident'>KClass</span>,
-	<span class='doccomment'>/// The `continue` keyword
-</span>	<span class='ident'>KContinue</span>,
-	<span class='doccomment'>/// The `debugger` keyword
-</span>	<span class='ident'>KDebugger</span>,
-	<span class='doccomment'>/// The `default` keyword
-</span>	<span class='ident'>KDefault</span>,
-	<span class='doccomment'>/// The `delete` keyword
-</span>	<span class='ident'>KDelete</span>,
-	<span class='doccomment'>/// The `do` keyword
-</span>	<span class='ident'>KDo</span>,
-	<span class='doccomment'>/// The `else` keyword
-</span>	<span class='ident'>KElse</span>,
-	<span class='doccomment'>/// The `enum` keyword
-</span>	<span class='ident'>KEnum</span>,
-	<span class='doccomment'>/// The `extends` keyword
-</span>	<span class='ident'>KExtends</span>,
-	<span class='doccomment'>/// The `finally` keyword
-</span>	<span class='ident'>KFinally</span>,
-	<span class='doccomment'>/// The `for` keyword
-</span>	<span class='ident'>KFor</span>,
-	<span class='doccomment'>/// The `function` keyword
-</span>	<span class='ident'>KFunction</span>,
-	<span class='doccomment'>/// The `if` keyword
-</span>	<span class='ident'>KIf</span>,
-	<span class='doccomment'>/// The `in` keyword
-</span>	<span class='ident'>KIn</span>,
-	<span class='doccomment'>/// The `instanceof` keyword
-</span>	<span class='ident'>KInstanceOf</span>,
-	<span class='doccomment'>/// The `import` keyword
-</span>	<span class='ident'>KImport</span>,
-	<span class='doccomment'>/// The `new` keyword
-</span>	<span class='ident'>KNew</span>,
-	<span class='doccomment'>/// The `return` keyword
-</span>	<span class='ident'>KReturn</span>,
-	<span class='doccomment'>/// The `super` keyword
-</span>	<span class='ident'>KSuper</span>,
-	<span class='doccomment'>/// The `switch` keyword
-</span>	<span class='ident'>KSwitch</span>,
-	<span class='doccomment'>/// The `this` keyword
-</span>	<span class='ident'>KThis</span>,
-	<span class='doccomment'>/// The `throw` keyword
-</span>	<span class='ident'>KThrow</span>,
-	<span class='doccomment'>/// The `try` keyword
-</span>	<span class='ident'>KTry</span>,
-	<span class='doccomment'>/// The `typeof` keyword
-</span>	<span class='ident'>KTypeOf</span>,
-	<span class='doccomment'>/// The `var` keyword
-</span>	<span class='ident'>KVar</span>,
-	<span class='doccomment'>/// The `void` keyword
-</span>	<span class='ident'>KVoid</span>,
-	<span class='doccomment'>/// The `while` keyword
-</span>	<span class='ident'>KWhile</span>,
-	<span class='doccomment'>/// The `with` keyword
-</span>	<span class='ident'>KWith</span>
+    <span class='doccomment'>/// The `break` keyword
+</span>    <span class='ident'>KBreak</span>,
+    <span class='doccomment'>/// The `case` keyword
+</span>    <span class='ident'>KCase</span>,
+    <span class='doccomment'>/// The `catch` keyword
+</span>    <span class='ident'>KCatch</span>,
+    <span class='doccomment'>/// The `class` keyword, which is reserved for future use
+</span>    <span class='ident'>KClass</span>,
+    <span class='doccomment'>/// The `continue` keyword
+</span>    <span class='ident'>KContinue</span>,
+    <span class='doccomment'>/// The `debugger` keyword
+</span>    <span class='ident'>KDebugger</span>,
+    <span class='doccomment'>/// The `default` keyword
+</span>    <span class='ident'>KDefault</span>,
+    <span class='doccomment'>/// The `delete` keyword
+</span>    <span class='ident'>KDelete</span>,
+    <span class='doccomment'>/// The `do` keyword
+</span>    <span class='ident'>KDo</span>,
+    <span class='doccomment'>/// The `else` keyword
+</span>    <span class='ident'>KElse</span>,
+    <span class='doccomment'>/// The `enum` keyword
+</span>    <span class='ident'>KEnum</span>,
+    <span class='doccomment'>/// The `extends` keyword
+</span>    <span class='ident'>KExtends</span>,
+    <span class='doccomment'>/// The `finally` keyword
+</span>    <span class='ident'>KFinally</span>,
+    <span class='doccomment'>/// The `for` keyword
+</span>    <span class='ident'>KFor</span>,
+    <span class='doccomment'>/// The `function` keyword
+</span>    <span class='ident'>KFunction</span>,
+    <span class='doccomment'>/// The `if` keyword
+</span>    <span class='ident'>KIf</span>,
+    <span class='doccomment'>/// The `in` keyword
+</span>    <span class='ident'>KIn</span>,
+    <span class='doccomment'>/// The `instanceof` keyword
+</span>    <span class='ident'>KInstanceOf</span>,
+    <span class='doccomment'>/// The `import` keyword
+</span>    <span class='ident'>KImport</span>,
+    <span class='doccomment'>/// The `new` keyword
+</span>    <span class='ident'>KNew</span>,
+    <span class='doccomment'>/// The `return` keyword
+</span>    <span class='ident'>KReturn</span>,
+    <span class='doccomment'>/// The `super` keyword
+</span>    <span class='ident'>KSuper</span>,
+    <span class='doccomment'>/// The `switch` keyword
+</span>    <span class='ident'>KSwitch</span>,
+    <span class='doccomment'>/// The `this` keyword
+</span>    <span class='ident'>KThis</span>,
+    <span class='doccomment'>/// The `throw` keyword
+</span>    <span class='ident'>KThrow</span>,
+    <span class='doccomment'>/// The `try` keyword
+</span>    <span class='ident'>KTry</span>,
+    <span class='doccomment'>/// The `typeof` keyword
+</span>    <span class='ident'>KTypeOf</span>,
+    <span class='doccomment'>/// The `var` keyword
+</span>    <span class='ident'>KVar</span>,
+    <span class='doccomment'>/// The `void` keyword
+</span>    <span class='ident'>KVoid</span>,
+    <span class='doccomment'>/// The `while` keyword
+</span>    <span class='ident'>KWhile</span>,
+    <span class='doccomment'>/// The `with` keyword
+</span>    <span class='ident'>KWith</span>
 }
 <span class='kw'>impl</span> <span class='ident'>FromStr</span> <span class='kw'>for</span> <span class='ident'>Keyword</span> {
-	<span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Keyword</span><span class='op'>&gt;</span> {
-		<span class='kw'>match</span> <span class='ident'>s</span> {
-			<span class='string'>&quot;break&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KBreak</span>),
-			<span class='string'>&quot;case&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KCase</span>),
-			<span class='string'>&quot;catch&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KCatch</span>),
-			<span class='string'>&quot;class&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KClass</span>),
-			<span class='string'>&quot;continue&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KContinue</span>),
-			<span class='string'>&quot;debugger&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDebugger</span>),
-			<span class='string'>&quot;default&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDefault</span>),
-			<span class='string'>&quot;delete&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDelete</span>),
-			<span class='string'>&quot;do&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDo</span>),
-			<span class='string'>&quot;else&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KElse</span>),
-			<span class='string'>&quot;enum&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KEnum</span>),
-			<span class='string'>&quot;extends&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KExtends</span>),
-			<span class='string'>&quot;finally&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KFinally</span>),
-			<span class='string'>&quot;for&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KFor</span>),
-			<span class='string'>&quot;function&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KFunction</span>),
-			<span class='string'>&quot;if&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KIf</span>),
-			<span class='string'>&quot;in&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KIn</span>),
-			<span class='string'>&quot;instanceof&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KInstanceOf</span>),
-			<span class='string'>&quot;import&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KImport</span>),
-			<span class='string'>&quot;new&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KNew</span>),
-			<span class='string'>&quot;return&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KReturn</span>),
-			<span class='string'>&quot;super&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KSuper</span>),
-			<span class='string'>&quot;switch&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KSwitch</span>),
-			<span class='string'>&quot;this&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KThis</span>),
-			<span class='string'>&quot;throw&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KThrow</span>),
-			<span class='string'>&quot;try&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KTry</span>),
-			<span class='string'>&quot;typeof&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KTypeOf</span>),
-			<span class='string'>&quot;var&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KVar</span>),
-			<span class='string'>&quot;void&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KVoid</span>),
-			<span class='string'>&quot;while&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KWhile</span>),
-			<span class='string'>&quot;with&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KWith</span>),
-			_ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
-		}
-	}
+    <span class='kw'>fn</span> <span class='ident'>from_str</span>(<span class='ident'>s</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Keyword</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='ident'>s</span> {
+            <span class='string'>&quot;break&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KBreak</span>),
+            <span class='string'>&quot;case&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KCase</span>),
+            <span class='string'>&quot;catch&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KCatch</span>),
+            <span class='string'>&quot;class&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KClass</span>),
+            <span class='string'>&quot;continue&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KContinue</span>),
+            <span class='string'>&quot;debugger&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDebugger</span>),
+            <span class='string'>&quot;default&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDefault</span>),
+            <span class='string'>&quot;delete&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDelete</span>),
+            <span class='string'>&quot;do&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KDo</span>),
+            <span class='string'>&quot;else&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KElse</span>),
+            <span class='string'>&quot;enum&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KEnum</span>),
+            <span class='string'>&quot;extends&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KExtends</span>),
+            <span class='string'>&quot;finally&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KFinally</span>),
+            <span class='string'>&quot;for&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KFor</span>),
+            <span class='string'>&quot;function&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KFunction</span>),
+            <span class='string'>&quot;if&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KIf</span>),
+            <span class='string'>&quot;in&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KIn</span>),
+            <span class='string'>&quot;instanceof&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KInstanceOf</span>),
+            <span class='string'>&quot;import&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KImport</span>),
+            <span class='string'>&quot;new&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KNew</span>),
+            <span class='string'>&quot;return&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KReturn</span>),
+            <span class='string'>&quot;super&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KSuper</span>),
+            <span class='string'>&quot;switch&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KSwitch</span>),
+            <span class='string'>&quot;this&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KThis</span>),
+            <span class='string'>&quot;throw&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KThrow</span>),
+            <span class='string'>&quot;try&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KTry</span>),
+            <span class='string'>&quot;typeof&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KTypeOf</span>),
+            <span class='string'>&quot;var&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KVar</span>),
+            <span class='string'>&quot;void&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KVoid</span>),
+            <span class='string'>&quot;while&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KWhile</span>),
+            <span class='string'>&quot;with&quot;</span> <span class='op'>=&gt;</span> <span class='prelude-val'>Some</span>(<span class='ident'>KWith</span>),
+            _ <span class='op'>=&gt;</span> <span class='prelude-val'>None</span>
+        }
+    }
 }
 <span class='kw'>impl</span> <span class='ident'>Show</span> <span class='kw'>for</span> <span class='ident'>Keyword</span> {
-	<span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
-		<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
-			<span class='ident'>KBreak</span> <span class='op'>=&gt;</span> <span class='string'>&quot;break&quot;</span>,
-			<span class='ident'>KCase</span> <span class='op'>=&gt;</span> <span class='string'>&quot;case&quot;</span>,
-			<span class='ident'>KCatch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;catch&quot;</span>,
-			<span class='ident'>KClass</span> <span class='op'>=&gt;</span> <span class='string'>&quot;class&quot;</span>,
-			<span class='ident'>KContinue</span> <span class='op'>=&gt;</span> <span class='string'>&quot;continue&quot;</span>,
-			<span class='ident'>KDebugger</span> <span class='op'>=&gt;</span> <span class='string'>&quot;debugger&quot;</span>,
-			<span class='ident'>KDefault</span> <span class='op'>=&gt;</span> <span class='string'>&quot;default&quot;</span>,
-			<span class='ident'>KDelete</span> <span class='op'>=&gt;</span> <span class='string'>&quot;delete&quot;</span>,
-			<span class='ident'>KDo</span> <span class='op'>=&gt;</span> <span class='string'>&quot;do&quot;</span>,
-			<span class='ident'>KElse</span> <span class='op'>=&gt;</span> <span class='string'>&quot;else&quot;</span>,
-			<span class='ident'>KEnum</span> <span class='op'>=&gt;</span> <span class='string'>&quot;enum&quot;</span>,
-			<span class='ident'>KExtends</span> <span class='op'>=&gt;</span> <span class='string'>&quot;extends&quot;</span>,
-			<span class='ident'>KFinally</span> <span class='op'>=&gt;</span> <span class='string'>&quot;finally&quot;</span>,
-			<span class='ident'>KFor</span> <span class='op'>=&gt;</span> <span class='string'>&quot;for&quot;</span>,
-			<span class='ident'>KFunction</span> <span class='op'>=&gt;</span> <span class='string'>&quot;function&quot;</span>,
-			<span class='ident'>KIf</span> <span class='op'>=&gt;</span> <span class='string'>&quot;if&quot;</span>,
-			<span class='ident'>KIn</span> <span class='op'>=&gt;</span> <span class='string'>&quot;in&quot;</span>,
-			<span class='ident'>KInstanceOf</span> <span class='op'>=&gt;</span> <span class='string'>&quot;instanceof&quot;</span>,
-			<span class='ident'>KImport</span> <span class='op'>=&gt;</span> <span class='string'>&quot;import&quot;</span>,
-			<span class='ident'>KNew</span> <span class='op'>=&gt;</span> <span class='string'>&quot;new&quot;</span>,
-			<span class='ident'>KReturn</span> <span class='op'>=&gt;</span> <span class='string'>&quot;return&quot;</span>,
-			<span class='ident'>KSuper</span> <span class='op'>=&gt;</span> <span class='string'>&quot;super&quot;</span>,
-			<span class='ident'>KSwitch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;switch&quot;</span>,
-			<span class='ident'>KThis</span> <span class='op'>=&gt;</span> <span class='string'>&quot;this&quot;</span>,
-			<span class='ident'>KThrow</span> <span class='op'>=&gt;</span> <span class='string'>&quot;throw&quot;</span>,
-			<span class='ident'>KTry</span> <span class='op'>=&gt;</span> <span class='string'>&quot;try&quot;</span>,
-			<span class='ident'>KTypeOf</span> <span class='op'>=&gt;</span> <span class='string'>&quot;typeof&quot;</span>,
-			<span class='ident'>KVar</span> <span class='op'>=&gt;</span> <span class='string'>&quot;var&quot;</span>,
-			<span class='ident'>KVoid</span> <span class='op'>=&gt;</span> <span class='string'>&quot;void&quot;</span>,
-			<span class='ident'>KWhile</span> <span class='op'>=&gt;</span> <span class='string'>&quot;while&quot;</span>,
-			<span class='ident'>KWith</span> <span class='op'>=&gt;</span> <span class='string'>&quot;with&quot;</span>
-		})
-	}
+    <span class='kw'>fn</span> <span class='ident'>fmt</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Formatter</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span> {
+        <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='kw'>match</span> <span class='op'>*</span><span class='self'>self</span> {
+            <span class='ident'>KBreak</span> <span class='op'>=&gt;</span> <span class='string'>&quot;break&quot;</span>,
+            <span class='ident'>KCase</span> <span class='op'>=&gt;</span> <span class='string'>&quot;case&quot;</span>,
+            <span class='ident'>KCatch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;catch&quot;</span>,
+            <span class='ident'>KClass</span> <span class='op'>=&gt;</span> <span class='string'>&quot;class&quot;</span>,
+            <span class='ident'>KContinue</span> <span class='op'>=&gt;</span> <span class='string'>&quot;continue&quot;</span>,
+            <span class='ident'>KDebugger</span> <span class='op'>=&gt;</span> <span class='string'>&quot;debugger&quot;</span>,
+            <span class='ident'>KDefault</span> <span class='op'>=&gt;</span> <span class='string'>&quot;default&quot;</span>,
+            <span class='ident'>KDelete</span> <span class='op'>=&gt;</span> <span class='string'>&quot;delete&quot;</span>,
+            <span class='ident'>KDo</span> <span class='op'>=&gt;</span> <span class='string'>&quot;do&quot;</span>,
+            <span class='ident'>KElse</span> <span class='op'>=&gt;</span> <span class='string'>&quot;else&quot;</span>,
+            <span class='ident'>KEnum</span> <span class='op'>=&gt;</span> <span class='string'>&quot;enum&quot;</span>,
+            <span class='ident'>KExtends</span> <span class='op'>=&gt;</span> <span class='string'>&quot;extends&quot;</span>,
+            <span class='ident'>KFinally</span> <span class='op'>=&gt;</span> <span class='string'>&quot;finally&quot;</span>,
+            <span class='ident'>KFor</span> <span class='op'>=&gt;</span> <span class='string'>&quot;for&quot;</span>,
+            <span class='ident'>KFunction</span> <span class='op'>=&gt;</span> <span class='string'>&quot;function&quot;</span>,
+            <span class='ident'>KIf</span> <span class='op'>=&gt;</span> <span class='string'>&quot;if&quot;</span>,
+            <span class='ident'>KIn</span> <span class='op'>=&gt;</span> <span class='string'>&quot;in&quot;</span>,
+            <span class='ident'>KInstanceOf</span> <span class='op'>=&gt;</span> <span class='string'>&quot;instanceof&quot;</span>,
+            <span class='ident'>KImport</span> <span class='op'>=&gt;</span> <span class='string'>&quot;import&quot;</span>,
+            <span class='ident'>KNew</span> <span class='op'>=&gt;</span> <span class='string'>&quot;new&quot;</span>,
+            <span class='ident'>KReturn</span> <span class='op'>=&gt;</span> <span class='string'>&quot;return&quot;</span>,
+            <span class='ident'>KSuper</span> <span class='op'>=&gt;</span> <span class='string'>&quot;super&quot;</span>,
+            <span class='ident'>KSwitch</span> <span class='op'>=&gt;</span> <span class='string'>&quot;switch&quot;</span>,
+            <span class='ident'>KThis</span> <span class='op'>=&gt;</span> <span class='string'>&quot;this&quot;</span>,
+            <span class='ident'>KThrow</span> <span class='op'>=&gt;</span> <span class='string'>&quot;throw&quot;</span>,
+            <span class='ident'>KTry</span> <span class='op'>=&gt;</span> <span class='string'>&quot;try&quot;</span>,
+            <span class='ident'>KTypeOf</span> <span class='op'>=&gt;</span> <span class='string'>&quot;typeof&quot;</span>,
+            <span class='ident'>KVar</span> <span class='op'>=&gt;</span> <span class='string'>&quot;var&quot;</span>,
+            <span class='ident'>KVoid</span> <span class='op'>=&gt;</span> <span class='string'>&quot;void&quot;</span>,
+            <span class='ident'>KWhile</span> <span class='op'>=&gt;</span> <span class='string'>&quot;while&quot;</span>,
+            <span class='ident'>KWith</span> <span class='op'>=&gt;</span> <span class='string'>&quot;with&quot;</span>
+        })
+    }
 }
 </pre>
 </section>
@@ -342,7 +342,7 @@
                 <dd>Move up in search results</dd>
                 <dt>&darr;</dt>
                 <dd>Move down in search results</dd>
-                <dt>&\#9166;</dt>
+                <dt>&#9166;</dt>
                 <dd>Go to active search result</dd>
             </dl>
         </div>
