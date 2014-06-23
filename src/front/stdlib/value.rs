@@ -10,6 +10,7 @@ use std::c_str::CString;
 use std::cell::RefCell;
 use std::iter::FromIterator;
 use std::cmp::PartialOrd;
+use stdlib::*;
 #[must_use]
 /// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;
@@ -52,6 +53,22 @@ impl Value {
         Value {
             ptr: box(GC) data
         }
+    }
+    /// Create a new global object
+    pub fn new_global() -> Value {
+        let global = Value::new_obj(None);
+        array::init(global);
+        boolean::init(global);
+        console::init(global);
+        error::init(global);
+        function::init(global);
+        json::init(global);
+        math::init(global);
+        number::init(global);
+        object::init(global);
+        string::init(global);
+        uri::init(global);
+        global
     }
     /// Returns a new empty object
     pub fn new_obj(global: Option<Value>) -> Value {

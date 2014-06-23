@@ -33,26 +33,28 @@ pub mod run {
 }
 /// The standard Javascript library
 pub mod stdlib {
-    /// Javascript values, utility methods and conversion between Javascript values and Rust values
-    pub mod value;
-    /// The global `Function` object and function value representations
-    pub mod function;
-    /// The global `Object` object
-    pub mod object;
     /// The global `Array` object
     pub mod array;
+    /// The global `Boolean` object
+    pub mod boolean;
     /// The global `console` object
     pub mod console;
-    /// The global `Math` object
-    pub mod math;
-    /// The global `JSON` object
-    pub mod json;
-    /// The global `Number` object with related functions and constants
-    pub mod number;
     /// The global `Error` object
     pub mod error;
-    /// Contains global methods concerning URIs
-    pub mod uri;
+    /// The global `Function` object and function value representations
+    pub mod function;
+    /// The global `JSON` object
+    pub mod json;
+    /// The global `Math` object
+    pub mod math;
+    /// The global `Number` object with related functions and constants
+    pub mod number;
+    /// The global `Object` object
+    pub mod object;
     /// The global `String` object
     pub mod string;
+    /// Contains global methods concerning URIs
+    pub mod uri;
+    /// Javascript values, utility methods and conversion between Javascript values and Rust values
+    pub mod value;
 }

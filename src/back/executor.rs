@@ -14,7 +14,7 @@ use jit::{
     Float64
 };
 use JSVal = front::stdlib::value::Value;
-use front::stdlib::value::{VNull, ResultValue, to_value};
+use front::stdlib::value::{Value, VNull, ResultValue, to_value};
 use front::stdlib::value::ResultValue;
 use front::run::executor::Executor;
 use std::gc::GC;
@@ -27,7 +27,7 @@ impl JitExecutor {
     /// Create a new JIT executor
     pub fn new() -> JitExecutor {
         JitExecutor {
-            global: JSVal::new_obj(None)
+            global: Value::new_global()
         }
     }
 
