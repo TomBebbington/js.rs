@@ -227,39 +227,17 @@ impl<B:Buffer> Lexer<B> {
                         }
                     });
                 },
-                ';' => {
-                    self.push_punc(PSemicolon);
-                },
-                ':' => {
-                    self.push_punc(PColon);
-                },
-                '.' => {
-                    self.push_punc(PDot);
-                },
-                '(' => {
-                    self.push_punc(POpenParen);
-                },
-                ')' => {
-                    self.push_punc(PCloseParen);
-                },
-                ',' => {
-                    self.push_punc(PComma);
-                },
-                '{' => {
-                    self.push_punc(POpenBlock);
-                },
-                '}' => {
-                    self.push_punc(PCloseBlock);
-                },
-                '[' => {
-                    self.push_punc(POpenBracket);
-                },
-                ']' => {
-                    self.push_punc(PCloseBracket);
-                },
-                '?' => {
-                    self.push_punc(PQuestion);
-                },
+                ';' => self.push_punc(PSemicolon),
+                ':' => self.push_punc(PColon),
+                '.' => self.push_punc(PDot),
+                '(' => self.push_punc(POpenParen),
+                ')' => self.push_punc(PCloseParen),
+                ',' => self.push_punc(PComma),
+                '{' => self.push_punc(POpenBlock),
+                '}' => self.push_punc(PCloseBlock),
+                '[' => self.push_punc(POpenBracket),
+                ']' => self.push_punc(PCloseBracket),
+                '?' => self.push_punc(PQuestion),
                 '/' if self.next_is('/') => {
                     let mut buf = String::new();
                     loop {
@@ -281,124 +259,87 @@ impl<B:Buffer> Lexer<B> {
                     }
                     self.push_token(TComment(buf));
                 },
-                '/' if self.next_is('=') => {
-                    self.push_punc(PAssignDiv);
-                },
-                '/' => {
-                    self.push_punc(PDiv);
-                },
-                '*' if self.next_is('=') => {
-                    self.push_punc(PAssignMul);
-                },
-                '*' => {
-                    self.push_punc(PMul);
-                },
-                '+' if self.next_is('=') => {
-                    self.push_punc(PAssignAdd);
-                },
-                '+' if self.next_is('+') => {
-                    self.push_punc(PInc);
-                },
-                '+' => {
-                    self.push_punc(PAdd);
-                },
-                '-' if self.next_is('=') => {
-                    self.push_punc(PAssignSub);
-                },
-                '-' if self.next_is('-') => {
-                    self.push_punc(PDec);
-                },
-                '-' => {
-                    self.push_punc(PSub);
-                },
-                '%' if self.next_is('=') => {
-                    self.push_punc(PAssignMod);
-                },
-                '%' => {
-                    self.push_punc(PMod);
-                },
-                '|' if self.next_is('|') => {
-                    self.push_punc(PBoolOr);
-                },
-                '|' if self.next_is('=') => {
-                    self.push_punc(PAssignOr);
-                },
-                '|' => {
-                    self.push_punc(POr);
-                },
-                '&' if self.next_is('&') => {
-                    self.push_punc(PBoolAnd);
-                },
-                '&' if self.next_is('=') => {
-                    self.push_punc(PAssignAnd);
-                },
-                '&' => {
-                    self.push_punc(PAnd);
-                },
-                '^' if self.next_is('=') => {
-                    self.push_punc(PAssignXor);
-                },
-                '^' => {
-                    self.push_punc(PXor);
-                },
-                '=' if self.next_is('>') => {
-                    self.push_punc(PArrow);
-                },
+                '/' if self.next_is('=') =>
+                    self.push_punc(PAssignDiv),
+                '/' => self.push_punc(PDiv),
+                '*' if self.next_is('=') =>
+                    self.push_punc(PAssignMul),
+                '*' => self.push_punc(PMul),
+                '+' if self.next_is('=') =>
+                    self.push_punc(PAssignAdd),
+                '+' if self.next_is('+') =>
+                    self.push_punc(PInc),
+                '+' => self.push_punc(PAdd),
+                '-' if self.next_is('=') =>
+                    self.push_punc(PAssignSub),
+                '-' if self.next_is('-') =>
+                    self.push_punc(PDec),
+                '-' => self.push_punc(PSub),
+                '%' if self.next_is('=') =>
+                    self.push_punc(PAssignMod),
+                '%' => self.push_punc(PMod),
+                '|' if self.next_is('|') =>
+                    self.push_punc(PBoolOr),
+                '|' if self.next_is('=') =>
+                    self.push_punc(PAssignOr),
+                '|' => self.push_punc(POr),
+                '&' if self.next_is('&') =>
+                    self.push_punc(PBoolAnd),
+                '&' if self.next_is('=') =>
+                    self.push_punc(PAssignAnd),
+                '&' => self.push_punc(PAnd),
+                '^' if self.next_is('=') =>
+                    self.push_punc(PAssignXor),
+                '^' => self.push_punc(PXor),
+                '=' if self.next_is('>') =>
+                    self.push_punc(PArrow),
                 '=' if self.next_is('=') => {
-                    if self.next_is('=') {
-                        self.push_punc(PStrictEq);
+                    let punc = if self.next_is('=') {
+                        PStrictEq
                     } else {
-                        self.push_punc(PEq);
-                    }
+                        PEq
+                    };
+                    self.push_punc(punc)
                 },
-                '=' => {
-                    self.push_punc(PAssign);
-                },
-                '<' if self.next_is('=') => {
-                    self.push_punc(PLessThanOrEq);
-                },
+                '=' => self.push_punc(PAssign),
+                '<' if self.next_is('=') =>
+                    self.push_punc(PLessThanOrEq),
                 '<' if self.next_is('<') => {
-                    if self.next_is('=') {
-                        self.push_punc(PAssignLeftSh);
+                    let punc = if self.next_is('=') {
+                        PAssignLeftSh
                     } else {
-                        self.push_punc(PLeftSh);
-                    }
+                        PLeftSh
+                    };
+                    self.push_punc(punc)
                 },
-                '<' => {
-                    self.push_punc(PLessThan);
-                },
-                '>' if self.next_is('=') => {
-                    self.push_punc(PGreaterThanOrEq);
-                },
+                '<' => self.push_punc(PLessThan),
+                '>' if self.next_is('=') =>
+                    self.push_punc(PGreaterThanOrEq),
                 '>' if self.next_is('>') => {
-                    if self.next_is('=') {
-                        self.push_punc(PAssignRightSh);
+                    let punc = if self.next_is('=') {
+                        PAssignRightSh
                     } else if self.next_is('>') {
                         if self.next_is('=') {
-                            self.push_punc(PAssignURightSh);
+                            PAssignURightSh
                         } else {
-                            self.push_punc(PURightSh);
+                            PURightSh
                         }
                     } else {
-                        self.push_punc(PRightSh);
-                    }
+                        PRightSh
+                    };
+                    self.push_punc(punc)
                 },
-                '>' => {
-                        self.push_punc(PGreaterThan);
-                },
+                '>' => self.push_punc(PGreaterThan),
                 '!' if self.next_is('=') => {
-                    if self.next_is('=') {
-                        self.push_punc(PStrictNotEq);
+                    let punc = if self.next_is('=') {
+                        PStrictNotEq
                     } else {
-                        self.push_punc(PNotEq);
-                    }
+                        PNotEq
+                    };
+                    self.push_punc(punc)
                 },
-                '!' => {
-                    self.push_punc(PNot);
-                },
-                '~' => {
-                    self.push_punc(PNeg);
-                },
+                '!' => self.push_punc(PNot),
+                '~' => self.push_punc(PNeg),
                 '\n' | '\u2028'|'\u2029' => {
                     self.line_number += 1;
                     self.column_number = 0;
