@@ -492,16 +492,20 @@ impl FromValue for bool {
 }
 impl<'s, T:ToValue> ToValue for &'s [T] {
     fn to_value(&self) -> Value {
+        let mut i = 0;
         let arr:ObjectData = self.iter().map(|elem| {
-            (i.to_str(), Property::new(elem.to_value()))
+            i += 1;
+           ((i - 1).to_str(), Property::new(elem.to_value()))
         }).collect();
         to_value(arr)
     }
 }
 impl<T:ToValue> ToValue for Vec<T> {
     fn to_value(&self) -> Value {
+        let mut i = 0;
         let arr:ObjectData = self.iter().map(|elem| {
-            (i.to_str(), Property::new(elem.to_value()))
+            i += 1;
+           ((i - 1).to_str(), Property::new(elem.to_value()))
         }).collect();
         to_value(arr)
     }

@@ -43,8 +43,9 @@ impl<'a> Executor<(JITVal<'a>, &'a Function<'a>)> for JitExecutor {
         func.set_optimization_level(5);
         func.set_recompilable();
         func.compile();
-        let func: fn(JSVal, JSVal, JSVal) -> JSVal = unsafe { func.closure3() };
-        Ok(func(self.global, self.global, self.global))
+        Ok(func.with_closure3(|run:fn(JSVal, JSVal, JSVal) -> JSVal| {
+            run(self.global, self.global, self.global)
+        }))
     }
 }
 
