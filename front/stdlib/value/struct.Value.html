@@ -38,7 +38,7 @@
     </nav>
 
     <section id='main' class="content struct">
-<h1 class='fqn'>Struct <a href='../../index.html'>front</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='struct' href=''>Value</a><a class='source' id='src-1018' href='../../../src/front/src/front/stdlib/value.rs.html#18-21'>[src]</a></h1>
+<h1 class='fqn'>Struct <a href='../../index.html'>front</a>::<a href='../index.html'>stdlib</a>::<a href='index.html'>value</a>::<a class='struct' href=''>Value</a><a class='source' id='src-4871' href='../../../src/front/src/front/stdlib/value.rs.html#19-22'>[src]</a></h1>
 <pre class='rust struct'>pub struct Value {
     pub ptr: <a class='struct' href='http://doc.rust-lang.org/std/gc/struct.Gc.html' title='std::gc::Gc'>Gc</a>&lt;<a class='type' href='../../../front/stdlib/value/type.ValueData.html' title='front::stdlib::value::ValueData'>ValueData</a>&gt;,
 }</pre><div class='docblock'><p>A Garbage-collected Javascript value as represented in the interpreter</p>
@@ -46,6 +46,8 @@
 <table><tr><td id='structfield.ptr'><code>ptr</code></td><td><div class='docblock'><p>The garbage-collected pointer</p>
 </div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h3><div class='methods'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(data: <a class='type' href='../../../front/stdlib/value/type.ValueData.html' title='front::stdlib::value::ValueData'>ValueData</a>) -&gt; <a class='struct' href='../../../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Move some value data into a new value</p>
+</div><h4 id='method.new_global' class='method'><code>fn <a href='#method.new_global' class='fnname'>new_global</a>() -&gt; <a class='struct' href='../../../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
+<div class='docblock'><p>Create a new global object</p>
 </div><h4 id='method.new_obj' class='method'><code>fn <a href='#method.new_obj' class='fnname'>new_obj</a>(global: <a class='type' href='http://doc.rust-lang.org/core/option/type.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a>&gt;) -&gt; <a class='struct' href='../../../front/stdlib/value/struct.Value.html' title='front::stdlib::value::Value'>Value</a></code></h4>
 <div class='docblock'><p>Returns a new empty object</p>
 </div><h4 id='method.is_object' class='method'><code>fn <a href='#method.is_object' class='fnname'>is_object</a>(&amp;self) -&gt; <a href='http://doc.rust-lang.org/std/primitive.bool.html'>bool</a></code></h4>

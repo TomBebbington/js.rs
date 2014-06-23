@@ -95,6 +95,8 @@
 <span id='56'>56</span>
 <span id='57'>57</span>
 <span id='58'>58</span>
+<span id='59'>59</span>
+<span id='60'>60</span>
 </pre><pre class='rust '>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>crate_id</span> <span class='op'>=</span> <span class='string'>&quot;github.com/TomBebbington/js.rs#front:0.1&quot;</span>]</span>
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>comment</span> <span class='op'>=</span> <span class='string'>&quot;Javascript backend&quot;</span>]</span>
@@ -131,28 +133,30 @@
 }
 <span class='doccomment'>/// The standard Javascript library
 </span><span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>stdlib</span> {
-    <span class='doccomment'>/// Javascript values, utility methods and conversion between Javascript values and Rust values
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>value</span>;
-    <span class='doccomment'>/// The global `Function` object and function value representations
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>function</span>;
-    <span class='doccomment'>/// The global `Object` object
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>object</span>;
     <span class='doccomment'>/// The global `Array` object
 </span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>array</span>;
+    <span class='doccomment'>/// The global `Boolean` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>boolean</span>;
     <span class='doccomment'>/// The global `console` object
 </span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>console</span>;
-    <span class='doccomment'>/// The global `Math` object
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span>;
-    <span class='doccomment'>/// The global `JSON` object
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>json</span>;
-    <span class='doccomment'>/// The global `Number` object with related functions and constants
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>number</span>;
     <span class='doccomment'>/// The global `Error` object
 </span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>error</span>;
-    <span class='doccomment'>/// Contains global methods concerning URIs
-</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>uri</span>;
+    <span class='doccomment'>/// The global `Function` object and function value representations
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>function</span>;
+    <span class='doccomment'>/// The global `JSON` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>json</span>;
+    <span class='doccomment'>/// The global `Math` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span>;
+    <span class='doccomment'>/// The global `Number` object with related functions and constants
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>number</span>;
+    <span class='doccomment'>/// The global `Object` object
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>object</span>;
     <span class='doccomment'>/// The global `String` object
 </span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>string</span>;
+    <span class='doccomment'>/// Contains global methods concerning URIs
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>uri</span>;
+    <span class='doccomment'>/// Javascript values, utility methods and conversion between Javascript values and Rust values
+</span>    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>value</span>;
 }
 </pre>
 </section>
