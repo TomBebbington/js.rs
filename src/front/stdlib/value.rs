@@ -509,10 +509,8 @@ impl ToValue for ObjectData {
 impl FromValue for ObjectData {
     fn from_value(v:Value) -> Result<ObjectData, &'static str> {
         match *v.ptr {
-            VObject(ref obj) => Ok(obj.clone().borrow().deref().clone()),
-            VFunction(ref func) => {
-                Ok(func.borrow().object.clone())
-            },
+            VObject(ref obj) => Ok(obj.borrow().deref().clone()),
+            VFunction(ref func) => Ok(func.borrow().object.clone()),
             _ => Err("Value is not a valid object")
         }
     }
