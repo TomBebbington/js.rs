@@ -179,9 +179,7 @@ impl Value {
     pub fn get_field<'a>(&self, field:&'a str) -> Value {
         match self.get_prop(field) {
             Some(prop) => prop.value,
-            None => Value{
-                ptr: box(GC) VUndefined
-            }
+            None => Value::new(VUndefined)
         }
     }
     /// Set the field in the value
