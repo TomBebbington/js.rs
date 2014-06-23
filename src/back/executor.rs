@@ -14,7 +14,7 @@ use jit::{
     Float64
 };
 use JSVal = front::stdlib::value::Value;
-use front::stdlib::value::{Value, VNull, ResultValue, to_value};
+use front::stdlib::value::{Value, VNull, to_value};
 use front::stdlib::value::ResultValue;
 use front::run::executor::Executor;
 use std::gc::GC;

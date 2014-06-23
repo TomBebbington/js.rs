@@ -2,7 +2,6 @@ use stdlib::object::{ObjectData, Property};
 use stdlib::value::{Value, VFunction, ResultValue, to_value};
 use collections::treemap::TreeMap;
 use std::iter::FromIterator;
-use std::gc::GC;
 use std::cell::RefCell;
 pub type FunctionData = fn(Vec<Value>, Value, Value, Value) -> ResultValue;
 #[deriving(Clone)]

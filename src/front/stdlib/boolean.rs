@@ -1,13 +1,12 @@
-use stdlib::value::{Value, VUndefined, ResultValue, to_value};
+use stdlib::value::{Value, VUndefined, ResultValue};
 use stdlib::function::Function;
-use std::gc::GC;
 
 /// Create a new boolean
-pub fn make_boolean(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
+pub fn make_boolean(_:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(Value::new(VUndefined))
 }
 /// Create a new `Boolean` object
-pub fn _create(global: Value) -> Value {
+pub fn _create(_: Value) -> Value {
     let boolean = Function::make(make_boolean, []);
     boolean
 }

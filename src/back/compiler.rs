@@ -19,7 +19,6 @@ use jit::{
 type CompiledValue<'a> = (Value<'a>, &'a Function<'a>);
 /// A compiler using the LibJIT backend
 pub struct JitCompiler<'a> {
-    context: &'a Context<'a>,
     curr: Function<'a>
 }
 impl<'a> JitCompiler<'a> {
@@ -27,7 +26,6 @@ impl<'a> JitCompiler<'a> {
     pub fn new(context: &'a Context) -> JitCompiler<'a> {
         let main_t = get_type::<fn(*int, *int, *int) -> *int>();
         JitCompiler {
-            context: context,
             curr: Function::new(context, &main_t)
         }
     }
