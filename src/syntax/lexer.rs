@@ -81,7 +81,7 @@ impl<B:Buffer> Lexer<B> {
         loop {
             let ch = match self.next() {
                 Ok(ch) => ch,
-                Err(ref err) if err.kind == EndOfFile => break,
+                Err(IoError {kind: EndOfFile, ..}) => break,
                 Err(err) => return Err(err)
             };
             self.column_number += 1;
