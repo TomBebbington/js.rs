@@ -523,6 +523,7 @@ impl Parser {
         }
     }
     /// Returns an error if the next symbol is not the punctuator `p`
+    #[inline(always)]
     fn expect_punc(&mut self, p:Punctuator, routine:&'static str) -> Result<(), ParseError> {
         self.expect(TPunctuator(p), routine)
     }
