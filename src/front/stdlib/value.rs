@@ -49,7 +49,9 @@ impl Value {
     #[inline]
     /// Move some value data into a new value
     pub fn new(data: ValueData) -> Value {
-        Value::new(data)
+        Value {
+            ptr: box(GC) data
+        }
     }
     /// Returns a new empty object
     pub fn new_obj(global: Option<Value>) -> Value {
