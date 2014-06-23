@@ -500,13 +500,13 @@ impl Parser {
         let (precedence, assoc) = op.get_precedence_and_assoc();
         self.pos += 1;
         let next = try!(self.parse());
-        Ok(match (next.clone()).def {
+        Ok(match next.def {
             BinOpExpr(ref op2, ref a, ref b) => {
                 let other_precedence = op2.get_precedence();
                 if precedence < other_precedence || (precedence == other_precedence && !assoc) {
                     mk!(BinOpExpr(*op2, b.clone(), box mk!(BinOpExpr(op.clone(), box orig, a.clone()))))
                 } else {
-                    mk!(BinOpExpr(op, box orig, box next))
+                    mk!(BinOpExpr(op, box orig, box next.clone()))
                 }
             },
             _ => mk!(BinOpExpr(op, box orig, box next))
