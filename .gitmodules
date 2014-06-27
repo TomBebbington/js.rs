@@ -1,3 +1,0 @@
-[submodule "libs/jit"]
-	path = libs/jit
-	url = https://github.com/TomBebbington/jit.rs

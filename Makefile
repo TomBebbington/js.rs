@@ -19,7 +19,7 @@ build: src/main
 libs/jit:
 	mkdir -p target
 	cd libs/jit && make build
-	cp libs/jit/target/* target
+	cp -rf libs/jit/target/* target
 libs: libs/jit
 doc:
 	$(RUSTDOC) src/syntax/syntax.rs -o doc -L target
