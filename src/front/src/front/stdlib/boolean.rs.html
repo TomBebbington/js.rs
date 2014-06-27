@@ -55,18 +55,16 @@
 <span id='16'>16</span>
 <span id='17'>17</span>
 <span id='18'>18</span>
-<span id='19'>19</span>
 </pre><pre class='rust '>
-<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>VUndefined</span>, <span class='ident'>ResultValue</span>, <span class='ident'>to_value</span>};
+<span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>value</span>::{<span class='ident'>Value</span>, <span class='ident'>VUndefined</span>, <span class='ident'>ResultValue</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::<span class='ident'>Function</span>;
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>gc</span>::<span class='ident'>GC</span>;
 
 <span class='doccomment'>/// Create a new boolean
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make_boolean</span>(_:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, <span class='ident'>this</span>:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>make_boolean</span>(_:<span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Value</span><span class='op'>&gt;</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>, _:<span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>ResultValue</span> {
     <span class='prelude-val'>Ok</span>(<span class='ident'>Value</span>::<span class='ident'>new</span>(<span class='ident'>VUndefined</span>))
 }
 <span class='doccomment'>/// Create a new `Boolean` object
-</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_create</span>(<span class='ident'>global</span>: <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
+</span><span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_create</span>(_: <span class='ident'>Value</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
     <span class='kw'>let</span> <span class='ident'>boolean</span> <span class='op'>=</span> <span class='ident'>Function</span>::<span class='ident'>make</span>(<span class='ident'>make_boolean</span>, []);
     <span class='ident'>boolean</span>
 }

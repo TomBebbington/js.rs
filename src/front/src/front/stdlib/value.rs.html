@@ -617,8 +617,6 @@
 <span id='578'>578</span>
 <span id='579'>579</span>
 <span id='580'>580</span>
-<span id='581'>581</span>
-<span id='582'>582</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>object</span>::{<span class='ident'>PROTOTYPE</span>, <span class='ident'>INSTANCE_PROTOTYPE</span>, <span class='ident'>ObjectData</span>, <span class='ident'>Property</span>};
 <span class='kw'>use</span> <span class='ident'>stdlib</span>::<span class='ident'>function</span>::<span class='ident'>Function</span>;
@@ -801,9 +799,7 @@
 </span>    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_field</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>field</span>:<span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>str</span>) <span class='op'>-&gt;</span> <span class='ident'>Value</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>get_prop</span>(<span class='ident'>field</span>) {
             <span class='prelude-val'>Some</span>(<span class='ident'>prop</span>) <span class='op'>=&gt;</span> <span class='ident'>prop</span>.<span class='ident'>value</span>,
-            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>Value</span>{
-                <span class='ident'>ptr</span>: <span class='kw'>box</span>(<span class='ident'>GC</span>) <span class='ident'>VUndefined</span>
-            }
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='ident'>Value</span>::<span class='ident'>new</span>(<span class='ident'>VUndefined</span>)
         }
     }
     <span class='doccomment'>/// Set the field in the value
