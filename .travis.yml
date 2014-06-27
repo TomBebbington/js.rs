@@ -2,12 +2,12 @@ env:
   global:
     - secure: mItYdbN2lPVCRwIPmP+oL1jglgt3rIiHlF7EGnubwuIbQOv9fvXEoNBdX24Kwk4nTnFW1RPE7wPya3rqdVzBGj6KqFlFnlTnXHfdR7nribiOWNudL6DMf+h2BzyODacM+LVXlgTxNjDB9Sd6PscaQzbtPzBLVUvURNey1yWrtec=
 before_install:
-  - wget http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
-  - tar -xzvf rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - yes | sudo add-apt-repository ppa:hansjorg/rust
+  - yes | sudo add-apt-repository ppa:cmrx64/cargo
+  - sudo apt-get update
   - git clone git://git.savannah.gnu.org/libjit.git
 install:
-  - sudo ./rust-nightly-x86_64-unknown-linux-gnu/install.sh
-  - sudo apt-get install texinfo
+  - sudo apt-get install cargo rust-nightly texinfo
   - cd libjit
   - ./auto_gen.sh
   - ./configure 
@@ -16,7 +16,7 @@ install:
   - sudo cp /usr/local/lib/libjit* /usr/lib/
   - cd ..
 script:
-  - make clean libjit libs doc
+  - make clean build doc
 notifications:
   email:
     - tophattedcoder@gmail.com
