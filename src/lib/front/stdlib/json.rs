@@ -1,5 +1,5 @@
-use stdlib::value::{Value, ResultValue, to_value};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, ResultValue, to_value};
+use front::stdlib::function::Function;
 use serialize::json::{ToJson, from_str};
 /// Parse a JSON string into a Javascript object
 pub fn parse(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {

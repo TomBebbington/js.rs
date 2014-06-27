@@ -1,5 +1,5 @@
-use stdlib::value::{Value, ResultValue, ToValue, FromValue, to_value, from_value};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, ResultValue, ToValue, FromValue, to_value, from_value};
+use front::stdlib::function::Function;
 use collections::treemap::TreeMap;
 pub static PROTOTYPE: &'static str = "prototype";
 pub static INSTANCE_PROTOTYPE: &'static str = "__proto__";

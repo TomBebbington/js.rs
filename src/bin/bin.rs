@@ -10,14 +10,12 @@
 #![feature(phase)]
 //! A Javascript execution command line tool
 
-extern crate back;
+extern crate js;
 extern crate collections;
-extern crate front;
 extern crate getopts;
 extern crate jit;
 #[phase(plugin, link)]
 extern crate log;
-extern crate syntax = "js_syntax";
 /// Interactive mode
 pub use interactive::Interactive;
 /// Unit test mode

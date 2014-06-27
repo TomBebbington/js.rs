@@ -1,5 +1,5 @@
-use stdlib::value::{Value, ResultValue, to_value};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, ResultValue, to_value};
+use front::stdlib::function::Function;
 
 /// Create a new array
 pub fn make_array(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {

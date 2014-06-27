@@ -1,5 +1,5 @@
-use stdlib::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
-use stdlib::function::Function;
+use front::stdlib::object::{PROTOTYPE, INSTANCE_PROTOTYPE, ObjectData, Property};
+use front::stdlib::function::Function;
 use collections::TreeMap;
 use serialize::json::{ToJson, Json, Number, String, Boolean, List, Object, Null};
 use std::fmt;
@@ -10,7 +10,7 @@ use std::c_str::CString;
 use std::cell::RefCell;
 use std::iter::FromIterator;
 use std::cmp::PartialOrd;
-use stdlib::*;
+use front::stdlib::*;
 #[must_use]
 /// The result of a Javascript expression is represented like this so it can succeed (`Ok`) or fail (`Err`)
 pub type ResultValue = Result<Value, Value>;

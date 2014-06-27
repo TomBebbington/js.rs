@@ -1,5 +1,5 @@
-use stdlib::value::{Value, ResultValue, to_value, from_value};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, ResultValue, to_value, from_value};
+use front::stdlib::function::Function;
 use std::rand::random;
 use std::f64;
 

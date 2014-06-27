@@ -1,9 +1,9 @@
-use ast::token::*;
-use ast::expr::*;
-use ast::constant::*;
-use ast::op::*;
-use ast::punc::*;
-use ast::keyword::*;
+use syntax::ast::token::*;
+use syntax::ast::expr::*;
+use syntax::ast::constant::*;
+use syntax::ast::op::*;
+use syntax::ast::punc::*;
+use syntax::ast::keyword::*;
 use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;

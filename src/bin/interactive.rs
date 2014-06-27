@@ -1,9 +1,10 @@
-use back::{JitCompiler, JitExecutor};
-use front::run::compiler::Compiler;
-use front::run::executor::Executor;
+use js::back::compiler::JitCompiler;
+use js::back::executor::JitExecutor;
+use js::front::run::compiler::Compiler;
+use js::front::run::executor::Executor;
+use js::syntax::lexer::Lexer;
+use js::syntax::parser::Parser;
 use jit::Context;
-use syntax::Lexer;
-use syntax::Parser;
 use std::io::stdio::{stdin, StdReader};
 use std::io::{BufReader, BufferedReader};
 /// An interactive command-line mode

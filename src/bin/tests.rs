@@ -1,15 +1,16 @@
-use back::{JitCompiler, JitExecutor};
 use collections::treemap::TreeMap;
-use front::run::compiler::Compiler;
-use front::run::executor::Executor;
-use front::stdlib::function::Function;
-use front::stdlib::value::{ResultValue, Value, to_value, from_value};
+use js::back::compiler::JitCompiler;
+use js::back::executor::JitExecutor;
+use js::front::run::compiler::Compiler;
+use js::front::run::executor::Executor;
+use js::front::stdlib::function::Function;
+use js::front::stdlib::value::{ResultValue, Value, to_value, from_value};
+use js::syntax::lexer::Lexer;
+use js::syntax::parser::Parser;
+use js::syntax::ast::token::{Token, TComment};
 use jit::Context;
 use std::io::{BufferedReader, File};
 use std::io::fs::walk_dir;
-use syntax::Lexer;
-use syntax::Parser;
-use syntax::ast::token::{Token, TComment};
 fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
     let mut map = TreeMap::new();
     for tk in tokens.iter() {

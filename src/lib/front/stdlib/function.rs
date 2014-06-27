@@ -1,5 +1,5 @@
-use stdlib::object::{ObjectData, Property};
-use stdlib::value::{Value, VFunction, ResultValue, to_value};
+use front::stdlib::object::{ObjectData, Property};
+use front::stdlib::value::{Value, VFunction, ResultValue, to_value};
 use collections::treemap::TreeMap;
 use std::iter::FromIterator;
 use std::cell::RefCell;

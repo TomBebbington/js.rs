@@ -1,5 +1,5 @@
-use ast::punc::*;
-use ast::token::*;
+use syntax::ast::punc::*;
+use syntax::ast::token::*;
 use std::io::{BufReader, BufferedReader, Buffer, IoError, IoResult, EndOfFile};
 use std::char::from_u32;
 use std::num::from_str_radix;

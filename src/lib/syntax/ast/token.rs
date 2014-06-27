@@ -1,7 +1,7 @@
 use std::fmt::{Formatter, Result, Show};
-use ast::pos::Position;
-use ast::punc::Punctuator;
-use ast::keyword::Keyword;
+use syntax::ast::pos::Position;
+use syntax::ast::punc::Punctuator;
+use syntax::ast::keyword::Keyword;
 #[deriving(Clone, PartialEq)]
 /// A single of token of Javascript code including its position
 pub struct Token {

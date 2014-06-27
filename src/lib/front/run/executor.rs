@@ -1,4 +1,4 @@
-use stdlib::value::{
+use front::stdlib::value::{
     Value, 
     ResultValue
 };

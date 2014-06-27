@@ -1,7 +1,7 @@
-use ast::expr::*;
-use ast::types::*;
-use ast::constant::*;
-use ast::op::*;
+use syntax::ast::expr::*;
+use syntax::ast::types::*;
+use syntax::ast::constant::*;
+use syntax::ast::op::*;
 use std::iter::FromIterator;
 
 /// Type an expression

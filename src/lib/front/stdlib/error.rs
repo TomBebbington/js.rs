@@ -1,6 +1,6 @@
-use stdlib::object::PROTOTYPE;
-use stdlib::value::{Value, ResultValue, to_value};
-use stdlib::function::Function;
+use front::stdlib::object::PROTOTYPE;
+use front::stdlib::value::{Value, ResultValue, to_value};
+use front::stdlib::function::Function;
 
 /// Create a new error
 pub fn make_error(args:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {

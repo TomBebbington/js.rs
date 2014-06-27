@@ -1,7 +1,7 @@
 use std::fmt::{Formatter, Result, Show};
-use ast::op::*;
-use ast::constant::Const;
-use ast::pos::Position;
+use syntax::ast::op::*;
+use syntax::ast::constant::Const;
+use syntax::ast::pos::Position;
 use collections::treemap::TreeMap;
 #[deriving(Clone, PartialEq)]
 /// A Javascript expression, including its position

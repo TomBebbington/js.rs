@@ -1,5 +1,5 @@
-use stdlib::value::{Value, VUndefined, ResultValue};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, VUndefined, ResultValue};
+use front::stdlib::function::Function;
 
 /// Create a new boolean
 pub fn make_boolean(_:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {

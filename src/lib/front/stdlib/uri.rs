@@ -1,5 +1,5 @@
-use stdlib::value::{Value, ResultValue, to_value};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, ResultValue, to_value};
+use front::stdlib::function::Function;
 use url::{encode, decode, encode_component, decode_component};
 
 /// Encode a URI

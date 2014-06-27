@@ -1,19 +1,22 @@
 [project]
 
-name = "javascript"
-version = "0.1"
+name = "js.rs"
+version = "0.0.1"
 readme = "README.md"
 authors = ["Tom Bebbington <tophattedcoder@gmail.com>"]
 tags = ["script"]
 
 [[lib]]
 
-name = "script"
+name = "js"
+path = "src/lib/lib.rs"
+
 
 [[bin]]
 
-name = "interactive"
+name = "js.rs"
+path = "src/bin/bin.rs"
 
-[[bin]]
+[dependencies.jit]
 
-name = "tests"
+git = "https://github.com/TomBebbington/jit.rs.git"

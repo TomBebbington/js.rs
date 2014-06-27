@@ -1,5 +1,5 @@
-use stdlib::value::{Value, ResultValue, VNumber, VInteger, to_value, from_value};
-use stdlib::function::Function;
+use front::stdlib::value::{Value, ResultValue, VNumber, VInteger, to_value, from_value};
+use front::stdlib::function::Function;
 use std::f64::{NAN, MAX_VALUE, MIN_VALUE, INFINITY, NEG_INFINITY, EPSILON};
 /// Parse a float into a value
 pub fn parse_float(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
