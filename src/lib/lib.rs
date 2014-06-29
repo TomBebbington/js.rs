@@ -4,7 +4,7 @@
 #![crate_type = "lib"]
 #![doc(
     html_favicon_url = "http://tombebbington.github.io/favicon.png"
-  )
+  ))
 #![experimental]
 #![feature(phase, macro_rules, globs)]
 #![deny(non_uppercase_statics, missing_doc, unnecessary_parens, unrecognized_lint,
