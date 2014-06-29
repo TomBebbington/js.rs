@@ -440,7 +440,7 @@ impl<'s> ToValue for &'s str {
         Value::new(VString(String::from_str(*self)))
     }
 }
-impl ToValue for *i8 {
+impl ToValue for *const i8 {
     fn to_value(&self) -> Value {
         unsafe {
             let cstr = CString::new(*self, false);

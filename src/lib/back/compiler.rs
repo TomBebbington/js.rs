@@ -24,7 +24,7 @@ pub struct JitCompiler<'a> {
 impl<'a> JitCompiler<'a> {
     /// Construct a new JIT Compiler on the given context
     pub fn new(context: &'a Context) -> JitCompiler<'a> {
-        let main_t = get_type::<fn(*int, *int, *int) -> *int>();
+        let main_t = get_type::<fn(&int, &int, &int) -> &int>();
         JitCompiler {
             curr: Function::new(context, &main_t)
         }
@@ -51,7 +51,7 @@ impl<'a> JitCompiler<'a> {
         }
     }
     fn undefined(&'a self) -> Value<'a> {
-        let ptr = Value::new(&self.curr, &get_type::<*int>());
+        let ptr = Value::new(&self.curr, &get_type::<&int>());
         let val = 0u8.compile(&self.curr);
         self.curr.insn_store(&ptr, &val);
         ptr
@@ -69,7 +69,7 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
             CBool(v) =>
                 v.compile(&self.curr),
             CNull => {
-                let ptr = Value::new(&self.curr, &get_type::<*int>());
+                let ptr = Value::new(&self.curr, &get_type::<&int>());
                 let val = 1u8.compile(&self.curr);
                 self.curr.insn_store(&ptr, &val);
                 ptr
