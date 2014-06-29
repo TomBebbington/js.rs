@@ -26,13 +26,13 @@ impl<'a> JitCompiler<'a> {
     pub fn new(context: &'a Context) -> JitCompiler<'a> {
         let main_t = get_type::<fn(*const int, *const int, *const int) -> *const int>();
         JitCompiler {
-            curr: Function::new(context, &main_t)
+            curr: Function::new(context, main_t)
         }
     }
     fn convert_bool(&'a self, val:Value<'a>) -> Value<'a> {
         let bool_t = get_type::<bool>();
         let val_kind = val.get_type().get_kind();
-        let convert = |v| self.curr.insn_convert(&v, &bool_t, false);
+        let convert = |v| self.curr.insn_convert(&v, bool_t, false);
         if val_kind.contains(SysBool) {
             val
         } else if val_kind.contains(Float64) {
@@ -51,7 +51,7 @@ impl<'a> JitCompiler<'a> {
         }
     }
     fn undefined(&'a self) -> Value<'a> {
-        let ptr = Value::new(&self.curr, &get_type::<&int>());
+        let ptr = Value::new(&self.curr, get_type::<&int>());
         let val = 0u8.compile(&self.curr);
         self.curr.insn_store(&ptr, &val);
         ptr
@@ -69,7 +69,7 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
             CBool(v) =>
                 v.compile(&self.curr),
             CNull => {
-                let ptr = Value::new(&self.curr, &get_type::<&int>());
+                let ptr = Value::new(&self.curr, get_type::<&int>());
                 let val = 1u8.compile(&self.curr);
                 self.curr.insn_store(&ptr, &val);
                 ptr
@@ -104,9 +104,9 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
     fn compile_bit_op(&'a self, op:BitOp, left:&Expr, right:&Expr) -> CompiledValue<'a> {
         let int_t = get_type::<i32>();
         let (c_left, _) = self.compile(left);
-        let c_left = self.curr.insn_convert(&c_left, &int_t, false);
+        let c_left = self.curr.insn_convert(&c_left, int_t.clone(), false);
         let (c_right, _) = self.compile(right);
-        let c_right = self.curr.insn_convert(&c_right, &int_t, false);
+        let c_right = self.curr.insn_convert(&c_right, int_t, false);
         (match op {
             BitAnd => c_left & c_right,
             BitOr => c_left | c_right,
@@ -142,7 +142,7 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
             CompLessThanOrEqual =>
                 self.curr.insn_leq(&c_left, &c_right),
         };
-        let bool_val = self.curr.insn_convert(&val, &get_type::<bool>(), false);
+        let bool_val = self.curr.insn_convert(&val, get_type::<bool>(), false);
         (bool_val, &self.curr)
     }
     fn compile_unary_op(&'a self, op:UnaryOp, val:&Expr) -> CompiledValue<'a> {
@@ -152,7 +152,7 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
             UnaryPlus => c_val,
             UnaryNot => {
                 let c_not = !c_val;
-                self.curr.insn_convert(&c_not, &get_type::<bool>(), false)
+                self.curr.insn_convert(&c_not, get_type::<bool>(), false)
             },
             _ => unimplemented!()
         }, &self.curr)
