@@ -24,7 +24,7 @@ pub struct JitCompiler<'a> {
 impl<'a> JitCompiler<'a> {
     /// Construct a new JIT Compiler on the given context
     pub fn new(context: &'a Context) -> JitCompiler<'a> {
-        let main_t = get_type::<fn(&int, &int, &int) -> &int>();
+        let main_t = get_type::<fn(*const int, *const int, *const int) -> *const int>();
         JitCompiler {
             curr: Function::new(context, &main_t)
         }

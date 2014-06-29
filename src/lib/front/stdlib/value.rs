@@ -215,9 +215,9 @@ impl Value {
             String(v) => VString(v),
             Boolean(v) => VBoolean(v),
             List(vs) => {
-                let mut i = 0;
+                let mut i = 0u;
                 let mut data : ObjectData = FromIterator::from_iter(vs.iter().map(|json| {
-                    i += 1;
+                    i += 1u;
                     ((i - 1).to_str().into_string(), Property::new(to_value(json.clone())))
                 }));
                 data.insert("length".into_string(), Property::new(to_value(vs.len() as i32)));
@@ -370,12 +370,12 @@ impl BitXor<Value, Value> for Value {
 }
 impl Shl<Value, Value> for Value {
     fn shl(&self, other:&Value) -> Value {
-        to_value(self.to_int() << other.to_int())
+        to_value(self.to_int() << other.to_int() as uint)
     }
 }
 impl Shr<Value, Value> for Value {
     fn shr(&self, other:&Value) -> Value {
-        to_value(self.to_int() >> other.to_int())
+        to_value(self.to_int() >> other.to_int() as uint)
     }
 }
 impl Not<Value> for Value {
