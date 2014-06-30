@@ -32,7 +32,7 @@ impl<'a> JitCompiler<'a> {
     fn convert_bool(&'a self, val:Value<'a>) -> Value<'a> {
         let bool_t = get_type::<bool>();
         let val_kind = val.get_type().get_kind();
-        let convert = |v| self.curr.insn_convert(&v, bool_t, false);
+        let convert = |v| self.curr.insn_convert(&v, bool_t.clone(), false);
         if val_kind.contains(SysBool) {
             val
         } else if val_kind.contains(Float64) {
