@@ -123,7 +123,7 @@ impl<B:Buffer> Lexer<B> {
                                         },
                                         'u' => {
                                             let mut nums = String::new();
-                                            for _ in range(0, 4) {
+                                            for _ in range(0u, 4u) {
                                                 nums.push_char(try!(self.next()));
                                             }
                                             self.column_number += 4;
