@@ -108,7 +108,7 @@ impl<B:Buffer> Lexer<B> {
                                         '0' => '\0',
                                         'x' => {
                                             let mut nums = String::with_capacity(2);
-                                            for _ in range(0, 2) {
+                                            for _ in range(0u, 2u) {
                                                 nums.push_char(try!(self.next()));
                                             }
                                             self.column_number += 2;
