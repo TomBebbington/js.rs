@@ -55,7 +55,7 @@ fn convert_to_value<'a>(func:&Function<'a>, val:&'a JITVal<'a>) -> JITVal<'a> {
     if val_kind.contains(SysBool) || val_kind.contains(UByte) {
         let bool_value = to_value::<bool>;
         let sig = get_type::<fn(bool) -> *const int>();
-        func.insn_call_native1(Some("bool_value"), bool_value, &sig, &mut [val])
+        func.insn_call_native1(Some("bool_value"), bool_value, sig, &mut [val])
     } else if val_kind.contains(Pointer) {
         let ref_t = val_type.get_ref();
         if ref_t.get_kind().contains(SysChar) {
@@ -66,7 +66,7 @@ fn convert_to_value<'a>(func:&Function<'a>, val:&'a JITVal<'a>) -> JITVal<'a> {
                 }
             }
             let sig = get_type::<fn(String) -> *const int>();
-            func.insn_call_native1(Some("string_value"), string_value, &sig, &mut [val])
+            func.insn_call_native1(Some("string_value"), string_value, sig, &mut [val])
         } else {
             fn ptr_value(ptr: &i8) -> JSVal {
                 match ptr.to_uint() {
@@ -77,7 +77,7 @@ fn convert_to_value<'a>(func:&Function<'a>, val:&'a JITVal<'a>) -> JITVal<'a> {
                     ptr => fail!("Invalid pointer: {}", ptr)
                 }
             }
-            let sig = get_type::<fn(&i8) -> *const int>();
+            let sig = get_type::<fn(*const i8) -> *const int>();
             func.insn_call_native1(Some("ptr_value"), ptr_value, &sig, &mut [val])
         }
     } else if val_kind.contains(Int) || val_kind.contains(UInt) {
