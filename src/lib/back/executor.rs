@@ -70,30 +70,30 @@ fn convert_to_value<'a>(func:&Function<'a>, val:&'a JITVal<'a>) -> JITVal<'a> {
         } else {
             fn ptr_value(ptr: &i8) -> JSVal {
                 match ptr.to_uint() {
-                    0u => JSVal::undefined(),
-                    1u => JSVal {
+                    Some(0u) => JSVal::undefined(),
+                    Some(1u) => JSVal {
                         ptr: box(GC) VNull
                     },
                     ptr => fail!("Invalid pointer: {}", ptr)
                 }
             }
             let sig = get_type::<fn(*const i8) -> *const int>();
-            func.insn_call_native1(Some("ptr_value"), ptr_value, &sig, &mut [val])
+            func.insn_call_native1(Some("ptr_value"), ptr_value, sig, &mut [val])
         }
     } else if val_kind.contains(Int) || val_kind.contains(UInt) {
         let int_value = to_value::<i32>;
         let sig = get_type::<fn(i32) -> *const int>();
-        func.insn_call_native1(Some("int_value"), int_value, &sig, &mut [val])
+        func.insn_call_native1(Some("int_value"), int_value, sig, &mut [val])
     } else if val_kind.contains(NInt) || val_kind.contains(NUInt) {
         fn sys_int_value(num:int) -> JSVal {
             to_value::<i32>(num as i32)
         }
         let sig = get_type::<fn(int) -> *const int>();
-        func.insn_call_native1(Some("sys_int_value"), sys_int_value, &sig, &mut [val])
+        func.insn_call_native1(Some("sys_int_value"), sys_int_value, sig, &mut [val])
     } else if val_kind.contains(Float64) {
         let float_value = to_value::<f64>;
         let sig = get_type::<fn(f64) -> *const int>();
-        func.insn_call_native1(Some("float_value"), float_value, &sig, &mut [val])
+        func.insn_call_native1(Some("float_value"), float_value, sig, &mut [val])
     } else {
         fail!("Invalid kind {}", val_kind.bits())
     }
