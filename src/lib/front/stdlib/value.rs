@@ -310,7 +310,7 @@ impl ToJson for Value {
                         nobj.insert(k.clone(), v.value.to_json());
                     }
                 }
-                Object(box nobj)
+                Object(nobj)
             },
             VString(ref str) => String(str.clone()),
             VNumber(num) => Number(num),
