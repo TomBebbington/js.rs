@@ -7,7 +7,6 @@ before_install:
   - sudo apt-get update
 install:
   - sudo apt-get install cargo rust-nightly texinfo
-  - sudo cp /usr/local/lib/libjit* /usr/lib/
   - cd ..
 script:
   - make clean build doc
