@@ -9,6 +9,7 @@ use js::syntax::lexer::Lexer;
 use js::syntax::parser::Parser;
 use js::syntax::ast::token::{Token, TComment};
 use jit::Context;
+use std::default::Default;
 use std::io::{BufferedReader, File};
 use std::io::fs::walk_dir;
 fn find_attrs(tokens: Vec<Token>) -> TreeMap<String, String> {
@@ -71,7 +72,8 @@ impl<'a> Tests<'a> {
         env.set_field("assert", Function::make(assert, ["condition"]));
         let compiler = JitCompiler::new(&self.context);
         let compiled = compiler.compile(&expr);
-        match JitExecutor::new().execute(&compiled) {
+        let executor: JitExecutor = Executor::new(&Default::default());
+        match executor.execute(&compiled) {
             Ok(_) =>
                 println!("{}: {}: All tests passed successfully", file, desc),
             Err(v) =>

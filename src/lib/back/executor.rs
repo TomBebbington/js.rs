@@ -14,25 +14,22 @@ use jit::{
     Float64
 };
 use JSVal = front::stdlib::value::Value;
-use front::stdlib::value::{Value, VNull, to_value};
+use front::stdlib::value::{VNull, to_value};
 use front::stdlib::value::ResultValue;
-use front::run::executor::Executor;
+use front::run::executor::{Executor, ExecutorConfig};
 use std::gc::GC;
 use std::c_str::CString;
 /// A JIT executor
 pub struct JitExecutor {
     global: JSVal
 }
-impl JitExecutor {
-    /// Create a new JIT executor
-    pub fn new() -> JitExecutor {
+impl<'a> Executor<(JITVal<'a>, &'a Function<'a>)> for JitExecutor {
+    #[inline(always)]
+    fn new(config:&ExecutorConfig) -> JitExecutor {
         JitExecutor {
-            global: Value::new_global()
+            global: config.global.clone()
         }
     }
-
-}
-impl<'a> Executor<(JITVal<'a>, &'a Function<'a>)> for JitExecutor {
     #[inline]
     fn get_global_obj(&self) -> JSVal {
         self.global

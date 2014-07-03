@@ -5,6 +5,7 @@ use js::front::run::executor::Executor;
 use js::syntax::lexer::Lexer;
 use js::syntax::parser::Parser;
 use jit::Context;
+use std::default::Default;
 use std::io::{BufferedReader, File};
 use std::path::Path;
 /// An command-line script executor
@@ -37,7 +38,8 @@ impl Runner {
             let compiler = JitCompiler::new(&context);
             let result = compiler.compile(&expr);
             debug!("Now running on JIT backend...");
-            match JitExecutor::new().execute(&result) {
+            let executor: JitExecutor = Executor::new(&Default::default());
+            match executor.execute(&result) {
                 Ok(v) =>
                     println!("{}", v),
                 Err(v) =>

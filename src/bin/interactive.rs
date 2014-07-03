@@ -5,6 +5,7 @@ use js::front::run::executor::Executor;
 use js::syntax::lexer::Lexer;
 use js::syntax::parser::Parser;
 use jit::Context;
+use std::default::Default;
 use std::io::stdio::{stdin, StdReader};
 use std::io::{BufReader, BufferedReader};
 /// An interactive command-line mode
@@ -20,7 +21,7 @@ impl<'a> Interactive<'a> {
     pub fn new() -> Interactive {
         Interactive {
             context: Context::new(),
-            executor: JitExecutor::new(),
+            executor: Executor::new(&Default::default()),
             input: stdin()
         }
     }
