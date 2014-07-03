@@ -20,77 +20,8 @@ extern crate serialize;
 extern crate time;
 extern crate url;
 /// The backend-defining traits and the Javascript standard library
-pub mod front {
-	#[macro_escape]
-	/// A macro which makes Javascript objects with pretty Rust syntax
-	pub mod macro;
-	/// Backend-defining traits
-	pub mod run {
-		/// For compiling Javascript values
-		pub mod compiler;
-		/// For executing the compiled Javascript values
-		pub mod executor;
-	}
-	/// The Javascript standard library
-	pub mod stdlib {
-		/// The `Array` global object
-		pub mod array;
-		/// The `Boolean` global object
-		pub mod boolean;
-		/// The `console` global object
-		pub mod console;
-		/// The `Error` global objects
-		pub mod error;
-		/// The `Function` global object
-		pub mod function;
-		/// The `JSON` global object
-		pub mod json;
-		/// The `Math` global object
-		pub mod math;
-		/// The `Number` global object and related global methods
-		pub mod number;
-		/// The `Object` global object
-		pub mod object;
-		/// The `String` global object
-		pub mod string;
-		/// The global URI methods
-		pub mod uri;
-		/// An arbritary Javascript value
-		pub mod value;
-	}
-}
+pub mod front;
 /// The default backend implemented on top of LibJIT
-pub mod back {
-	/// The compiler, which transforms Javascript expressions to LibJIT IR
-	pub mod compiler;
-	/// The executor, which runs the LibJIT IR by compiling it then running it
-	pub mod executor;
-}
+pub mod back;
 /// Javascript parsing and syntax
-pub mod syntax {
-	/// The Javascript Abstract Syntax Tree
-	pub mod ast {
-		/// Constants
-		pub mod constant;
-		/// Expressions
-		pub mod expr;
-		/// Keywords
-		pub mod keyword;
-		/// Operators
-		pub mod op;
-		/// Positions
-		pub mod pos;
-		/// Punctuators
-		pub mod punc;
-		/// Tokens
-		pub mod token;
-		/// An expression typer
-		pub mod typer;
-		/// Types
-		pub mod types;
-	}
-	/// Parses a string stream into a sequence of tokens
-	pub mod lexer;
-	/// Parses a sequence of tokens into expressions
-	pub mod parser;
-}
+pub mod syntax;

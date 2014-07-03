@@ -5,14 +5,8 @@ before_install:
   - yes | sudo add-apt-repository ppa:hansjorg/rust
   - yes | sudo add-apt-repository ppa:cmrx64/cargo
   - sudo apt-get update
-  - git clone git://git.savannah.gnu.org/libjit.git
 install:
   - sudo apt-get install cargo rust-nightly texinfo
-  - cd libjit
-  - ./auto_gen.sh
-  - ./configure 
-  - make
-  - sudo make install
   - sudo cp /usr/local/lib/libjit* /usr/lib/
   - cd ..
 script:
