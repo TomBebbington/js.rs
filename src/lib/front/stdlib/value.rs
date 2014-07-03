@@ -389,17 +389,8 @@ impl Neg<Value> for Value {
     }
 }
 impl PartialOrd for Value {
-    fn lt(&self, other: &Value) -> bool {
-        self.to_num() < other.to_num()
-    }
-    fn le(&self, other: &Value) -> bool {
-        self.to_num() <= other.to_num()
-    }
-    fn gt(&self, other: &Value) -> bool {
-        self.to_num() > other.to_num()
-    }
-    fn ge(&self, other: &Value) -> bool {
-        self.to_num() >= other.to_num()
+    fn partial_cmp(&self, other: &Value) -> Option<Ordering> {
+        self.to_num().partial_cmp(&other.to_num())
     }
 }
 /// Conversion to Javascript values from Rust values
