@@ -7,9 +7,8 @@ before_install:
   - sudo apt-get update
 install:
   - sudo apt-get install cargo rust-nightly texinfo
-  - cd ..
 script:
-  - make clean build doc
+  - make build doc
 notifications:
   email:
     - tophattedcoder@gmail.com
