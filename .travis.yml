@@ -1,12 +1,9 @@
 env:
   global:
     - secure: mItYdbN2lPVCRwIPmP+oL1jglgt3rIiHlF7EGnubwuIbQOv9fvXEoNBdX24Kwk4nTnFW1RPE7wPya3rqdVzBGj6KqFlFnlTnXHfdR7nribiOWNudL6DMf+h2BzyODacM+LVXlgTxNjDB9Sd6PscaQzbtPzBLVUvURNey1yWrtec=
-before_install:
-  - yes | sudo add-apt-repository ppa:hansjorg/rust
-  - yes | sudo add-apt-repository ppa:cmrx64/cargo
-  - sudo apt-get update
 install:
-  - sudo apt-get install cargo rust-nightly texinfo
+  - curl -s http://www.rust-lang.org/rustup.sh | sudo sh
+  - sudo apt-get install texinfo
 script:
   - make build doc
 notifications:
