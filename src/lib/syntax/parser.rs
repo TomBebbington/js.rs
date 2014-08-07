@@ -8,11 +8,11 @@ use collections::treemap::TreeMap;
 use std::fmt;
 use std::vec::Vec;
 macro_rules! mk (
-    ($def:expr) => (
-        Expr::new($def, try!(self.get_token(self.pos - 1)).pos, try!(self.get_token(self.pos - 1)).pos)
+    ($this:expr, $def:expr) => (
+        Expr::new($def, try!($this.get_token($this.pos - 1)).pos, try!($this.get_token($this.pos - 1)).pos)
     );
-    ($def:expr, $first:expr) => (
-        Expr::new($def, $first.pos, try!(self.get_token(self.pos - 1)).pos)
+    ($this:expr, $def:expr, $first:expr) => (
+        Expr::new($def, $first.pos, try!($this.get_token($this.pos - 1)).pos)
     );
 )
 #[deriving(Clone, PartialEq)]
@@ -74,13 +74,13 @@ impl Parser {
             let result = try!(self.parse());
             exprs.push(result);
         }
-        Ok(mk!(BlockExpr(exprs)))
+        Ok(mk!(self, BlockExpr(exprs)))
     }
     fn parse_struct(&mut self, keyword:Keyword) -> ParseResult {
         match keyword {
             KThrow => {
                 let thrown = try!(self.parse());
-                Ok(mk!(ThrowExpr(box thrown)))
+                Ok(mk!(self, ThrowExpr(box thrown)))
             },
             KVar => {
                 let mut vars = Vec::new();
@@ -112,24 +112,24 @@ impl Parser {
                         }
                     }
                 }
-                Ok(mk!(VarDeclExpr(vars)))
+                Ok(mk!(self, VarDeclExpr(vars)))
             },
-            KReturn => Ok(mk!(ReturnExpr(Some(box try!(self.parse()).clone())))),
+            KReturn => Ok(mk!(self, ReturnExpr(Some(box try!(self.parse()).clone())))),
             KNew => {
                 let call = try!(self.parse());
                 match call.def {
-                    CallExpr(ref func, ref args) => Ok(mk!(ConstructExpr(func.clone(), args.clone()))),
+                    CallExpr(ref func, ref args) => Ok(mk!(self, ConstructExpr(func.clone(), args.clone()))),
                     _ => Err(ExpectedExpr("constructor", call))
                 }
             },
-            KTypeOf => Ok(mk!(TypeOfExpr(box try!(self.parse())))),
+            KTypeOf => Ok(mk!(self, TypeOfExpr(box try!(self.parse())))),
             KIf => {
                 try!(self.expect_punc(POpenParen, "if block"));
                 let cond = try!(self.parse());
                 try!(self.expect_punc(PCloseParen, "if block"));
                 let expr = try!(self.parse());
                 let next = self.get_token(self.pos + 1);
-                Ok(mk!(IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TKeyword(KElse) {
+                Ok(mk!(self, IfExpr(box cond, box expr, if next.is_ok() && next.unwrap().data == TKeyword(KElse) {
                     self.pos += 2;
                     Some(box try!(self.parse()))
                 } else {
@@ -141,7 +141,7 @@ impl Parser {
                 let cond = try!(self.parse());
                 try!(self.expect_punc(PCloseParen, "while condition"));
                 let expr = try!(self.parse());
-                Ok(mk!(WhileLoopExpr(box cond, box expr)))
+                Ok(mk!(self, WhileLoopExpr(box cond, box expr)))
             },
             KSwitch => {
                 try!(self.expect_punc(POpenParen, "switch value"));
@@ -177,14 +177,14 @@ impl Parser {
                                     _ => block.push(try!(self.parse()))
                                 }
                             }
-                            default = Some(mk!(BlockExpr(block)));
+                            default = Some(mk!(self, BlockExpr(block)));
                         },
                         TPunctuator(PCloseBlock) => break,
                         _ => return Err(Expected(vec!(TKeyword(KCase), TKeyword(KDefault), TPunctuator(PCloseBlock)), tok, "switch block"))
                     }
                 }
                 try!(self.expect_punc(PCloseBlock, "switch block"));
-                Ok(mk!(SwitchExpr(box value.unwrap(), cases, match default {
+                Ok(mk!(self, SwitchExpr(box value.unwrap(), cases, match default {
                     Some(v) => Some(box v),
                     None => None
                 })))
@@ -215,7 +215,7 @@ impl Parser {
                 }
                 self.pos += 1;
                 let block = try!(self.parse());
-                Ok(mk!(FunctionDeclExpr(name, args, box block)))
+                Ok(mk!(self, FunctionDeclExpr(name, args, box block)))
             },
             _ => Err(UnexpectedKeyword(keyword))
         }
@@ -229,19 +229,19 @@ impl Parser {
         self.pos += 1;
         let expr : Expr = match token.data {
             TPunctuator(PSemicolon) | TComment(_) if self.pos < self.tokens.len() => try!(self.parse()),
-            TPunctuator(PSemicolon) | TComment(_) => mk!(ConstExpr(CUndefined)),
+            TPunctuator(PSemicolon) | TComment(_) => mk!(self, ConstExpr(CUndefined)),
             TNumericLiteral(num) =>
-                mk!(ConstExpr(CNum(num))),
+                mk!(self, ConstExpr(CNum(num))),
             TNullLiteral =>
-                mk!(ConstExpr(CNull)),
+                mk!(self, ConstExpr(CNull)),
             TStringLiteral(text) =>
-                mk!(ConstExpr(CString(text))),
+                mk!(self, ConstExpr(CString(text))),
             TBooleanLiteral(val) =>
-                mk!(ConstExpr(CBool(val))),
+                mk!(self, ConstExpr(CBool(val))),
             TIdentifier(ref s) if s.as_slice() == "undefined" =>
-                mk!(ConstExpr(CUndefined)),
+                mk!(self, ConstExpr(CUndefined)),
             TIdentifier(s) =>
-                mk!(LocalExpr(s)),
+                mk!(self, LocalExpr(s)),
             TKeyword(keyword) =>
                 try!(self.parse_struct(keyword)),
             TPunctuator(POpenParen) => {
@@ -249,7 +249,7 @@ impl Parser {
                     TPunctuator(PCloseParen) if try!(self.get_token(self.pos + 1)).data == TPunctuator(PArrow) => {
                         self.pos += 2;
                         let expr = try!(self.parse());
-                        mk!(ArrowFunctionDeclExpr(Vec::new(), box expr), token)
+                        mk!(self, ArrowFunctionDeclExpr(Vec::new(), box expr), token)
                     },
                     _ => {
                         let next = try!(self.parse());
@@ -287,7 +287,7 @@ impl Parser {
                                 }
                                 try!(self.expect(TPunctuator(PArrow), "arrow function"));
                                 let expr = try!(self.parse());
-                                mk!(ArrowFunctionDeclExpr(args, box expr), token)
+                                mk!(self, ArrowFunctionDeclExpr(args, box expr), token)
                             }
                             _ => return Err(Expected(vec!(TPunctuator(PCloseParen)), next_tok, "brackets"))
                         }
@@ -305,7 +305,7 @@ impl Parser {
                     } else if token.data == TPunctuator(PComma) && expect_comma_or_end {
                         expect_comma_or_end = false;
                     } else if token.data == TPunctuator(PComma) && !expect_comma_or_end {
-                        array.push(mk!(ConstExpr(CNull)));
+                        array.push(mk!(self, ConstExpr(CNull)));
                         expect_comma_or_end = false;
                     } else if expect_comma_or_end {
                         return Err(Expected(vec!(TPunctuator(PComma), TPunctuator(PCloseBracket)), token.clone(), "array declaration"));
@@ -317,11 +317,11 @@ impl Parser {
                     }
                     self.pos += 1;
                 }
-                mk!(ArrayDeclExpr(array), token)
+                mk!(self, ArrayDeclExpr(array), token)
             },
             TPunctuator(POpenBlock) if try!(self.get_token(self.pos)).data == TPunctuator(PCloseBlock) => {
                 self.pos += 1;
-                mk!(ObjectDeclExpr(box TreeMap::new()), token)
+                mk!(self, ObjectDeclExpr(box TreeMap::new()), token)
             },
             TPunctuator(POpenBlock) if try!(self.get_token(self.pos + 1)).data == TPunctuator(PColon) => {
                 let mut map = box TreeMap::new();
@@ -338,7 +338,7 @@ impl Parser {
                     map.insert(name, value);
                     self.pos += 1;
                 }
-                mk!(ObjectDeclExpr(map), token)
+                mk!(self, ObjectDeclExpr(map), token)
             },
             TPunctuator(POpenBlock) => {
                 let mut exprs = Vec::new();
@@ -350,18 +350,18 @@ impl Parser {
                     }
                 }
                 self.pos += 1;
-                mk!(BlockExpr(exprs), token)
+                mk!(self, BlockExpr(exprs), token)
             },
             TPunctuator(PSub) =>
-                mk!(UnaryOpExpr(UnaryMinus, box try!(self.parse()))),
+                mk!(self, UnaryOpExpr(UnaryMinus, box try!(self.parse()))),
             TPunctuator(PAdd) =>
-                mk!(UnaryOpExpr(UnaryPlus, box try!(self.parse()))),
+                mk!(self, UnaryOpExpr(UnaryPlus, box try!(self.parse()))),
             TPunctuator(PNot) =>
-                mk!(UnaryOpExpr(UnaryNot, box try!(self.parse()))),
+                mk!(self, UnaryOpExpr(UnaryNot, box try!(self.parse()))),
             TPunctuator(PInc) =>
-                mk!(UnaryOpExpr(UnaryIncrementPre, box try!(self.parse()))),
+                mk!(self, UnaryOpExpr(UnaryIncrementPre, box try!(self.parse()))),
             TPunctuator(PDec) =>
-                mk!(UnaryOpExpr(UnaryDecrementPre, box try!(self.parse()))),
+                mk!(self, UnaryOpExpr(UnaryDecrementPre, box try!(self.parse()))),
             _ => return Err(Expected(Vec::new(), token.clone(), "script"))
         };
         if self.pos >= self.tokens.len() {
@@ -386,7 +386,7 @@ impl Parser {
                 self.pos += 1;
                 let tk = try!(self.get_token(self.pos));
                 match tk.data {
-                    TIdentifier(ref s) => result = mk!(GetConstFieldExpr(box expr, s.to_string())),
+                    TIdentifier(ref s) => result = mk!(self, GetConstFieldExpr(box expr, s.to_string())),
                     _ => return Err(Expected(vec!(TIdentifier("identifier".into_string())), tk, "field access"))
                 }
                 self.pos += 1;
@@ -411,20 +411,20 @@ impl Parser {
                         expect_comma_or_end = true;
                     }
                 }
-                result = mk!(CallExpr(box expr, args));
+                result = mk!(self, CallExpr(box expr, args));
             },
             TPunctuator(PQuestion) => {
                 self.pos += 1;
                 let if_e = try!(self.parse());
                 try!(self.expect(TPunctuator(PColon), "if expression"));
                 let else_e = try!(self.parse());
-                result = mk!(IfExpr(box expr, box if_e, Some(box else_e)));
+                result = mk!(self, IfExpr(box expr, box if_e, Some(box else_e)));
             },
             TPunctuator(POpenBracket) => {
                 self.pos += 1;
                 let index = try!(self.parse());
                 try!(self.expect(TPunctuator(PCloseBracket), "array index"));
-                result = mk!(GetFieldExpr(box expr, box index));
+                result = mk!(self, GetFieldExpr(box expr, box index));
             },
             TPunctuator(PSemicolon) | TComment(_) => {
                 self.pos += 1;
@@ -432,7 +432,7 @@ impl Parser {
             TPunctuator(PAssign) => {
                 self.pos += 1;
                 let next = try!(self.parse());
-                result = mk!(AssignExpr(box expr, box next));
+                result = mk!(self, AssignExpr(box expr, box next));
             },
             TPunctuator(PArrow) => {
                 self.pos += 1;
@@ -442,7 +442,7 @@ impl Parser {
                     _ => return Err(ExpectedExpr("identifier", result))
                 }
                 let next = try!(self.parse());
-                result = mk!(ArrowFunctionDeclExpr(args, box next));
+                result = mk!(self, ArrowFunctionDeclExpr(args, box next));
             },
             TPunctuator(PAdd) =>
                 result = try!(self.binop(BinNum(OpAdd), expr)),
@@ -485,9 +485,9 @@ impl Parser {
             TPunctuator(PGreaterThanOrEq) =>
                 result = try!(self.binop(BinComp(CompGreaterThanOrEqual), expr)),
             TPunctuator(PInc) =>
-                result = mk!(UnaryOpExpr(UnaryIncrementPost, box try!(self.parse()))),
+                result = mk!(self, UnaryOpExpr(UnaryIncrementPost, box try!(self.parse()))),
             TPunctuator(PDec) =>
-                result = mk!(UnaryOpExpr(UnaryDecrementPost, box try!(self.parse()))),
+                result = mk!(self, UnaryOpExpr(UnaryDecrementPost, box try!(self.parse()))),
             _ => carry_on = false
         };
         if carry_on && self.pos < self.tokens.len() {
@@ -504,12 +504,12 @@ impl Parser {
             BinOpExpr(ref op2, ref a, ref b) => {
                 let other_precedence = op2.get_precedence();
                 if precedence < other_precedence || (precedence == other_precedence && !assoc) {
-                    mk!(BinOpExpr(*op2, b.clone(), box mk!(BinOpExpr(op.clone(), box orig, a.clone()))))
+                    mk!(self, BinOpExpr(*op2, b.clone(), box mk!(self, BinOpExpr(op.clone(), box orig, a.clone()))))
                 } else {
-                    mk!(BinOpExpr(op, box orig, box next.clone()))
+                    mk!(self, BinOpExpr(op, box orig, box next.clone()))
                 }
             },
-            _ => mk!(BinOpExpr(op, box orig, box next))
+            _ => mk!(self, BinOpExpr(op, box orig, box next))
         })
     }
     /// Returns an error if the next symbol is not `tk`
