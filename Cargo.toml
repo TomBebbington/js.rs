@@ -2,9 +2,7 @@
 
 name = "js"
 version = "0.0.1"
-readme = "README.md"
 authors = ["Tom Bebbington <tophattedcoder@gmail.com>"]
-tags = ["script"]
 
 [[lib]]
 
