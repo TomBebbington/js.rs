@@ -11,9 +11,9 @@ pub trait Compiler<'a, Compiled> {
     fn compile(&'a self, expr:&Expr) -> Compiled {
         debug!("Compiling {}", expr);
         match expr.def.clone() {
-            UnaryOpExpr(op, ex) =>
+            UnaryOpExpr(op, box ref ex) =>
                 self.compile_unary_op(op, ex),
-            BinOpExpr(op, left, right) =>
+            BinOpExpr(op, box ref left, box ref right) =>
                 self.compile_bin_op(op, left, right),
             ConstExpr(ref c) =>
                 self.compile_const(c),
@@ -21,37 +21,37 @@ pub trait Compiler<'a, Compiled> {
                 self.compile_local(l),
             BlockExpr(vals) =>
                 self.compile_block(vals),
-            GetConstFieldExpr(obj, field) =>
+            GetConstFieldExpr(box ref obj, field) =>
                 self.compile_get_const_field(obj, field),
-            GetFieldExpr(obj, field) =>
+            GetFieldExpr(box ref obj, box ref field) =>
                 self.compile_get_field(obj, field),
-            CallExpr(func, args) =>
+            CallExpr(box ref func, args) =>
                 self.compile_call(func, args),
-            WhileLoopExpr(cond, expr) =>
+            WhileLoopExpr(box ref cond, box ref expr) =>
                 self.compile_while_loop(cond, expr),
-            IfExpr(cond, if_expr, else_expr) =>
+            IfExpr(box ref cond, box ref if_expr, else_expr) =>
                 self.compile_if(cond, if_expr, else_expr),
-            SwitchExpr(value, cases, default) =>
+            SwitchExpr(box ref value, cases, default) =>
                 self.compile_switch(value, cases, default),
-            ObjectDeclExpr(fields) =>
+            ObjectDeclExpr(box ref fields) =>
                 self.compile_object_decl(fields),
             ArrayDeclExpr(values) =>
                 self.compile_array_decl(values),
-            FunctionDeclExpr(name, args, ret) =>
+            FunctionDeclExpr(name, args, box ref ret) =>
                 self.compile_function_decl(name, args, ret),
-            ArrowFunctionDeclExpr(args, ret) =>
+            ArrowFunctionDeclExpr(args, box ref ret) =>
                 self.compile_arrow_function_decl(args, ret),
-            ConstructExpr(func, args) =>
+            ConstructExpr(box ref func, args) =>
                 self.compile_construct(func, args),
             ReturnExpr(val) =>
                 self.compile_return(val),
-            ThrowExpr(val) =>
+            ThrowExpr(box ref val) =>
                 self.compile_throw(val),
-            AssignExpr(left, right) =>
+            AssignExpr(box ref left, box ref right) =>
                 self.compile_assign(left, right),
             VarDeclExpr(vars) =>
                 self.compile_var_decl(vars),
-            TypeOfExpr(expr) =>
+            TypeOfExpr(box ref expr) =>
                 self.compile_typeof(expr)
         }
     }
