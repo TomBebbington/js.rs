@@ -1,4 +1,3 @@
-#![crate_id = "github.com/TomBebbington/js.rs"]
 #![comment = "Javascript parsing and execution command line tool"]
 #![license = "MIT"]
 #![crate_type = "bin"]
@@ -41,14 +40,14 @@ pub fn main() {
         None if m.opt_present("h") => {
             println!("{}", getopts::usage("Usage: js.rs [OPTIONS] [INPUT]", opts));
         },
-        None if m.opt_present("t") || (m.free.len() >= 2 && m.free.get(1).as_slice() == "test") => {
+        None if m.opt_present("t") || (m.free.len() >= 2 && m.free[1].as_slice() == "test") => {
             Tests::new().run();
         },
-        None if m.opt_present("i") || (m.free.len() >= 2 && m.free.get(1).as_slice() == "interactive") => {
+        None if m.opt_present("i") || (m.free.len() >= 2 && m.free[1].as_slice() == "interactive") => {
             Interactive::new().run();
         },
         None if m.free.len() >= 2 => {
-            Runner::new(m.free.get(1).clone()).run();
+            Runner::new(m.free[1].clone()).run();
         },
         None => {
             println!("{}", getopts::short_usage("Usage: js.rs [OPTIONS] [INPUT]", opts));

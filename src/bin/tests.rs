@@ -36,7 +36,7 @@ pub struct Tests<'a> {
 }
 impl<'a> Tests<'a> {
     /// Create a new unit tester
-    pub fn new() -> Tests {
+    pub fn new() -> Tests<'a> {
         Tests {
             context: Context::new()
         }
@@ -47,8 +47,8 @@ impl<'a> Tests<'a> {
             if args.len() < 2 {
                 return Err(to_value("'assert' function expects assertion and description arguments"));
             }
-            let val : bool = from_value(*args.get(0)).unwrap();
-            let desc : Value = *args.get(1);
+            let val : bool = from_value(args[0]).unwrap();
+            let desc : Value = args[1];
             if val {
                 Ok(desc)
             } else {

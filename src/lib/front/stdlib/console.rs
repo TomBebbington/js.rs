@@ -13,7 +13,7 @@ pub fn error(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     let args : Vec<String> = args.iter().map(|x|from_value::<String>(*x).unwrap()).collect();
     match writeln!(&mut stderr().unwrap(), "{}: {}", strftime("%X", &now()), args.connect(" ")) {
         Ok(_) => Ok(Value::undefined()),
-        Err(io_error) => Err(to_value(io_error.to_str()))
+        Err(io_error) => Err(to_value(io_error.to_string()))
     }
 }
 /// Create a new `console` object

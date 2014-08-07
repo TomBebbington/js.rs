@@ -31,7 +31,6 @@ impl Type {
     pub fn normalise(&mut self) {
         *self = match self.clone() {
             AnyOfType(ref tys) if tys.is_empty() => UndefinedType,
-            AnyOfType(ref tys) if tys.len() == 0 => tys.get(0).clone(),
             thing => thing
         }
     }

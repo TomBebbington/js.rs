@@ -1,4 +1,4 @@
-#![crate_id = "github.com/TomBebbington/js.rs#js:0.1"]
+#![crate_name = "js"]
 #![comment = "Javascript parsing, compilation and execution using LibJIT"]
 #![license = "MIT"]
 #![crate_type = "lib"]

@@ -6,7 +6,7 @@ use std::f64;
 /// Get the absolute value of a number
 pub fn abs(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().abs()
+        from_value::<f64>(args[0]).unwrap().abs()
     } else {
         f64::NAN
     }))
@@ -14,7 +14,7 @@ pub fn abs(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the arccos of a number
 pub fn acos(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().acos()
+        from_value::<f64>(args[0]).unwrap().acos()
     } else {
         f64::NAN
     }))
@@ -22,7 +22,7 @@ pub fn acos(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the arcsine of a number
 pub fn asin(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().asin()
+        from_value::<f64>(args[0]).unwrap().asin()
     } else {
         f64::NAN
     }))
@@ -30,7 +30,7 @@ pub fn asin(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the arctangent of a number
 pub fn atan(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().atan()
+        from_value::<f64>(args[0]).unwrap().atan()
     } else {
         f64::NAN
     }))
@@ -38,7 +38,7 @@ pub fn atan(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the arctangent of a numbers
 pub fn atan2(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().atan2(args.get(1).to_num())
+        from_value::<f64>(args[0]).unwrap().atan2(args[1].to_num())
     } else {
         f64::NAN
     }))
@@ -46,7 +46,7 @@ pub fn atan2(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the cubic root of a number
 pub fn cbrt(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().cbrt()
+        from_value::<f64>(args[0]).unwrap().cbrt()
     } else {
         f64::NAN
     }))
@@ -54,7 +54,7 @@ pub fn cbrt(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get lowest integer above a number
 pub fn ceil(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().ceil()
+        from_value::<f64>(args[0]).unwrap().ceil()
     } else {
         f64::NAN
     }))
@@ -62,7 +62,7 @@ pub fn ceil(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the cosine of a number
 pub fn cos(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().cos()
+        from_value::<f64>(args[0]).unwrap().cos()
     } else {
         f64::NAN
     }))
@@ -70,7 +70,7 @@ pub fn cos(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the power to raise the natural logarithm to get the number
 pub fn exp(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().exp()
+        from_value::<f64>(args[0]).unwrap().exp()
     } else {
         f64::NAN
     }))
@@ -78,7 +78,7 @@ pub fn exp(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the highest integer below a number
 pub fn floor(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().floor()
+        from_value::<f64>(args[0]).unwrap().floor()
     } else {
         f64::NAN
     }))
@@ -86,7 +86,7 @@ pub fn floor(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the natural logarithm of a number
 pub fn log(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().log(f64::consts::E)
+        from_value::<f64>(args[0]).unwrap().log(f64::consts::E)
     } else {
         f64::NAN
     }))
@@ -112,8 +112,8 @@ pub fn min(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Raise a number to a power
 pub fn pow(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 2 {
-        let num : f64 = from_value(*args.get(0)).unwrap();
-        let power : f64 = from_value(*args.get(1)).unwrap();
+        let num : f64 = from_value(args[0]).unwrap();
+        let power : f64 = from_value(args[1]).unwrap();
         num.powf(power)
     } else {
         f64::NAN
@@ -126,7 +126,7 @@ pub fn _random(_:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Round a number to the nearest integer
 pub fn round(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().round()
+        from_value::<f64>(args[0]).unwrap().round()
     } else {
         f64::NAN
     }))
@@ -134,7 +134,7 @@ pub fn round(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the sine of a number
 pub fn sin(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().sin()
+        from_value::<f64>(args[0]).unwrap().sin()
     } else {
         f64::NAN
     }))
@@ -142,7 +142,7 @@ pub fn sin(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the square root of a number
 pub fn sqrt(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().sqrt()
+        from_value::<f64>(args[0]).unwrap().sqrt()
     } else {
         f64::NAN
     }))
@@ -150,7 +150,7 @@ pub fn sqrt(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 /// Get the tangent of a number
 pub fn tan(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
     Ok(to_value(if args.len() >= 1 {
-        from_value::<f64>(*args.get(0)).unwrap().tan()
+        from_value::<f64>(args[0]).unwrap().tan()
     } else {
         f64::NAN
     }))

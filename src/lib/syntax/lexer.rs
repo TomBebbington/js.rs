@@ -4,6 +4,50 @@ use std::io::{BufReader, BufferedReader, Buffer, IoError, IoResult, EndOfFile};
 use std::char::from_u32;
 use std::num::from_str_radix;
 use std::from_str::FromStr;
+macro_rules! vop(
+    ($this:ident, $assign_op:expr, $op:expr) => ({
+        let preview = try!($this.preview_next());
+        match preview {
+            '=' => {
+                $this.buffer.consume(1);
+                $assign_op
+            },
+            _ => $op
+        }
+    });
+    ($this:ident, $assign_op:expr, $op:expr, {$($case:pat => $block:expr),+}) => ({
+        let preview = try!($this.preview_next());
+        match preview {
+            '=' => {
+                $this.buffer.consume(1);
+                $assign_op
+            },
+            $($case => $block)+,
+            _ => $op
+        }
+    });
+    ($this:ident, $op:expr, {$($case:pat => $block:expr),+}) => ({
+        let preview = try!($this.preview_next());
+        match preview {
+            $($case => $block)+,
+            _ => $op
+        }
+    });
+)
+macro_rules! op(
+    ($this:ident, $assign_op:expr, $op:expr) => ({
+        let punc = vop!($this, $assign_op, $op);
+        $this.push_punc(punc);
+    });
+    ($this:ident, $assign_op:expr, $op:expr, {$($case:pat => $block:expr),+}) => ({
+        let punc = vop!($this, $assign_op, $op, {$($case => $block),+});
+        $this.push_punc(punc);
+    });
+    ($this:ident, $op:expr, {$($case:pat => $block:expr),+}) => ({
+        let punc = vop!($this, $op, {$($case => $block),+});
+        $this.push_punc();
+    });
+)
 /// A Javascript lexer
 pub struct Lexer<B> {
     /// The list of tokens generated so far
@@ -13,9 +57,7 @@ pub struct Lexer<B> {
     /// The current column number in the script
     column_number : uint,
     /// The reader
-    buffer: B,
-    /// The peeked character buffer
-    peek_buffer: String
+    buffer: B
 }
 impl<B:Buffer> Lexer<B> {
     /// Creates a new lexer with empty buffers
@@ -24,8 +66,7 @@ impl<B:Buffer> Lexer<B> {
             tokens: Vec::new(),
             line_number: 1,
             column_number: 0,
-            buffer: buffer,
-            peek_buffer: String::new()
+            buffer: buffer
         }
     }
     #[inline(always)]
@@ -45,36 +86,20 @@ impl<B:Buffer> Lexer<B> {
         lexer.lex().unwrap();
         lexer.tokens
     }
+    #[inline(always)]
     fn next(&mut self) -> IoResult<char> {
-        if self.peek_buffer.len() == 0 {
-            self.buffer.read_char()
-        } else {
-            Ok(match self.peek_buffer.pop_char() {
-                Some(v) => v,
-                None => unreachable!()
-            })
-        }
+        self.buffer.read_char()
     }
-    fn next_is(&mut self, peek:char) -> bool {
-        if self.peek_buffer.len() > 0 {
-            let matched = self.peek_buffer.as_slice().char_at(self.peek_buffer.len() - 1) == peek;
-            if matched {
-                self.peek_buffer.pop_char();
-            }
-            matched
-        } else {
-            match self.buffer.read_char() {
-                Ok(ch) if ch == peek => {
-                    self.column_number += 1;
-                    true
-                },
-                Ok(ch) if ch != peek => {
-                    self.peek_buffer.push_char(ch);
-                    false
-                },
-                _ => false
-            }
+    fn preview_next(&mut self) -> IoResult<char> {
+        let buf = try!(self.buffer.fill_buf());
+        Ok(buf[0] as char)
+    }
+    fn next_is(&mut self, peek:char) -> IoResult<bool> {
+        let result = try!(self.preview_next()) == peek;
+        if result {
+            self.buffer.consume(1);
         }
+        Ok(result)
     }
     /// Processes an input stream from the `buffer` into a vector of tokens
     pub fn lex(&mut self) -> IoResult<()> {
@@ -108,7 +133,7 @@ impl<B:Buffer> Lexer<B> {
                                         '0' => '\0',
                                         'x' => {
                                             let mut nums = String::with_capacity(2);
-                                            for _ in range(0u, 2u) {
+                                            for _ in range(0u8, 2) {
                                                 nums.push_char(try!(self.next()));
                                             }
                                             self.column_number += 2;
@@ -123,7 +148,7 @@ impl<B:Buffer> Lexer<B> {
                                         },
                                         'u' => {
                                             let mut nums = String::new();
-                                            for _ in range(0u, 4u) {
+                                            for _ in range(0u8, 4) {
                                                 nums.push_char(try!(self.next()));
                                             }
                                             self.column_number += 4;
@@ -147,72 +172,74 @@ impl<B:Buffer> Lexer<B> {
                     }
                     self.push_token(TStringLiteral(buf))
                 },
-                '0' if self.next_is('x') => {
+                '0' => {
                     let mut buf = String::new();
-                    loop {
-                        match try!(self.next()) {
-                            ch if ch.is_digit_radix(16) => buf.push_char(ch),
-                            ch => {
-                                self.peek_buffer.push_char(ch);
-                                break;
+                    let num = if try!(self.next_is('x')) {
+                        loop {
+                            let ch = try!(self.preview_next());
+                            match ch {
+                                ch if ch.is_digit_radix(16) => {
+                                    self.buffer.consume(1);
+                                    buf.push_char(ch)
+                                },
+                                _ => break
                             }
                         }
-                    }
-                    self.push_token(TNumericLiteral(from_str_radix(buf.as_slice(), 16).unwrap()));
-                },
-                '0' => {
-                    let mut buf = "0".into_string();
-                    let mut gone_decimal = false;
-                    loop {
-                        let ch = self.next();
-                        match ch {
-                            Ok(ch) if ch.is_digit_radix(8) =>
-                                buf.push_char(ch),
-                            Ok('8') | Ok('9') | Ok('.') => {
-                                gone_decimal = true;
-                                buf.push_char(ch.unwrap());
-                            },
-                            Ok(ch) => {
-                                self.peek_buffer.push_char(ch);
-                                break;
-                            },
-                            Err(IoError {kind: EndOfFile, ..}) =>
-                                break,
-                            Err(err) =>
-                                return Err(err)
-                        }
-                    }
-                    self.push_token(TNumericLiteral(if gone_decimal {
-                        from_str(buf.as_slice())
+                        from_str_radix(buf.as_slice(), 16).unwrap()                  
                     } else {
-                        from_str_radix(buf.as_slice(), 8)
-                    }.unwrap()));
+                        let mut gone_decimal = false;
+                        loop {
+                            let ch = try!(self.preview_next());
+                            match ch {
+                                ch if ch.is_digit_radix(8) => {
+                                    buf.push_char(ch);
+                                    self.buffer.consume(1);
+                                },
+                                '8' | '9' | '.' => {
+                                    gone_decimal = true;
+                                    buf.push_char(ch);
+                                    self.buffer.consume(1);
+                                },
+                                _ =>
+                                    break
+                            }
+                        }
+                        if gone_decimal {
+                            from_str(buf.as_slice())
+                        } else {
+                            from_str_radix(buf.as_slice(), 8)
+                        }.unwrap()
+                    };
+                    self.push_token(TNumericLiteral(num))
                 },
                 _ if ch.is_digit() => {
-                    let mut buf = String::new();
-                    buf.push_char(ch);
+                    let mut buf = ch.to_string();
                     loop {
-                        let ch = try!(self.next());
+                        let ch = try!(self.preview_next());
                         match ch {
-                            '.' => buf.push_char(ch),
-                            _ if ch.is_digit() => buf.push_char(ch),
-                            _ => {
-                                self.peek_buffer.push_char(ch);
-                                break;
-                            }
+                            '.' => {
+                                buf.push_char(ch);
+                                self.buffer.consume(1);
+                            },
+                            _ if ch.is_digit() => {
+                                buf.push_char(ch);
+                                self.buffer.consume(1);
+                            },
+                            _ => break
                         }
                     }
                     self.push_token(TNumericLiteral(from_str(buf.as_slice()).unwrap()));
                 },
                 _ if ch.is_alphabetic() || ch == '$' || ch == '_' => {
-                    let mut buf = String::new();
-                    buf.push_char(ch);
+                    let mut buf = ch.to_string();
                     loop {
-                        let ch = try!(self.next());
+                        let ch = try!(self.preview_next());
                         match ch {
-                            _ if ch.is_alphabetic() || ch.is_digit() || ch == '_' => buf.push_char(ch),
+                            _ if ch.is_alphabetic() || ch.is_digit() || ch == '_' => {
+                                buf.push_char(ch);
+                                self.buffer.consume(1);
+                            },
                             _ => {
-                                self.peek_buffer.push_char(ch);
                                 break;
                             }
                         }
@@ -238,107 +265,64 @@ impl<B:Buffer> Lexer<B> {
                 '[' => self.push_punc(POpenBracket),
                 ']' => self.push_punc(PCloseBracket),
                 '?' => self.push_punc(PQuestion),
-                '/' if self.next_is('/') => {
-                    let mut buf = String::new();
-                    loop {
-                        match try!(self.next()) {
-                            '\n' => break,
-                            ch => buf.push_char(ch)
-                        }
-                    }
-                    self.push_token(TComment(buf));
-                },
-                '/' if self.next_is('*') => {
-                    let mut buf = String::new();
-                    loop {
-                        match try!(self.next()) {
-                            '\n' => break,
-                            '*' if self.next_is('/') => break,
-                            ch => buf.push_char(ch)
-                        }
-                    }
-                    self.push_token(TComment(buf));
-                },
-                '/' if self.next_is('=') =>
-                    self.push_punc(PAssignDiv),
-                '/' => self.push_punc(PDiv),
-                '*' if self.next_is('=') =>
-                    self.push_punc(PAssignMul),
-                '*' => self.push_punc(PMul),
-                '+' if self.next_is('=') =>
-                    self.push_punc(PAssignAdd),
-                '+' if self.next_is('+') =>
-                    self.push_punc(PInc),
-                '+' => self.push_punc(PAdd),
-                '-' if self.next_is('=') =>
-                    self.push_punc(PAssignSub),
-                '-' if self.next_is('-') =>
-                    self.push_punc(PDec),
-                '-' => self.push_punc(PSub),
-                '%' if self.next_is('=') =>
-                    self.push_punc(PAssignMod),
-                '%' => self.push_punc(PMod),
-                '|' if self.next_is('|') =>
-                    self.push_punc(PBoolOr),
-                '|' if self.next_is('=') =>
-                    self.push_punc(PAssignOr),
-                '|' => self.push_punc(POr),
-                '&' if self.next_is('&') =>
-                    self.push_punc(PBoolAnd),
-                '&' if self.next_is('=') =>
-                    self.push_punc(PAssignAnd),
-                '&' => self.push_punc(PAnd),
-                '^' if self.next_is('=') =>
-                    self.push_punc(PAssignXor),
-                '^' => self.push_punc(PXor),
-                '=' if self.next_is('>') =>
-                    self.push_punc(PArrow),
-                '=' if self.next_is('=') => {
-                    let punc = if self.next_is('=') {
-                        PStrictEq
-                    } else {
-                        PEq
+                '/' => {
+                    let token = match try!(self.preview_next()) {
+                        '/' => {
+                            let comment = try!(self.buffer.read_line());
+                            TComment(comment.as_slice().slice_to(comment.len() - 1).into_string())
+                        },
+                        '*' => {
+                            let mut buf = String::new();
+                            loop {
+                                match try!(self.next()) {
+                                    '*' =>
+                                        if try!(self.next_is('/')) {
+                                            break;
+                                        } else {
+                                            buf.push_char('*');
+                                        },
+                                    ch =>
+                                        buf.push_char(ch)
+                                }
+                            }
+                            TComment(buf)
+                        },
+                        '=' => TPunctuator(PAssignDiv),
+                        _ => TPunctuator(PDiv)
                     };
-                    self.push_punc(punc)
+                    self.push_token(token)
                 },
-                '=' => self.push_punc(PAssign),
-                '<' if self.next_is('=') =>
-                    self.push_punc(PLessThanOrEq),
-                '<' if self.next_is('<') => {
-                    let punc = if self.next_is('=') {
-                        PAssignLeftSh
-                    } else {
-                        PLeftSh
-                    };
-                    self.push_punc(punc)
-                },
-                '<' => self.push_punc(PLessThan),
-                '>' if self.next_is('=') =>
-                    self.push_punc(PGreaterThanOrEq),
-                '>' if self.next_is('>') => {
-                    let punc = if self.next_is('=') {
-                        PAssignRightSh
-                    } else if self.next_is('>') {
-                        if self.next_is('=') {
-                            PAssignURightSh
-                        } else {
-                            PURightSh
-                        }
-                    } else {
-                        PRightSh
-                    };
-                    self.push_punc(punc)
-                },
-                '>' => self.push_punc(PGreaterThan),
-                '!' if self.next_is('=') => {
-                    let punc = if self.next_is('=') {
-                        PStrictNotEq
-                    } else {
-                        PNotEq
-                    };
-                    self.push_punc(punc)
-                },
-                '!' => self.push_punc(PNot),
+                '*' => op!(self, PAssignMul, PMul),
+                '+' => op!(self, PAssignAdd, PAdd, {
+                    '+' => PInc
+                }),
+                '-' => op!(self, PAssignSub, PSub, {
+                    '+' => PDec
+                }),
+                '%' => op!(self, PAssignMod, PMod),
+                '|' => op!(self, PAssignOr, POr, {
+                    '|' => PBoolOr
+                }),
+                '&' => op!(self, PAssignAnd, PAnd, {
+                    '&' => PBoolAnd
+                }),
+                '^' => op!(self, PAssignXor, PXor),
+                '=' => op!(self, if try!(self.next_is('=')) {
+                    PStrictEq
+                } else {
+                    PEq
+                }, PAssign, {
+                    '>' => PArrow
+                }),
+                '<' => op!(self, PLessThanOrEq, PLessThan, {
+                    '<' => vop!(self, PAssignLeftSh, PLeftSh)
+                }),
+                '>' => op!(self, PGreaterThanOrEq, PGreaterThan, {
+                    '>' => vop!(self, PAssignRightSh, PRightSh, {
+                        '>' => vop!(self, PAssignURightSh, PURightSh)
+                    })
+                }),
+                '!' => op!(self, vop!(self, PStrictNotEq, PNotEq), PNot),
                 '~' => self.push_punc(PNeg),
                 '\n' | '\u2028'|'\u2029' => {
                     self.line_number += 1;

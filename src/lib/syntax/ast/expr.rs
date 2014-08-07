@@ -106,11 +106,9 @@ impl Show for ExprDef {
             GetConstFieldExpr(ref ex, ref field) => write!(f, "{}.{}", ex, field),
             GetFieldExpr(ref ex, ref field) => write!(f, "{}[{}]", ex, field),
             CallExpr(ref ex, ref args) => {
-                try!(write!(f, "{}", ex));
-                try!(write!(f, "{}", "("));
-                let arg_strs:Vec<String> = args.iter().map(|arg| arg.to_str()).collect();
-                try!(write!(f, "{}", arg_strs.connect(",")));
-                write!(f, "{}", ")")
+                try!(write!(f, "{}(", ex));
+                let arg_strs:Vec<String> = args.iter().map(|arg| arg.to_string()).collect();
+                write!(f, "{})", arg_strs.connect(","))
             },
             ConstructExpr(ref func, ref args) => write!(f, "new {}({})", func, args),
             WhileLoopExpr(ref cond, ref expr) => write!(f, "while({}) {}", cond, expr),

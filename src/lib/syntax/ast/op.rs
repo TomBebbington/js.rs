@@ -175,10 +175,10 @@ impl Operator for BinOp {
 impl Show for BinOp {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{}", match *self {
-            BinNum(op) => op.to_str(),
-            BinBit(op) => op.to_str(),
-            BinComp(op) => op.to_str(),
-            BinLog(op) => op.to_str()
+            BinNum(op) => op.to_string(),
+            BinBit(op) => op.to_string(),
+            BinComp(op) => op.to_string(),
+            BinLog(op) => op.to_string()
         })
     }
 }

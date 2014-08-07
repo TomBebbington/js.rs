@@ -1,6 +1,6 @@
 [project]
 
-name = "js.rs"
+name = "js"
 version = "0.0.1"
 readme = "README.md"
 authors = ["Tom Bebbington <tophattedcoder@gmail.com>"]
@@ -14,9 +14,11 @@ path = "src/lib/lib.rs"
 
 [[bin]]
 
-name = "js.rs"
+name = "js"
 path = "src/bin/bin.rs"
 
 [dependencies.jit]
-
 git = "https://github.com/TomBebbington/jit.rs.git"
+
+[dependencies.url]
+git = "https://github.com/servo/rust-url"

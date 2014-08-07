@@ -2,7 +2,6 @@ use syntax::ast::expr::*;
 use syntax::ast::types::*;
 use syntax::ast::constant::*;
 use syntax::ast::op::*;
-use std::iter::FromIterator;
 
 /// Type an expression
 pub fn resolve_type(expr:&Expr) -> Type {
@@ -25,8 +24,8 @@ pub fn resolve_type(expr:&Expr) -> Type {
             ObjectType,
         ArrayDeclExpr(_) =>
             ObjectType,
-        BinOpExpr(BinNum(OpAdd), ref a, ref b) => {
-            match (resolve_type(*a), resolve_type(*b)) {
+        BinOpExpr(BinNum(OpAdd), box ref a, box ref b) => {
+            match (resolve_type(a), resolve_type(b)) {
                 (StringType, _) | (_, StringType) =>
                     StringType,
                 (IntegerType, IntegerType) =>
@@ -44,12 +43,12 @@ pub fn resolve_type(expr:&Expr) -> Type {
             BooleanType,
         UnaryOpExpr(UnaryNot, _) =>
             BooleanType,
-        UnaryOpExpr(UnaryPlus, ref inner) | UnaryOpExpr(UnaryMinus, ref inner) =>
-            resolve_type(*inner),
+        UnaryOpExpr(UnaryPlus, box ref inner) | UnaryOpExpr(UnaryMinus, box ref inner) =>
+            resolve_type(inner),
         UnaryOpExpr(_, _) =>
             NumberType,
         BlockExpr(ref exprs) =>
-            resolve_type(exprs.get(exprs.len() - 1)),
+            resolve_type(&exprs[exprs.len() - 1]),
         LocalExpr(_) =>
             AnyType,
         GetConstFieldExpr(_, _) =>
@@ -60,17 +59,17 @@ pub fn resolve_type(expr:&Expr) -> Type {
             AnyType,
         WhileLoopExpr(_, _) =>
             UndefinedType,
-        IfExpr(_, ref if_expr, Some(ref else_expr)) => {
-            let if_type = resolve_type(*if_expr);
-            let else_type = resolve_type(*else_expr);
+        IfExpr(_, box ref if_expr, Some(box ref else_expr)) => {
+            let if_type = resolve_type(if_expr);
+            let else_type = resolve_type(else_expr);
             if if_type == else_type {
                 if_type
             } else {
                 AnyOfType(vec!(if_type, else_type))
             }
         },
-        IfExpr(_, ref if_expr, None) => {
-            let if_type = resolve_type(*if_expr);
+        IfExpr(_, box ref if_expr, None) => {
+            let if_type = resolve_type(if_expr);
             let else_type = UndefinedType;
             if if_type == else_type {
                 if_type
@@ -79,11 +78,11 @@ pub fn resolve_type(expr:&Expr) -> Type {
             }
         },
         SwitchExpr(_, ref matches, None) => {
-            AnyOfType(FromIterator::from_iter(matches.iter().map(|&(_, ref block)| resolve_type(block.get(block.len() - 1)))))
+            AnyOfType(matches.iter().map(|&(_, ref block)| resolve_type(&block[block.len() - 1])).collect())
         },
-        SwitchExpr(_, ref matches, Some(ref def)) => {
-            let mut types : Vec<Type> = FromIterator::from_iter(matches.iter().map(|&(_, ref block)| resolve_type(block.get(block.len() - 1))));
-            types.push(resolve_type(*def));
+        SwitchExpr(_, ref matches, Some(box ref def)) => {
+            let mut types : Vec<Type> = matches.iter().map(|&(_, ref block)| resolve_type(&block[block.len() - 1])).collect();
+            types.push(resolve_type(def));
             AnyOfType(types)
         },
         FunctionDeclExpr(_, _, _) | ArrowFunctionDeclExpr(_, _) =>
@@ -94,8 +93,8 @@ pub fn resolve_type(expr:&Expr) -> Type {
             UndefinedType,
         ThrowExpr(_) =>
             UndefinedType,
-        AssignExpr(_, ref what) =>
-            resolve_type(*what),
+        AssignExpr(_, box ref what) =>
+            resolve_type(what),
         VarDeclExpr(_) =>
             UndefinedType,
         TypeOfExpr(_) =>

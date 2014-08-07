@@ -372,7 +372,7 @@ impl Parser {
     }
     fn get_token(&self, pos:uint) -> Result<Token, ParseError> {
         if pos < self.tokens.len() {
-            Ok(self.tokens.get(pos).clone())
+            Ok(self.tokens[pos].clone())
         } else {
             Err(AbruptEnd)
         }

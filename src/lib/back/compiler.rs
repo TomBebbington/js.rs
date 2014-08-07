@@ -24,7 +24,7 @@ pub struct JitCompiler<'a> {
 impl<'a> JitCompiler<'a> {
     /// Construct a new JIT Compiler on the given context
     pub fn new(context: &'a Context) -> JitCompiler<'a> {
-        let main_t = get_type::<fn(*const int, *const int, *const int) -> *const int>();
+        let main_t = get_type::<fn(*mut int, *mut int, *mut int) -> *mut int>();
         JitCompiler {
             curr: Function::new(context, main_t)
         }
@@ -33,21 +33,23 @@ impl<'a> JitCompiler<'a> {
         let bool_t = get_type::<bool>();
         let val_kind = val.get_type().get_kind();
         let convert = |v| self.curr.insn_convert(&v, bool_t.clone(), false);
-        if val_kind.contains(SysBool) {
-            val
-        } else if val_kind.contains(Float64) {
-            let zero = 0.0f64.compile(&self.curr);
-            let not_zero = self.curr.insn_neq(&val, &zero);
-            let not_nan = !self.curr.insn_is_nan(&val);
-            convert(not_zero & not_nan)
-        } else if val_kind.contains(Int) || val_kind.contains(UInt) || val_kind.contains(NInt) || val_kind.contains(NUInt) {
-            let zero = 0i.compile(&self.curr); 
-            convert(self.curr.insn_neq(&val, &zero))
-        } else if val_kind.contains(Pointer) {
-            let one = 1i.compile(&self.curr);
-            convert(self.curr.insn_gt(&val, &one))
-        } else {
-            convert(val)
+        match val_kind {
+            SysBool => val,
+            Float64 => {
+                let zero = 0.0f64.compile(&self.curr);
+                let not_zero = self.curr.insn_neq(&val, &zero);
+                let not_nan = !self.curr.insn_is_nan(&val);
+                convert(not_zero & not_nan)
+            },
+            Int | UInt | NInt | NUInt => {
+                let zero = 0i.compile(&self.curr); 
+                convert(self.curr.insn_neq(&val, &zero))
+            },
+            Pointer => {
+                let one = 1i.compile(&self.curr);
+                convert(self.curr.insn_gt(&val, &one))
+            },
+            _ => convert(val)
         }
     }
     fn undefined(&'a self) -> Value<'a> {
@@ -159,7 +161,7 @@ impl<'a> Compiler<'a, (Value<'a>, &'a Function<'a>)> for JitCompiler<'a> {
     }
     fn compile_return(&'a self, val:Option<Box<Expr>>) -> CompiledValue<'a> {
         match val {
-            Some(val) => {
+            Some(box ref val) => {
                 let (c_val, _) = self.compile(val);
                 self.curr.insn_return(&c_val)
             },

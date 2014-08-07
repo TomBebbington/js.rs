@@ -66,34 +66,34 @@ pub fn make_object(_:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
 }
 /// Get the prototype of an object
 pub fn get_proto_of(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
-    let obj = args.get(0);
+    let obj = args[0];
     Ok(obj.get_field(INSTANCE_PROTOTYPE))
 }
 /// Set the prototype of an object
 pub fn set_proto_of(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
-    let obj = *args.get(0);
-    let proto = *args.get(1);
+    let obj = args[0];
+    let proto = args[1];
     obj.set_field(INSTANCE_PROTOTYPE, proto);
     Ok(obj)
 }
 /// Define a property in an object
 pub fn define_prop(args:Vec<Value>, _:Value, _:Value, _:Value) -> ResultValue {
-    let obj = args.get(0);
-    let prop = from_value::<String>(*args.get(1)).unwrap();
-    let desc = from_value::<Property>(*args.get(2)).unwrap();
+    let obj = args[0];
+    let prop = from_value::<String>(args[1]).unwrap();
+    let desc = from_value::<Property>(args[2]).unwrap();
     obj.set_prop(prop.as_slice(), desc);
     Ok(Value::undefined())
 }
 /// To string
 pub fn to_string(_:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
-    Ok(to_value(this.to_str().into_string()))
+    Ok(to_value(this.to_string()))
 }
 /// Check if it has a property
 pub fn has_own_prop(args:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
     let prop = if args.len() == 0 {
         None
     } else {
-        from_value::<String>(*args.get(0)).ok()
+        from_value::<String>(args[0]).ok()
     };
     Ok(to_value(prop.is_some() && this.get_prop(prop.unwrap().as_slice()).is_some()))
 }

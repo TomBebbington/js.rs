@@ -18,7 +18,7 @@ pub struct Interactive<'a> {
 }
 impl<'a> Interactive<'a> {
     /// Create a new interactive mode info
-    pub fn new() -> Interactive {
+    pub fn new() -> Interactive<'a> {
         Interactive {
             context: Context::new(),
             executor: Executor::new(&Default::default()),

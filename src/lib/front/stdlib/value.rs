@@ -218,7 +218,7 @@ impl Value {
                 let mut i = 0u;
                 let mut data : ObjectData = FromIterator::from_iter(vs.iter().map(|json| {
                     i += 1u;
-                    ((i - 1).to_str().into_string(), Property::new(to_value(json.clone())))
+                    ((i - 1).to_string(), Property::new(to_value(json.clone())))
                 }));
                 data.insert("length".into_string(), Property::new(to_value(vs.len() as i32)));
                 VObject(RefCell::new(data))
@@ -288,7 +288,7 @@ impl PartialEq for Value {
     fn eq(&self, other:&Value) -> bool {
         match ((**self).clone(), (*other.ptr).clone()) {
             _ if self.is_null_or_undefined() && other.is_null_or_undefined() => true,
-            (VString(_), _) | (_, VString(_)) => self.to_str() == other.to_str(),
+            (VString(_), _) | (_, VString(_)) => self.to_string() == other.to_string(),
             (VBoolean(a), VBoolean(b)) if a == b => true,
             (VNumber(a), VNumber(b)) if a == b && !a.is_nan() && !b.is_nan() => true,
             (VNumber(a), _) if a == other.to_num() => true,
@@ -322,11 +322,7 @@ impl ToJson for Value {
 impl Add<Value, Value> for Value {
     fn add(&self, other:&Value) -> Value {
         if self.is_string() || other.is_string() {
-            let self_str = self.to_str();
-            let other_str = other.to_str();
-            let mut text = String::with_capacity(self_str.len() + other_str.len());
-            text.push_str(self_str.as_slice());
-            text.push_str(other_str.as_slice());
+            let text = self.to_string().append(other.to_string().as_slice());
             to_value(text)
         } else {
             to_value(self.to_num() + other.to_num())
@@ -423,7 +419,7 @@ impl ToValue for String {
 }
 impl FromValue for String {
     fn from_value(v:Value) -> Result<String, &'static str> {
-        Ok(v.to_str())
+        Ok(v.to_string())
     }
 }
 impl<'s> ToValue for &'s str {
@@ -446,7 +442,7 @@ impl ToValue for char {
 }
 impl FromValue for char {
     fn from_value(v:Value) -> Result<char, &'static str> {
-        Ok(v.to_str().as_slice().char_at(0))
+        Ok(v.to_string().as_slice().char_at(0))
     }
 }
 impl ToValue for f64 {
@@ -481,18 +477,16 @@ impl FromValue for bool {
 }
 impl<'s, T:ToValue> ToValue for &'s [T] {
     fn to_value(&self) -> Value {
-        let arr:ObjectData = self.iter().enumerate().map(|(i, elem)| {
-           (i.to_str(), Property::new(elem.to_value()))
-        }).collect();
-        to_value(arr)
+        to_value::<ObjectData>(self.iter().enumerate().map(|(i, elem)| {
+           (i.to_string(), Property::new(elem.to_value()))
+        }).collect())
     }
 }
 impl<T:ToValue> ToValue for Vec<T> {
     fn to_value(&self) -> Value {
-        let arr:ObjectData = self.iter().enumerate().map(|(i, elem)| {
-           (i.to_str(), Property::new(elem.to_value()))
-        }).collect();
-        to_value(arr)
+        to_value::<ObjectData>(self.iter().enumerate().map(|(i, elem)| {
+           (i.to_string(), Property::new(elem.to_value()))
+        }).collect())
     }
 }
 impl<T:FromValue> FromValue for Vec<T> {
@@ -500,7 +494,7 @@ impl<T:FromValue> FromValue for Vec<T> {
         let len = v.get_field("length").to_int();
         let mut vec = Vec::with_capacity(len as uint);
         for i in range(0, len) {
-            vec.push(try!(from_value(v.get_field(i.to_str().as_slice()))))
+            vec.push(try!(from_value(v.get_field(i.to_string().as_slice()))))
         }
         Ok(vec)
     }

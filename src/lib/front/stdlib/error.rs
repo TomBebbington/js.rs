@@ -5,7 +5,7 @@ use front::stdlib::function::Function;
 /// Create a new error
 pub fn make_error(args:Vec<Value>, _:Value, _:Value, this:Value) -> ResultValue {
     if args.len() >= 1 {
-        this.set_field("message", to_value(args.get(0).to_str().into_string()));
+        this.set_field("message", args[0]);
     }
     Ok(Value::undefined())
 }

@@ -11,48 +11,48 @@ pub trait Compiler<'a, Compiled> {
     fn compile(&'a self, expr:&Expr) -> Compiled {
         debug!("Compiling {}", expr);
         match expr.def.clone() {
-            UnaryOpExpr(op, box ref ex) =>
-                self.compile_unary_op(op, ex),
-            BinOpExpr(op, box ref left, box ref right) =>
-                self.compile_bin_op(op, left, right),
+            UnaryOpExpr(op, box ex) =>
+                self.compile_unary_op(op, &ex),
+            BinOpExpr(op, box left, box right) =>
+                self.compile_bin_op(op, &left, &right),
             ConstExpr(ref c) =>
                 self.compile_const(c),
             LocalExpr(l) =>
                 self.compile_local(l),
             BlockExpr(vals) =>
                 self.compile_block(vals),
-            GetConstFieldExpr(box ref obj, field) =>
-                self.compile_get_const_field(obj, field),
-            GetFieldExpr(box ref obj, box ref field) =>
-                self.compile_get_field(obj, field),
-            CallExpr(box ref func, args) =>
-                self.compile_call(func, args),
-            WhileLoopExpr(box ref cond, box ref expr) =>
-                self.compile_while_loop(cond, expr),
-            IfExpr(box ref cond, box ref if_expr, else_expr) =>
-                self.compile_if(cond, if_expr, else_expr),
-            SwitchExpr(box ref value, cases, default) =>
-                self.compile_switch(value, cases, default),
-            ObjectDeclExpr(box ref fields) =>
-                self.compile_object_decl(fields),
+            GetConstFieldExpr(box obj, field) =>
+                self.compile_get_const_field(&obj, field),
+            GetFieldExpr(box obj, box field) =>
+                self.compile_get_field(&obj, &field),
+            CallExpr(box func, args) =>
+                self.compile_call(&func, args),
+            WhileLoopExpr(box cond, box expr) =>
+                self.compile_while_loop(&cond, &expr),
+            IfExpr(box cond, box if_expr, else_expr) =>
+                self.compile_if(&cond, &if_expr, else_expr),
+            SwitchExpr(box value, cases, default) =>
+                self.compile_switch(&value, cases, default),
+            ObjectDeclExpr(box fields) =>
+                self.compile_object_decl(&fields),
             ArrayDeclExpr(values) =>
                 self.compile_array_decl(values),
-            FunctionDeclExpr(name, args, box ref ret) =>
-                self.compile_function_decl(name, args, ret),
-            ArrowFunctionDeclExpr(args, box ref ret) =>
-                self.compile_arrow_function_decl(args, ret),
-            ConstructExpr(box ref func, args) =>
-                self.compile_construct(func, args),
+            FunctionDeclExpr(name, args, box ret) =>
+                self.compile_function_decl(name, args, &ret),
+            ArrowFunctionDeclExpr(args, box ret) =>
+                self.compile_arrow_function_decl(args, &ret),
+            ConstructExpr(box func, args) =>
+                self.compile_construct(&func, args),
             ReturnExpr(val) =>
                 self.compile_return(val),
-            ThrowExpr(box ref val) =>
-                self.compile_throw(val),
-            AssignExpr(box ref left, box ref right) =>
-                self.compile_assign(left, right),
+            ThrowExpr(box val) =>
+                self.compile_throw(&val),
+            AssignExpr(box left, box right) =>
+                self.compile_assign(&left, &right),
             VarDeclExpr(vars) =>
                 self.compile_var_decl(vars),
-            TypeOfExpr(box ref expr) =>
-                self.compile_typeof(expr)
+            TypeOfExpr(box expr) =>
+                self.compile_typeof(&expr)
         }
     }
     /// Compile a unary operation
