@@ -4,11 +4,10 @@ name = "js"
 version = "0.0.1"
 authors = ["Tom Bebbington <tophattedcoder@gmail.com>"]
 
-[[lib]]
+[lib]
 
 name = "js"
 path = "src/lib/lib.rs"
-
 
 [[bin]]
 
